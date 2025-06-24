@@ -765,6 +765,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...formData,
       userId: user.id,
       tireSize: formData.tireSizeRequired,
+      submittedAt: new Date().toISOString(),
     };
 
     const formDataToSend = new FormData();

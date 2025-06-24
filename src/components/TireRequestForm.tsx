@@ -83,7 +83,7 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
   const getSuggestionValue = (suggestion: Vehicle) => suggestion.vehicleNumber;
 
   const renderSuggestion = (suggestion: Vehicle) => (
-    <div className="p-2 hover:bg-gray-100 cursor-pointer">
+    <div className="p-2 cursor-pointer hover:bg-gray-100">
       {suggestion.vehicleNumber} - {suggestion.make} {suggestion.model}
     </div>
   );
@@ -109,7 +109,7 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">Vehicle Information</h3>
+      <h3 className="mb-4 text-xl font-semibold">Vehicle Information</h3>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -213,7 +213,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
   errors,
 }) => (
   <div className="space-y-4">
-    <h3 className="text-xl font-semibold mb-4">Tire Details</h3>
+    <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
     <div className="grid gap-4 md:grid-cols-2">
       <div>
         <label
@@ -352,7 +352,7 @@ const RequestInformationStep: React.FC<StepProps> = ({
   errors,
 }) => (
   <div className="space-y-4">
-    <h3 className="text-xl font-semibold mb-4">Request Information</h3>
+    <h3 className="mb-4 text-xl font-semibold">Request Information</h3>
     <div className="grid gap-4">
       <div>
         <label
@@ -426,7 +426,7 @@ const RequesterDetailsStep: React.FC<StepProps> = ({
   errors,
 }) => (
   <div className="space-y-4">
-    <h3 className="text-xl font-semibold mb-4">Requester Details</h3>
+    <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
     <div className="grid gap-4 md:grid-cols-3">
       <div>
         <label
@@ -506,7 +506,7 @@ const AdditionalInformationStep: React.FC<StepProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">Additional Information</h3>
+      <h3 className="mb-4 text-xl font-semibold">Additional Information</h3>
       <div className="space-y-4">
         <div>
           <label
@@ -540,12 +540,12 @@ const AdditionalInformationStep: React.FC<StepProps> = ({
               </div>
             ))}
           </div>
-          <p className="mt-1 text-sm text-gray-500 mb-4">
+          <p className="mt-1 mb-4 text-sm text-gray-500">
             Upload images of tire wear, damage, or other relevant details
           </p>
 
           {/* Image Preview Grid */}
-          <div className="grid gap-4 md:grid-cols-4 mt-4">
+          <div className="grid gap-4 mt-4 md:grid-cols-4">
             {formData.images.map(
               (file, index) =>
                 file && (
@@ -553,16 +553,16 @@ const AdditionalInformationStep: React.FC<StepProps> = ({
                     <img
                       src={URL.createObjectURL(file)}
                       alt={`Uploaded preview ${index + 1}`}
-                      className="w-full h-40 object-cover rounded border border-gray-300"
+                      className="object-cover w-full h-40 border border-gray-300 rounded"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute p-1 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
+                        className="w-4 h-4"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -600,7 +600,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const fetchRequests = async () => {
       try {
         const response = await fetch(
-          "https://tyremanagement-backend-production.up.railway.app/requests/user/" +
+          "https://tyremanagement-backend-production.up.railway.app/api/requests/user/" +
             user?.id
         );
         if (response.ok) {
@@ -780,7 +780,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     try {
       const response = await fetch(
-        "https://tyremanagement-backend-production.up.railway.app/requests",
+        "https://tyremanagement-backend-production.up.railway.app/api/requests",
         {
           method: "POST",
           body: formDataToSend,
@@ -830,10 +830,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   }
 
   return (
-    <div className="relative p-6 bg-white rounded-lg shadow-md space-y-8">
+    <div className="relative p-6 space-y-8 bg-white rounded-lg shadow-md">
       <div className="mb-8">
         <div className="relative">
-          <div className="absolute left-0 top-1/2 w-full h-1 bg-gray-200 -translate-y-1/2"></div>
+          <div className="absolute left-0 w-full h-1 -translate-y-1/2 bg-gray-200 top-1/2"></div>
           <div className="relative flex justify-between">
             {[1, 2, 3, 4, 5].map((step) => (
               <div
@@ -850,7 +850,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
             ))}
           </div>
         </div>
-        <div className="mt-4 flex justify-between text-sm">
+        <div className="flex justify-between mt-4 text-sm">
           <span>Vehicle Info</span>
           <span>Tire Details</span>
           <span>Request Info</span>
@@ -957,7 +957,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         </div>
       </form>
 
-      <div className="mt-12 border-t pt-8">
+      <div className="pt-8 mt-12 border-t">
         <RequestTable
           requests={requests}
           title="Your Tire Requests"

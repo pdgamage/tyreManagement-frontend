@@ -1,0 +1,114 @@
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+.hover-lift {
+  transition: transform 0.2s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+.card-transition {
+  transition: all 0.3s ease-out;
+}
+.card-transition:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+.scale-transition {
+  transition: transform 0.2s ease-out;
+}
+.scale-transition:hover {
+  transform: scale(1.02);
+}
+.button-pop {
+  transition: all 0.2s ease-out;
+}
+.button-pop:active {
+  transform: scale(0.95);
+}
+.rotate-hover {
+  transition: transform 0.3s ease-out;
+}
+.rotate-hover:hover {
+  transform: rotate(15deg);
+}
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}

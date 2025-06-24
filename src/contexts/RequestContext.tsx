@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "tyremanagement-backend-production.up.railway.app";
+  "https://tyremanagement-backend-production.up.railway.app";
 
 import type { Request as RequestType } from "../types/request";
 

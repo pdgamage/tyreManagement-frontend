@@ -600,7 +600,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const fetchRequests = async () => {
       try {
         const response = await fetch(
-          "tyremanagement-backend-production.up.railway.app/requests/user/" +
+          "https://tyremanagement-backend-production.up.railway.app/requests/user/" +
             user?.id
         );
         if (response.ok) {
@@ -780,7 +780,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     try {
       const response = await fetch(
-        "tyremanagement-backend-production.up.railway.app/requests",
+        "https://tyremanagement-backend-production.up.railway.app/requests",
         {
           method: "POST",
           body: formDataToSend,

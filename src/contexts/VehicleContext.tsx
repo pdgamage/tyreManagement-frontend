@@ -26,7 +26,7 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
-    "tyremanagement-backend-production.up.railway.app";
+    "https://tyremanagement-backend-production.up.railway.app";
 
   const fetchVehicles = async () => {
     try {

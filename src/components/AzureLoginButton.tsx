@@ -16,7 +16,7 @@ const AzureLoginButton = () => {
       const idToken = loginResponse.idToken;
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/azure-protected`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
         {
           method: "GET",
           headers: {

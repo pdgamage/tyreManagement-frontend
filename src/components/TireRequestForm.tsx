@@ -39,8 +39,15 @@ interface TireFormData {
 
 interface StepProps {
   formData: TireFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+  handleChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
+  handleFileChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => void;
   errors: Record<string, string>;
 }
 
@@ -49,20 +56,18 @@ interface VehicleInformationStepProps extends StepProps {
   onVehicleSelect: (vehicle: Vehicle) => void;
 }
 
-
-
-const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({ 
-  formData, 
-  handleChange, 
+const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
+  formData,
+  handleChange,
   errors,
   vehicles,
-  onVehicleSelect
+  onVehicleSelect,
 }) => {
   const [suggestions, setSuggestions] = useState<Vehicle[]>([]);
 
   const getSuggestions = (value: string) => {
     const inputValue = value.trim().toLowerCase();
-    return vehicles.filter(vehicle => 
+    return vehicles.filter((vehicle) =>
       vehicle.vehicleNumber.toLowerCase().includes(inputValue)
     );
   };
@@ -84,17 +89,21 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
   );
 
   const inputProps = {
-    placeholder: 'Type vehicle number',
+    placeholder: "Type vehicle number",
     value: formData.vehicleNumber,
     onChange: (_: React.FormEvent<any>, { newValue }: { newValue: string }) => {
       handleChange({
-        target: { name: 'vehicleNumber', value: newValue }
+        target: { name: "vehicleNumber", value: newValue },
       } as React.ChangeEvent<HTMLInputElement>);
     },
-    className: "w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    className:
+      "w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500",
   };
 
-  const onSuggestionSelected = (_: any, { suggestion }: { suggestion: Vehicle }) => {
+  const onSuggestionSelected = (
+    _: any,
+    { suggestion }: { suggestion: Vehicle }
+  ) => {
     onVehicleSelect(suggestion);
   };
 
@@ -103,7 +112,10 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
       <h3 className="text-xl font-semibold mb-4">Vehicle Information</h3>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="vehicleNumber" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="vehicleNumber"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Vehicle Number *
           </label>
           <div className="relative">
@@ -116,19 +128,25 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
               inputProps={inputProps}
               onSuggestionSelected={onSuggestionSelected}
               theme={{
-                container: 'relative',
-                input: 'w-full p-3 border border-gray-300 rounded',
-                suggestionsContainer: 'absolute z-10 w-full bg-white shadow-lg rounded mt-1',
-                suggestionsList: 'list-none p-0 m-0 max-h-60 overflow-auto',
-                suggestion: 'cursor-pointer',
-                suggestionHighlighted: 'bg-gray-100'
+                container: "relative",
+                input: "w-full p-3 border border-gray-300 rounded",
+                suggestionsContainer:
+                  "absolute z-10 w-full bg-white shadow-lg rounded mt-1",
+                suggestionsList: "list-none p-0 m-0 max-h-60 overflow-auto",
+                suggestion: "cursor-pointer",
+                suggestionHighlighted: "bg-gray-100",
               }}
             />
           </div>
-          {errors.vehicleNumber && <p className="mt-1 text-sm text-red-600">{errors.vehicleNumber}</p>}
+          {errors.vehicleNumber && (
+            <p className="mt-1 text-sm text-red-600">{errors.vehicleNumber}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="vehicleBrand" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="vehicleBrand"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Vehicle Brand *
           </label>
           <input
@@ -140,10 +158,15 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
             required
             readOnly
           />
-          {errors.vehicleBrand && <p className="mt-1 text-sm text-red-600">{errors.vehicleBrand}</p>}
+          {errors.vehicleBrand && (
+            <p className="mt-1 text-sm text-red-600">{errors.vehicleBrand}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="vehicleModel" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="vehicleModel"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Vehicle Model *
           </label>
           <input
@@ -155,10 +178,15 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
             required
             readOnly
           />
-          {errors.vehicleModel && <p className="mt-1 text-sm text-red-600">{errors.vehicleModel}</p>}
+          {errors.vehicleModel && (
+            <p className="mt-1 text-sm text-red-600">{errors.vehicleModel}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="year" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="year"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Year *
           </label>
           <input
@@ -170,19 +198,28 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
             required
             readOnly
           />
-          {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
+          {errors.year && (
+            <p className="mt-1 text-sm text-red-600">{errors.year}</p>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }) => (
+const TireDetailsStep: React.FC<StepProps> = ({
+  formData,
+  handleChange,
+  errors,
+}) => (
   <div className="space-y-4">
     <h3 className="text-xl font-semibold mb-4">Tire Details</h3>
     <div className="grid gap-4 md:grid-cols-2">
       <div>
-        <label htmlFor="tireSizeRequired" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="tireSizeRequired"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Tire Size Required *
         </label>
         <input
@@ -194,10 +231,15 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.tireSizeRequired && <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>}
+        {errors.tireSizeRequired && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
+        )}
       </div>
       <div>
-        <label htmlFor="quantity" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="quantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Quantity *
         </label>
         <input
@@ -210,10 +252,15 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
+        {errors.quantity && (
+          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+        )}
       </div>
       <div>
-        <label htmlFor="tubesQuantity" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="tubesQuantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Tubes Quantity
         </label>
         <input
@@ -227,7 +274,10 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
         />
       </div>
       <div>
-        <label htmlFor="existingTireMake" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="existingTireMake"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Existing Tire Make *
         </label>
         <input
@@ -239,10 +289,15 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.existingTireMake && <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>}
+        {errors.existingTireMake && (
+          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
+        )}
       </div>
       <div>
-        <label htmlFor="lastReplacementDate" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="lastReplacementDate"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Last Replacement Date *
         </label>
         <input
@@ -254,10 +309,17 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.lastReplacementDate && <p className="mt-1 text-sm text-red-600">{errors.lastReplacementDate}</p>}
+        {errors.lastReplacementDate && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.lastReplacementDate}
+          </p>
+        )}
       </div>
       <div>
-        <label htmlFor="tireWearPattern" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="tireWearPattern"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Tire Wear Pattern *
         </label>
         <select
@@ -276,18 +338,27 @@ const TireDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }
           <option value="Patches">Patches</option>
           <option value="Other">Other</option>
         </select>
-        {errors.tireWearPattern && <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>}
+        {errors.tireWearPattern && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
+        )}
       </div>
     </div>
   </div>
 );
 
-const RequestInformationStep: React.FC<StepProps> = ({ formData, handleChange, errors }) => (
+const RequestInformationStep: React.FC<StepProps> = ({
+  formData,
+  handleChange,
+  errors,
+}) => (
   <div className="space-y-4">
     <h3 className="text-xl font-semibold mb-4">Request Information</h3>
     <div className="grid gap-4">
       <div>
-        <label htmlFor="requestReason" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="requestReason"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Request Reason *
         </label>
         <textarea
@@ -299,11 +370,16 @@ const RequestInformationStep: React.FC<StepProps> = ({ formData, handleChange, e
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.requestReason && <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>}
+        {errors.requestReason && (
+          <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
+        )}
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="userSection" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="userSection"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Department/Section *
           </label>
           <input
@@ -315,10 +391,15 @@ const RequestInformationStep: React.FC<StepProps> = ({ formData, handleChange, e
             className="w-full p-3 border border-gray-300 rounded"
             required
           />
-          {errors.userSection && <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>}
+          {errors.userSection && (
+            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
+          )}
         </div>
         <div>
-          <label htmlFor="costCenter" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="costCenter"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Cost Center *
           </label>
           <input
@@ -330,19 +411,28 @@ const RequestInformationStep: React.FC<StepProps> = ({ formData, handleChange, e
             className="w-full p-3 border border-gray-300 rounded"
             required
           />
-          {errors.costCenter && <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>}
+          {errors.costCenter && (
+            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
+          )}
         </div>
       </div>
     </div>
   </div>
 );
 
-const RequesterDetailsStep: React.FC<StepProps> = ({ formData, handleChange, errors }) => (
+const RequesterDetailsStep: React.FC<StepProps> = ({
+  formData,
+  handleChange,
+  errors,
+}) => (
   <div className="space-y-4">
     <h3 className="text-xl font-semibold mb-4">Requester Details</h3>
     <div className="grid gap-4 md:grid-cols-3">
       <div>
-        <label htmlFor="requesterName" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="requesterName"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Name *
         </label>
         <input
@@ -354,10 +444,15 @@ const RequesterDetailsStep: React.FC<StepProps> = ({ formData, handleChange, err
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.requesterName && <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>}
+        {errors.requesterName && (
+          <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
+        )}
       </div>
       <div>
-        <label htmlFor="requesterEmail" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="requesterEmail"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Email *
         </label>
         <input
@@ -369,10 +464,15 @@ const RequesterDetailsStep: React.FC<StepProps> = ({ formData, handleChange, err
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.requesterEmail && <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>}
+        {errors.requesterEmail && (
+          <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
+        )}
       </div>
       <div>
-        <label htmlFor="requesterPhone" className="block mb-1 font-medium text-gray-700">
+        <label
+          htmlFor="requesterPhone"
+          className="block mb-1 font-medium text-gray-700"
+        >
           Phone *
         </label>
         <input
@@ -384,15 +484,23 @@ const RequesterDetailsStep: React.FC<StepProps> = ({ formData, handleChange, err
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.requesterPhone && <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>}
+        {errors.requesterPhone && (
+          <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
+        )}
       </div>
     </div>
   </div>
 );
 
-const AdditionalInformationStep: React.FC<StepProps> = ({ formData, handleChange, handleFileChange }) => {
+const AdditionalInformationStep: React.FC<StepProps> = ({
+  formData,
+  handleChange,
+  handleFileChange,
+}) => {
   const removeImage = (index: number) => {
-    const e = { target: { files: null } } as unknown as React.ChangeEvent<HTMLInputElement>;
+    const e = {
+      target: { files: null },
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     handleFileChange(e, index);
   };
 
@@ -401,7 +509,10 @@ const AdditionalInformationStep: React.FC<StepProps> = ({ formData, handleChange
       <h3 className="text-xl font-semibold mb-4">Additional Information</h3>
       <div className="space-y-4">
         <div>
-          <label htmlFor="comments" className="block mb-1 font-medium text-gray-700">
+          <label
+            htmlFor="comments"
+            className="block mb-1 font-medium text-gray-700"
+          >
             Comments
           </label>
           <textarea
@@ -432,29 +543,39 @@ const AdditionalInformationStep: React.FC<StepProps> = ({ formData, handleChange
           <p className="mt-1 text-sm text-gray-500 mb-4">
             Upload images of tire wear, damage, or other relevant details
           </p>
-          
+
           {/* Image Preview Grid */}
           <div className="grid gap-4 md:grid-cols-4 mt-4">
-            {formData.images.map((file, index) => (
-              file && (
-                <div key={`preview-${index}`} className="relative group">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt={`Uploaded preview ${index + 1}`}
-                    className="w-full h-40 object-cover rounded border border-gray-300"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              )
-            ))}
+            {formData.images.map(
+              (file, index) =>
+                file && (
+                  <div key={`preview-${index}`} className="relative group">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Uploaded preview ${index + 1}`}
+                      className="w-full h-40 object-cover rounded border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )
+            )}
           </div>
         </div>
       </div>
@@ -478,7 +599,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   React.useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/requests/user/" + user?.id);
+        const response = await fetch(
+          "tyremanagement-backend-production.up.railway.app/requests/user/" +
+            user?.id
+        );
         if (response.ok) {
           const data = await response.json();
           setRequests(data);
@@ -525,7 +649,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -549,14 +675,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   };
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
       year: vehicle.year ? vehicle.year.toString() : "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
-      tireSizeRequired: vehicle.tireSize || ""
+      tireSizeRequired: vehicle.tireSize || "",
     }));
   };
 
@@ -565,27 +691,41 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     switch (step) {
       case 1:
-        if (!formData.vehicleNumber) newErrors.vehicleNumber = 'Vehicle number is required';
-        if (!formData.vehicleBrand) newErrors.vehicleBrand = 'Vehicle brand is required';
-        if (!formData.vehicleModel) newErrors.vehicleModel = 'Vehicle model is required';
-        if (!formData.year) newErrors.year = 'Year is required';
+        if (!formData.vehicleNumber)
+          newErrors.vehicleNumber = "Vehicle number is required";
+        if (!formData.vehicleBrand)
+          newErrors.vehicleBrand = "Vehicle brand is required";
+        if (!formData.vehicleModel)
+          newErrors.vehicleModel = "Vehicle model is required";
+        if (!formData.year) newErrors.year = "Year is required";
         break;
       case 2:
-        if (!formData.tireSizeRequired) newErrors.tireSizeRequired = 'Tire size is required';
-        if (!formData.quantity || formData.quantity < 1) newErrors.quantity = 'Valid quantity is required';
-        if (!formData.existingTireMake) newErrors.existingTireMake = 'Existing tire make is required';
-        if (!formData.lastReplacementDate) newErrors.lastReplacementDate = 'Last replacement date is required';
-        if (!formData.tireWearPattern) newErrors.tireWearPattern = 'Tire wear pattern is required';
+        if (!formData.tireSizeRequired)
+          newErrors.tireSizeRequired = "Tire size is required";
+        if (!formData.quantity || formData.quantity < 1)
+          newErrors.quantity = "Valid quantity is required";
+        if (!formData.existingTireMake)
+          newErrors.existingTireMake = "Existing tire make is required";
+        if (!formData.lastReplacementDate)
+          newErrors.lastReplacementDate = "Last replacement date is required";
+        if (!formData.tireWearPattern)
+          newErrors.tireWearPattern = "Tire wear pattern is required";
         break;
       case 3:
-        if (!formData.requestReason) newErrors.requestReason = 'Request reason is required';
-        if (!formData.userSection) newErrors.userSection = 'Department/Section is required';
-        if (!formData.costCenter) newErrors.costCenter = 'Cost center is required';
+        if (!formData.requestReason)
+          newErrors.requestReason = "Request reason is required";
+        if (!formData.userSection)
+          newErrors.userSection = "Department/Section is required";
+        if (!formData.costCenter)
+          newErrors.costCenter = "Cost center is required";
         break;
       case 4:
-        if (!formData.requesterName) newErrors.requesterName = 'Name is required';
-        if (!formData.requesterEmail) newErrors.requesterEmail = 'Email is required';
-        if (!formData.requesterPhone) newErrors.requesterPhone = 'Phone is required';
+        if (!formData.requesterName)
+          newErrors.requesterName = "Name is required";
+        if (!formData.requesterEmail)
+          newErrors.requesterEmail = "Email is required";
+        if (!formData.requesterPhone)
+          newErrors.requesterPhone = "Phone is required";
         break;
     }
 
@@ -595,12 +735,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 5));
+      setCurrentStep((prev) => Math.min(prev + 1, 5));
     }
   };
 
   const handlePrevious = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -639,13 +779,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     });
 
     try {
-      const response = await fetch("http://localhost:5000/api/requests", {
-        method: "POST",
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        "tyremanagement-backend-production.up.railway.app/requests",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to submit request');
+        throw new Error("Failed to submit request");
       }
 
       setFormLoading(false);
@@ -676,7 +819,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   if (!vehicles || vehicles.length === 0) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-md">
-        <h2 className="mb-6 text-2xl font-bold">Tire Replacement Approval Request</h2>
+        <h2 className="mb-6 text-2xl font-bold">
+          Tire Replacement Approval Request
+        </h2>
         <div className="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
           No vehicles found. Please contact your administrator.
         </div>
@@ -694,7 +839,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               <div
                 key={step}
                 className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10 
-                  ${currentStep >= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                  ${
+                    currentStep >= step
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-600"
+                  }`}
               >
                 {step}
               </div>
@@ -721,13 +870,15 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         </div>
       )}
 
-      <form onSubmit={(e) => {
+      <form
+        onSubmit={(e) => {
           e.preventDefault();
           if (currentStep === 5) {
             handleSubmit(e);
           }
-        }} 
-        className="space-y-6">
+        }}
+        className="space-y-6"
+      >
         <div className="min-h-[400px]">
           {currentStep === 1 && (
             <VehicleInformationStep
@@ -778,7 +929,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
             type="button"
             onClick={handlePrevious}
             className={`px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 
-              ${currentStep === 1 ? 'invisible' : ''}`}
+              ${currentStep === 1 ? "invisible" : ""}`}
           >
             Previous
           </button>
@@ -798,16 +949,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               type="submit"
               disabled={formLoading}
               className={`px-6 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700
-                ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                ${formLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              {formLoading ? 'Submitting...' : 'Submit Request'}
+              {formLoading ? "Submitting..." : "Submit Request"}
             </button>
           )}
         </div>
       </form>
 
       <div className="mt-12 border-t pt-8">
-        <RequestTable 
+        <RequestTable
           requests={requests}
           title="Your Tire Requests"
           onView={handleView}

@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 
 type Role =
   | "user"
@@ -46,11 +47,7 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
@@ -58,6 +55,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const isAuthenticated = useIsAuthenticated();
+  const { accounts } = useMsal();
 
   // Check for existing session on initial load
   useEffect(() => {
@@ -79,6 +78,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     initializeAuth();
   }, []);
+
+  // Fetch user info from backend when authenticated
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (isAuthenticated && accounts.length > 0) {
+        setIsLoading(true);
+        try {
+          // Get the idToken from MSAL account
+          const idToken = accounts[0].idTokenClaims?.id_token;
+          if (!idToken) return;
+          const res = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+              },
+            }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem("user", JSON.stringify(data.user));
+            setUser(data.user);
+            navigate(`/${data.user.role}`);
+          } else {
+            alert("Access denied: You are not authorized.");
+          }
+        } catch (err) {
+          setError("Failed to fetch user info");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchUser();
+    // eslint-disable-next-line
+  }, [isAuthenticated, accounts, navigate]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);

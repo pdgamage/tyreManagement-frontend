@@ -15,7 +15,6 @@ import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
-import { useMsalRedirectHandler } from "./hooks/useMsalRedirectHandler";
 
 export function App() {
   return (
@@ -23,7 +22,6 @@ export function App() {
       <BrowserRouter>
         <AuthProvider>
           <RequestProvider>
-            <MsalRedirectHandlerWrapper />
             <Routes>
               <Route
                 path="/"
@@ -112,11 +110,6 @@ export function App() {
   );
 }
 
-function MsalRedirectHandlerWrapper() {
-  useMsalRedirectHandler();
-  return null;
-}
-
 // New component for protected routes
 const RequireAuth = ({
   children,
@@ -129,17 +122,14 @@ const RequireAuth = ({
   const location = useLocation();
 
   if (isLoading) {
-    // Show a loading spinner or nothing while auth is being checked
     return <div>Loading...</div>;
   }
 
   if (!user) {
-    // Not logged in: redirect to login page
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (user.role !== role) {
-    // Logged in but wrong role: redirect to their dashboard
     return <Navigate to={`/${user.role}`} replace />;
   }
 

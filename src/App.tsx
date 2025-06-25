@@ -23,88 +23,88 @@ export function App() {
       <BrowserRouter>
         <AuthProvider>
           <RequestProvider>
-             <MsalRedirectHandlerWrapper>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <Layout>
+            <MsalRedirectHandlerWrapper>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <Layout>
+                      <PageTransition>
+                        <Home />
+                      </PageTransition>
+                    </Layout>
+                  }
+                />
+                {/* Public routes (no login required) */}
+                <Route
+                  path="/user"
+                  element={
+                    <RequireAuth role="user">
+                      <Layout>
+                        <PageTransition>
+                          <UserDashboard />
+                        </PageTransition>
+                      </Layout>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/vehicle-registration"
+                  element={
+                    <Layout>
+                      <PageTransition>
+                        <VehicleRegistration />
+                      </PageTransition>
+                    </Layout>
+                  }
+                />
+                {/* Single login route */}
+                <Route
+                  path="/login"
+                  element={
                     <PageTransition>
-                      <Home />
+                      <Login />
                     </PageTransition>
-                  </Layout>
-                }
-              />
-              {/* Public routes (no login required) */}
-              <Route
-                path="/user"
-                element={
-                  <RequireAuth role="user">
-                    <Layout>
-                      <PageTransition>
-                        <UserDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/vehicle-registration"
-                element={
-                  <Layout>
-                    <PageTransition>
-                      <VehicleRegistration />
-                    </PageTransition>
-                  </Layout>
-                }
-              />
-              {/* Single login route */}
-              <Route
-                path="/login"
-                element={
-                  <PageTransition>
-                    <Login />
-                  </PageTransition>
-                }
-              />
-              {/* Protected routes */}
-              <Route
-                path="/supervisor/*"
-                element={
-                  <RequireAuth role="supervisor">
-                    <Layout>
-                      <PageTransition>
-                        <SupervisorDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/technical-manager/*"
-                element={
-                  <RequireAuth role="technical-manager">
-                    <Layout>
-                      <PageTransition>
-                        <TechnicalManagerDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/engineer/*"
-                element={
-                  <RequireAuth role="engineer">
-                    <Layout>
-                      <PageTransition>
-                        <EngineerDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-            </Routes>
+                  }
+                />
+                {/* Protected routes */}
+                <Route
+                  path="/supervisor/*"
+                  element={
+                    <RequireAuth role="supervisor">
+                      <Layout>
+                        <PageTransition>
+                          <SupervisorDashboard />
+                        </PageTransition>
+                      </Layout>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/technical-manager/*"
+                  element={
+                    <RequireAuth role="technical-manager">
+                      <Layout>
+                        <PageTransition>
+                          <TechnicalManagerDashboard />
+                        </PageTransition>
+                      </Layout>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/engineer/*"
+                  element={
+                    <RequireAuth role="engineer">
+                      <Layout>
+                        <PageTransition>
+                          <EngineerDashboard />
+                        </PageTransition>
+                      </Layout>
+                    </RequireAuth>
+                  }
+                />
+              </Routes>
             </MsalRedirectHandlerWrapper>
           </RequestProvider>
         </AuthProvider>
@@ -113,11 +113,14 @@ export function App() {
   );
 }
 
-function MsalRedirectHandlerWrapper({ children }: { children: React.ReactNode }) {
+function MsalRedirectHandlerWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   useMsalRedirectHandler();
   return <>{children}</>;
 }
-
 
 // New component for protected routes
 const RequireAuth = ({
@@ -127,8 +130,13 @@ const RequireAuth = ({
   children: ReactNode;
   role: string;
 }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
+
+  if (isLoading) {
+    // Show a loading spinner or nothing while auth is being checked
+    return <div>Loading...</div>;
+  }
 
   if (!user) {
     // Not logged in: redirect to login page

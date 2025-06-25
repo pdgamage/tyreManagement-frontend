@@ -10,7 +10,7 @@ const Login = () => {
 
   useEffect(() => {
     console.log("Login page user:", user, "isLoading:", isLoading);
-    if (user && user.role) {
+    if (!isLoading && user && user.role) {
       console.log("Redirecting to dashboard:", user.role);
       navigate(`/${user.role}`, { replace: true });
     }

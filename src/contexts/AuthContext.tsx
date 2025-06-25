@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Fetch user info from backend when authenticated
   useEffect(() => {
     const fetchUser = async () => {
-      if (isAuthenticated && accounts.length > 0) {
+      if (isAuthenticated && accounts.length > 0 && !user) {
         setIsLoading(true);
         try {
           // Use acquireTokenSilent to get a valid access token
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     fetchUser();
     // eslint-disable-next-line
-  }, [isAuthenticated, accounts, instance]);
+  }, [isAuthenticated, accounts, instance, user]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);

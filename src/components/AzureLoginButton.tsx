@@ -1,40 +1,8 @@
 import { useMsal } from "@azure/msal-react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 
 const AzureLoginButton = () => {
   const { instance } = useMsal();
-  const navigate = useNavigate();
-  const { setUser } = useAuth();
 
-  // Handle redirect response after login
-  useEffect(() => {
-    instance.handleRedirectPromise().then(async (loginResponse) => {
-      if (loginResponse) {
-        const idToken = loginResponse.idToken;
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          localStorage.setItem("user", JSON.stringify(data.user));
-          setUser(data.user);
-          navigate(`/${data.user.role}`);
-        } else {
-          alert("Access denied: You are not authorized.");
-        }
-      }
-    });
-  }, [instance, setUser, navigate]);
-
-  // Trigger login redirect
   const handleLogin = () => {
     instance.loginRedirect({
       scopes: ["openid", "profile", "email"],

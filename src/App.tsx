@@ -15,8 +15,11 @@ import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
+import { useMsalRedirectHandler } from "./hooks/useMsalRedirectHandler";
 
 export function App() {
+  useMsalRedirectHandler();
+
   return (
     <VehicleProvider>
       <BrowserRouter>

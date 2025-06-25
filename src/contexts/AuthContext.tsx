@@ -86,14 +86,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
-            // Add a delay before redirecting
+            // Redirect to dashboard if on home or login page
             if (
-              window.location.pathname === "/login" ||
-              window.location.pathname === "/"
+              window.location.pathname === "/" ||
+              window.location.pathname === "/login"
             ) {
               setTimeout(() => {
                 navigate(`/${data.user.role}`, { replace: true });
-              }, 10000); // 2 seconds delay
+              }, 200); // 200ms delay for smoothness
             }
           } else {
             setError("Access denied: You are not authorized.");
@@ -115,26 +115,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
 
     try {
-      // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 500));
-
       if (!username || !password) {
         throw new Error("Username and password are required");
       }
-
-      // In a real app, this would validate with a backend
       const userData = {
         id: `${role}-${Date.now()}`,
         name: username,
         role,
-        email: `${username}@example.com`, // Mock email
-        department: role === "engineer" ? "Engineering" : "Operations", // Mock department
+        email: `${username}@example.com`,
+        department: role === "engineer" ? "Engineering" : "Operations",
       };
-
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
-
-      // Navigate to role-specific dashboard
       navigate(`/${role}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -149,14 +142,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setError(null);
 
     try {
-      // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (!data.username || !data.password || !data.email) {
         throw new Error("Required fields are missing");
       }
-
-      // In a real app, this would send the registration data to a backend
       // Mock successful registration
       return;
     } catch (err) {

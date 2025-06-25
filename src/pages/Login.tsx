@@ -1,18 +1,25 @@
 import React, { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import AzureLoginButton from "../components/AzureLoginButton";
 
 const Login = () => {
-  const { user } = useAuth();
+  const { user, isLoading, error } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user && user.role) {
+      console.log("Redirecting to dashboard:", user.role);
       navigate(`/${user.role}`, { replace: true });
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Auth error:", error);
+    }
+  }, [error]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
@@ -53,6 +60,8 @@ const Login = () => {
                   <p className="text-sm text-gray-500">
                     Use your Microsoft account to securely access the system
                   </p>
+                  {isLoading && <div className="text-blue-600">Loading...</div>}
+                  {error && <div className="text-red-600">Error: {error}</div>}
                 </div>
               </div>
             </div>

@@ -154,7 +154,7 @@ const Home = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-12 bg-gray-50 rounded-xl">
+      {/* <section className="py-12 bg-gray-50 rounded-xl">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             System Benefits
@@ -169,10 +169,10 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Service Highlights */}
-      <section className="py-12">
+      {/* <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             Service Highlights
@@ -193,7 +193,7 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Stats Section */}
       <section className="bg-blue-50 py-16 rounded-xl">

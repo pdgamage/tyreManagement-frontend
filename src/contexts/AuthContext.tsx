@@ -162,7 +162,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    navigate("/login");
+    instance.logoutRedirect({ postLogoutRedirectUri: "/login" });
   };
 
   const isAuthorized = (allowedRoles: Role[]) => {

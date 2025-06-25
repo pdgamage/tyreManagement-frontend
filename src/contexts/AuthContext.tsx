@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (isAuthenticated && accounts.length > 0 && !user) {
         setIsLoading(true);
         try {
-          // Use acquireTokenSilent to get a valid access token
           const request = {
             account: accounts[0] as AccountInfo,
             scopes: ["openid", "profile", "email"],
@@ -87,6 +86,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
+            // Add a delay before redirecting
+            if (
+              window.location.pathname === "/login" ||
+              window.location.pathname === "/"
+            ) {
+              setTimeout(() => {
+                navigate(`/${data.user.role}`, { replace: true });
+              }, 2000); // 2 seconds delay
+            }
           } else {
             setError("Access denied: You are not authorized.");
           }
@@ -100,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     fetchUser();
     // eslint-disable-next-line
-  }, [isAuthenticated, accounts, instance, user]);
+  }, [isAuthenticated, accounts, instance, user, navigate]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);

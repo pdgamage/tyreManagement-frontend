@@ -34,6 +34,5 @@ export function useMsalRedirectHandler() {
         }
       }
     });
-    // eslint-disable-next-line
   }, [instance, setUser, navigate]);
 }

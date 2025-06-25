@@ -964,11 +964,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           requests={requests}
           title="Your Tire Requests"
           onView={handleView}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          onDelete={handleDelete}
-          user={user} // <-- Pass the user object here
-          showActions={true}
+          onApprove={() => {}}
+          onReject={() => {}}
+          user={user} 
+          showActions={false}
         />
       </div>
     </div>

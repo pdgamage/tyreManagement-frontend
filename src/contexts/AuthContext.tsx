@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+import { AccountInfo } from "@azure/msal-browser";
 
 type Role =
   | "user"
@@ -57,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated();
-  const { accounts } = useMsal();
+  const { instance, accounts } = useMsal();
 
   // Fetch user info from backend when authenticated
   useEffect(() => {
@@ -65,9 +66,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (isAuthenticated && accounts.length > 0) {
         setIsLoading(true);
         try {
-          // Get the idToken from MSAL account
-          const idToken = accounts[0].idTokenClaims?.id_token;
-          if (!idToken) return;
+          // Use acquireTokenSilent to get a valid access token
+          const request = {
+            account: accounts[0] as AccountInfo,
+            scopes: ["openid", "profile", "email"],
+          };
+          const response = await instance.acquireTokenSilent(request);
+          const idToken = response.idToken;
+
           const res = await fetch(
             `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
             {
@@ -81,12 +87,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
-            // Optionally: navigate(`/${data.user.role}`);
           } else {
             setError("Access denied: You are not authorized.");
           }
         } catch (err) {
           setError("Failed to fetch user info");
+          console.error("AuthProvider fetchUser error:", err);
         } finally {
           setIsLoading(false);
         }
@@ -94,7 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     fetchUser();
     // eslint-disable-next-line
-  }, [isAuthenticated, accounts]);
+  }, [isAuthenticated, accounts, instance]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);
@@ -167,7 +173,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
-        setUser, // Add setUser to AuthContextType!
+        setUser,
         isLoading,
         error,
         login,

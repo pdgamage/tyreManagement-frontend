@@ -1,4 +1,4 @@
-import  { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
@@ -9,11 +9,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Login page user:", user, "isLoading:", isLoading);
     if (user && user.role) {
       console.log("Redirecting to dashboard:", user.role);
       navigate(`/${user.role}`, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   useEffect(() => {
     if (error) {

@@ -225,7 +225,7 @@ const Home = () => {
       </section> */}
 
       {/* Stats Section */}
-      <section className="bg-blue-50 py-16 rounded-xl">
+      {/* <section className="bg-blue-50 py-16 rounded-xl">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             System Statistics
@@ -249,7 +249,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

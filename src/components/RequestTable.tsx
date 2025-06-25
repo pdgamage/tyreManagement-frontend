@@ -11,6 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { Request } from "../types/request";
+import { Trash2, Image as ImageIcon } from 'lucide-react';
 
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {

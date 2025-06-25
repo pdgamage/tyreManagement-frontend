@@ -6,6 +6,7 @@ import Autosuggest from "react-autosuggest";
 import { Vehicle } from "../types/api";
 import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -761,30 +762,31 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     setFormLoading(true);
 
-    const submitData = {
-      ...formData,
-      userId: user.id,
-      tireSize: formData.tireSizeRequired,
-      submittedAt: new Date().toISOString(),
-    };
-
-    const formDataToSend = new FormData();
-    Object.entries(submitData).forEach(([key, value]) => {
-      if (key === "images" && Array.isArray(value)) {
-        value.forEach((file) => {
-          if (file) formDataToSend.append("images", file);
-        });
-      } else if (value !== null && value !== undefined) {
-        formDataToSend.append(key, value.toString());
-      }
-    });
-
     try {
+      // 1. Upload images to Cloudinary
+      const imageFiles = formData.images.filter(Boolean) as File[];
+      const imageUrls: string[] = [];
+      for (const file of imageFiles) {
+        const url = await uploadToCloudinary(file);
+        imageUrls.push(url);
+      }
+
+      // 2. Prepare data to send to backend
+      const submitData = {
+        ...formData,
+        userId: user.id,
+        tireSize: formData.tireSizeRequired,
+        submittedAt: new Date().toISOString(),
+        images: imageUrls, // send URLs, not files
+      };
+
+      // 3. Send to backend (as JSON)
       const response = await fetch(
         "https://tyremanagement-backend-production.up.railway.app/api/requests",
         {
           method: "POST",
-          body: formDataToSend,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submitData),
         }
       );
 
@@ -795,7 +797,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       setFormLoading(false);
       setSuccess(true);
 
-      // Delay closing the form so the user sees the success message
       setTimeout(() => {
         setSuccess(false);
         setFormData(initialFormData);

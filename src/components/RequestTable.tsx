@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Eye, CheckCircle, XCircle, Clock, CheckCircle2, ChevronLeft, ChevronRight, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ChevronDown, ChevronUp, Eye, CheckCircle, XCircle, Clock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Request } from '../types/request';
 
 const getStatusStyles = (status: string) => {
@@ -48,7 +48,6 @@ interface RequestTableProps{
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onView: (request: Request) => void;
-  onDelete: (id: string) => void; // <-- Add this
   showActions?: boolean;
 }
 
@@ -58,7 +57,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onApprove,
   onReject,
   onView,
-  onDelete, // <-- Add this
   showActions = true,
 }) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -66,8 +64,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const requestsPerPage = 5;
-  const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [modalImages, setModalImages] = useState<string[]>([]);
 
   const toggleRow = (id: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -94,16 +90,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
       month: 'short',
       day: 'numeric',
     });
-  };
-
-  const openImageModal = (images: string[]) => {
-    setModalImages(images);
-    setImageModalOpen(true);
-  };
-
-  const closeImageModal = () => {
-    setImageModalOpen(false);
-    setModalImages([]);
   };
 
   // Sort and paginate the requests
@@ -218,20 +204,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         className="text-blue-600 hover:text-blue-900"
                       >
                         <Eye className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => openImageModal(request.images || [])}
-                        className="text-indigo-600 hover:text-indigo-900"
-                        title="View Images"
-                      >
-                        <ImageIcon className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(request.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Delete Request"
-                      >
-                        <Trash2 className="w-5 h-5" />
                       </button>
                       {request.status === 'pending' && (
                         <>
@@ -381,35 +353,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
             >
               <ChevronRight size={20} />
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Image Modal */}
-      {imageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full relative">
-            <button
-              onClick={closeImageModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-            <h3 className="text-lg font-semibold mb-4">Request Images</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {modalImages.length > 0 ? (
-                modalImages.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`Request image ${idx + 1}`}
-                    className="w-full h-40 object-cover rounded border"
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-gray-500">No images available.</div>
-              )}
-            </div>
           </div>
         </div>
       )}

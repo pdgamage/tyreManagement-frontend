@@ -1,5 +1,5 @@
-import React from "react";
 import { useMsal } from "@azure/msal-react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -8,33 +8,37 @@ const AzureLoginButton = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const handleLogin = async () => {
-    try {
-      const loginResponse = await instance.loginPopup({
-        scopes: ["openid", "profile", "email"],
-      });
-      const idToken = loginResponse.idToken;
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
+  // Handle redirect response after login
+  useEffect(() => {
+    instance.handleRedirectPromise().then(async (loginResponse) => {
+      if (loginResponse) {
+        const idToken = loginResponse.idToken;
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("user", JSON.stringify(data.user));
+          setUser(data.user);
+          navigate(`/${data.user.role}`);
+        } else {
+          alert("Access denied: You are not authorized.");
         }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setUser(data.user);
-        navigate(`/${data.user.role}`);
-      } else {
-        alert("Access denied: You are not authorized.");
       }
-    } catch (err) {
-      console.error("Login failed:", err);
-    }
+    });
+  }, [instance, setUser, navigate]);
+
+  // Trigger login redirect
+  const handleLogin = () => {
+    instance.loginRedirect({
+      scopes: ["openid", "profile", "email"],
+    });
   };
 
   return (

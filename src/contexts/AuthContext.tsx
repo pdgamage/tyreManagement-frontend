@@ -86,15 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
-            // Redirect to dashboard if on home or login page
-            if (
-              window.location.pathname === "/" ||
-              window.location.pathname === "/login"
-            ) {
-              setTimeout(() => {
-                navigate(`/${data.user.role}`, { replace: true });
-              }, 2000); // 200ms delay for smoothness
-            }
+            // Do NOT navigate here
           } else {
             setError("Access denied: You are not authorized.");
           }

@@ -9,11 +9,15 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Login page user:", user, "isLoading:", isLoading);
+    let timeout: NodeJS.Timeout | undefined;
     if (!isLoading && user && user.role) {
-      console.log("Redirecting to dashboard:", user.role);
-      navigate(`/${user.role}`, { replace: true });
+      timeout = setTimeout(() => {
+        navigate(`/${user.role}`, { replace: true });
+      }, 2000); // 2 seconds delay
     }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [user, isLoading, navigate]);
 
   useEffect(() => {
@@ -63,6 +67,11 @@ const Login = () => {
                   </p>
                   {isLoading && <div className="text-blue-600">Loading...</div>}
                   {error && <div className="text-red-600">Error: {error}</div>}
+                  {user && user.role && !isLoading && (
+                    <div className="text-green-600">
+                      Login successful! Redirecting to dashboard...
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

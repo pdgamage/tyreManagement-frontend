@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             ) {
               setTimeout(() => {
                 navigate(`/${data.user.role}`, { replace: true });
-              }, 2000); // 2 seconds delay
+              }, 10000); // 2 seconds delay
             }
           } else {
             setError("Access denied: You are not authorized.");

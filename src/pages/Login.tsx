@@ -1,14 +1,18 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import AzureLoginButton from "../components/AzureLoginButton";
 
 const Login = () => {
   const { user } = useAuth();
-  if (user) {
-    return <Navigate to={`/${user.role}`} />;
-  }
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && user.role) {
+      navigate(`/${user.role}`, { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">

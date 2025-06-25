@@ -14,7 +14,7 @@ const Login = () => {
       console.log("Redirecting to dashboard in 2 seconds:", user.role);
       timeout = setTimeout(() => {
         navigate(`/${user.role}`, { replace: true });
-      }, 2000);
+      }, 5000);
     }
     return () => {
       if (timeout) clearTimeout(timeout);

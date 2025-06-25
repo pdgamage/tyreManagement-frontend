@@ -27,13 +27,14 @@ interface RegisterData {
   employeeId: string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isLoading: boolean;
   error: string | null;
   login: (role: Role, username: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (role: Role, data: RegisterData) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   isAuthorized: (allowedRoles: Role[]) => boolean;
 }
 
@@ -58,27 +59,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useIsAuthenticated();
   const { accounts } = useMsal();
 
-  // Check for existing session on initial load
-  useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      try {
-        // In a real app, you would verify the session with your backend
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (err) {
-        localStorage.removeItem("user");
-        setError("Session validation failed");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
   // Fetch user info from backend when authenticated
   useEffect(() => {
     const fetchUser = async () => {
@@ -101,9 +81,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
-            navigate(`/${data.user.role}`);
+            // Optionally: navigate(`/${data.user.role}`);
           } else {
-            alert("Access denied: You are not authorized.");
+            setError("Access denied: You are not authorized.");
           }
         } catch (err) {
           setError("Failed to fetch user info");
@@ -114,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     fetchUser();
     // eslint-disable-next-line
-  }, [isAuthenticated, accounts, navigate]);
+  }, [isAuthenticated, accounts]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);
@@ -150,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (role: Role, data: RegisterData) => {
+  const register = async (data: RegisterData) => {
     setIsLoading(true);
     setError(null);
 
@@ -187,7 +167,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
-        setUser,
+        setUser, // Add setUser to AuthContextType!
         isLoading,
         error,
         login,

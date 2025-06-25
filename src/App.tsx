@@ -18,13 +18,12 @@ import PageTransition from "./components/PageTransition";
 import { useMsalRedirectHandler } from "./hooks/useMsalRedirectHandler";
 
 export function App() {
-  useMsalRedirectHandler();
-
   return (
     <VehicleProvider>
       <BrowserRouter>
         <AuthProvider>
           <RequestProvider>
+             <MsalRedirectHandlerWrapper>
             <Routes>
               <Route
                 path="/"
@@ -106,12 +105,19 @@ export function App() {
                 }
               />
             </Routes>
+            </MsalRedirectHandlerWrapper>
           </RequestProvider>
         </AuthProvider>
       </BrowserRouter>
     </VehicleProvider>
   );
 }
+
+function MsalRedirectHandlerWrapper({ children }: { children: React.ReactNode }) {
+  useMsalRedirectHandler();
+  return <>{children}</>;
+}
+
 
 // New component for protected routes
 const RequireAuth = ({

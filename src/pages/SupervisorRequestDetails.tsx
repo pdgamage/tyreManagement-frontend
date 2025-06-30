@@ -18,14 +18,22 @@ const SupervisorRequestDetails = () => {
       setLoading(true);
       setError(null);
       try {
+        if (isNaN(numericId)) {
+          throw new Error("Invalid request ID.");
+        }
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/requests/${numericId}`
         );
-        if (!res.ok) throw new Error("Failed to fetch request");
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error("Request not found.");
+          }
+          throw new Error("Failed to fetch request.");
+        }
         const data = await res.json();
         setRequest(data);
-      } catch (err) {
-        setError("Failed to load request");
+      } catch (err: any) {
+        setError(err.message || "Failed to load request");
       }
       setLoading(false);
     };
@@ -51,11 +59,11 @@ const SupervisorRequestDetails = () => {
   };
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
-  if (error || !request)
+  if (error)
+    return <div className="p-8 text-center text-red-600">Error: {error}</div>;
+  if (!request)
     return (
-      <div className="p-8 text-center text-red-600">
-        {error || "Request not found"}
-      </div>
+      <div className="p-8 text-center text-red-600">Request not found.</div>
     );
 
   return (

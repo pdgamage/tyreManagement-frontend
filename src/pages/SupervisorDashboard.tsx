@@ -132,7 +132,7 @@ const SupervisorDashboard = () => {
               onApprove={() => {}}
               onReject={() => {}}
               onView={(request) =>
-                navigate(`/supervisor/request/${request.id}`)
+                navigate(`/supervisor/request/${Number(request.id)}`)
               }
               showActions={false}
             />
@@ -144,7 +144,7 @@ const SupervisorDashboard = () => {
               onApprove={() => {}}
               onReject={() => {}}
               onView={(request) =>
-                navigate(`/supervisor/request/${request.id}`)
+                navigate(`/supervisor/request/${Number(request.id)}`)
               }
               showActions={false}
             />

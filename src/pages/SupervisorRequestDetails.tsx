@@ -5,6 +5,7 @@ import { Request } from "../types/request";
 
 const SupervisorRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
   const [request, setRequest] = useState<Request | null>(null);
   const [notes, setNotes] = useState("");
@@ -18,7 +19,7 @@ const SupervisorRequestDetails = () => {
       setError(null);
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/requests/${id}`
+          `${import.meta.env.VITE_API_URL}/api/requests/${numericId}`
         );
         if (!res.ok) throw new Error("Failed to fetch request");
         const data = await res.json();

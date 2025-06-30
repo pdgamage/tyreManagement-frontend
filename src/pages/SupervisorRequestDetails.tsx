@@ -69,10 +69,7 @@ const SupervisorRequestDetails = () => {
 
   return (
     <div className="flex items-start justify-center min-h-screen bg-gray-100">
-      <div
-        className="w-full max-w-5xl p-8 mt-10 bg-white shadow-lg md:w-4/5 rounded-xl"
-        style={{ maxHeight: "80vh", overflowY: "auto" }}
-      >
+      <div className="w-full max-w-5xl p-8 mt-10 bg-white shadow-lg md:w-4/5 rounded-xl">
         <button
           className="px-4 py-2 mb-4 text-blue-700 transition bg-blue-100 rounded hover:bg-blue-200"
           onClick={() => navigate(-1)}
@@ -97,15 +94,18 @@ const SupervisorRequestDetails = () => {
             {request.status.replace(/_/g, " ")}
           </span>
         </h2>
-        <form className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Left column */}
-            <div className="space-y-4">
+        <form className="space-y-10">
+          {/* Vehicle & Requester Info */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Vehicle & Requester Info
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Number
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.vehicleNumber}
                 </div>
               </div>
@@ -113,7 +113,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Brand
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.vehicleBrand}
                 </div>
               </div>
@@ -121,7 +121,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Model
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.vehicleModel}
                 </div>
               </div>
@@ -129,13 +129,13 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Year
                 </label>
-                <div className="p-2 rounded bg-gray-50">{request.year}</div>
+                <div className="p-2 bg-white rounded">{request.year}</div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Department/Section
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.userSection}
                 </div>
               </div>
@@ -143,15 +143,13 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Cost Center
                 </label>
-                <div className="p-2 rounded bg-gray-50">
-                  {request.costCenter}
-                </div>
+                <div className="p-2 bg-white rounded">{request.costCenter}</div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Requester Name
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.requesterName}
                 </div>
               </div>
@@ -159,7 +157,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Requester Email
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.requesterEmail}
                 </div>
               </div>
@@ -167,7 +165,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Requester Phone
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.requesterPhone}
                 </div>
               </div>
@@ -175,18 +173,24 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Submitted At
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {new Date(request.submittedAt).toLocaleString()}
                 </div>
               </div>
             </div>
-            {/* Right column */}
-            <div className="space-y-4">
+          </div>
+          <hr />
+          {/* Tire & Request Details */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Tire & Request Details
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Size Required
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.tireSizeRequired}
                 </div>
               </div>
@@ -194,13 +198,13 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Quantity
                 </label>
-                <div className="p-2 rounded bg-gray-50">{request.quantity}</div>
+                <div className="p-2 bg-white rounded">{request.quantity}</div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tubes Quantity
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.tubesQuantity}
                 </div>
               </div>
@@ -208,7 +212,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Existing Tire Make
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.existingTireMake}
                 </div>
               </div>
@@ -216,7 +220,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Last Replacement Date
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.lastReplacementDate
                     ? new Date(request.lastReplacementDate).toLocaleDateString()
                     : "-"}
@@ -226,7 +230,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Present KM Reading
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.presentKmReading}
                 </div>
               </div>
@@ -234,7 +238,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Previous KM Reading
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.previousKmReading}
                 </div>
               </div>
@@ -242,7 +246,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Wear Pattern
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.tireWearPattern}
                 </div>
               </div>
@@ -250,7 +254,7 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Request Reason
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.requestReason}
                 </div>
               </div>
@@ -258,19 +262,20 @@ const SupervisorRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Comments
                 </label>
-                <div className="p-2 rounded bg-gray-50">
+                <div className="p-2 bg-white rounded">
                   {request.comments || "N/A"}
                 </div>
               </div>
             </div>
           </div>
+          <hr />
           {/* Images Section with error handling */}
           {request.images && request.images.length > 0 && (
             <div>
-              <label className="block mb-1 font-semibold text-gray-700">
+              <h3 className="mb-2 text-lg font-semibold text-gray-800">
                 Images
-              </label>
-              <div className="flex flex-wrap gap-3 mt-2">
+              </h3>
+              <div className="flex flex-wrap gap-3 p-4 mt-2 rounded-lg bg-gray-50">
                 {request.images.map((img, idx) =>
                   img ? (
                     <img
@@ -288,6 +293,8 @@ const SupervisorRequestDetails = () => {
               </div>
             </div>
           )}
+          <hr />
+          {/* Supervisor Notes */}
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
               Supervisor Notes
@@ -300,6 +307,7 @@ const SupervisorRequestDetails = () => {
               rows={3}
             />
           </div>
+          {/* Action Buttons */}
           <div className="flex gap-4 mt-6">
             <button
               type="button"

@@ -12,12 +12,12 @@ const UserDashboard = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">User Dashboard</h1>
         <div className="space-x-3">
           <button
             onClick={() => window.location.href = '/vehicle-registration'}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            className="px-4 py-2 text-white transition-colors bg-green-600 rounded hover:bg-green-700"
           >
             Register Vehicle
           </button>
@@ -25,14 +25,14 @@ const UserDashboard = () => {
       </div>
 
       {/* Tire Request Form Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-medium text-gray-900">Submit New Tire Request</h2>
         </div>
         <div className="p-6">
           <TireRequestForm
             onSuccess={() => {
-              // Handle success if needed
+              
             }}
           />
         </div>

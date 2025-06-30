@@ -694,6 +694,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 1:
         if (!formData.vehicleNumber)
           newErrors.vehicleNumber = "Vehicle number is required";
+        else if (!vehicleNumberExists(formData.vehicleNumber))
+          newErrors.vehicleNumber = "Vehicle not registered";
         if (!formData.vehicleBrand)
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
@@ -808,6 +810,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       setError("An error occurred while submitting your request");
     }
   };
+
+  const vehicleNumberExists = (number: string) =>
+    vehicles.some(
+      (v) =>
+        v.vehicleNumber.trim().toLowerCase() === number.trim().toLowerCase()
+    );
 
   // Redirect to login if not logged in
   if (!user) {

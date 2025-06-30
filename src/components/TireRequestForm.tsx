@@ -707,11 +707,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           return rest;
         });
       }
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        vehicleNumber: "Vehicle number is required",
-      }));
     }
     // eslint-disable-next-line
   }, [formData.vehicleNumber, vehicles]);

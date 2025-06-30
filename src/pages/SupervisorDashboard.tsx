@@ -22,13 +22,18 @@ const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
   const { logout } = useAuth() as AuthContextType;
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'requests' | 'reports'>('requests');
+  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
+    "requests"
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
@@ -42,35 +47,33 @@ const SupervisorDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const pendingRequests = requests.filter(
-    (req) => req.status === "pending"
-  );
+  const pendingRequests = requests.filter((req) => req.status === "pending");
   const approvedRequests = requests.filter(
     (req) => req.status === "supervisor approved"
   );
-  const rejectedRequests = requests.filter(
-    (req) => req.status === "rejected"
-  );
+  const rejectedRequests = requests.filter((req) => req.status === "rejected");
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Supervisor Dashboard</h1>
+        <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Supervisor Dashboard
+            </h1>
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center space-x-3 focus:outline-none"
               >
-                <UserCircle className="h-8 w-8 text-gray-600" />
+                <UserCircle className="w-8 h-8 text-gray-600" />
               </button>
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg">
                   <button
                     onClick={() => logout()}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
                   >
                     Logout
                   </button>
@@ -81,23 +84,23 @@ const SupervisorDashboard = () => {
 
           {/* Tab Navigation */}
           <div className="mt-4 border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+            <nav className="flex -mb-px space-x-8">
               <button
-                onClick={() => setActiveTab('requests')}
+                onClick={() => setActiveTab("requests")}
                 className={`${
-                  activeTab === 'requests'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "requests"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 } whitespace-nowrap pb-4 px-1 border-b-2 font-medium`}
               >
                 Requests
               </button>
               <button
-                onClick={() => setActiveTab('reports')}
+                onClick={() => setActiveTab("reports")}
                 className={`${
-                  activeTab === 'reports'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "reports"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 } whitespace-nowrap pb-4 px-1 border-b-2 font-medium`}
               >
                 Reports & Analytics
@@ -108,8 +111,8 @@ const SupervisorDashboard = () => {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'requests' ? (
+      <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {activeTab === "requests" ? (
           <div className="space-y-6">
             {/* Pending Requests */}
             <RequestTable
@@ -117,7 +120,9 @@ const SupervisorDashboard = () => {
               title="Pending Requests"
               onApprove={() => {}}
               onReject={() => {}}
-              onView={(request) => navigate(`/supervisor/request/${request.id}`)}
+              onView={(request) =>
+                navigate(`/supervisor/request/${request.id}`)
+              }
             />
 
             {/* Approved Requests */}
@@ -126,7 +131,9 @@ const SupervisorDashboard = () => {
               title="Approved Requests"
               onApprove={() => {}}
               onReject={() => {}}
-              onView={(request) => navigate(`/supervisor/request/${request.id}`)}
+              onView={(request) =>
+                navigate(`/supervisor/request/${request.id}`)
+              }
               showActions={false}
             />
 
@@ -136,7 +143,9 @@ const SupervisorDashboard = () => {
               title="Rejected Requests"
               onApprove={() => {}}
               onReject={() => {}}
-              onView={(request) => navigate(`/supervisor/request/${request.id}`)}
+              onView={(request) =>
+                navigate(`/supervisor/request/${request.id}`)
+              }
               showActions={false}
             />
           </div>

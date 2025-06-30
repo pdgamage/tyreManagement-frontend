@@ -17,7 +17,9 @@ const SupervisorRequestDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/${id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/requests/${id}`
+        );
         if (!res.ok) throw new Error("Failed to fetch request");
         const data = await res.json();
         setRequest(data);
@@ -48,35 +50,55 @@ const SupervisorRequestDetails = () => {
   };
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
-  if (error || !request) return <div className="p-8 text-center text-red-600">{error || "Request not found"}</div>;
+  if (error || !request)
+    return (
+      <div className="p-8 text-center text-red-600">
+        {error || "Request not found"}
+      </div>
+    );
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">Request #{request.id}</h2>
+    <div className="max-w-xl p-6 mx-auto mt-8 bg-white rounded shadow">
+      <h2 className="mb-4 text-2xl font-bold">Request #{request.id}</h2>
       <div className="mb-4">
-        <div><strong>Status:</strong> {request.status}</div>
-        <div><strong>Reason:</strong> {request.requestReason}</div>
-        <div><strong>Vehicle:</strong> {request.vehicleNumber} ({request.vehicleBrand} {request.vehicleModel})</div>
-        <div><strong>Requester:</strong> {request.requesterName} ({request.requesterEmail})</div>
-        <div><strong>Quantity:</strong> {request.quantity}</div>
-        <div><strong>Submitted:</strong> {new Date(request.submittedAt).toLocaleString()}</div>
+        <div>
+          <strong>Status:</strong> {request.status}
+        </div>
+        <div>
+          <strong>Reason:</strong> {request.requestReason}
+        </div>
+        <div>
+          <strong>Vehicle:</strong> {request.vehicleNumber} (
+          {request.vehicleBrand} {request.vehicleModel})
+        </div>
+        <div>
+          <strong>Requester:</strong> {request.requesterName} (
+          {request.requesterEmail})
+        </div>
+        <div>
+          <strong>Quantity:</strong> {request.quantity}
+        </div>
+        <div>
+          <strong>Submitted:</strong>{" "}
+          {new Date(request.submittedAt).toLocaleString()}
+        </div>
         {/* Add more fields as needed */}
       </div>
       <textarea
-        className="w-full border rounded p-2 mb-4"
+        className="w-full p-2 mb-4 border rounded"
         placeholder="Enter notes..."
         value={notes}
-        onChange={e => setNotes(e.target.value)}
+        onChange={(e) => setNotes(e.target.value)}
       />
       <div className="flex gap-4">
         <button
-          className="px-4 py-2 bg-green-600 text-white rounded"
+          className="px-4 py-2 text-white bg-green-600 rounded"
           onClick={() => handleAction(true)}
         >
           Approve
         </button>
         <button
-          className="px-4 py-2 bg-red-600 text-white rounded"
+          className="px-4 py-2 text-white bg-red-600 rounded"
           onClick={() => handleAction(false)}
         >
           Reject

@@ -1,48 +1,56 @@
-import React, { useState } from 'react';
-import { Eye, CheckCircle, XCircle, Clock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Request } from '../types/request';
+import React, { useState } from "react";
+import {
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import type { Request } from "../types/request";
 
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
-    case 'pending':
+    case "pending":
       return {
-        bg: 'bg-yellow-50',
-        text: 'text-yellow-700',
-        border: 'border-yellow-300',
+        bg: "bg-yellow-50",
+        text: "text-yellow-700",
+        border: "border-yellow-300",
         icon: <Clock className="w-4 h-4" />,
       };
-    case 'approved':
+    case "approved":
       return {
-        bg: 'bg-green-50',
-        text: 'text-green-700',
-        border: 'border-green-300',
+        bg: "bg-green-50",
+        text: "text-green-700",
+        border: "border-green-300",
         icon: <CheckCircle2 className="w-4 h-4" />,
       };
-    case 'rejected':
+    case "rejected":
       return {
-        bg: 'bg-red-50',
-        text: 'text-red-700',
-        border: 'border-red-300',
+        bg: "bg-red-50",
+        text: "text-red-700",
+        border: "border-red-300",
         icon: <XCircle className="w-4 h-4" />,
       };
-    case 'complete':
+    case "complete":
       return {
-        bg: 'bg-blue-50',
-        text: 'text-blue-700',
-        border: 'border-blue-300',
+        bg: "bg-blue-50",
+        text: "text-blue-700",
+        border: "border-blue-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
     default:
       return {
-        bg: 'bg-gray-50',
-        text: 'text-gray-700',
-        border: 'border-gray-300',
+        bg: "bg-gray-50",
+        text: "text-gray-700",
+        border: "border-gray-300",
         icon: <Clock className="w-4 h-4" />,
       };
   }
 };
 
-interface RequestTableProps{
+interface RequestTableProps {
   requests: Request[];
   title: string;
   onApprove: (id: string) => void;
@@ -59,60 +67,65 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onView,
   showActions = true,
 }) => {
-  const [sortField, setSortField] = useState<keyof Request>('submittedAt');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<keyof Request>("submittedAt");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const requestsPerPage = 5;
 
   const handleSort = (field: keyof Request) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Sort and paginate the requests
   const sortedRequests = [...requests].sort((a, b) => {
-    const aValue = a[sortField] || '';
-    const bValue = b[sortField] || '';
-    
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortDirection === 'asc' 
+    const aValue = a[sortField] || "";
+    const bValue = b[sortField] || "";
+
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortDirection === "asc"
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     }
-    
+
     const numA = Number(aValue);
     const numB = Number(bValue);
-    
+
     if (!isNaN(numA) && !isNaN(numB)) {
-      return sortDirection === 'asc' ? numA - numB : numB - numA;
+      return sortDirection === "asc" ? numA - numB : numB - numA;
     }
-    
+
     return 0;
   });
 
   const totalPages = Math.ceil(requests.length / requestsPerPage);
   const indexOfLastRequest = currentPage * requestsPerPage;
   const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
-  const currentRequests = sortedRequests.slice(indexOfFirstRequest, indexOfLastRequest);
+  const currentRequests = sortedRequests.slice(
+    indexOfFirstRequest,
+    indexOfLastRequest
+  );
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-between">
+    <div className="overflow-hidden bg-white rounded-lg shadow-md">
+      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <h3 className="flex items-center justify-between text-lg font-semibold text-gray-800">
           <span>{title}</span>
-          <span className="text-sm text-gray-500">{requests.length} requests</span>
+          <span className="text-sm text-gray-500">
+            {requests.length} requests
+          </span>
         </h3>
       </div>
 
@@ -120,30 +133,30 @@ const RequestTable: React.FC<RequestTableProps> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 <button
                   className="flex items-center space-x-1 text-left"
-                  onClick={() => handleSort('submittedAt')}
+                  onClick={() => handleSort("submittedAt")}
                 >
                   <span>Date</span>
                 </button>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Vehicle Info
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 <button
                   className="flex items-center space-x-1 text-left"
-                  onClick={() => handleSort('requesterName')}
+                  onClick={() => handleSort("requesterName")}
                 >
                   <span>Requester</span>
                 </button>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Status
               </th>
               {showActions && (
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
                   Actions
                 </th>
               )}
@@ -153,21 +166,27 @@ const RequestTable: React.FC<RequestTableProps> = ({
             {currentRequests.map((request) => (
               <tr
                 key={request.id}
-                className="hover:bg-gray-50 cursor-pointer"
+                className="cursor-pointer hover:bg-gray-50"
                 onClick={() => onView(request)}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   {formatDate(request.submittedAt)}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">{request.vehicleNumber}</div>
+                  <div className="text-sm text-gray-900">
+                    {request.vehicleNumber}
+                  </div>
                   <div className="text-sm text-gray-500">
                     {request.vehicleBrand} {request.vehicleModel}
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">{request.requesterName}</div>
-                  <div className="text-sm text-gray-500">{request.userSection}</div>
+                  <div className="text-sm text-gray-900">
+                    {request.requesterName}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {request.userSection}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
                   <span
@@ -183,23 +202,32 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   </span>
                 </td>
                 {showActions && (
-                  <td className="px-6 py-4 text-right text-sm font-medium space-x-3">
+                  <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
                     <button
-                      onClick={e => { e.stopPropagation(); onView(request); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onView(request);
+                      }}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {request.status === 'pending' && (
+                    {request.status === "pending" && (
                       <>
                         <button
-                          onClick={e => { e.stopPropagation(); onApprove(request.id); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onApprove(request.id);
+                          }}
                           className="text-green-600 hover:text-green-900"
                         >
                           <CheckCircle className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={e => { e.stopPropagation(); onReject(request.id); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onReject(request.id);
+                          }}
                           className="text-red-600 hover:text-red-900"
                         >
                           <XCircle className="w-5 h-5" />
@@ -216,46 +244,52 @@ const RequestTable: React.FC<RequestTableProps> = ({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center text-sm text-gray-700">
             <span>
-              Showing {indexOfFirstRequest + 1} to {Math.min(indexOfLastRequest, requests.length)} of {requests.length} results
+              Showing {indexOfFirstRequest + 1} to{" "}
+              {Math.min(indexOfLastRequest, requests.length)} of{" "}
+              {requests.length} results
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`p-2 rounded-md ${
                 currentPage === 1
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-200"
               }`}
             >
               <ChevronLeft size={20} />
             </button>
             <div className="flex items-center space-x-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === page
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 rounded-md ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
             </div>
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className={`p-2 rounded-md ${
                 currentPage === totalPages
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-200"
               }`}
             >
               <ChevronRight size={20} />

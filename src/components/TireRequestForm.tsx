@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useVehicles } from "../contexts/VehicleContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
@@ -597,7 +597,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [requests, setRequests] = useState<Request[]>([]);
 
   // Fetch requests when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchRequests = async () => {
       try {
         const response = await fetch(
@@ -686,6 +686,35 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       tireSizeRequired: vehicle.tireSize || "",
     }));
   };
+
+  const vehicleNumberExists = (number: string) =>
+    vehicles.some(
+      (v) =>
+        v.vehicleNumber.trim().toLowerCase() === number.trim().toLowerCase()
+    );
+
+  // Real-time validation for vehicle number
+  useEffect(() => {
+    if (formData.vehicleNumber) {
+      if (!vehicleNumberExists(formData.vehicleNumber)) {
+        setErrors((prev) => ({
+          ...prev,
+          vehicleNumber: "Vehicle not registered",
+        }));
+      } else {
+        setErrors((prev) => {
+          const { vehicleNumber, ...rest } = prev;
+          return rest;
+        });
+      }
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        vehicleNumber: "Vehicle number is required",
+      }));
+    }
+    // eslint-disable-next-line
+  }, [formData.vehicleNumber, vehicles]);
 
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
@@ -810,12 +839,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       setError("An error occurred while submitting your request");
     }
   };
-
-  const vehicleNumberExists = (number: string) =>
-    vehicles.some(
-      (v) =>
-        v.vehicleNumber.trim().toLowerCase() === number.trim().toLowerCase()
-    );
 
   // Redirect to login if not logged in
   if (!user) {

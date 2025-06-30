@@ -23,7 +23,7 @@ const SupervisorRequestDetails = () => {
           throw new Error("Invalid request ID.");
         }
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/requests/${numericId}`
+          `${import.meta.env.VITE_API_BASE_URL}/api/requests/${numericId}`
         );
         if (!res.ok) {
           if (res.status === 404) {

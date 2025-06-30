@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Eye, CheckCircle, XCircle, Clock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, Clock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Request } from '../types/request';
 
 const getStatusStyles = (status: string) => {
@@ -59,21 +59,10 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onView,
   showActions = true,
 }) => {
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [sortField, setSortField] = useState<keyof Request>('submittedAt');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const requestsPerPage = 5;
-
-  const toggleRow = (id: string) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (expandedRows.has(id)) {
-      newExpandedRows.delete(id);
-    } else {
-      newExpandedRows.add(id);
-    }
-    setExpandedRows(newExpandedRows);
-  };
 
   const handleSort = (field: keyof Request) => {
     if (sortField === field) {
@@ -137,9 +126,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   onClick={() => handleSort('submittedAt')}
                 >
                   <span>Date</span>
-                  {sortField === 'submittedAt' && (
-                    sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                  )}
                 </button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -151,9 +137,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   onClick={() => handleSort('requesterName')}
                 >
                   <span>Requester</span>
-                  {sortField === 'requesterName' && (
-                    sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                  )}
                 </button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -164,144 +147,68 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   Actions
                 </th>
               )}
-              <th className="w-8 px-6 py-3"></th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentRequests.map((request) => (
-              <React.Fragment key={request.id}>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {formatDate(request.submittedAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{request.vehicleNumber}</div>
-                    <div className="text-sm text-gray-500">
-                      {request.vehicleBrand} {request.vehicleModel}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{request.requesterName}</div>
-                    <div className="text-sm text-gray-500">{request.userSection}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        ${getStatusStyles(request.status).bg}
-                        ${getStatusStyles(request.status).text}
-                        ${getStatusStyles(request.status).border}
-                        border
-                      `}
-                    >
-                      {getStatusStyles(request.status).icon}
-                      <span className="ml-1">{request.status}</span>
-                    </span>
-                  </td>
-                  {showActions && (
-                    <td className="px-6 py-4 text-right text-sm font-medium space-x-3">
-                      <button
-                        onClick={() => onView(request)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      {request.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => onApprove(request.id)}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            <CheckCircle className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => onReject(request.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <XCircle className="w-5 h-5" />
-                          </button>
-                        </>
-                      )}
-                    </td>
-                  )}
-                  <td className="px-6 py-4 text-right">
+              <tr
+                key={request.id}
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => onView(request)}
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {formatDate(request.submittedAt)}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">{request.vehicleNumber}</div>
+                  <div className="text-sm text-gray-500">
+                    {request.vehicleBrand} {request.vehicleModel}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">{request.requesterName}</div>
+                  <div className="text-sm text-gray-500">{request.userSection}</div>
+                </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                      ${getStatusStyles(request.status).bg}
+                      ${getStatusStyles(request.status).text}
+                      ${getStatusStyles(request.status).border}
+                      border
+                    `}
+                  >
+                    {getStatusStyles(request.status).icon}
+                    <span className="ml-1">{request.status}</span>
+                  </span>
+                </td>
+                {showActions && (
+                  <td className="px-6 py-4 text-right text-sm font-medium space-x-3">
                     <button
-                      onClick={() => toggleRow(request.id)}
-                      className="text-gray-400 hover:text-gray-600"
+                      onClick={e => { e.stopPropagation(); onView(request); }}
+                      className="text-blue-600 hover:text-blue-900"
                     >
-                      {expandedRows.has(request.id) ? (
-                        <ChevronUp size={20} />
-                      ) : (
-                        <ChevronDown size={20} />
-                      )}
+                      <Eye className="w-5 h-5" />
                     </button>
+                    {request.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={e => { e.stopPropagation(); onApprove(request.id); }}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={e => { e.stopPropagation(); onReject(request.id); }}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                   </td>
-                </tr>
-                {expandedRows.has(request.id) && (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-6 bg-gray-50">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                          <h4 className="text-base font-semibold text-gray-900 mb-3 pb-1 border-b">Tire Details</h4>
-                          <div className="space-y-2">
-                            <p className="text-sm"><span className="font-medium">Size Required:</span> {request.tireSizeRequired || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Current Size:</span> {request.tireSize || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Quantity:</span> {request.quantity || '0'}</p>
-                            <p className="text-sm"><span className="font-medium">Tubes Quantity:</span> {request.tubesQuantity || '0'}</p>
-                            <p className="text-sm"><span className="font-medium">Current Make:</span> {request.existingTireMake || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Last Replaced:</span> {request.lastReplacementDate ? new Date(request.lastReplacementDate).toLocaleDateString() : '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Wear Pattern:</span> {request.tireWearPattern || '-'}</p>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="text-base font-semibold text-gray-900 mb-3 pb-1 border-b">Request Info</h4>
-                          <div className="space-y-2">
-                            <p className="text-sm"><span className="font-medium">Reason:</span> {request.requestReason || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Department:</span> {request.userSection || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Cost Center:</span> {request.costCenter || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Requester Name:</span> {request.requesterName || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Email:</span> {request.requesterEmail || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Phone:</span> {request.requesterPhone || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Comments:</span> {request.comments || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Submitted:</span> {new Date(request.submittedAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="text-base font-semibold text-gray-900 mb-3 pb-1 border-b">Vehicle Info</h4>
-                          <div className="space-y-2">
-                            <p className="text-sm"><span className="font-medium">Vehicle ID:</span> {request.vehicleId || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Number:</span> {request.vehicleNumber || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Brand:</span> {request.vehicleBrand || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Model:</span> {request.vehicleModel || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Year:</span> {request.year || '-'}</p>
-                            <p className="text-sm"><span className="font-medium">Current KM:</span> {request.presentKmReading?.toLocaleString() || '0'}</p>
-                            <p className="text-sm"><span className="font-medium">Previous KM:</span> {request.previousKmReading?.toLocaleString() || '0'}</p>
-                            <p className="text-sm"><span className="font-medium">KM Difference:</span> {((request.presentKmReading || 0) - (request.previousKmReading || 0)).toLocaleString()}</p>
-                          </div>
-                        </div>
-
-                        {request.images && request.images.length > 0 && (
-                          <div className="col-span-full mt-4">
-                            <h4 className="text-base font-semibold text-gray-900 mb-3 pb-1 border-b">Images</h4>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                              {request.images.map((img: string, index: number) => (
-                                <div key={index} className="aspect-square relative rounded-lg overflow-hidden border">
-                                  <img
-                                    src={img}
-                                    alt={`Tire image ${index + 1}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
                 )}
-              </React.Fragment>
+              </tr>
             ))}
           </tbody>
         </table>

@@ -15,6 +15,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
+import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 
 export function App() {
   return (
@@ -101,6 +102,10 @@ export function App() {
                     </Layout>
                   </RequireAuth>
                 }
+              />
+              <Route
+                path="/supervisor/request/:id"
+                element={<SupervisorRequestDetails />}
               />
             </Routes>
           </RequestProvider>

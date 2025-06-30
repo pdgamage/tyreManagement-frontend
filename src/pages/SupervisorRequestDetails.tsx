@@ -98,220 +98,232 @@ const SupervisorRequestDetails = () => {
           </span>
         </h2>
         <form className="space-y-6">
-          <div className="flex flex-col gap-6">
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Vehicle Number
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.vehicleNumber}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Vehicle Brand
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.vehicleBrand}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Vehicle Model
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.vehicleModel}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Year
-              </label>
-              <div className="p-2 rounded bg-gray-50">{request.year}</div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Department/Section
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.userSection}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Cost Center
-              </label>
-              <div className="p-2 rounded bg-gray-50">{request.costCenter}</div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Requester Name
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.requesterName}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Requester Email
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.requesterEmail}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Requester Phone
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.requesterPhone}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Submitted At
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {new Date(request.submittedAt).toLocaleString()}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Tire Size Required
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.tireSizeRequired}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Quantity
-              </label>
-              <div className="p-2 rounded bg-gray-50">{request.quantity}</div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Tubes Quantity
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.tubesQuantity}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Existing Tire Make
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.existingTireMake}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Last Replacement Date
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.lastReplacementDate
-                  ? new Date(request.lastReplacementDate).toLocaleDateString()
-                  : "-"}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Present KM Reading
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.presentKmReading}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Previous KM Reading
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.previousKmReading}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Tire Wear Pattern
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.tireWearPattern}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Request Reason
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.requestReason}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Comments
-              </label>
-              <div className="p-2 rounded bg-gray-50">
-                {request.comments || "N/A"}
-              </div>
-            </div>
-            {request.images && request.images.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Left column */}
+            <div className="space-y-4">
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
-                  Images
+                  Vehicle Number
                 </label>
-                <div className="flex flex-wrap gap-3 mt-2">
-                  {request.images.map((img, idx) =>
-                    img ? (
-                      <img
-                        key={idx}
-                        src={img}
-                        alt={`Tire image ${idx + 1}`}
-                        className="object-cover w-24 h-24 border rounded"
-                      />
-                    ) : null
-                  )}
+                <div className="p-2 rounded bg-gray-50">
+                  {request.vehicleNumber}
                 </div>
               </div>
-            )}
-            <div>
-              <label className="block mb-1 font-semibold text-gray-700">
-                Supervisor Notes
-              </label>
-              <textarea
-                className="w-full p-2 mt-1 border rounded"
-                placeholder="Enter notes..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Brand
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.vehicleBrand}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Model
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.vehicleModel}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Year
+                </label>
+                <div className="p-2 rounded bg-gray-50">{request.year}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Department/Section
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.userSection}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Cost Center
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.costCenter}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Name
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.requesterName}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Email
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.requesterEmail}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Phone
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.requesterPhone}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Submitted At
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {new Date(request.submittedAt).toLocaleString()}
+                </div>
+              </div>
             </div>
-            <div className="flex gap-4 mt-6">
-              <button
-                type="button"
-                className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
-                onClick={() => handleAction(true)}
-              >
-                Approve
-              </button>
-              <button
-                type="button"
-                className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
-                onClick={() => setShowRejectConfirm(true)}
-              >
-                Reject
-              </button>
-              <button
-                type="button"
-                className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-                onClick={() => navigate("/supervisor")}
-              >
-                Cancel
-              </button>
+            {/* Right column */}
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Size Required
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.tireSizeRequired}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Quantity
+                </label>
+                <div className="p-2 rounded bg-gray-50">{request.quantity}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tubes Quantity
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.tubesQuantity}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Existing Tire Make
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.existingTireMake}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Last Replacement Date
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.lastReplacementDate
+                    ? new Date(request.lastReplacementDate).toLocaleDateString()
+                    : "-"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Present KM Reading
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.presentKmReading}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Previous KM Reading
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.previousKmReading}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Wear Pattern
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.tireWearPattern}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Request Reason
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.requestReason}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Comments
+                </label>
+                <div className="p-2 rounded bg-gray-50">
+                  {request.comments || "N/A"}
+                </div>
+              </div>
             </div>
           </div>
+          {/* Images Section with error handling */}
+          {request.images && request.images.length > 0 && (
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                Images
+              </label>
+              <div className="flex flex-wrap gap-3 mt-2">
+                {request.images.map((img, idx) =>
+                  img ? (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Tire image ${idx + 1}`}
+                      className="object-cover w-24 h-24 border rounded"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/96?text=Image+Not+Found";
+                      }}
+                    />
+                  ) : null
+                )}
+              </div>
+            </div>
+          )}
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Supervisor Notes
+            </label>
+            <textarea
+              className="w-full p-2 mt-1 border rounded"
+              placeholder="Enter notes..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div className="flex gap-4 mt-6">
+            <button
+              type="button"
+              className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+              onClick={() => handleAction(true)}
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+              onClick={() => setShowRejectConfirm(true)}
+            >
+              Reject
+            </button>
+            <button
+              type="button"
+              className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
+              onClick={() => navigate("/supervisor")}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
-
         {/* Reject Confirmation Modal */}
         {showRejectConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

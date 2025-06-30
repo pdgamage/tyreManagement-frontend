@@ -68,8 +68,14 @@ const SupervisorRequestDetails = () => {
     );
 
   return (
-    <div className="max-w-2xl p-8 mx-auto mt-10 bg-white shadow-lg rounded-xl">
-      <h2 className="flex items-center gap-2 mb-6 text-3xl font-bold text-blue-700">
+    <div className="max-w-lg p-8 mx-auto mt-10 bg-white shadow-lg rounded-xl">
+      <button
+        className="px-4 py-2 mb-4 text-blue-700 transition bg-blue-100 rounded hover:bg-blue-200"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
+      <h2 className="flex items-center gap-2 mb-6 text-2xl font-bold text-blue-700">
         <span>Request #{request.id}</span>
         <span
           className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold
@@ -88,7 +94,7 @@ const SupervisorRequestDetails = () => {
         </span>
       </h2>
       <form className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="flex flex-col gap-6">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
               Vehicle Number
@@ -159,8 +165,6 @@ const SupervisorRequestDetails = () => {
               {new Date(request.submittedAt).toLocaleString()}
             </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
               Tire Size Required
@@ -225,74 +229,76 @@ const SupervisorRequestDetails = () => {
               {request.tireWearPattern}
             </div>
           </div>
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold text-gray-700">
-            Request Reason
-          </label>
-          <div className="p-2 rounded bg-gray-50">{request.requestReason}</div>
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold text-gray-700">
-            Comments
-          </label>
-          <div className="p-2 rounded bg-gray-50">
-            {request.comments || "N/A"}
-          </div>
-        </div>
-        {request.images && request.images.length > 0 && (
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
-              Images
+              Request Reason
             </label>
-            <div className="flex flex-wrap gap-3 mt-2">
-              {request.images.map((img, idx) =>
-                img ? (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`Tire image ${idx + 1}`}
-                    className="object-cover w-24 h-24 border rounded"
-                  />
-                ) : null
-              )}
+            <div className="p-2 rounded bg-gray-50">
+              {request.requestReason}
             </div>
           </div>
-        )}
-        <div>
-          <label className="block mb-1 font-semibold text-gray-700">
-            Supervisor Notes
-          </label>
-          <textarea
-            className="w-full p-2 mt-1 border rounded"
-            placeholder="Enter notes..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-          />
-        </div>
-        <div className="flex gap-4 mt-6">
-          <button
-            type="button"
-            className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
-            onClick={() => handleAction(true)}
-          >
-            Approve
-          </button>
-          <button
-            type="button"
-            className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
-            onClick={() => setShowRejectConfirm(true)}
-          >
-            Reject
-          </button>
-          <button
-            type="button"
-            className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-            onClick={() => navigate("/supervisor")}
-          >
-            Cancel
-          </button>
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Comments
+            </label>
+            <div className="p-2 rounded bg-gray-50">
+              {request.comments || "N/A"}
+            </div>
+          </div>
+          {request.images && request.images.length > 0 && (
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                Images
+              </label>
+              <div className="flex flex-wrap gap-3 mt-2">
+                {request.images.map((img, idx) =>
+                  img ? (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Tire image ${idx + 1}`}
+                      className="object-cover w-24 h-24 border rounded"
+                    />
+                  ) : null
+                )}
+              </div>
+            </div>
+          )}
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Supervisor Notes
+            </label>
+            <textarea
+              className="w-full p-2 mt-1 border rounded"
+              placeholder="Enter notes..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div className="flex gap-4 mt-6">
+            <button
+              type="button"
+              className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+              onClick={() => handleAction(true)}
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+              onClick={() => setShowRejectConfirm(true)}
+            >
+              Reject
+            </button>
+            <button
+              type="button"
+              className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
+              onClick={() => navigate("/supervisor")}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </form>
 

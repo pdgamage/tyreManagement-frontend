@@ -992,7 +992,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (currentStep === 5) {
+          if (currentStep === 4) {
             handleSubmit(e);
           }
         }}

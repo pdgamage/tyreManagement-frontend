@@ -8,22 +8,17 @@ const VehicleRegistration = () => {
   const [showForm, setShowForm] = useState(false);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link to="/user" className="flex items-center text-blue-600 hover:underline">
-          <ArrowLeftIcon size={16} className="mr-1" />
-          Back to Dashboard
-        </Link>
-      </div>
+    <div className="px-4 py-8 mx-auto max-w-7xl">
+      
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Vehicle Registration</h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">Vehicle Registration</h1>
           <p className="text-gray-600">Register and manage vehicles in the system</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700"
         >
           {showForm ? (
             <>

@@ -279,7 +279,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           htmlFor="existingTireMake"
           className="block mb-1 font-medium text-gray-700"
         >
-          Existing Tire Make *
+          Brand name *
         </label>
         <input
           type="text"
@@ -383,7 +383,24 @@ const RequestInformationStep: React.FC<StepProps> = ({
           >
             Department/Section *
           </label>
-          <input
+          <select
+            id="userSection"
+            name="userSection"
+            value={formData.userSection}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          >
+            <option value="">Select Department</option>
+            <option value="Field">Field Operations / Service Delivery</option>
+            <option value="Logistics">Logistics & Distribution</option>
+            <option value="Sales">Sales & Marketing</option>
+            <option value="Support">Customer Support </option>
+            <option value="Maintenance">Maintenance & Technical Support</option>
+            <option value="Security">Security</option>
+            <option value="Training">Training & HR</option>
+          </select>
+          {/* <input
             type="text"
             id="userSection"
             name="userSection"
@@ -391,7 +408,7 @@ const RequestInformationStep: React.FC<StepProps> = ({
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded"
             required
-          />
+          /> */}
           {errors.userSection && (
             <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
           )}

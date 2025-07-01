@@ -392,13 +392,19 @@ const RequestInformationStep: React.FC<StepProps> = ({
             required
           >
             <option value="">Select Department</option>
-            <option value="Field">Field Operations / Service Delivery</option>
-            <option value="Logistics">Logistics & Distribution</option>
-            <option value="Sales">Sales & Marketing</option>
-            <option value="Support">Customer Support </option>
-            <option value="Maintenance">Maintenance & Technical Support</option>
+            <option value="Field Operations / Service Delivery">
+              Field Operations / Service Delivery
+            </option>
+            <option value="Logistics & Distribution">
+              Logistics & Distribution
+            </option>
+            <option value="Sales & Marketing">Sales & Marketing</option>
+            <option value="Customer Support">Customer Support </option>
+            <option value="Maintenance & Technical Support">
+              Maintenance & Technical Support
+            </option>
             <option value="Security">Security</option>
-            <option value="Training">Training & HR</option>
+            <option value="Training & HR">Training & HR</option>
           </select>
           {/* <input
             type="text"

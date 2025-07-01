@@ -433,7 +433,6 @@ const RequestInformationStep: React.FC<StepProps> = ({
       </div>
     </div>
     <div className="space-y-4">
-      <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
       <div className="grid gap-4 md:grid-cols-3">
         <div>
           <label
@@ -956,7 +955,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         <div className="relative">
           <div className="absolute left-0 w-full h-1 -translate-y-1/2 bg-gray-200 top-1/2"></div>
           <div className="relative flex justify-between">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <div
                 key={step}
                 className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10 
@@ -975,7 +974,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           <span>Vehicle Info</span>
           <span>Tire Details</span>
           <span>Request Info</span>
-          <span>Requester Info</span>
           <span>Additional Info</span>
         </div>
       </div>
@@ -1027,7 +1025,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               errors={errors}
             />
           )}
-          
+
           {currentStep === 4 && (
             <AdditionalInformationStep
               formData={formData}

@@ -467,6 +467,7 @@ const RequesterDetailsStep: React.FC<StepProps> = ({
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
           required
+          readOnly
         />
         {errors.requesterName && (
           <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
@@ -698,7 +699,34 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }
   };
 
-  const handleVehicleSelect = (vehicle: Vehicle) => {
+  const handleVehicleSelect = async (vehicle: Vehicle) => {
+    // Fetch previous requests for this vehicle
+    let lastReplacementDate = "";
+    try {
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production.up.railway.app"
+        }/api/requests/vehicle/${vehicle.id}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          data[0].lastReplacementDate
+        ) {
+          lastReplacementDate = data[0].lastReplacementDate.slice(0, 10);
+        } else {
+          lastReplacementDate = new Date().toISOString().slice(0, 10);
+        }
+      } else {
+        lastReplacementDate = new Date().toISOString().slice(0, 10);
+      }
+    } catch {
+      lastReplacementDate = new Date().toISOString().slice(0, 10);
+    }
+
     setFormData((prev) => ({
       ...prev,
       vehicleId: vehicle.id.toString(),
@@ -707,6 +735,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
       tireSizeRequired: vehicle.tireSize || "",
+      lastReplacementDate: lastReplacementDate, // <-- auto-filled here
     }));
   };
 
@@ -857,6 +886,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       setError("An error occurred while submitting your request");
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        requesterName: user.name || "",
+        requesterEmail: user.email || "",
+      }));
+    }
+  }, [user]);
 
   // Redirect to login if not logged in
   if (!user) {

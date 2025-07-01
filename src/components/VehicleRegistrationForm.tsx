@@ -264,7 +264,7 @@ const VehicleRegistrationForm = () => {
           >
             Department
           </label>
-          <input
+          {/* <input
             id="department"
             type="text"
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -272,7 +272,21 @@ const VehicleRegistrationForm = () => {
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
             required
-          />
+          /> */}
+          <select
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            required
+          >
+            <option value="" disabled>
+              -- Select Department --
+            </option>
+            <option value="Marketing Department">Marketing Department</option>
+            <option value="Logistics Department">Logistics Department</option>
+            <option value="HR Department">HR Department</option>
+            <option value="IT Department">IT Department</option>
+          </select>
         </div>
         <button
           type="submit"

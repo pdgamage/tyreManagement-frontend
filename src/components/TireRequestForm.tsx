@@ -844,7 +844,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
@@ -1045,7 +1045,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           >
             Previous
           </button>
-          {currentStep < 5 ? (
+          {currentStep < 4 ? (
             <button
               type="button"
               onClick={(e) => {

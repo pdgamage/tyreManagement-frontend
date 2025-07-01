@@ -432,82 +432,149 @@ const RequestInformationStep: React.FC<StepProps> = ({
         </div>
       </div>
     </div>
-  </div>
-);
-
-const RequesterDetailsStep: React.FC<StepProps> = ({
-  formData,
-  handleChange,
-  errors,
-}) => (
-  <div className="space-y-4">
-    <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
-    <div className="grid gap-4 md:grid-cols-3">
-      <div>
-        <label
-          htmlFor="requesterName"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Name *
-        </label>
-        <input
-          type="text"
-          id="requesterName"
-          name="requesterName"
-          value={formData.requesterName}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-          readOnly
-        />
-        {errors.requesterName && (
-          <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="requesterEmail"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Email *
-        </label>
-        <input
-          type="email"
-          id="requesterEmail"
-          name="requesterEmail"
-          value={formData.requesterEmail}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-          readOnly
-        />
-        {errors.requesterEmail && (
-          <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="requesterPhone"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Phone *
-        </label>
-        <input
-          type="tel"
-          id="requesterPhone"
-          name="requesterPhone"
-          value={formData.requesterPhone}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
-        {errors.requesterPhone && (
-          <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
-        )}
+    <div className="space-y-4">
+      <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div>
+          <label
+            htmlFor="requesterName"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Name *
+          </label>
+          <input
+            type="text"
+            id="requesterName"
+            name="requesterName"
+            value={formData.requesterName}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            readOnly
+          />
+          {errors.requesterName && (
+            <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="requesterEmail"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Email *
+          </label>
+          <input
+            type="email"
+            id="requesterEmail"
+            name="requesterEmail"
+            value={formData.requesterEmail}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            readOnly
+          />
+          {errors.requesterEmail && (
+            <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="requesterPhone"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Phone *
+          </label>
+          <input
+            type="tel"
+            id="requesterPhone"
+            name="requesterPhone"
+            value={formData.requesterPhone}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          />
+          {errors.requesterPhone && (
+            <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
+          )}
+        </div>
       </div>
     </div>
   </div>
 );
+
+// const RequesterDetailsStep: React.FC<StepProps> = ({
+//   formData,
+//   handleChange,
+//   errors,
+// }) => (
+//   <div className="space-y-4">
+//     <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
+//     <div className="grid gap-4 md:grid-cols-3">
+//       <div>
+//         <label
+//           htmlFor="requesterName"
+//           className="block mb-1 font-medium text-gray-700"
+//         >
+//           Name *
+//         </label>
+//         <input
+//           type="text"
+//           id="requesterName"
+//           name="requesterName"
+//           value={formData.requesterName}
+//           onChange={handleChange}
+//           className="w-full p-3 border border-gray-300 rounded"
+//           required
+//           readOnly
+//         />
+//         {errors.requesterName && (
+//           <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
+//         )}
+//       </div>
+//       <div>
+//         <label
+//           htmlFor="requesterEmail"
+//           className="block mb-1 font-medium text-gray-700"
+//         >
+//           Email *
+//         </label>
+//         <input
+//           type="email"
+//           id="requesterEmail"
+//           name="requesterEmail"
+//           value={formData.requesterEmail}
+//           onChange={handleChange}
+//           className="w-full p-3 border border-gray-300 rounded"
+//           required
+//           readOnly
+//         />
+//         {errors.requesterEmail && (
+//           <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
+//         )}
+//       </div>
+//       <div>
+//         <label
+//           htmlFor="requesterPhone"
+//           className="block mb-1 font-medium text-gray-700"
+//         >
+//           Phone *
+//         </label>
+//         <input
+//           type="tel"
+//           id="requesterPhone"
+//           name="requesterPhone"
+//           value={formData.requesterPhone}
+//           onChange={handleChange}
+//           className="w-full p-3 border border-gray-300 rounded"
+//           required
+//         />
+//         {errors.requesterPhone && (
+//           <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
+//         )}
+//       </div>
+//     </div>
+//   </div>
+// );
 
 const AdditionalInformationStep: React.FC<StepProps> = ({
   formData,

@@ -1027,15 +1027,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               errors={errors}
             />
           )}
+          
           {currentStep === 4 && (
-            <RequesterDetailsStep
-              formData={formData}
-              handleChange={handleChange}
-              handleFileChange={handleFileChange}
-              errors={errors}
-            />
-          )}
-          {currentStep === 5 && (
             <AdditionalInformationStep
               formData={formData}
               handleChange={handleChange}

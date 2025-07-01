@@ -189,7 +189,6 @@ const VehicleRegistrationForm = () => {
           <input
             id="vehicleNumber"
             type="text"
-            maxLength={8}
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., TRK-2023-001"
             value={vehicleNumber}

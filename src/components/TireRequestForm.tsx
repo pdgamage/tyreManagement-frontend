@@ -406,15 +406,6 @@ const RequestInformationStep: React.FC<StepProps> = ({
             <option value="Security">Security</option>
             <option value="Training & HR">Training & HR</option>
           </select>
-          {/* <input
-            type="text"
-            id="userSection"
-            name="userSection"
-            value={formData.userSection}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          /> */}
           {errors.userSection && (
             <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
           )}

@@ -28,6 +28,12 @@ const VehicleRegistrationForm = () => {
     setError("");
     setSuccess(false);
 
+    // Vehicle number max length validation
+    if (vehicleNumber.length > 8) {
+      setError("Vehicle Number cannot exceed 8 characters");
+      return;
+    }
+
     setFormLoading(true);
 
     try {
@@ -159,7 +165,6 @@ const VehicleRegistrationForm = () => {
         </div>
       )}
 
-      <h2 className="mb-6 text-2xl font-bold">Register New Vehicle</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
@@ -171,6 +176,7 @@ const VehicleRegistrationForm = () => {
           <input
             id="vehicleNumber"
             type="text"
+            maxLength={8}
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., TRK-2023-001"
             value={vehicleNumber}

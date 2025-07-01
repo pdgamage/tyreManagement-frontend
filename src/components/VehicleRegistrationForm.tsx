@@ -17,11 +17,25 @@ const VehicleRegistrationForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [vehicleNumberError, setVehicleNumberError] = useState("");
 
   // Redirect to login if not logged in
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  // Instant validation for vehicle number
+  const handleVehicleNumberChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setVehicleNumber(value);
+    if (value.length > 8) {
+      setVehicleNumberError("Vehicle Number cannot exceed 8 characters");
+    } else {
+      setVehicleNumberError("");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +62,7 @@ const VehicleRegistrationForm = () => {
           tireSize,
           department,
           status: "active",
-          registeredBy: user.id, // <-- Add this line
+          registeredBy: user.id,
         }),
       });
 
@@ -68,7 +82,7 @@ const VehicleRegistrationForm = () => {
           tireSize,
           department,
           status: "active",
-          registeredBy: user.id, // <-- Add this
+          registeredBy: user.id,
         });
         setSuccess(true);
         setFormLoading(false);
@@ -88,7 +102,6 @@ const VehicleRegistrationForm = () => {
         }, 4000);
       } catch (err: any) {
         setFormLoading(false);
-        // Show backend error if available, otherwise generic error
         setError(
           err?.message || "An error occurred while registering the vehicle"
         );
@@ -176,13 +189,15 @@ const VehicleRegistrationForm = () => {
           <input
             id="vehicleNumber"
             type="text"
-            maxLength={8}
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., TRK-2023-001"
             value={vehicleNumber}
-            onChange={(e) => setVehicleNumber(e.target.value)}
+            onChange={handleVehicleNumberChange}
             required
           />
+          {vehicleNumberError && (
+            <p className="mt-1 text-sm text-red-600">{vehicleNumberError}</p>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
@@ -264,29 +279,14 @@ const VehicleRegistrationForm = () => {
           >
             Department
           </label>
-          {/* <input
+          <input
             id="department"
-            type="text"
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="e.g., Logistics"
+            name="department"
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded"
             required
-          /> */}
-          <select
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              -- Select Department --
-            </option>
-            <option value="Marketing Department">Marketing Department</option>
-            <option value="Logistics Department">Logistics Department</option>
-            <option value="HR Department">HR Department</option>
-            <option value="IT Department">IT Department</option>
-          </select>
+          />
         </div>
         <button
           type="submit"

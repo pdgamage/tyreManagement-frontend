@@ -1,11 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { LockKeyhole, LogOutIcon, PhoneIcon, MailIcon } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { Link } from "react-router-dom";
+import { LockKeyhole, LogOutIcon, PhoneIcon, MailIcon } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  
   return (
     <>
       {/* Top info bar */}
@@ -44,16 +43,16 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
-                  alt="SLT Mobitel" 
-                  className="h-12" 
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
+                  alt="SLT Mobitel"
+                  className="h-12"
                 />
               </Link>
             </div>
             {user && (
-              <button 
-                onClick={logout} 
+              <button
+                onClick={logout}
                 className="flex items-center px-4 py-2 text-white transition-colors bg-red-600 rounded hover:bg-red-700"
               >
                 <LogOutIcon size={16} className="mr-2" />

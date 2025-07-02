@@ -688,12 +688,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         );
         if (response.ok) {
           const data = await response.json();
-          setRequests(Array.isArray(data) ? data : []);
-        } else {
-          setRequests([]);
+          setRequests(data);
         }
       } catch (err) {
-        setRequests([]);
         console.error("Error fetching requests:", err);
       }
     };
@@ -930,25 +927,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }
   }, [user]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this request?"))
-      return;
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Failed to delete request");
-      setRequests((prev) => {
-        const idx = prev.findIndex((r) => r.id === id);
-        if (idx === -1) return prev;
-        return [...prev.slice(0, idx), ...prev.slice(idx + 1)];
-      });
-    } catch (err) {
-      alert("Failed to delete request");
-    }
-  };
-
   // Redirect to login if not logged in
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -1093,11 +1071,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       <div className="pt-8 mt-12 border-t">
         <RequestTable
-          requests={Array.isArray(requests) ? requests : []}
+          requests={requests}
           title="Your Tire Requests"
           onView={handleView}
-          onDelete={handleDelete}
-          showActions={true}
+          onApprove={() => {}}
+          onReject={() => {}}
+          showActions={false}
         />
       </div>
     </div>

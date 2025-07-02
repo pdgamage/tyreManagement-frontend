@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import {
-  Eye,
-  CheckCircle,
-  XCircle,
+  Trash, // Add Trash icon
+  // Eye,
+  // CheckCircle,
+  // XCircle,
   Clock,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -56,6 +59,7 @@ interface RequestTableProps {
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onView: (request: Request) => void;
+  onDelete: (id: string) => void; // Add onDelete prop
   showActions?: boolean;
 }
 
@@ -65,6 +69,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onApprove,
   onReject,
   onView,
+  onDelete, // Add onDelete prop
   showActions = true,
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
@@ -167,7 +172,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
               <tr
                 key={request.id}
                 className="cursor-pointer hover:bg-gray-50"
-                onClick={() => onView(request)} 
+                onClick={() => onView(request)}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   {formatDate(request.submittedAt)}
@@ -203,14 +208,17 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
+                    {/* Remove action icons, keep logic */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onView(request);
                       }}
                       className="text-blue-600 hover:text-blue-900"
+                      aria-label="View"
                     >
-                      <Eye className="w-5 h-5" />
+                      {/* Eye icon removed */}
+                      View
                     </button>
                     {request.status === "pending" && (
                       <>
@@ -220,8 +228,10 @@ const RequestTable: React.FC<RequestTableProps> = ({
                             onApprove(request.id);
                           }}
                           className="text-green-600 hover:text-green-900"
+                          aria-label="Approve"
                         >
-                          <CheckCircle className="w-5 h-5" />
+                          {/* CheckCircle icon removed */}
+                          Approve
                         </button>
                         <button
                           onClick={(e) => {
@@ -229,11 +239,24 @@ const RequestTable: React.FC<RequestTableProps> = ({
                             onReject(request.id);
                           }}
                           className="text-red-600 hover:text-red-900"
+                          aria-label="Reject"
                         >
-                          <XCircle className="w-5 h-5" />
+                          {/* XCircle icon removed */}
+                          Reject
                         </button>
                       </>
                     )}
+                    {/* Add Delete icon for all roles and statuses */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(request.id);
+                      }}
+                      className="text-gray-500 hover:text-red-700"
+                      aria-label="Delete"
+                    >
+                      <Trash className="w-5 h-5" />
+                    </button>
                   </td>
                 )}
               </tr>

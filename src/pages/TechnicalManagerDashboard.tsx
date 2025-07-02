@@ -202,7 +202,9 @@ const TechnicalManagerDashboard = () => {
               onApprove={handleApprove}
               onReject={handleReject}
               onDelete={() => {}}
-              onView={(request) => setSelectedRequest(request)}
+              onView={(request) =>
+                navigate(`/technical-manager/request/${request.id}`)
+              }
               showActions={false}
             />
 
@@ -212,7 +214,9 @@ const TechnicalManagerDashboard = () => {
               title="Technically Rejected Requests"
               onApprove={handleApprove}
               onReject={handleReject}
-              onView={(request) => setSelectedRequest(request)}
+              onView={(request) =>
+                navigate(`/technical-manager/request/${request.id}`)
+              }
               onDelete={() => {}}
               showActions={false}
             />

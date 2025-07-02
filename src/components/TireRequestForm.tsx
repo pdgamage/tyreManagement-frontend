@@ -688,9 +688,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         );
         if (response.ok) {
           const data = await response.json();
-          setRequests(data);
+          setRequests(Array.isArray(data) ? data : []);
+        } else {
+          setRequests([]);
         }
       } catch (err) {
+        setRequests([]);
         console.error("Error fetching requests:", err);
       }
     };
@@ -1090,7 +1093,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       <div className="pt-8 mt-12 border-t">
         <RequestTable
-          requests={requests}
+          requests={Array.isArray(requests) ? requests : []}
           title="Your Tire Requests"
           onView={handleView}
           onDelete={handleDelete}

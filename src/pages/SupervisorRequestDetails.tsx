@@ -34,6 +34,10 @@ const SupervisorRequestDetails = () => {
         }
         const data = await res.json();
         setRequest(data);
+        // If not pending, set notes to supervisor_notes from backend
+        if (data.status !== "pending" && data.supervisor_notes) {
+          setNotes(data.supervisor_notes);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to load request");
       }
@@ -309,6 +313,7 @@ const SupervisorRequestDetails = () => {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
+              readOnly={request.status !== "pending"} // Make read-only if not pending
             />
           </div>
           {/* Action Buttons */}

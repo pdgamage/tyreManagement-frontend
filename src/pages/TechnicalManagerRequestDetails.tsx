@@ -280,6 +280,18 @@ const TechnicalManagerRequestDetails = () => {
             </div>
           </div>
           <hr />
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Supervisor Notes
+            </label>
+            <textarea
+              className="w-full p-2 mt-1 border rounded"
+              placeholder="No supervisor notes"
+              value={request.supervisor_notes || ""}
+              readOnly={true}
+              rows={3}
+            />
+          </div>
           {/* Images Section with error handling */}
           {request.images && request.images.length > 0 && (
             <div>
@@ -305,19 +317,7 @@ const TechnicalManagerRequestDetails = () => {
             </div>
           )}
           <hr />
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Supervisor Notes
-            </label>
-            <textarea
-              className="w-full p-2 mt-1 border rounded"
-              placeholder="Enter notes..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              readOnly={true} 
-            />
-          </div>
+
           {/* Technical Manager Notes */}
           <div>
             <label className="block mb-1 font-semibold text-gray-700">

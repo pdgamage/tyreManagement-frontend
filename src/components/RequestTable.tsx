@@ -208,49 +208,17 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
-                    {/* Remove action icons, keep logic */}
+                    {/* Delete icon for all roles and statuses */}
                     <button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
-                        onView(request);
-                      }}
-                      className="text-blue-600 hover:text-blue-900"
-                      aria-label="View"
-                    >
-                      {/* Eye icon removed */}
-                      View
-                    </button>
-                    {request.status === "pending" && (
-                      <>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onApprove(request.id);
-                          }}
-                          className="text-green-600 hover:text-green-900"
-                          aria-label="Approve"
-                        >
-                          {/* CheckCircle icon removed */}
-                          Approve
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onReject(request.id);
-                          }}
-                          className="text-red-600 hover:text-red-900"
-                          aria-label="Reject"
-                        >
-                          {/* XCircle icon removed */}
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {/* Add Delete icon for all roles and statuses */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(request.id);
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this request?"
+                          )
+                        ) {
+                          await onDelete(request.id);
+                        }
                       }}
                       className="text-gray-500 hover:text-red-700"
                       aria-label="Delete"

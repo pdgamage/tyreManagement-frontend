@@ -7,6 +7,7 @@ import { Vehicle } from "../types/api";
 import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
+import { useRequests } from "../contexts/RequestContext";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -677,6 +678,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [success, setSuccess] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [requests, setRequests] = useState<Request[]>([]);
+  const { requests: pendingRequests, fetchRequests } = useRequests();
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -927,6 +929,17 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }
   }, [user]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`, {
+        method: "DELETE",
+      });
+      await fetchRequests();
+    } catch {
+      alert("Failed to delete request");
+    }
+  };
+
   // Redirect to login if not logged in
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -1071,12 +1084,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       <div className="pt-8 mt-12 border-t">
         <RequestTable
-          requests={requests}
-          title="Your Tire Requests"
-          onView={handleView}
+          requests={pendingRequests}
+          title="Pending Requests"
           onApprove={() => {}}
           onReject={() => {}}
-          showActions={false}
+          onDelete={handleDelete}
+          showActions={true}
         />
       </div>
     </div>

@@ -20,13 +20,21 @@ const TechnicalManagerRequestDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        if (isNaN(numericId)) throw new Error("Invalid request ID.");
+        if (isNaN(numericId)) {
+          throw new Error("Invalid request ID.");
+        }
         const res = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/requests/${numericId}`
         );
-        if (!res.ok) throw new Error("Failed to fetch request.");
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error("Request not found.");
+          }
+          throw new Error("Failed to fetch request.");
+        }
         const data = await res.json();
         setRequest(data);
+        // If not supervisor approved, set notes to technical_manager_notes from backend
         if (
           data.status !== "supervisor approved" &&
           data.technical_manager_notes
@@ -97,48 +105,250 @@ const TechnicalManagerRequestDetails = () => {
             {request.status.replace(/_/g, " ")}
           </span>
         </h2>
-        {/* ...Display request details similar to SupervisorRequestDetails... */}
-        <div>
-          <label className="block mb-1 font-semibold text-gray-700">
-            Technical Manager Notes
-          </label>
-          <textarea
-            className="w-full p-2 mt-1 border rounded"
-            placeholder="Enter notes..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-            readOnly={request.status !== "supervisor approved"}
-          />
-        </div>
-        <div className="flex gap-4 mt-6">
-          {request.status === "supervisor approved" && (
-            <>
-              <button
-                type="button"
-                className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
-                onClick={() => handleAction(true)}
-                disabled={isApproving}
-              >
-                {isApproving ? "Approving..." : "Approve"}
-              </button>
-              <button
-                type="button"
-                className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
-                onClick={() => setShowRejectConfirm(true)}
-              >
-                Reject
-              </button>
-            </>
+        <form className="space-y-10">
+          {/* Vehicle & Requester Info */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Vehicle & Requester Info
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Number
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleNumber}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Brand
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleBrand}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Model
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleModel}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Year
+                </label>
+                <div className="p-2 bg-white rounded">{request.year}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Department/Section
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.userSection}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Cost Center
+                </label>
+                <div className="p-2 bg-white rounded">{request.costCenter}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Name
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterName}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Email
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterEmail}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Phone
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterPhone}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Submitted At
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {new Date(request.submittedAt).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          {/* Tire & Request Details */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Tire & Request Details
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Size Required
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tireSizeRequired}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Quantity
+                </label>
+                <div className="p-2 bg-white rounded">{request.quantity}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tubes Quantity
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tubesQuantity}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Existing Tire Make
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.existingTireMake}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Last Replacement Date
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.lastReplacementDate
+                    ? new Date(request.lastReplacementDate).toLocaleDateString()
+                    : "-"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Present KM Reading
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.presentKmReading}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Previous KM Reading
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.previousKmReading}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Wear Pattern
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearPattern}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Request Reason
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requestReason}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Comments
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.comments || "N/A"}
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          {/* Images Section with error handling */}
+          {request.images && request.images.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                Images
+              </h3>
+              <div className="flex flex-wrap gap-3 p-4 mt-2 rounded-lg bg-gray-50">
+                {request.images.map((img, idx) =>
+                  img ? (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Tire image ${idx + 1}`}
+                      className="object-cover w-24 h-24 border rounded"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/96?text=Image+Not+Found";
+                      }}
+                    />
+                  ) : null
+                )}
+              </div>
+            </div>
           )}
-          <button
-            type="button"
-            className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-            onClick={() => navigate("/technical-manager")}
-          >
-            Cancel
-          </button>
-        </div>
+          <hr />
+          {/* Technical Manager Notes */}
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Technical Manager Notes
+            </label>
+            <textarea
+              className="w-full p-2 mt-1 border rounded"
+              placeholder="Enter notes..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              readOnly={request.status !== "supervisor approved"}
+            />
+          </div>
+          {/* Action Buttons */}
+          <div className="flex gap-4 mt-6">
+            {request.status === "supervisor approved" && (
+              <>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+                  onClick={() => handleAction(true)}
+                  disabled={isApproving}
+                >
+                  {isApproving ? "Approving..." : "Approve"}
+                </button>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+                  onClick={() => setShowRejectConfirm(true)}
+                >
+                  Reject
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
+              onClick={() => navigate("/technical-manager")}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
         {/* Reject Confirmation Modal */}
         {showRejectConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

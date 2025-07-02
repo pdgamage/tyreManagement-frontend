@@ -82,10 +82,10 @@ const SupervisorRequestDetails = () => {
           className="px-4 py-2 mb-4 text-blue-700 transition bg-blue-100 rounded hover:bg-blue-200"
           onClick={() => navigate(-1)}
         >
-          &larr; Back
+           Back
         </button>
         <h2 className="flex items-center gap-2 mb-6 text-2xl font-bold text-blue-700">
-          <span>Request #{request.id}</span>
+          <span>Request {request.id}</span>
           <span
             className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold
           ${

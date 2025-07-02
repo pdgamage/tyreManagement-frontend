@@ -927,6 +927,21 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }
   }, [user]);
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this request?"))
+      return;
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Failed to delete request");
+      setRequests((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      alert("Failed to delete request");
+    }
+  };
+
   // Redirect to login if not logged in
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -1074,9 +1089,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           requests={requests}
           title="Your Tire Requests"
           onView={handleView}
-          onApprove={() => {}}
-          onReject={() => {}}
-          showActions={false}
+          onDelete={handleDelete}
+          showActions={true}
         />
       </div>
     </div>

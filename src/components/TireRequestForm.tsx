@@ -489,7 +489,16 @@ const RequestInformationStep: React.FC<StepProps> = ({
             id="requesterPhone"
             name="requesterPhone"
             value={formData.requesterPhone}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only digits and limit to 15 characters
+              if (/^\d{0,15}$/.test(value)) {
+                handleChange(e);
+              }
+            }}
+            pattern="\d{1,15}"
+            maxLength={15}
+            inputMode="numeric"
             className="w-full p-3 border border-gray-300 rounded"
             required
           />

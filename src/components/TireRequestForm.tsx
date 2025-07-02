@@ -308,6 +308,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           value={formData.lastReplacementDate}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
           required
         />
         {errors.lastReplacementDate && (
@@ -971,7 +972,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
             {[1, 2, 3, 4].map((step) => (
               <div
                 key={step}
-                className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10 
+                className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10
                   ${
                     currentStep >= step
                       ? "bg-blue-600 text-white"
@@ -1053,7 +1054,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           <button
             type="button"
             onClick={handlePrevious}
-            className={`px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 
+            className={`px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200
               ${currentStep === 1 ? "invisible" : ""}`}
           >
             Previous

@@ -21,7 +21,15 @@ export interface Request {
   presentKmReading: number;
   previousKmReading: number;
   tireWearPattern: string;
-  comments: string | null;  status: 'pending' | 'supervisor approved' | 'technical-manager approved' | 'engineer approved' | 'complete' | 'rejected';
+  comments: string | null;
+  status:
+    | "pending"
+    | "supervisor approved"
+    | "technical-manager approved"
+    | "engineer approved"
+    | "complete"
+    | "rejected";
   submittedAt: Date | string;
   images?: string[];
+  supervisor_notes?: string;
 }

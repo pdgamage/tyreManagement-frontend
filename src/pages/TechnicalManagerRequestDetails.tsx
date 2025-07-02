@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import { Request } from "../types/request";
 
-const SupervisorRequestDetails = () => {
+const TechnicalManagerRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
   const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
@@ -34,9 +34,12 @@ const SupervisorRequestDetails = () => {
         }
         const data = await res.json();
         setRequest(data);
-        // If not pending, set notes to supervisor_notes from backend
-        if (data.status !== "pending" && data.supervisor_notes) {
-          setNotes(data.supervisor_notes);
+        // If not supervisor approved, set notes to technical_manager_notes from backend
+        if (
+          data.status !== "supervisor approved" &&
+          data.technical_manager_notes
+        ) {
+          setNotes(data.technical_manager_notes);
         }
       } catch (err: any) {
         setError(err.message || "Failed to load request");
@@ -51,19 +54,19 @@ const SupervisorRequestDetails = () => {
       alert("Please enter notes");
       return;
     }
-    setIsApproving(true); // Start loading
+    setIsApproving(true);
     try {
       await updateRequestStatus(
         id!,
-        approve ? "supervisor approved" : "rejected",
+        approve ? "technical-manager approved" : "rejected",
         notes
       );
       await fetchRequests();
-      navigate("/supervisor");
+      navigate("/technical-manager");
     } catch {
       alert("Failed to update request status");
     } finally {
-      setIsApproving(false); // End loading
+      setIsApproving(false);
     }
   };
 
@@ -82,22 +85,22 @@ const SupervisorRequestDetails = () => {
           className="px-4 py-2 mb-4 text-blue-700 transition bg-blue-100 rounded hover:bg-blue-200"
           onClick={() => navigate(-1)}
         >
-           Back
+          Back
         </button>
         <h2 className="flex items-center gap-2 mb-6 text-2xl font-bold text-blue-700">
           <span>Request {request.id}</span>
           <span
             className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold
-          ${
-            request.status === "pending"
-              ? "bg-yellow-100 text-yellow-800"
-              : request.status === "rejected"
-              ? "bg-red-100 text-red-800"
-              : request.status.includes("approved")
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
-          }
-        `}
+              ${
+                request.status === "supervisor approved"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : request.status === "rejected"
+                  ? "bg-red-100 text-red-800"
+                  : request.status.includes("approved")
+                  ? "bg-green-100 text-green-800"
+                  : "bg-gray-100 text-gray-800"
+              }
+            `}
           >
             {request.status.replace(/_/g, " ")}
           </span>
@@ -277,6 +280,18 @@ const SupervisorRequestDetails = () => {
             </div>
           </div>
           <hr />
+          <div>
+            <label className="block mb-1 font-semibold text-gray-700">
+              Supervisor Notes
+            </label>
+            <textarea
+              className="w-full p-2 mt-1 border rounded"
+              placeholder="No supervisor notes"
+              value={request.supervisor_notes || ""}
+              readOnly={true}
+              rows={3}
+            />
+          </div>
           {/* Images Section with error handling */}
           {request.images && request.images.length > 0 && (
             <div>
@@ -302,10 +317,11 @@ const SupervisorRequestDetails = () => {
             </div>
           )}
           <hr />
-          {/* Supervisor Notes */}
+
+          {/* Technical Manager Notes */}
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
-              Supervisor Notes
+              Technical Manager Notes
             </label>
             <textarea
               className="w-full p-2 mt-1 border rounded"
@@ -313,12 +329,12 @@ const SupervisorRequestDetails = () => {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              readOnly={request.status !== "pending"} // Make read-only if not pending
+              readOnly={request.status !== "supervisor approved"}
             />
           </div>
           {/* Action Buttons */}
           <div className="flex gap-4 mt-6">
-            {request.status === "pending" && (
+            {request.status === "supervisor approved" && (
               <>
                 <button
                   type="button"
@@ -340,7 +356,7 @@ const SupervisorRequestDetails = () => {
             <button
               type="button"
               className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-              onClick={() => navigate("/supervisor")}
+              onClick={() => navigate("/technical-manager")}
             >
               Cancel
             </button>
@@ -381,4 +397,4 @@ const SupervisorRequestDetails = () => {
   );
 };
 
-export default SupervisorRequestDetails;
+export default TechnicalManagerRequestDetails;

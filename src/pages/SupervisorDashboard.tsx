@@ -47,6 +47,17 @@ const SupervisorDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`, {
+        method: "DELETE",
+      });
+      await fetchRequests(); // Refresh the list after deletion
+    } catch {
+      alert("Failed to delete request");
+    }
+  };
+
   const pendingRequests = requests.filter((req) => req.status === "pending");
   const approvedRequests = requests.filter(
     (req) => req.status === "supervisor approved"
@@ -123,6 +134,7 @@ const SupervisorDashboard = () => {
               onView={(request) =>
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
+              onDelete={handleDelete}
             />
 
             {/* Approved Requests */}
@@ -135,6 +147,7 @@ const SupervisorDashboard = () => {
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
               showActions={false}
+              onDelete={handleDelete}
             />
 
             {/* Rejected Requests */}
@@ -147,6 +160,7 @@ const SupervisorDashboard = () => {
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
               showActions={false}
+              onDelete={handleDelete}
             />
           </div>
         ) : (

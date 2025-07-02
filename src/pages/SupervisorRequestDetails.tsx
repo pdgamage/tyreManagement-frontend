@@ -12,7 +12,7 @@ const SupervisorRequestDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
-  const [isApproving, setIsApproving] = useState(false); 
+  const [isApproving, setIsApproving] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -313,21 +313,25 @@ const SupervisorRequestDetails = () => {
           </div>
           {/* Action Buttons */}
           <div className="flex gap-4 mt-6">
-            <button
-              type="button"
-              className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
-              onClick={() => handleAction(true)}
-              disabled={isApproving}
-            >
-              {isApproving ? "Approving..." : "Approve"}
-            </button>
-            <button
-              type="button"
-              className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
-              onClick={() => setShowRejectConfirm(true)}
-            >
-              Reject
-            </button>
+            {request.status === "pending" && (
+              <>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+                  onClick={() => handleAction(true)}
+                  disabled={isApproving}
+                >
+                  {isApproving ? "Approving..." : "Approve"}
+                </button>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+                  onClick={() => setShowRejectConfirm(true)}
+                >
+                  Reject
+                </button>
+              </>
+            )}
             <button
               type="button"
               className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"

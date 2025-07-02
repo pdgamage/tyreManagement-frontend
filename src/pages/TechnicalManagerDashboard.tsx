@@ -119,32 +119,7 @@ const TechnicalManagerDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Technical Manager Dashboard
-            </h1>
-
-            {/* Profile Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-3 focus:outline-none"
-              >
-                <UserCircle className="w-8 h-8 text-gray-600" />
-                <ChevronDown className="w-4 h-4 text-gray-600" />
-              </button>
-              {isProfileOpen && (
-                <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg">
-                  <button
-                    onClick={() => logout()}
-                    className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          
 
           {/* Navigation Tabs */}
           <div className="mt-4 border-b border-gray-200">

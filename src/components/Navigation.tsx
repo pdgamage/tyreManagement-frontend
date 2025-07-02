@@ -76,12 +76,7 @@ const Navigation = () => {
             >
               Technical Review
             </NavLink>
-            <NavLink
-              to="/technical-manager/inventory"
-              icon={<BarChart3Icon size={20} />}
-            >
-              Inventory
-            </NavLink>
+            
           </>
         );
       case "engineer":
@@ -90,12 +85,7 @@ const Navigation = () => {
             <NavLink to="/engineer" icon={<ClipboardListIcon size={20} />}>
               Engineering Review
             </NavLink>
-            <NavLink
-              to="/engineer/specifications"
-              icon={<Settings2Icon size={20} />}
-            >
-              Specifications
-            </NavLink>
+            
           </>
         );
       case "customer-officer":

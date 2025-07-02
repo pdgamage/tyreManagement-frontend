@@ -950,6 +950,23 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     );
   }
 
+  // Delete logic for user requests
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production.up.railway.app/api"
+        }/requests/${id}`,
+        { method: "DELETE" }
+      );
+      // Refresh requests after deletion
+      setRequests((prev) => prev.filter((req) => req.id !== id));
+    } catch {
+      alert("Failed to delete request");
+    }
+  };
+
   return (
     <div className="relative p-6 space-y-8 bg-white rounded-lg shadow-md">
       <div className="mb-8">
@@ -980,7 +997,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       </div>
 
       {error && (
-        <div className="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
+        <div className="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded ">
           {error}
         </div>
       )}
@@ -1077,7 +1094,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onView={handleView}
           onApprove={() => {}}
           onReject={() => {}}
-          showActions={false}
+          onDelete={handleDelete} // <-- Add this line
+          showActions={true} // <-- Change to true to show delete icon
         />
       </div>
     </div>
@@ -1085,3 +1103,5 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 };
 
 export default TireRequestForm;
+
+// sample comit

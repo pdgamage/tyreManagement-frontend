@@ -1088,6 +1088,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           title="Pending Requests"
           onApprove={() => {}}
           onReject={() => {}}
+          onView={handleView}
           onDelete={handleDelete}
           showActions={true}
         />

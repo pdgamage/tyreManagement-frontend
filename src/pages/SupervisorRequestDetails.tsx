@@ -67,7 +67,7 @@ const SupervisorRequestDetails = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) return <div className="p-8 text-left">Loading...</div>;
   if (error)
     return <div className="p-8 text-center text-red-600">Error: {error}</div>;
   if (!request)

@@ -12,6 +12,7 @@ const SupervisorRequestDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [isApproving, setIsApproving] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,6 +47,7 @@ const SupervisorRequestDetails = () => {
       alert("Please enter notes");
       return;
     }
+    setIsApproving(true); // Start loading
     try {
       await updateRequestStatus(
         id!,
@@ -56,6 +58,8 @@ const SupervisorRequestDetails = () => {
       navigate("/supervisor");
     } catch {
       alert("Failed to update request status");
+    } finally {
+      setIsApproving(false); // End loading
     }
   };
 
@@ -313,8 +317,9 @@ const SupervisorRequestDetails = () => {
               type="button"
               className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
               onClick={() => handleAction(true)}
+              disabled={isApproving}
             >
-              Approve
+              {isApproving ? "Approving..." : "Approve"}
             </button>
             <button
               type="button"

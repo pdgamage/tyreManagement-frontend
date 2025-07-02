@@ -936,7 +936,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         { method: "DELETE" }
       );
       if (!res.ok) throw new Error("Failed to delete request");
-      setRequests((prev) => prev.filter((r) => r.id !== id));
+      setRequests((prev) => {
+        const idx = prev.findIndex((r) => r.id === id);
+        if (idx === -1) return prev;
+        return [...prev.slice(0, idx), ...prev.slice(idx + 1)];
+      });
     } catch (err) {
       alert("Failed to delete request");
     }

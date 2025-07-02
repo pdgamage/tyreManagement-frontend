@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Trash2,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -54,14 +53,18 @@ const getStatusStyles = (status: string) => {
 interface RequestTableProps {
   requests: Request[];
   title: string;
-  onDelete: (id: string) => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+  onView: (request: Request) => void;
   showActions?: boolean;
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
   requests,
   title,
-  onDelete,
+  onApprove,
+  onReject,
+  onView,
   showActions = true,
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
@@ -154,14 +157,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
               </th>
               {showActions && (
                 <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
-                  Delete
+                  Actions
                 </th>
               )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentRequests.map((request) => (
-              <tr key={request.id} className="hover:bg-gray-50">
+              <tr
+                key={request.id}
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => onView(request)} 
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
                   {formatDate(request.submittedAt)}
                 </td>
@@ -195,14 +202,38 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   </span>
                 </td>
                 {showActions && (
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
                     <button
-                      onClick={() => onDelete(request.id)}
-                      className="text-red-600 hover:text-red-900"
-                      title="Delete Request"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onView(request);
+                      }}
+                      className="text-blue-600 hover:text-blue-900"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Eye className="w-5 h-5" />
                     </button>
+                    {request.status === "pending" && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onApprove(request.id);
+                          }}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onReject(request.id);
+                          }}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                   </td>
                 )}
               </tr>

@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRequests } from "../contexts/RequestContext";
-import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
-import { UserCircle } from "lucide-react";
 import { Request } from "../types/request";
 import { useNavigate } from "react-router-dom";
 
@@ -13,15 +11,10 @@ interface RequestsContextType {
   updateRequestStatus: (id: string, status: string, notes: string) => void;
 }
 
-interface AuthContextType {
-  user: { name: string; email: string } | null;
-  logout: () => void;
-}
+
 
 const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
-  const { logout } = useAuth() as AuthContextType;
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
     "requests"
   );

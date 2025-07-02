@@ -64,12 +64,7 @@ const Navigation = () => {
             <NavLink to="/supervisor" icon={<ClipboardListIcon size={20} />}>
               Requests
             </NavLink>
-            <NavLink
-              to="/supervisor/reports"
-              icon={<BarChart3Icon size={20} />}
-            >
-              Reports
-            </NavLink>
+           
           </>
         );
       case "technical-manager":
@@ -143,19 +138,19 @@ const Navigation = () => {
   };
   return (
     <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center space-x-8 h-16">
+      <div className="px-4 mx-auto max-w-7xl">
+        <div className="flex items-center h-16 space-x-8">
           <NavLink to="/" icon={<HomeIcon size={20} />} requiresAuth={false}>
             Home
           </NavLink>
           {renderRoleSpecificLinks()}
           {user && (
-            <div className="ml-auto flex items-center space-x-4">
+            <div className="flex items-center ml-auto space-x-4">
               <span className="flex items-center space-x-2 text-gray-600">
                 <UserIcon size={20} />
                 <span>{user.name}</span>
               </span>
-              <span className="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+              <span className="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full">
                 {user.role
                   .split("-")
                   .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

@@ -962,13 +962,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   // Delete logic for user requests
   const handleDelete = async (id: string) => {
     try {
-      await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL ||
-          "https://tyremanagement-backend-production.up.railway.app/api"
-        }/requests/${id}`,
-        { method: "DELETE" }
-      );
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`, {
+        method: "DELETE",
+      });
       // Refresh requests after deletion
       setRequests((prev) => prev.filter((req) => req.id !== id));
     } catch {

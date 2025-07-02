@@ -1,15 +1,12 @@
-
 import { Link } from "react-router-dom";
 import tireImage from "../images/car-tire-png-469.png";
 import {
-  
   TruckIcon,
   BarChart3Icon,
   ClipboardListIcon,
   PhoneIcon,
   MailIcon,
   ShieldCheckIcon,
- 
 } from "lucide-react";
 
 const Home = () => {
@@ -110,8 +107,8 @@ const Home = () => {
               </Link>
 
               {/* remove register vehicle from home */}
-              {/* <Link 
-          to="/vehicle-registration" 
+              {/* <Link
+          to="/vehicle-registration"
           className="border-2 border-white text-white px-6 py-2 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors w-full sm:w-auto transform hover:-translate-y-1"
         >
           Register Vehicle

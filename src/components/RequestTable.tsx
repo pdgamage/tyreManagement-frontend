@@ -167,7 +167,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
               <tr
                 key={request.id}
                 className="cursor-pointer hover:bg-gray-50"
-                onClick={() => onView(request)} 
+                onClick={() => onView(request)}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   {formatDate(request.submittedAt)}

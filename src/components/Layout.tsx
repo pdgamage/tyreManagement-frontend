@@ -73,7 +73,7 @@ const Layout = ({
       <div className="container px-4 mx-auto">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
-            <img src="https://www.mobitel.lk/sites/default/files/mobitel-logo.png" alt="SLT Mobitel" className="h-12 mb-4" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" alt="SLT Mobitel" className="h-12 mb-4" />
             <p className="text-gray-400">
               Sri Lanka's National Mobile Service Provider
             </p>

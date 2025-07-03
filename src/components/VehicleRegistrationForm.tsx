@@ -290,11 +290,28 @@ const VehicleRegistrationForm = () => {
             <option value="" disabled>
               Select a department
             </option>
+            <option value="" disabled>
+              Select a department
+            </option>
             <option value="HR department">HR Department</option>
             <option value="IT department">IT Department</option>
             <option value="Marketing department">Marketing Department</option>
             <option value="Security">Security</option>
             <option value="User department">User Department</option>
+            <option value="Finance department">Finance Department</option>
+            <option value="Procurement department">
+              Procurement Department
+            </option>
+            <option value="Legal department">Legal Department</option>
+            <option value="Customer support">Customer Support</option>
+            <option value="Operations department">Operations Department</option>
+            <option value="Logistics department">Logistics Department</option>
+            <option value="Engineering department">
+              Engineering Department
+            </option>
+            <option value="Administration department">
+              Administration Department
+            </option>
           </select>
         </div>
         <button

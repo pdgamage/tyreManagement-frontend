@@ -205,22 +205,15 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
-                    {/* Delete icon for all roles and statuses */}
                     <button
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
-                        if (
-                          window.confirm(
-                            "Are you sure you want to delete this request?"
-                          )
-                        ) {
-                          await onDelete(request.id);
-                        }
+                        onDelete(request.id); // <-- Remove window.confirm, just call onDelete
                       }}
                       className="px-4 text-gray-500 hover:text-red-700"
                       aria-label="Delete"
                     >
-                      <Trash className="w-5 h-5 " />
+                      <Trash className="w-5 h-5" />
                     </button>
                   </td>
                 )}

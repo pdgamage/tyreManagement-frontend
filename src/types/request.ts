@@ -32,4 +32,6 @@ export interface Request {
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
+  technical_manager_note?: string;
+  engineer_note?: string;
 }

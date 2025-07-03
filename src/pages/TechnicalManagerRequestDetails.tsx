@@ -326,7 +326,13 @@ const TechnicalManagerRequestDetails = () => {
             <textarea
               className="w-full p-2 mt-1 border rounded"
               placeholder="Enter notes..."
-              value={notes}
+              value={
+                // Show the note from the table for rejected or approved
+                request.status === "technical-manager approved" ||
+                request.status === "rejected"
+                  ? request.technical_manager_note || ""
+                  : notes
+              }
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               readOnly={request.status !== "supervisor approved"}

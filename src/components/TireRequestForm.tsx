@@ -945,7 +945,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   }
 
   if (vehiclesLoading) {
-    return <div>Loading vehicles...</div>;
+    return <div>Loading details...</div>;
   }
 
   if (!vehicles || vehicles.length === 0) {

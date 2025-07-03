@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
-import TireRequestForm from "../components/TireRequestForm";
 import { Request } from "../types/request";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +10,8 @@ interface RequestsContextType {
   fetchRequests: () => void;
   updateRequestStatus: (id: string, status: string, notes: string) => void;
 }
+
+
 
 const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
@@ -39,6 +40,8 @@ const SupervisorDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
 
+  
+
   const pendingRequests = requests.filter((req) => req.status === "pending");
   const approvedRequests = requests.filter(
     (req) => req.status === "supervisor approved"
@@ -50,6 +53,8 @@ const SupervisorDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          
+
           {/* Tab Navigation */}
           <div className="mt-4 border-b border-gray-200">
             <nav className="flex -mb-px space-x-8">
@@ -124,7 +129,6 @@ const SupervisorDashboard = () => {
         ) : (
           <RequestReports requests={requests} role="supervisor" />
         )}
-        <TireRequestForm onSuccess={fetchRequests} />
       </main>
     </div>
   );

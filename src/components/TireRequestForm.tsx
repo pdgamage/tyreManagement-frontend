@@ -914,10 +914,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         throw new Error("Failed to submit request");
       }
 
-      const createdRequest = await response.json(); // get the new request
-
-      setRequests((prev) => [createdRequest, ...prev]); // add to top of table
-
       setFormLoading(false);
       setSuccess(true);
 
@@ -925,7 +921,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setSuccess(false);
         setFormData(initialFormData);
         setCurrentStep(1);
-        if (onSuccess) onSuccess(); // <-- see next step
+        if (onSuccess) onSuccess();
       }, 2000);
     } catch (err) {
       setFormLoading(false);
@@ -980,7 +976,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           method: "DELETE",
         }
       );
-      setRequests((prev) => prev.filter((req) => req.id !== deleteId)); // update table
+      setRequests((prev) => prev.filter((req) => req.id !== deleteId));
     } catch {
       alert("Failed to delete request");
     }

@@ -1117,8 +1117,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       </div>
 
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg pointer-events-auto">
             <h3 className="mb-4 text-lg font-semibold text-red-700">
               Confirm Deletion
             </h3>

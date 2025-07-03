@@ -914,6 +914,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         throw new Error("Failed to submit request");
       }
 
+      // --- ADD THIS: Get the created request and update state ---
+      const createdRequest = await response.json();
+      setRequests((prev) => [createdRequest, ...prev]);
+      // ---------------------------------------------------------
+
       setFormLoading(false);
       setSuccess(true);
 

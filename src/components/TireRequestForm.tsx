@@ -687,6 +687,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [success, setSuccess] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [requests, setRequests] = useState<Request[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -912,6 +914,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         throw new Error("Failed to submit request");
       }
 
+      const createdRequest = await response.json(); // get the new request
+
+      setRequests((prev) => [createdRequest, ...prev]); // add to top of table
+
       setFormLoading(false);
       setSuccess(true);
 
@@ -919,7 +925,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setSuccess(false);
         setFormData(initialFormData);
         setCurrentStep(1);
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess(); // <-- see next step
       }, 2000);
     } catch (err) {
       setFormLoading(false);
@@ -961,15 +967,25 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   // Delete logic for user requests
   const handleDelete = async (id: string) => {
+    setShowDeleteConfirm(true);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/requests/${id}`, {
-        method: "DELETE",
-      });
-      // Refresh requests after deletion
-      setRequests((prev) => prev.filter((req) => req.id !== id));
+      await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${deleteId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      setRequests((prev) => prev.filter((req) => req.id !== deleteId)); // update table
     } catch {
       alert("Failed to delete request");
     }
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
   };
 
   return (
@@ -1099,10 +1115,40 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onView={handleView}
           onApprove={() => {}}
           onReject={() => {}}
-          onDelete={handleDelete} // <-- Add this line
-          showActions={true} // <-- Change to true to show delete icon
+          onDelete={handleDelete}
+          showActions={true}
         />
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold text-red-700">
+              Confirm Deletion
+            </h3>
+            <p className="mb-6">
+              Are you sure you want to delete this request?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeleteId(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                onClick={confirmDelete}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

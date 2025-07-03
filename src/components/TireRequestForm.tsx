@@ -916,7 +916,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       // --- ADD THIS: Get the created request and update state ---
       const createdRequest = await response.json();
-      setRequests((prev) => [createdRequest, ...prev]);
+      setRequests((prev) => [createdRequest, ...prev]); // User table updates instantly
+
+      if (onSuccess) onSuccess(); // Supervisor dashboard will refetch requests
       // ---------------------------------------------------------
 
       setFormLoading(false);
@@ -926,7 +928,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setSuccess(false);
         setFormData(initialFormData);
         setCurrentStep(1);
-        if (onSuccess) onSuccess();
       }, 2000);
     } catch (err) {
       setFormLoading(false);

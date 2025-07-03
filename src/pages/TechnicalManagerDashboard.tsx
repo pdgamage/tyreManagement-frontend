@@ -3,6 +3,7 @@ import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
+import TireRequestForm from "../components/TireRequestForm";
 import { UserCircle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -119,8 +120,6 @@ const TechnicalManagerDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          
-
           {/* Navigation Tabs */}
           <div className="mt-4 border-b border-gray-200">
             <nav className="flex -mb-px space-x-8">
@@ -199,6 +198,7 @@ const TechnicalManagerDashboard = () => {
         ) : (
           <RequestReports requests={requests} role="technical-manager" />
         )}
+        <TireRequestForm onSuccess={fetchRequests} />
       </main>
 
       {/* Notes Modal */}

@@ -984,34 +984,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setDeleteId(null);
   };
 
-  useEffect(() => {
-    const eventSource = new EventSource(
-      "https://tyremanagement-backend-production.up.railway.app/api/requests/events/requests"
-    );
-
-    eventSource.onmessage = (event) => {
-      try {
-        const newRequest = JSON.parse(event.data);
-        setRequests((prev) => {
-          // Prevent duplicates
-          if (prev.some((r) => r.id === newRequest.id)) return prev;
-          return [newRequest, ...prev];
-        });
-      } catch (err) {
-        console.error("Error parsing SSE event:", err);
-      }
-    };
-
-    eventSource.onerror = (err) => {
-      console.error("SSE connection error:", err);
-      eventSource.close();
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
-
   return (
     <div className="relative p-6 space-y-8 bg-white rounded-lg shadow-md">
       <div className="mb-8">

@@ -978,7 +978,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
       setRequests((prev) => prev.filter((req) => req.id !== deleteId));
     } catch {
-      alert("Failed to delete request");
+      // Optionally show an error in your modal, but do NOT use alert()
     }
     setShowDeleteConfirm(false);
     setDeleteId(null);

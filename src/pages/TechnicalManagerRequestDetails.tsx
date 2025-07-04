@@ -59,7 +59,8 @@ const TechnicalManagerRequestDetails = () => {
       await updateRequestStatus(
         id!,
         approve ? "technical-manager approved" : "rejected",
-        notes
+        notes,
+        "technical - manager"
       );
       await fetchRequests();
       navigate("/technical-manager");

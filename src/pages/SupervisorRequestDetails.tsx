@@ -57,7 +57,7 @@ const SupervisorRequestDetails = () => {
         id!,
         approve ? "supervisor approved" : "rejected",
         notes,
-        "supervisor" // <-- add this
+        "supervisor" 
       );
       await fetchRequests();
       navigate("/supervisor");

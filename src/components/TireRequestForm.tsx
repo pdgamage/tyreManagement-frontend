@@ -919,7 +919,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       setRequests((prev) => [createdRequest, ...prev]); // User table updates instantly
 
       if (onSuccess) onSuccess(); // Supervisor dashboard will refetch requests
-      // ---------------------------------------------------------
 
       setFormLoading(false);
       setSuccess(true);

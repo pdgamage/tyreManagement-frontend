@@ -7,6 +7,7 @@ import {
   ChevronRight,
   CheckCircle,
   XCircle,
+  Eye,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -205,6 +206,16 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onView(request);
+                      }}
+                      className="px-4 text-gray-500 hover:text-blue-700"
+                      aria-label="View Details"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

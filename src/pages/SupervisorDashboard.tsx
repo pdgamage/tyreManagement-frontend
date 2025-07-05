@@ -4,22 +4,28 @@ import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 interface RequestsContextType {
   requests: Request[];
   fetchRequests: () => void;
-  updateRequestStatus: (id: string, status: string, notes: string) => void;
+  updateRequestStatus: (
+    id: string,
+    status: string,
+    notes: string,
+    role: string
+  ) => Promise<void>;
 }
-
-
 
 const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
     "requests"
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,21 +46,26 @@ const SupervisorDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
 
-  
+  // Filter requests for this supervisor only
+  const supervisorRequests = requests.filter(
+    (req) => req.supervisorId === user.id // <-- Only requests for this supervisor
+  );
 
-  const pendingRequests = requests.filter((req) => req.status === "pending");
-  const approvedRequests = requests.filter(
+  const pendingRequests = supervisorRequests.filter(
+    (req) => req.status === "pending"
+  );
+  const approvedRequests = supervisorRequests.filter(
     (req) => req.status === "supervisor approved"
   );
-  const rejectedRequests = requests.filter((req) => req.status === "rejected");
+  const rejectedRequests = supervisorRequests.filter(
+    (req) => req.status === "rejected"
+  );
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          
-
           {/* Tab Navigation */}
           <div className="mt-4 border-b border-gray-200">
             <nav className="flex -mb-px space-x-8">
@@ -127,7 +138,7 @@ const SupervisorDashboard = () => {
             />
           </div>
         ) : (
-          <RequestReports requests={requests} role="supervisor" />
+          <RequestReports requests={supervisorRequests} role="supervisor" />
         )}
       </main>
     </div>

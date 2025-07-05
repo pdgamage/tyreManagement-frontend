@@ -825,8 +825,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.userSection = "Department/Section is required";
         if (!formData.costCenter)
           newErrors.costCenter = "Cost center is required";
-        if (!formData.supervisorId)
-          newErrors.supervisorId = "Supervisor is required";
         break;
       case 4:
         if (!formData.requesterName)
@@ -835,6 +833,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.requesterEmail = "Email is required";
         if (!formData.requesterPhone)
           newErrors.requesterPhone = "Phone is required";
+        if (!formData.supervisorId)
+          newErrors.supervisorId = "Supervisor is required";
         break;
     }
 

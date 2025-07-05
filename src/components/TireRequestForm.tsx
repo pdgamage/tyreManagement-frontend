@@ -36,6 +36,7 @@ interface TireFormData {
   comments: string;
   images: (File | null)[];
   userId?: number;
+  supervisorId: string;
 }
 
 interface StepProps {
@@ -55,6 +56,12 @@ interface StepProps {
 interface VehicleInformationStepProps extends StepProps {
   vehicles: Vehicle[];
   onVehicleSelect: (vehicle: Vehicle) => void;
+}
+
+interface Supervisor {
+  id: number;
+  name: string;
+  email: string;
 }
 
 const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
@@ -348,10 +355,17 @@ const TireDetailsStep: React.FC<StepProps> = ({
   </div>
 );
 
-const RequestInformationStep: React.FC<StepProps> = ({
+interface RequestInformationStepProps extends StepProps {
+  supervisors: Supervisor[];
+  supervisorsLoading: boolean;
+}
+
+const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
   formData,
   handleChange,
   errors,
+  supervisors,
+  supervisorsLoading,
 }) => (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Request Information</h3>
@@ -432,158 +446,36 @@ const RequestInformationStep: React.FC<StepProps> = ({
           )}
         </div>
       </div>
-    </div>
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-3">
-        <div>
-          <label
-            htmlFor="requesterName"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Name *
-          </label>
-          <input
-            type="text"
-            id="requesterName"
-            name="requesterName"
-            value={formData.requesterName}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.requesterName && (
-            <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="requesterEmail"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Email *
-          </label>
-          <input
-            type="email"
-            id="requesterEmail"
-            name="requesterEmail"
-            value={formData.requesterEmail}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.requesterEmail && (
-            <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="requesterPhone"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Phone *
-          </label>
-          <input
-            type="tel"
-            id="requesterPhone"
-            name="requesterPhone"
-            value={formData.requesterPhone}
-            onChange={(e) => {
-              const value = e.target.value;
-              // Allow only digits and limit to 15 characters
-              if (/^\d{0,15}$/.test(value)) {
-                handleChange(e);
-              }
-            }}
-            pattern="\d{1,15}"
-            maxLength={15}
-            inputMode="numeric"
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
-          {errors.requesterPhone && (
-            <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
-          )}
-        </div>
+      <div>
+        <label
+          htmlFor="supervisorId"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Select Supervisor *
+        </label>
+        <select
+          id="supervisorId"
+          name="supervisorId"
+          value={formData.supervisorId}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+          disabled={supervisorsLoading}
+        >
+          <option value="">Select Supervisor</option>
+          {supervisors.map((sup) => (
+            <option key={sup.id} value={sup.id}>
+              {sup.name} ({sup.email})
+            </option>
+          ))}
+        </select>
+        {errors.supervisorId && (
+          <p className="mt-1 text-sm text-red-600">{errors.supervisorId}</p>
+        )}
       </div>
     </div>
   </div>
 );
-
-// const RequesterDetailsStep: React.FC<StepProps> = ({
-//   formData,
-//   handleChange,
-//   errors,
-// }) => (
-//   <div className="space-y-4">
-//     <h3 className="mb-4 text-xl font-semibold">Requester Details</h3>
-//     <div className="grid gap-4 md:grid-cols-3">
-//       <div>
-//         <label
-//           htmlFor="requesterName"
-//           className="block mb-1 font-medium text-gray-700"
-//         >
-//           Name *
-//         </label>
-//         <input
-//           type="text"
-//           id="requesterName"
-//           name="requesterName"
-//           value={formData.requesterName}
-//           onChange={handleChange}
-//           className="w-full p-3 border border-gray-300 rounded"
-//           required
-//           readOnly
-//         />
-//         {errors.requesterName && (
-//           <p className="mt-1 text-sm text-red-600">{errors.requesterName}</p>
-//         )}
-//       </div>
-//       <div>
-//         <label
-//           htmlFor="requesterEmail"
-//           className="block mb-1 font-medium text-gray-700"
-//         >
-//           Email *
-//         </label>
-//         <input
-//           type="email"
-//           id="requesterEmail"
-//           name="requesterEmail"
-//           value={formData.requesterEmail}
-//           onChange={handleChange}
-//           className="w-full p-3 border border-gray-300 rounded"
-//           required
-//           readOnly
-//         />
-//         {errors.requesterEmail && (
-//           <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
-//         )}
-//       </div>
-//       <div>
-//         <label
-//           htmlFor="requesterPhone"
-//           className="block mb-1 font-medium text-gray-700"
-//         >
-//           Phone *
-//         </label>
-//         <input
-//           type="tel"
-//           id="requesterPhone"
-//           name="requesterPhone"
-//           value={formData.requesterPhone}
-//           onChange={handleChange}
-//           className="w-full p-3 border border-gray-300 rounded"
-//           required
-//         />
-//         {errors.requesterPhone && (
-//           <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
-//         )}
-//       </div>
-//     </div>
-//   </div>
-// );
 
 const AdditionalInformationStep: React.FC<StepProps> = ({
   formData,
@@ -690,6 +582,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
+  const [supervisorsLoading, setSupervisorsLoading] = useState(true);
+
   // Fetch requests when component mounts
   useEffect(() => {
     const fetchRequests = async () => {
@@ -711,6 +606,23 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       fetchRequests();
     }
   }, [user?.id]);
+
+  useEffect(() => {
+    const fetchSupervisors = async () => {
+      try {
+        const res = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/users/supervisors"
+        );
+        const data = await res.json();
+        setSupervisors(data);
+      } catch {
+        setSupervisors([]);
+      } finally {
+        setSupervisorsLoading(false);
+      }
+    };
+    fetchSupervisors();
+  }, []);
 
   const handleView = (request: Request) => {
     // Implement view logic if needed
@@ -738,6 +650,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     tireWearPattern: "",
     comments: "",
     images: Array(7).fill(null),
+    supervisorId: "",
   };
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
@@ -839,6 +752,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.userSection = "Department/Section is required";
         if (!formData.costCenter)
           newErrors.costCenter = "Cost center is required";
+        if (!formData.supervisorId)
+          newErrors.supervisorId = "Supervisor is required";
         break;
       case 4:
         if (!formData.requesterName)
@@ -897,7 +812,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         userId: user.id,
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
-        images: imageUrls, // send URLs, not files
+        images: imageUrls,
+        supervisorId: formData.supervisorId, // <-- add this
       };
 
       // 3. Send to backend (as JSON)
@@ -1063,6 +979,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              supervisors={supervisors}
+              supervisorsLoading={supervisorsLoading}
             />
           )}
 

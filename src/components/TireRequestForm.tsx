@@ -446,33 +446,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           )}
         </div>
       </div>
-      <div>
-        <label
-          htmlFor="supervisorId"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Select Supervisor *
-        </label>
-        <select
-          id="supervisorId"
-          name="supervisorId"
-          value={formData.supervisorId}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-          disabled={supervisorsLoading}
-        >
-          <option value="">Select Supervisor</option>
-          {supervisors.map((sup) => (
-            <option key={sup.id} value={sup.id}>
-              {sup.name} ({sup.email})
-            </option>
-          ))}
-        </select>
-        {errors.supervisorId && (
-          <p className="mt-1 text-sm text-red-600">{errors.supervisorId}</p>
-        )}
-      </div>
+      {/* Supervisor select field removed from here */}
     </div>
     <div className="grid gap-4 md:grid-cols-3">
       <div>
@@ -541,10 +515,18 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
   </div>
 );
 
-const AdditionalInformationStep: React.FC<StepProps> = ({
+interface AdditionalInformationStepProps extends StepProps {
+  supervisors: Supervisor[];
+  supervisorsLoading: boolean;
+}
+
+const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
   formData,
   handleChange,
   handleFileChange,
+  errors,
+  supervisors,
+  supervisorsLoading,
 }) => {
   const removeImage = (index: number) => {
     const e = {
@@ -626,6 +608,33 @@ const AdditionalInformationStep: React.FC<StepProps> = ({
                 )
             )}
           </div>
+        </div>
+        <div>
+          <label
+            htmlFor="supervisorId"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Select Supervisor *
+          </label>
+          <select
+            id="supervisorId"
+            name="supervisorId"
+            value={formData.supervisorId}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            disabled={supervisorsLoading}
+          >
+            <option value="">Select Supervisor</option>
+            {supervisors.map((sup: Supervisor) => (
+              <option key={sup.id} value={sup.id}>
+                {sup.name} ({sup.email})
+              </option>
+            ))}
+          </select>
+          {errors.supervisorId && (
+            <p className="mt-1 text-sm text-red-600">{errors.supervisorId}</p>
+          )}
         </div>
       </div>
     </div>
@@ -1054,6 +1063,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              supervisors={supervisors}
+              supervisorsLoading={supervisorsLoading}
             />
           )}
         </div>

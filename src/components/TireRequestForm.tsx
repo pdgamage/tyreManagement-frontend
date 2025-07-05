@@ -474,7 +474,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
         )}
       </div>
     </div>
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-3">
       <div>
         <label
           htmlFor="requesterName"
@@ -515,6 +515,26 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
         />
         {errors.requesterEmail && (
           <p className="mt-1 text-sm text-red-600">{errors.requesterEmail}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="requesterPhone"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Phone Number *
+        </label>
+        <input
+          type="tel"
+          id="requesterPhone"
+          name="requesterPhone"
+          value={formData.requesterPhone}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        />
+        {errors.requesterPhone && (
+          <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
         )}
       </div>
     </div>

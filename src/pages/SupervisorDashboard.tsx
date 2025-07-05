@@ -1,20 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { useRequests } from "../contexts/RequestContext";
+import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
 import { useNavigate } from "react-router-dom";
 
-interface RequestsContextType {
-  requests: Request[];
-  fetchRequests: () => void;
-  updateRequestStatus: (id: string, status: string, notes: string) => void;
-}
-
-
-
 const SupervisorDashboard = () => {
-  const { requests, fetchRequests } = useRequests() as RequestsContextType;
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<Request[]>([]);
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
     "requests"
   );
@@ -37,10 +30,12 @@ const SupervisorDashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
-
-  
+    if (user?.id) {
+      fetch(`/api/requests/supervisor/${user.id}`)
+        .then((res) => res.json())
+        .then((data) => setRequests(data));
+    }
+  }, [user?.id]);
 
   const pendingRequests = requests.filter((req) => req.status === "pending");
   const approvedRequests = requests.filter(
@@ -53,8 +48,6 @@ const SupervisorDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          
-
           {/* Tab Navigation */}
           <div className="mt-4 border-b border-gray-200">
             <nav className="flex -mb-px space-x-8">

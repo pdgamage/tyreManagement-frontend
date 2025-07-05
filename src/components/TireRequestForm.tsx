@@ -914,7 +914,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       setTimeout(() => {
         setSuccess(false);
-        setFormData(initialFormData);
+        setFormData({
+          ...initialFormData,
+          requesterName: user.name || "",
+          requesterEmail: user.email || "",
+        });
         setCurrentStep(1);
       }, 2000);
     } catch (err) {

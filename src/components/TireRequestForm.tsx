@@ -1017,7 +1017,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           ) : (
             <button
               type="submit"
-              disabled={formLoading}
+              disabled={false}
               className={`px-6 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700
                 ${formLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             >

@@ -1163,6 +1163,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onApprove={() => {}}
           onReject={() => {}}
           onDelete={handleDelete}
+          onPlaceOrder={() => {}}
           showActions={true}
         />
       </div>

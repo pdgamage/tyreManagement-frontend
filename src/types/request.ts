@@ -28,11 +28,14 @@ export interface Request {
     | "technical-manager approved"
     | "engineer approved"
     | "complete"
-    | "rejected";
+    | "rejected"
+    | "order placed";
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
   technical_manager_note?: string;
   engineer_note?: string;
   supervisorId: string;
+  order_placed?: boolean;
+  order_timestamp?: Date | string;
 }

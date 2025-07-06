@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import Navbar from "../components/Navbar";
 import AzureLoginButton from "../components/AzureLoginButton";
 import { Shield, CheckCircle, Users, Settings } from "lucide-react";
 
@@ -29,10 +28,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <Navbar />
-
       {/* Main Content */}
-      <div className="flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8 min-h-screen">
         <div className="w-full max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 

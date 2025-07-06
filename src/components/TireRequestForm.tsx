@@ -9,6 +9,7 @@ import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 import RequestDetailsModal from "./RequestDetailsModal";
+import PlaceOrderModal from "./PlaceOrderModal";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -658,6 +659,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
+  const [orderRequest, setOrderRequest] = useState<TireRequest | null>(null);
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
@@ -748,6 +751,29 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const handleCloseModal = () => {
     setShowDetailsModal(false);
     setSelectedRequest(null);
+  };
+
+  const handlePlaceOrder = (request: any) => {
+    setOrderRequest(request);
+    setShowPlaceOrderModal(true);
+  };
+
+  const handleOrderPlaced = async () => {
+    // Refresh the requests list after order is placed
+    if (user?.id) {
+      try {
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/requests/user/" +
+            user.id
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setRequests(data);
+        }
+      } catch (err) {
+        console.error("Error fetching requests:", err);
+      }
+    }
   };
 
   const initialFormData = {
@@ -1163,6 +1189,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onApprove={() => {}}
           onReject={() => {}}
           onDelete={handleDelete}
+          onPlaceOrder={handlePlaceOrder}
           showActions={true}
         />
       </div>
@@ -1202,6 +1229,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         request={selectedRequest}
         isOpen={showDetailsModal}
         onClose={handleCloseModal}
+      />
+
+      {/* Place Order Modal */}
+      <PlaceOrderModal
+        request={orderRequest}
+        isOpen={showPlaceOrderModal}
+        onClose={() => setShowPlaceOrderModal(false)}
+        onOrderPlaced={handleOrderPlaced}
       />
     </div>
   );

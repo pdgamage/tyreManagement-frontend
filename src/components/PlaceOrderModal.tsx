@@ -1,0 +1,229 @@
+import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
+import type { Request } from '../types/request';
+import type { TireRequest } from '../types/api';
+
+interface Supplier {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  formsfree_key: string;
+}
+
+interface PlaceOrderModalProps {
+  request: Request | TireRequest | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onOrderPlaced: () => void;
+}
+
+const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
+  request,
+  isOpen,
+  onClose,
+  onOrderPlaced,
+}) => {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
+  const [orderNotes, setOrderNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSuppliers();
+    }
+  }, [isOpen]);
+
+  const fetchSuppliers = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/suppliers`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSuppliers(data);
+      } else {
+        setError('Failed to fetch suppliers');
+      }
+    } catch (err) {
+      setError('Error fetching suppliers');
+      console.error('Error fetching suppliers:', err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedSupplierId) {
+      setError('Please select a supplier');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/requests/${request?.id}/place-order`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            supplierId: selectedSupplierId,
+            orderNotes: orderNotes,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Order placed successfully:', result);
+        onOrderPlaced();
+        onClose();
+        // Reset form
+        setSelectedSupplierId(null);
+        setOrderNotes('');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to place order');
+      }
+    } catch (err) {
+      setError('Error placing order');
+      console.error('Error placing order:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedSupplierId(null);
+    setOrderNotes('');
+    setError(null);
+    onClose();
+  };
+
+  if (!isOpen || !request) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">
+            Place Order - Request #{request.id}
+          </h2>
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Request Summary */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold text-gray-800 mb-2">Order Summary</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Vehicle:</span> {request.vehicleNumber}
+            </div>
+            <div>
+              <span className="font-medium">Tire Size:</span> {request.tireSizeRequired}
+            </div>
+            <div>
+              <span className="font-medium">Quantity:</span> {request.quantity}
+            </div>
+            <div>
+              <span className="font-medium">Tubes:</span> {request.tubesQuantity}
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* Supplier Selection */}
+          <div className="mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Select Supplier</h3>
+            {suppliers.length === 0 ? (
+              <p className="text-gray-500">Loading suppliers...</p>
+            ) : (
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {suppliers.map((supplier) => (
+                  <div
+                    key={supplier.id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                      selectedSupplierId === supplier.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setSelectedSupplierId(supplier.id)}
+                  >
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="radio"
+                        name="supplier"
+                        value={supplier.id}
+                        checked={selectedSupplierId === supplier.id}
+                        onChange={() => setSelectedSupplierId(supplier.id)}
+                        className="mr-3"
+                      />
+                      <h4 className="font-medium text-gray-800">{supplier.name}</h4>
+                    </div>
+                    <div className="ml-6 text-sm text-gray-600">
+                      <p>Email: {supplier.email}</p>
+                      {supplier.phone && <p>Phone: {supplier.phone}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Order Notes */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Order Notes (Optional)
+            </label>
+            <textarea
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={3}
+              placeholder="Add any special instructions or notes for the supplier..."
+            />
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !selectedSupplierId}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Placing Order...' : 'Place Order'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default PlaceOrderModal;

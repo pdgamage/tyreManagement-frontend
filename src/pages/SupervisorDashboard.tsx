@@ -108,6 +108,7 @@ const SupervisorDashboard = () => {
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
               onDelete={() => {}}
+              onPlaceOrder={() => {}}
               showActions={false}
             />
 
@@ -120,8 +121,9 @@ const SupervisorDashboard = () => {
               onView={(request) =>
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
-              showActions={false}
               onDelete={() => {}}
+              onPlaceOrder={() => {}}
+              showActions={false}
             />
 
             {/* Rejected Requests */}
@@ -133,8 +135,9 @@ const SupervisorDashboard = () => {
               onView={(request) =>
                 navigate(`/supervisor/request/${Number(request.id)}`)
               }
-              showActions={false}
               onDelete={() => {}}
+              onPlaceOrder={() => {}}
+              showActions={false}
             />
           </div>
         ) : (

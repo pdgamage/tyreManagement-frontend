@@ -8,6 +8,7 @@ import {
   CheckCircle,
   XCircle,
   Eye,
+  ShoppingCart,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -57,7 +58,8 @@ interface RequestTableProps {
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onView: (request: Request) => void;
-  onDelete: (id: string) => void; // Add onDelete prop
+  onDelete: (id: string) => void;
+  onPlaceOrder: (request: Request) => void;
   showActions?: boolean;
 }
 
@@ -67,7 +69,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onApprove,
   onReject,
   onView,
-  onDelete, // Add onDelete prop
+  onDelete,
+  onPlaceOrder,
   showActions = true,
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
@@ -216,6 +219,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
+                    {request.status === "complete" && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPlaceOrder(request);
+                        }}
+                        className="px-4 text-gray-500 hover:text-green-700"
+                        aria-label="Place Order"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

@@ -96,6 +96,7 @@ const EngineerDashboard = () => {
             onReject={handleReject}
             onView={(request) => navigate(`/engineer/request/${request.id}`)}
             onDelete={() => {}}
+            onPlaceOrder={() => {}}
             showActions={true}
           />
         </div>
@@ -109,6 +110,7 @@ const EngineerDashboard = () => {
             onReject={handleReject}
             onView={(request) => navigate(`/engineer/request/${request.id}`)}
             onDelete={() => {}}
+            onPlaceOrder={() => {}}
             showActions={false}
           />
         </div>
@@ -123,6 +125,7 @@ const EngineerDashboard = () => {
             onReject={handleReject}
             onView={(request) => navigate(`/engineer/request/${request.id}`)}
             onDelete={() => {}}
+            onPlaceOrder={() => {}}
             showActions={false}
           />
         </div>

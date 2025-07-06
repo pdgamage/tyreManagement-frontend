@@ -17,7 +17,6 @@ import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
 import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
-import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -114,10 +113,6 @@ export function App() {
               <Route
                 path="/technical-manager/request/:id"
                 element={<TechnicalManagerRequestDetails />}
-              />
-              <Route
-                path="/engineer/request/:id"
-                element={<EngineerRequestDetails />}
               />
             </Routes>
           </RequestProvider>

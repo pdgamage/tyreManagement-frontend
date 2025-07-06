@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRequests } from '../contexts/RequestContext';
 import RequestTable from '../components/RequestTable';
-import PlaceOrderModal from '../components/PlaceOrderModal';
 import { UserCircle, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -16,8 +15,6 @@ const EngineerDashboard = () => {
   const [isApproving, setIsApproving] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
-  const [orderRequest, setOrderRequest] = useState<Request | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -96,15 +93,6 @@ const EngineerDashboard = () => {
     }
   };
 
-  const handlePlaceOrder = (request: Request) => {
-    setOrderRequest(request);
-    setShowPlaceOrderModal(true);
-  };
-
-  const handleOrderPlaced = async () => {
-    await fetchRequests(); // Refresh the requests list
-  };
-
   const handleLogout = async () => {
     await logout();
     navigate('/login');
@@ -147,43 +135,36 @@ const EngineerDashboard = () => {
         {/* Pending Requests Table */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Pending Engineering Review ({pendingRequests.length})</h2>
-          <RequestTable
+          <RequestTable 
             requests={pendingRequests}
             title="Pending Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
+            onView={(request) => {}}
           />
         </div>
 
         {/* Approved Requests Table */}
         <div>          <h2 className="text-xl font-semibold mb-4">Completed Requests ({completedRequests.length})</h2>
-          <RequestTable
+          <RequestTable 
             requests={completedRequests}
             title="Completed Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={handlePlaceOrder}
-            showActions={true}
+            onView={(request) => setSelectedRequest(request)}
+            showActions={false}
           />
         </div>
 
         {/* Rejected Requests Table */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Engineering Rejected Requests ({rejectedRequests.length})</h2>
-          <RequestTable
+          <RequestTable 
             requests={rejectedRequests}
             title="Rejected Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
+            onView={(request) => {}}
             showActions={false}
           />
         </div>
@@ -225,17 +206,6 @@ const EngineerDashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Place Order Modal */}
-      <PlaceOrderModal
-        request={orderRequest}
-        isOpen={showPlaceOrderModal}
-        onClose={() => {
-          setShowPlaceOrderModal(false);
-          setOrderRequest(null);
-        }}
-        onOrderPlaced={handleOrderPlaced}
-      />
     </div>
   );
 };

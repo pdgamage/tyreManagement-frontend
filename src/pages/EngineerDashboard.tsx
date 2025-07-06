@@ -7,13 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import type { Request } from '../types/request';
 
 const EngineerDashboard = () => {
-  const { requests, updateRequestStatus, fetchRequests } = useRequests();
+  const { requests, fetchRequests } = useRequests();
   const { user, logout } = useAuth();
-  const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
-  const [selectedRequestData, setSelectedRequestData] = useState<Request | null>(null);
-  const [notes, setNotes] = useState('');
-  const [isApproving, setIsApproving] = useState(false);
-  const [showNotesModal, setShowNotesModal] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -37,62 +32,19 @@ const EngineerDashboard = () => {
   // Get requests that are completed
   const completedRequests = requests.filter(req => req.status === 'complete');
   // Get requests rejected by engineer
-  const rejectedRequests = requests.filter(req => 
-    req.status === 'rejected' && 
-    req.comments?.includes('Engineer:')
-  );  const handleApprove = (requestId: string) => {
-    const request = requests.find(r => r.id === requestId);
-    if (request) {
-      setSelectedRequest(requestId);
-      setSelectedRequestData(request);
-      setIsApproving(true);
-      setShowNotesModal(true);
-    }
+  const rejectedRequests = requests.filter(req =>
+    req.status === 'rejected' &&
+    req.engineer_note
+  );
+
+  const handleApprove = (requestId: string) => {
+    // Navigate to detail page for approval
+    navigate(`/engineer/request/${requestId}`);
   };
 
   const handleReject = (requestId: string) => {
-    const request = requests.find(r => r.id === requestId);
-    if (request) {
-      setSelectedRequest(requestId);
-      setSelectedRequestData(request as unknown as Request);
-      setIsApproving(false);
-      setShowNotesModal(true);
-    }
-  };
-  const handleNotesSubmit = async () => {
-    if (!selectedRequest || !notes.trim()) {
-      alert('Please add notes');
-      return;
-    }
-    
-    try {
-      // First mark as engineer approved/rejected
-      await updateRequestStatus(
-        selectedRequest,
-        isApproving ? 'engineer approved' : 'rejected',
-        `Engineer: ${notes}`,
-        'engineer'
-      );
-
-      // If approved, move to complete status
-      if (isApproving) {
-        await updateRequestStatus(
-          selectedRequest,
-          'complete',
-          'Auto-completed after engineer approval',
-          'engineer'
-        );
-      }
-
-      setShowNotesModal(false);
-      setSelectedRequest(null);
-      setSelectedRequestData(null);
-      setNotes('');
-      await fetchRequests(); // Refresh the list
-    } catch (error) {
-      console.error('Failed to update request status:', error);
-      alert('Failed to update request status');
-    }
+    // Navigate to detail page for rejection
+    navigate(`/engineer/request/${requestId}`);
   };
 
   const handleLogout = async () => {
@@ -144,7 +96,7 @@ const EngineerDashboard = () => {
             onReject={handleReject}
             onView={(request) => navigate(`/engineer/request/${request.id}`)}
             onDelete={() => {}}
-            showActions={false}
+            showActions={true}
           />
         </div>
 
@@ -176,42 +128,7 @@ const EngineerDashboard = () => {
         </div>
       </div>
 
-      {/* Notes Modal */}
-      {showNotesModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-lg font-semibold mb-4">
-              {isApproving ? 'Approve Request' : 'Reject Request'}
-            </h3>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full h-32 p-2 border rounded"
-              placeholder="Add your notes..."
-            />
-            <div className="flex justify-end space-x-4 mt-4">
-              <button
-                onClick={() => {
-                  setShowNotesModal(false);
-                  setSelectedRequest(null);
-                  setNotes('');
-                }}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleNotesSubmit}
-                className={`px-4 py-2 text-white rounded ${
-                  isApproving ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
-                }`}
-              >
-                {isApproving ? 'Approve' : 'Reject'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };

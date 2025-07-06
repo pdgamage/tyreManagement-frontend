@@ -60,7 +60,7 @@ const TechnicalManagerRequestDetails = () => {
         id!,
         approve ? "technical-manager approved" : "rejected",
         notes,
-        "technical - manager"
+        "technical-manager"
       );
       await fetchRequests();
       navigate("/technical-manager");

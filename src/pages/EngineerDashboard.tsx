@@ -70,7 +70,8 @@ const EngineerDashboard = () => {
       await updateRequestStatus(
         selectedRequest,
         isApproving ? 'engineer approved' : 'rejected',
-        `Engineer: ${notes}`
+        `Engineer: ${notes}`,
+        'engineer'
       );
 
       // If approved, move to complete status
@@ -78,7 +79,8 @@ const EngineerDashboard = () => {
         await updateRequestStatus(
           selectedRequest,
           'complete',
-          'Auto-completed after engineer approval'
+          'Auto-completed after engineer approval',
+          'engineer'
         );
       }
 
@@ -135,23 +137,26 @@ const EngineerDashboard = () => {
         {/* Pending Requests Table */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Pending Engineering Review ({pendingRequests.length})</h2>
-          <RequestTable 
+          <RequestTable
             requests={pendingRequests}
             title="Pending Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => {}}
+            onView={(request) => navigate(`/engineer/request/${request.id}`)}
+            onDelete={() => {}}
+            showActions={false}
           />
         </div>
 
         {/* Approved Requests Table */}
         <div>          <h2 className="text-xl font-semibold mb-4">Completed Requests ({completedRequests.length})</h2>
-          <RequestTable 
+          <RequestTable
             requests={completedRequests}
             title="Completed Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => setSelectedRequest(request)}
+            onView={(request) => navigate(`/engineer/request/${request.id}`)}
+            onDelete={() => {}}
             showActions={false}
           />
         </div>
@@ -159,12 +164,13 @@ const EngineerDashboard = () => {
         {/* Rejected Requests Table */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Engineering Rejected Requests ({rejectedRequests.length})</h2>
-          <RequestTable 
+          <RequestTable
             requests={rejectedRequests}
             title="Rejected Requests"
             onApprove={handleApprove}
             onReject={handleReject}
-            onView={(request) => {}}
+            onView={(request) => navigate(`/engineer/request/${request.id}`)}
+            onDelete={() => {}}
             showActions={false}
           />
         </div>

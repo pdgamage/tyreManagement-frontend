@@ -12,9 +12,13 @@ const AzureLoginButton = () => {
   return (
     <button
       onClick={handleLogin}
-      className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-4 text-base font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
+      className="group relative w-full flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
     >
-      <span className="absolute left-4">
+      {/* Background gradient animation */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      {/* Microsoft Logo */}
+      <span className="relative z-10 mr-3">
         <svg
           className="w-6 h-6"
           viewBox="0 0 21 21"
@@ -27,7 +31,24 @@ const AzureLoginButton = () => {
           <path d="M0 11H10V21H0V11Z" fill="#FFB900" />
         </svg>
       </span>
-      Sign in with Microsoft
+
+      {/* Button Text */}
+      <span className="relative z-10 flex items-center">
+        Sign in with Microsoft
+        <svg
+          className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </span>
+
+      {/* Shine effect */}
+      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      </div>
     </button>
   );
 };

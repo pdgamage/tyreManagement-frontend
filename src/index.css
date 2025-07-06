@@ -1,8 +1,8 @@
 
-
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "./styles/animations.css";
 
 /* Autosuggest suggestion list styles */
 .react-autosuggest__container {

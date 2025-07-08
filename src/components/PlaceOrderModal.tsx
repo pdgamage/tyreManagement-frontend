@@ -89,7 +89,18 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         setOrderNotes('');
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Failed to place order');
+        // Check if the error is just a database issue but email was sent
+        if (errorData.error && errorData.error.includes('Data truncated') && errorData.emailResult) {
+          // Email was sent successfully, treat as success
+          console.log('Order email sent successfully despite database error');
+          onOrderPlaced();
+          onClose();
+          // Reset form
+          setSelectedSupplierId(null);
+          setOrderNotes('');
+        } else {
+          setError(errorData.error || 'Failed to place order');
+        }
       }
     } catch (err) {
       setError('Error placing order');

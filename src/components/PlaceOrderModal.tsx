@@ -29,9 +29,12 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const [orderNotes, setOrderNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
+      setError(null);
+      setSuccess(null);
       fetchSuppliers();
     }
   }, [isOpen]);
@@ -82,22 +85,42 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
       if (response.ok) {
         const result = await response.json();
         console.log('Order placed successfully:', result);
-        onOrderPlaced();
-        onClose();
-        // Reset form
-        setSelectedSupplierId(null);
-        setOrderNotes('');
+
+        // Show success message
+        setSuccess(`Order placed successfully! Email sent to ${result.supplier.name} (${result.supplier.email})`);
+        setError(null);
+
+        // Wait 2 seconds to show success message, then close
+        setTimeout(() => {
+          onOrderPlaced();
+          onClose();
+          // Reset form
+          setSelectedSupplierId(null);
+          setOrderNotes('');
+          setSuccess(null);
+        }, 2000);
+
       } else {
         const errorData = await response.json();
         // Check if the error is just a database issue but email was sent
         if (errorData.error && errorData.error.includes('Data truncated') && errorData.emailResult) {
           // Email was sent successfully, treat as success
           console.log('Order email sent successfully despite database error');
-          onOrderPlaced();
-          onClose();
-          // Reset form
-          setSelectedSupplierId(null);
-          setOrderNotes('');
+
+          // Show success message
+          setSuccess('Order placed successfully! Email sent to supplier.');
+          setError(null);
+
+          // Wait 2 seconds to show success message, then close
+          setTimeout(() => {
+            onOrderPlaced();
+            onClose();
+            // Reset form
+            setSelectedSupplierId(null);
+            setOrderNotes('');
+            setSuccess(null);
+          }, 2000);
+
         } else {
           setError(errorData.error || 'Failed to place order');
         }
@@ -210,6 +233,18 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                {success}
+              </div>
             </div>
           )}
 

@@ -6,7 +6,10 @@ import Autosuggest from "react-autosuggest";
 import { Vehicle } from "../types/api";
 import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
+import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
+import RequestDetailsModal from "./RequestDetailsModal";
+import PlaceOrderModal from "./PlaceOrderModal";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -654,6 +657,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [requests, setRequests] = useState<Request[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
+  const [orderRequest, setOrderRequest] = useState<TireRequest | null>(null);
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
@@ -697,8 +704,76 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     fetchSupervisors();
   }, []);
 
+  // Convert Request type to TireRequest type for the modal
+  const convertRequestToTireRequest = (request: Request): TireRequest => {
+    return {
+      id: parseInt(request.id),
+      vehicleId: parseInt(request.vehicleId || "0"),
+      vehicleNumber: request.vehicleNumber,
+      quantity: request.quantity,
+      tubesQuantity: request.tubesQuantity,
+      tireSize: request.tireSize,
+      requestReason: request.requestReason,
+      requesterName: request.requesterName,
+      requesterEmail: request.requesterEmail,
+      requesterPhone: request.requesterPhone,
+      year: request.year,
+      vehicleBrand: request.vehicleBrand,
+      vehicleModel: request.vehicleModel,
+      userSection: request.userSection,
+      lastReplacementDate: typeof request.lastReplacementDate === 'string'
+        ? request.lastReplacementDate
+        : request.lastReplacementDate.toISOString(),
+      existingTireMake: request.existingTireMake,
+      tireSizeRequired: request.tireSizeRequired,
+      costCenter: request.costCenter,
+      presentKmReading: request.presentKmReading,
+      previousKmReading: request.previousKmReading,
+      tireWearPattern: request.tireWearPattern,
+      comments: request.comments || undefined,
+      images: request.images,
+      status: request.status,
+      submittedAt: typeof request.submittedAt === 'string'
+        ? request.submittedAt
+        : request.submittedAt.toISOString(),
+      supervisorNotes: request.supervisor_notes,
+      technicalManagerNotes: request.technical_manager_note,
+      engineerNotes: request.engineer_note,
+    };
+  };
+
   const handleView = (request: Request) => {
-    // Implement view logic if needed
+    const convertedRequest = convertRequestToTireRequest(request);
+    setSelectedRequest(convertedRequest);
+    setShowDetailsModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailsModal(false);
+    setSelectedRequest(null);
+  };
+
+  const handlePlaceOrder = (request: any) => {
+    setOrderRequest(request);
+    setShowPlaceOrderModal(true);
+  };
+
+  const handleOrderPlaced = async () => {
+    // Refresh the requests list after order is placed
+    if (user?.id) {
+      try {
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/requests/user/" +
+            user.id
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setRequests(data);
+        }
+      } catch (err) {
+        console.error("Error fetching requests:", err);
+      }
+    }
   };
 
   const initialFormData = {
@@ -1114,6 +1189,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onApprove={() => {}}
           onReject={() => {}}
           onDelete={handleDelete}
+          onPlaceOrder={handlePlaceOrder}
           showActions={true}
         />
       </div>
@@ -1147,6 +1223,21 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           </div>
         </div>
       )}
+
+      {/* Request Details Modal */}
+      <RequestDetailsModal
+        request={selectedRequest}
+        isOpen={showDetailsModal}
+        onClose={handleCloseModal}
+      />
+
+      {/* Place Order Modal */}
+      <PlaceOrderModal
+        request={orderRequest}
+        isOpen={showPlaceOrderModal}
+        onClose={() => setShowPlaceOrderModal(false)}
+        onOrderPlaced={handleOrderPlaced}
+      />
     </div>
   );
 };

@@ -7,6 +7,8 @@ import {
   ChevronRight,
   CheckCircle,
   XCircle,
+  Eye,
+  ShoppingCart,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -56,7 +58,8 @@ interface RequestTableProps {
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onView: (request: Request) => void;
-  onDelete: (id: string) => void; // Add onDelete prop
+  onDelete: (id: string) => void;
+  onPlaceOrder: (request: Request) => void;
   showActions?: boolean;
 }
 
@@ -66,7 +69,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onApprove,
   onReject,
   onView,
-  onDelete, // Add onDelete prop
+  onDelete,
+  onPlaceOrder,
   showActions = true,
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
@@ -205,6 +209,39 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onView(request);
+                      }}
+                      className="px-4 text-gray-500 hover:text-blue-700"
+                      aria-label="View Details"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                    {(() => {
+                      console.log('Request status check:', {
+                        id: request.id,
+                        status: request.status,
+                        statusType: typeof request.status,
+                        trimmed: request.status?.toLowerCase().trim(),
+                        isComplete: request.status?.toLowerCase().trim() === "complete",
+                        orderPlaced: (request as any).order_placed
+                      });
+                      return (request.status?.toLowerCase().trim() === "complete" && !(request as any).order_placed);
+                    })() && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPlaceOrder(request);
+                        }}
+                        className="px-4 text-gray-500 hover:text-green-700"
+                        aria-label="Place Order"
+                        title="Place Order"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

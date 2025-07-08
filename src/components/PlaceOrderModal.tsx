@@ -122,17 +122,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           }, 2000);
 
         } else {
-          // Check if it's a "already placed" error
-          if (errorData.error && errorData.error.includes('already been placed')) {
-            setError('This order has already been placed. The page will refresh to show the current status.');
-            // Auto-close and refresh after showing the error
-            setTimeout(() => {
-              onOrderPlaced(); // This will refresh the table
-              onClose();
-            }, 3000);
-          } else {
-            setError(errorData.error || 'Failed to place order');
-          }
+          setError(errorData.error || 'Failed to place order');
         }
       }
     } catch (err) {

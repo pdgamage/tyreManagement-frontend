@@ -29,7 +29,6 @@ export interface Request {
     | "engineer approved"
     | "complete"
     | "rejected";
-  order_status?: "pending" | "placed" | "shipped" | "delivered" | "cancelled";
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;

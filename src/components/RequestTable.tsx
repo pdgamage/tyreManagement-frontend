@@ -42,54 +42,6 @@ const getStatusStyles = (status: string) => {
         border: "border-blue-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
-
-    default:
-      return {
-        bg: "bg-gray-50",
-        text: "text-gray-700",
-        border: "border-gray-300",
-        icon: <Clock className="w-4 h-4" />,
-      };
-  }
-};
-
-const getOrderStatusStyles = (orderStatus: string) => {
-  switch (orderStatus?.toLowerCase()) {
-    case "pending":
-      return {
-        bg: "bg-gray-50",
-        text: "text-gray-700",
-        border: "border-gray-300",
-        icon: <Clock className="w-4 h-4" />,
-      };
-    case "placed":
-      return {
-        bg: "bg-purple-50",
-        text: "text-purple-700",
-        border: "border-purple-300",
-        icon: <ShoppingCart className="w-4 h-4" />,
-      };
-    case "shipped":
-      return {
-        bg: "bg-blue-50",
-        text: "text-blue-700",
-        border: "border-blue-300",
-        icon: <CheckCircle className="w-4 h-4" />,
-      };
-    case "delivered":
-      return {
-        bg: "bg-green-50",
-        text: "text-green-700",
-        border: "border-green-300",
-        icon: <CheckCircle2 className="w-4 h-4" />,
-      };
-    case "cancelled":
-      return {
-        bg: "bg-red-50",
-        text: "text-red-700",
-        border: "border-red-300",
-        icon: <XCircle className="w-4 h-4" />,
-      };
     default:
       return {
         bg: "bg-gray-50",
@@ -209,9 +161,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
               <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Status
               </th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                Order Status
-              </th>
               {showActions && (
                 <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
                   Actions
@@ -258,19 +207,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     <span className="ml-1">{request.status}</span>
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                      ${getOrderStatusStyles(request.order_status || 'pending').bg}
-                      ${getOrderStatusStyles(request.order_status || 'pending').text}
-                      ${getOrderStatusStyles(request.order_status || 'pending').border}
-                      border
-                    `}
-                  >
-                    {getOrderStatusStyles(request.order_status || 'pending').icon}
-                    <span className="ml-1">{request.order_status || 'pending'}</span>
-                  </span>
-                </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
                     <button
@@ -284,25 +220,15 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       <Eye className="w-5 h-5" />
                     </button>
                     {(() => {
-                      const status = request.status?.toLowerCase().trim();
-                      const orderStatus = request.order_status?.toLowerCase().trim();
-                      const isComplete = status === "complete";
-                      const isOrderPending = !orderStatus || orderStatus === "pending";
-                      const orderPlacedField = (request as any).order_placed;
-
                       console.log('Request status check:', {
                         id: request.id,
                         status: request.status,
-                        orderStatus: request.order_status,
-                        isComplete,
-                        isOrderPending,
-                        orderPlacedField
+                        statusType: typeof request.status,
+                        trimmed: request.status?.toLowerCase().trim(),
+                        isComplete: request.status?.toLowerCase().trim() === "complete",
+                        orderPlaced: (request as any).order_placed
                       });
-
-                      // Show place order button ONLY if:
-                      // 1. Status is "complete" AND
-                      // 2. Order status is "pending" (or null/undefined)
-                      return (isComplete && isOrderPending);
+                      return (request.status?.toLowerCase().trim() === "complete" && !(request as any).order_placed);
                     })() && (
                       <button
                         onClick={(e) => {

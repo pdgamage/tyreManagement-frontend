@@ -69,7 +69,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/requests/${request?.id}/place-order`,
+        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/suppliers/place-order`,
         {
           method: 'POST',
           headers: {
@@ -77,6 +77,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           },
           body: JSON.stringify({
             supplierId: selectedSupplierId,
+            requestId: request?.id,
             orderNotes: orderNotes,
           }),
         }
@@ -87,7 +88,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         console.log('Order placed successfully:', result);
 
         // Show success message
-        setSuccess(`Order placed successfully! Email sent to ${result.supplier.name} (${result.supplier.email})`);
+        setSuccess(`Order placed successfully! Email sent to ${result.supplier} (${result.email})`);
         setError(null);
 
         // Wait 2 seconds to show success message, then close

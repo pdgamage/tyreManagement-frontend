@@ -48,7 +48,7 @@ const SupervisorDashboard = () => {
 
   // Filter requests for this supervisor only
   const supervisorRequests = requests.filter(
-    (req) => req.supervisorId === user.id // <-- Only requests for this supervisor
+    (req) => req.supervisorId === user?.id // <-- Only requests for this supervisor
   );
 
   const pendingRequests = supervisorRequests.filter(
@@ -62,13 +62,17 @@ const SupervisorDashboard = () => {
       req.supervisor_decision_by === user?.id
   );
 
-  // Show rejected requests done by current supervisor
+  // Show rejected requests done by current supervisor only
   const rejectedRequests = supervisorRequests.filter(
     (req) =>
       req.status === "rejected" &&
       req.supervisor_notes &&
       req.supervisor_notes.trim() !== "" &&
-      req.supervisor_decision_by === user?.id
+      req.supervisor_decision_by === user?.id &&
+      // Ensure this was actually rejected by supervisor, not by technical manager or engineer
+      (!req.technical_manager_note ||
+        req.technical_manager_note.trim() === "") &&
+      (!req.engineer_note || req.engineer_note.trim() === "")
   );
 
   return (

@@ -15,7 +15,8 @@ interface RequestsContextType {
     id: string,
     status: string,
     notes: string,
-    role: string
+    role: string,
+    userId?: string
   ) => Promise<void>;
 }
 
@@ -39,14 +40,20 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const updateRequestStatus = useCallback(
-    async (id: string, status: string, notes: string ,role: string) => {
+    async (
+      id: string,
+      status: string,
+      notes: string,
+      role: string,
+      userId?: string
+    ) => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/requests/${id}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status, notes ,role }),
+          body: JSON.stringify({ status, notes, role, userId }),
         });
 
         if (!res.ok) {

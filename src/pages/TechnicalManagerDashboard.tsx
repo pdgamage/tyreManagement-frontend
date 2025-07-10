@@ -14,22 +14,16 @@ interface RequestsContextType {
   updateRequestStatus: (
     id: string,
     status: string,
-    notes: string
+    notes: string,
+    role: string,
+    userId?: string
   ) => Promise<void>;
-}
-
-interface AuthContextType {
-  currentUser: {
-    name: string;
-    email: string;
-  } | null;
-  logout: () => Promise<void>;
 }
 
 const TechnicalManagerDashboard = () => {
   const { requests, fetchRequests, updateRequestStatus } =
     useRequests() as RequestsContextType;
-  const { logout } = useAuth() as unknown as AuthContextType;
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -79,7 +73,15 @@ const TechnicalManagerDashboard = () => {
   const approvedRequests = requests.filter(
     (req) => req.status === "technical-manager approved"
   );
-  const rejectedRequests = requests.filter((req) => req.status === "rejected");
+
+  // Filter rejected requests to only show those rejected by the current technical manager
+  const rejectedRequests = requests.filter(
+    (req) =>
+      req.status === "rejected" &&
+      req.technical_manager_note &&
+      req.technical_manager_note.trim() !== "" &&
+      req.technical_manager_id === user?.id
+  );
 
   const handleApprove = (requestId: string) => {
     setSelectedRequest(requests.find((r) => r.id === requestId) || null);
@@ -103,7 +105,9 @@ const TechnicalManagerDashboard = () => {
       await updateRequestStatus(
         selectedRequest.id,
         isApproving ? "technical-manager approved" : "rejected",
-        notes
+        notes,
+        "technical-manager",
+        user?.id
       );
       setShowNotesModal(false);
       setSelectedRequest(null);
@@ -119,8 +123,6 @@ const TechnicalManagerDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          
-
           {/* Navigation Tabs */}
           <div className="mt-4 border-b border-gray-200">
             <nav className="flex -mb-px space-x-8">

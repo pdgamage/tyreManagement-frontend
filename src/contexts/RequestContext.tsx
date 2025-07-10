@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
+import { useSSE } from "../hooks/useSSE";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -85,6 +86,13 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     onRequestUpdate: handleRequestUpdate,
     onConnect: () => console.log("RequestContext: WebSocket connected"),
     onDisconnect: () => console.log("RequestContext: WebSocket disconnected"),
+  });
+
+  // Initialize SSE connection (more reliable for Railway)
+  useSSE({
+    onRequestUpdate: handleRequestUpdate,
+    onConnect: () => console.log("RequestContext: SSE connected"),
+    onDisconnect: () => console.log("RequestContext: SSE disconnected"),
   });
 
   const fetchRequests = useCallback(async () => {

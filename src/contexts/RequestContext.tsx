@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
 import { useSSE } from "../hooks/useSSE";
+import { usePolling } from "../hooks/usePolling";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -70,11 +71,9 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
 
-      // Option 2: Force complete refresh as fallback
-      setTimeout(() => {
-        console.log("Force refreshing requests after WebSocket update");
-        fetchRequests();
-      }, 500);
+      // Option 2: Force complete refresh immediately
+      console.log("Force refreshing requests after WebSocket update");
+      fetchRequests();
 
       // Force re-render by updating timestamp
       setLastUpdate(Date.now());
@@ -104,6 +103,13 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       setRequests([]);
     }
   }, []);
+
+  // Backup polling mechanism (ensures updates even if WebSocket/SSE fails)
+  usePolling({
+    onPoll: fetchRequests,
+    interval: 5000, // Poll every 5 seconds
+    enabled: true,
+  });
 
   const updateRequestStatus = useCallback(
     async (

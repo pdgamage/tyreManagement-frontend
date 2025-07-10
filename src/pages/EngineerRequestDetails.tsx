@@ -13,6 +13,9 @@ const EngineerRequestDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageZoom, setImageZoom] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,6 +78,44 @@ const EngineerRequestDetails = () => {
     } finally {
       setIsApproving(false);
     }
+  };
+
+  // Image modal functions
+  const openImageModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setShowImageModal(true);
+    setImageZoom(1);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setImageZoom(1);
+  };
+
+  const nextImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
+      setImageZoom(1);
+    }
+  };
+
+  const prevImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + validImages.length) % validImages.length
+      );
+      setImageZoom(1);
+    }
+  };
+
+  const zoomIn = () => {
+    setImageZoom((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const zoomOut = () => {
+    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   if (loading) return <div className="p-8 text-left">Loading...</div>;
@@ -294,7 +335,8 @@ const EngineerRequestDetails = () => {
                       key={idx}
                       src={img}
                       alt={`Tire image ${idx + 1}`}
-                      className="object-cover w-24 h-24 border rounded"
+                      className="object-cover w-24 h-24 transition-opacity border rounded cursor-pointer hover:opacity-80"
+                      onClick={() => openImageModal(idx)}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "https://via.placeholder.com/96?text=Image+Not+Found";
@@ -409,6 +451,140 @@ const EngineerRequestDetails = () => {
                 >
                   Yes, Reject
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Image Modal */}
+        {showImageModal && request?.images && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
+            <div className="relative max-w-4xl max-h-full p-4">
+              {/* Close button */}
+              <button
+                onClick={closeImageModal}
+                className="absolute z-10 p-2 text-white transition-all bg-black bg-opacity-50 rounded-full top-4 right-4 hover:bg-opacity-70"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Zoom controls */}
+              <div className="absolute z-10 flex gap-2 top-4 left-4">
+                <button
+                  onClick={zoomOut}
+                  className="p-2 text-white transition-all bg-black bg-opacity-50 rounded-full hover:bg-opacity-70"
+                  title="Zoom Out"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 12H4"
+                    />
+                  </svg>
+                </button>
+                <span className="px-3 py-2 text-sm text-white bg-black bg-opacity-50 rounded-full">
+                  {Math.round(imageZoom * 100)}%
+                </span>
+                <button
+                  onClick={zoomIn}
+                  className="p-2 text-white transition-all bg-black bg-opacity-50 rounded-full hover:bg-opacity-70"
+                  title="Zoom In"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Navigation arrows */}
+              {request.images.filter((img) => img).length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute p-3 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full left-4 top-1/2 hover:bg-opacity-70"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute p-3 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full right-4 top-1/2 hover:bg-opacity-70"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </>
+              )}
+
+              {/* Image */}
+              <div className="flex items-center justify-center max-h-screen overflow-hidden">
+                <img
+                  src={request.images.filter((img) => img)[currentImageIndex]}
+                  alt={`Tire image ${currentImageIndex + 1}`}
+                  className="object-contain max-w-full max-h-full transition-transform duration-200"
+                  style={{ transform: `scale(${imageZoom})` }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "https://via.placeholder.com/800x600?text=Image+Not+Found";
+                  }}
+                />
+              </div>
+
+              {/* Image counter */}
+              <div className="absolute px-3 py-1 text-sm text-white transform -translate-x-1/2 bg-black bg-opacity-50 rounded-full bottom-4 left-1/2">
+                {currentImageIndex + 1} /{" "}
+                {request.images.filter((img) => img).length}
               </div>
             </div>
           </div>

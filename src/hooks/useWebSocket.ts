@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -21,6 +21,7 @@ export const useWebSocket = ({
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
   const lastPingRef = useRef<number>(Date.now());
+  const [isConnected, setIsConnected] = useState(false);
 
   const forceReconnect = useCallback(() => {
     if (socketRef.current) {
@@ -80,6 +81,8 @@ export const useWebSocket = ({
 
     // Handle connection
     socket.on("connect", () => {
+      setIsConnected(true);
+
       // Authenticate user with server
       socket.emit("authenticate", {
         id: user.id,
@@ -108,12 +111,13 @@ export const useWebSocket = ({
     });
 
     // Handle authentication confirmation
-    socket.on("authenticated", (data) => {
-      // Authentication successful
+    socket.on("authenticated", () => {
+      setIsConnected(true); // Ensure we're marked as connected after auth
     });
 
     // Handle disconnection
-    socket.on("disconnect", (reason) => {
+    socket.on("disconnect", () => {
+      setIsConnected(false);
       onDisconnect?.();
     });
 
@@ -125,8 +129,8 @@ export const useWebSocket = ({
     });
 
     // Handle reconnection
-    socket.on("reconnect", (attemptNumber) => {
-      // Reconnected successfully
+    socket.on("reconnect", () => {
+      setIsConnected(true);
     });
 
     socket.on("reconnect_attempt", (attemptNumber) => {
@@ -173,6 +177,6 @@ export const useWebSocket = ({
   return {
     socket: socketRef.current,
     emit,
-    isConnected: socketRef.current?.connected || false,
+    isConnected: isConnected && socketRef.current?.connected,
   };
 };

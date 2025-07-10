@@ -68,7 +68,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   // Initialize WebSocket connection
-  useWebSocket({
+  const { isConnected } = useWebSocket({
     onRequestUpdate: handleRequestUpdate,
     onConnect: () => {
       setWsConnected(true);
@@ -77,6 +77,11 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       setWsConnected(false);
     },
   });
+
+  // Also track connection status from the hook itself
+  React.useEffect(() => {
+    setWsConnected(isConnected || false);
+  }, [isConnected]);
 
   // SSE disabled due to Railway connection issues
   // useSSE({

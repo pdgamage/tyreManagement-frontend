@@ -11,6 +11,7 @@ const EngineerRequestDetails = () => {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const navigate = useNavigate();
 
@@ -23,7 +24,10 @@ const EngineerRequestDetails = () => {
           throw new Error("Invalid request ID.");
         }
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/requests/${numericId}`
+          `${
+            import.meta.env.VITE_API_BASE_URL ||
+            "https://tyremanagement-backend-production.up.railway.app"
+          }/api/requests/${numericId}`
         );
         if (!res.ok) {
           if (res.status === 404) {
@@ -57,12 +61,7 @@ const EngineerRequestDetails = () => {
     try {
       if (approve) {
         // First approve as engineer
-        await updateRequestStatus(
-          id!,
-          "engineer approved",
-          notes,
-          "engineer"
-        );
+        await updateRequestStatus(id!, "engineer approved", notes, "engineer");
         // Then mark as complete
         await updateRequestStatus(
           id!,
@@ -72,12 +71,7 @@ const EngineerRequestDetails = () => {
         );
       } else {
         // Just reject
-        await updateRequestStatus(
-          id!,
-          "rejected",
-          notes,
-          "engineer"
-        );
+        await updateRequestStatus(id!, "rejected", notes, "engineer");
       }
       await fetchRequests();
       navigate("/engineer");
@@ -117,7 +111,7 @@ const EngineerRequestDetails = () => {
                   : request.status.includes("approved")
                   ? "bg-green-100 text-green-800"
                   : "bg-gray-100 text-gray-800"
-            }`}
+              }`}
           >
             {request.status.replace(/_/g, " ")}
           </span>
@@ -161,6 +155,20 @@ const EngineerRequestDetails = () => {
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
+                  Department/Section
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.userSection}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Cost Center
+                </label>
+                <div className="p-2 bg-white rounded">{request.costCenter}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
                   Requester Name
                 </label>
                 <div className="p-2 bg-white rounded">
@@ -185,19 +193,20 @@ const EngineerRequestDetails = () => {
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
-                  User Section
+                  Submitted At
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.userSection}
+                  {new Date(request.submittedAt).toLocaleString()}
                 </div>
               </div>
             </div>
           </div>
+          <hr />
 
-          {/* Tire Details */}
+          {/* Tire & Request Details */}
           <div>
             <h3 className="mb-2 text-lg font-semibold text-gray-800">
-              Tire Details
+              Tire & Request Details
             </h3>
             <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
               <div>
@@ -235,21 +244,17 @@ const EngineerRequestDetails = () => {
                   Last Replacement Date
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {new Date(request.lastReplacementDate).toLocaleDateString()}
+                  {request.lastReplacementDate
+                    ? new Date(request.lastReplacementDate).toLocaleDateString()
+                    : "-"}
                 </div>
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
-                  Cost Center
-                </label>
-                <div className="p-2 bg-white rounded">{request.costCenter}</div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Present KM Reading
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.presentKmReading?.toLocaleString()}
+                  {request.presentKmReading}
                 </div>
               </div>
               <div>
@@ -257,7 +262,7 @@ const EngineerRequestDetails = () => {
                   Previous KM Reading
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.previousKmReading?.toLocaleString()}
+                  {request.previousKmReading}
                 </div>
               </div>
               <div>
@@ -276,20 +281,42 @@ const EngineerRequestDetails = () => {
                   {request.requestReason}
                 </div>
               </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Comments
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.comments || "N/A"}
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Comments */}
-          {request.comments && (
+          <hr />
+          {/* Images Section with error handling */}
+          {request.images && request.images.length > 0 && (
             <div>
               <h3 className="mb-2 text-lg font-semibold text-gray-800">
-                Comments
+                Images
               </h3>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-white rounded">{request.comments}</div>
+              <div className="flex flex-wrap gap-3 p-4 mt-2 rounded-lg bg-gray-50">
+                {request.images.map((img, idx) =>
+                  img ? (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Tire image ${idx + 1}`}
+                      className="object-cover w-24 h-24 border rounded"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/96?text=Image+Not+Found";
+                      }}
+                    />
+                  ) : null
+                )}
               </div>
             </div>
           )}
+          <hr />
 
           {/* Previous Notes */}
           {(request.supervisor_notes || request.technical_manager_note) && (
@@ -299,15 +326,21 @@ const EngineerRequestDetails = () => {
               </h3>
               <div className="space-y-4">
                 {request.supervisor_notes && (
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h4 className="font-semibold text-blue-800">Supervisor Notes:</h4>
+                  <div className="p-4 rounded-lg bg-blue-50">
+                    <h4 className="font-semibold text-blue-800">
+                      Supervisor Notes:
+                    </h4>
                     <p className="text-blue-700">{request.supervisor_notes}</p>
                   </div>
                 )}
                 {request.technical_manager_note && (
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h4 className="font-semibold text-purple-800">Technical Manager Notes:</h4>
-                    <p className="text-purple-700">{request.technical_manager_note}</p>
+                  <div className="p-4 rounded-lg bg-purple-50">
+                    <h4 className="font-semibold text-purple-800">
+                      Technical Manager Notes:
+                    </h4>
+                    <p className="text-purple-700">
+                      {request.technical_manager_note}
+                    </p>
                   </div>
                 )}
               </div>
@@ -319,7 +352,7 @@ const EngineerRequestDetails = () => {
             <h3 className="mb-2 text-lg font-semibold text-gray-800">
               Engineering Review Notes
             </h3>
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 rounded-lg bg-gray-50">
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -332,27 +365,65 @@ const EngineerRequestDetails = () => {
           </div>
 
           {/* Action Buttons */}
-          {request.status === "technical-manager approved" && (
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => handleAction(false)}
-                disabled={isApproving}
-                className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
-              >
-                {isApproving ? "Processing..." : "Reject"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAction(true)}
-                disabled={isApproving}
-                className="px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
-              >
-                {isApproving ? "Processing..." : "Approve & Complete"}
-              </button>
-            </div>
-          )}
+          <div className="flex gap-4 mt-6">
+            {request.status === "technical-manager approved" && (
+              <>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+                  onClick={() => handleAction(true)}
+                  disabled={isApproving}
+                >
+                  {isApproving ? "Processing..." : "Approve & Complete"}
+                </button>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+                  onClick={() => setShowRejectConfirm(true)}
+                >
+                  Reject
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
+              onClick={() => navigate("/engineer")}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
+        {/* Reject Confirmation Modal */}
+        {showRejectConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+              <h3 className="mb-4 text-lg font-semibold text-red-700">
+                Confirm Rejection
+              </h3>
+              <p className="mb-6">
+                Are you sure you want to reject this request?
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  onClick={() => setShowRejectConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                  onClick={() => {
+                    setShowRejectConfirm(false);
+                    handleAction(false);
+                  }}
+                >
+                  Yes, Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

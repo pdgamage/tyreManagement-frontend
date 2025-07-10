@@ -650,8 +650,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const { vehicles, loading: vehiclesLoading } = useVehicles();
   const { user } = useAuth();
-  const { requests, fetchRequests, reconnectWebSocket, wsConnected } =
-    useRequests();
+  const { requests, fetchRequests, lastUpdate } = useRequests();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -1162,25 +1161,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         {/* Connection Status */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                wsConnected ? "bg-green-500" : "bg-red-500"
-              }`}
-            ></div>
+            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
             <span className="text-sm text-gray-600">
-              {wsConnected
-                ? "Real-time updates active"
-                : "Using backup sync (2s)"}
+              Auto-sync every 1.5 seconds
             </span>
           </div>
-          {!wsConnected && (
-            <button
-              onClick={reconnectWebSocket}
-              className="px-3 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600"
-            >
-              Reconnect
-            </button>
-          )}
+          <div className="text-xs text-gray-500">
+            Last updated: {new Date(lastUpdate).toLocaleTimeString()}
+          </div>
         </div>
 
         <RequestTable

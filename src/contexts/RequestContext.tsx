@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { useWebSocket } from "../hooks/useWebSocket";
 import { usePolling } from "../hooks/usePolling";
 
 const API_BASE_URL =
@@ -52,36 +51,13 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Handle real-time request updates
-  const handleRequestUpdate = useCallback(
-    async (data: any) => {
-      if (data.type === "REQUEST_UPDATE") {
-        try {
-          await fetchRequests();
-        } catch (error) {
-          // Error during refresh
-        }
-        setLastUpdate(Date.now());
-      }
-    },
-    [fetchRequests]
-  );
+  // WebSocket disabled - using polling only for updates
 
-  // Initialize WebSocket connection
-  const { isConnected } = useWebSocket({
-    onRequestUpdate: handleRequestUpdate,
-    onConnect: () => {
-      setWsConnected(true);
-    },
-    onDisconnect: () => {
-      setWsConnected(false);
-    },
-  });
-
-  // Also track connection status from the hook itself
+  // WebSocket disabled due to Railway compatibility issues
+  // Using polling-only for real-time updates
   React.useEffect(() => {
-    setWsConnected(isConnected || false);
-  }, [isConnected]);
+    setWsConnected(false); // Always show as disconnected since we're not using WebSocket
+  }, []);
 
   // SSE disabled due to Railway connection issues
   // useSSE({
@@ -90,10 +66,10 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   //   onDisconnect: () => console.log("RequestContext: SSE disconnected"),
   // });
 
-  // Dynamic polling - more aggressive when WebSocket is disconnected
+  // Aggressive polling for real-time updates (WebSocket disabled)
   usePolling({
     onPoll: fetchRequests,
-    interval: wsConnected ? 10000 : 2000, // 10s when WS connected, 2s when disconnected
+    interval: 1500, // Poll every 1.5 seconds for near real-time updates
     enabled: true,
   });
 

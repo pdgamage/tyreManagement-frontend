@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
+import { useWebSocket } from "../hooks/useWebSocket";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -28,6 +35,38 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [requests, setRequests] = useState<Request[]>([]);
+
+  // Handle real-time request updates
+  const handleRequestUpdate = useCallback((data: any) => {
+    console.log("Received request update:", data);
+
+    if (data.type === "REQUEST_UPDATE") {
+      const updatedRequest = data.request;
+
+      setRequests((prevRequests) => {
+        const existingIndex = prevRequests.findIndex(
+          (req) => req.id === updatedRequest.id
+        );
+
+        if (existingIndex >= 0) {
+          // Update existing request
+          const newRequests = [...prevRequests];
+          newRequests[existingIndex] = updatedRequest;
+          return newRequests;
+        } else {
+          // Add new request if it doesn't exist
+          return [...prevRequests, updatedRequest];
+        }
+      });
+    }
+  }, []);
+
+  // Initialize WebSocket connection
+  useWebSocket({
+    onRequestUpdate: handleRequestUpdate,
+    onConnect: () => console.log("RequestContext: WebSocket connected"),
+    onDisconnect: () => console.log("RequestContext: WebSocket disconnected"),
+  });
 
   const fetchRequests = useCallback(async () => {
     try {

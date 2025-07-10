@@ -374,18 +374,7 @@ const TechnicalManagerRequestDetails = () => {
             </div>
           </div>
           <hr />
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Supervisor Notes
-            </label>
-            <textarea
-              className="w-full p-2 mt-1 border rounded"
-              placeholder="No supervisor notes"
-              value={request.supervisor_notes || ""}
-              readOnly={true}
-              rows={3}
-            />
-          </div>
+          
           {/* Images Section with error handling */}
           {request.images && request.images.length > 0 && (
             <div>
@@ -399,7 +388,7 @@ const TechnicalManagerRequestDetails = () => {
                       key={idx}
                       src={img}
                       alt={`Tire image ${idx + 1}`}
-                      className="object-cover w-24 h-24 border rounded cursor-pointer hover:opacity-80 transition-opacity"
+                      className="object-cover w-24 h-24 transition-opacity border rounded cursor-pointer hover:opacity-80"
                       onClick={() => openImageModal(idx)}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
@@ -418,7 +407,7 @@ const TechnicalManagerRequestDetails = () => {
               <h3 className="mb-2 text-lg font-semibold text-gray-800">
                 Supervisor Notes
               </h3>
-              <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="p-4 rounded-lg bg-blue-50">
                 <p className="text-blue-700">{request.supervisor_notes}</p>
               </div>
             </div>
@@ -528,7 +517,7 @@ const TechnicalManagerRequestDetails = () => {
             {/* Close button */}
             <button
               onClick={closeImageModal}
-              className="absolute z-20 p-3 text-white transition-all bg-black bg-opacity-70 rounded-full top-4 right-4 hover:bg-opacity-90"
+              className="absolute z-20 p-3 text-white transition-all bg-black rounded-full bg-opacity-70 top-4 right-4 hover:bg-opacity-90"
             >
               <svg
                 className="w-6 h-6"
@@ -549,7 +538,7 @@ const TechnicalManagerRequestDetails = () => {
             <div className="absolute z-20 flex gap-2 top-4 left-4">
               <button
                 onClick={zoomOut}
-                className="p-3 text-white transition-all bg-black bg-opacity-70 rounded-full hover:bg-opacity-90"
+                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
                 title="Zoom Out"
               >
                 <svg
@@ -566,12 +555,12 @@ const TechnicalManagerRequestDetails = () => {
                   />
                 </svg>
               </button>
-              <span className="px-4 py-3 text-sm font-medium text-white bg-black bg-opacity-70 rounded-full">
+              <span className="px-4 py-3 text-sm font-medium text-white bg-black rounded-full bg-opacity-70">
                 {Math.round(imageZoom * 100)}%
               </span>
               <button
                 onClick={zoomIn}
-                className="p-3 text-white transition-all bg-black bg-opacity-70 rounded-full hover:bg-opacity-90"
+                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
                 title="Zoom In"
               >
                 <svg
@@ -595,7 +584,7 @@ const TechnicalManagerRequestDetails = () => {
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-70 rounded-full left-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 left-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
                 >
                   <svg
                     className="w-8 h-8"
@@ -613,7 +602,7 @@ const TechnicalManagerRequestDetails = () => {
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-70 rounded-full right-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 right-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
                 >
                   <svg
                     className="w-8 h-8"
@@ -667,7 +656,7 @@ const TechnicalManagerRequestDetails = () => {
             </div>
 
             {/* Image counter */}
-            <div className="absolute z-20 px-4 py-2 text-sm font-medium text-white transform -translate-x-1/2 bg-black bg-opacity-70 rounded-full bottom-6 left-1/2">
+            <div className="absolute z-20 px-4 py-2 text-sm font-medium text-white transform -translate-x-1/2 bg-black rounded-full bg-opacity-70 bottom-6 left-1/2">
               {currentImageIndex + 1} of{" "}
               {request.images.filter((img) => img).length}
             </div>

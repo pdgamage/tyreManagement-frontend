@@ -1159,12 +1159,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       <div className="pt-8 mt-12 border-t">
         {/* Connection Status */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-            <span className="text-sm text-gray-600">
-              Auto-sync every 1.5 seconds
-            </span>
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
           </div>
           <div className="text-xs text-gray-500">
             Last updated: {new Date(lastUpdate).toLocaleTimeString()}

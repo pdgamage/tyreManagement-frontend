@@ -35,29 +35,48 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [requests, setRequests] = useState<Request[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
 
   // Handle real-time request updates
-  const handleRequestUpdate = useCallback((data: any) => {
+  const handleRequestUpdate = useCallback(async (data: any) => {
     console.log("Received request update:", data);
 
     if (data.type === "REQUEST_UPDATE") {
       const updatedRequest = data.request;
 
+      // Option 1: Update state directly
       setRequests((prevRequests) => {
         const existingIndex = prevRequests.findIndex(
           (req) => req.id === updatedRequest.id
         );
 
         if (existingIndex >= 0) {
-          // Update existing request
-          const newRequests = [...prevRequests];
-          newRequests[existingIndex] = updatedRequest;
+          // Update existing request - create completely new array to force re-render
+          const newRequests = prevRequests.map((req, index) =>
+            index === existingIndex ? { ...updatedRequest } : req
+          );
+          console.log(
+            "Updated existing request:",
+            updatedRequest.id,
+            "Status:",
+            updatedRequest.status
+          );
           return newRequests;
         } else {
           // Add new request if it doesn't exist
-          return [...prevRequests, updatedRequest];
+          console.log("Adding new request:", updatedRequest.id);
+          return [...prevRequests, { ...updatedRequest }];
         }
       });
+
+      // Option 2: Force complete refresh as fallback
+      setTimeout(() => {
+        console.log("Force refreshing requests after WebSocket update");
+        fetchRequests();
+      }, 500);
+
+      // Force re-render by updating timestamp
+      setLastUpdate(Date.now());
     }
   }, []);
 

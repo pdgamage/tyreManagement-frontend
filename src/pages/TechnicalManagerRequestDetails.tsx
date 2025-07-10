@@ -13,6 +13,12 @@ const TechnicalManagerRequestDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageZoom, setImageZoom] = useState(1);
+  const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,6 +77,69 @@ const TechnicalManagerRequestDetails = () => {
     }
   };
 
+  // Image modal functions
+  const openImageModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setShowImageModal(true);
+    setImageZoom(1);
+    setImagePan({ x: 0, y: 0 });
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setImageZoom(1);
+    setImagePan({ x: 0, y: 0 });
+  };
+
+  const nextImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
+      setImageZoom(1);
+      setImagePan({ x: 0, y: 0 });
+    }
+  };
+
+  const prevImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + validImages.length) % validImages.length
+      );
+      setImageZoom(1);
+      setImagePan({ x: 0, y: 0 });
+    }
+  };
+
+  const zoomIn = () => {
+    setImageZoom((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const zoomOut = () => {
+    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  // Mouse drag handlers for panning
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (imageZoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - imagePan.x, y: e.clientY - imagePan.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && imageZoom > 1) {
+      setImagePan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   if (loading) return <div className="p-8 text-left">Loading...</div>;
   if (error)
     return <div className="p-8 text-center text-red-600">Error: {error}</div>;
@@ -82,12 +151,6 @@ const TechnicalManagerRequestDetails = () => {
   return (
     <div className="flex items-start justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-5xl p-8 mt-10 bg-white shadow-lg md:w-4/5 rounded-xl">
-        <button
-          className="px-4 py-2 mb-4 text-blue-700 transition bg-blue-100 rounded hover:bg-blue-200"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
         <h2 className="flex items-center gap-2 mb-6 text-2xl font-bold text-blue-700">
           <span>Request {request.id}</span>
           <span
@@ -306,7 +369,8 @@ const TechnicalManagerRequestDetails = () => {
                       key={idx}
                       src={img}
                       alt={`Tire image ${idx + 1}`}
-                      className="object-cover w-24 h-24 border rounded"
+                      className="object-cover w-24 h-24 border rounded cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => openImageModal(idx)}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "https://via.placeholder.com/96?text=Image+Not+Found";
@@ -314,6 +378,18 @@ const TechnicalManagerRequestDetails = () => {
                     />
                   ) : null
                 )}
+              </div>
+            </div>
+          )}
+          <hr />
+          {/* Supervisor Notes Display */}
+          {request.supervisor_notes && (
+            <div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                Supervisor Notes
+              </h3>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-blue-700">{request.supervisor_notes}</p>
               </div>
             </div>
           )}
@@ -396,6 +472,158 @@ const TechnicalManagerRequestDetails = () => {
                   Yes, Reject
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Image Modal */}
+        {showImageModal && request?.images && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-95">
+            {/* Close button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute z-20 p-3 text-white transition-all bg-black bg-opacity-70 rounded-full top-4 right-4 hover:bg-opacity-90"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Zoom controls */}
+            <div className="absolute z-20 flex gap-2 top-4 left-4">
+              <button
+                onClick={zoomOut}
+                className="p-3 text-white transition-all bg-black bg-opacity-70 rounded-full hover:bg-opacity-90"
+                title="Zoom Out"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
+                </svg>
+              </button>
+              <span className="px-4 py-3 text-sm font-medium text-white bg-black bg-opacity-70 rounded-full">
+                {Math.round(imageZoom * 100)}%
+              </span>
+              <button
+                onClick={zoomIn}
+                className="p-3 text-white transition-all bg-black bg-opacity-70 rounded-full hover:bg-opacity-90"
+                title="Zoom In"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Navigation arrows - Always visible with higher z-index */}
+            {request.images.filter((img) => img).length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-70 rounded-full left-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                >
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black bg-opacity-70 rounded-full right-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                >
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Image container */}
+            <div
+              className="flex items-center justify-center w-full h-full overflow-hidden"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{
+                cursor:
+                  imageZoom > 1
+                    ? isDragging
+                      ? "grabbing"
+                      : "grab"
+                    : "default",
+              }}
+            >
+              <img
+                src={request.images.filter((img) => img)[currentImageIndex]}
+                alt={`Tire image ${currentImageIndex + 1}`}
+                className="object-contain max-w-full max-h-full transition-transform duration-200 select-none"
+                style={{
+                  transform: `scale(${imageZoom}) translate(${
+                    imagePan.x / imageZoom
+                  }px, ${imagePan.y / imageZoom}px)`,
+                  transformOrigin: "center center",
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "https://via.placeholder.com/800x600?text=Image+Not+Found";
+                }}
+                draggable={false}
+              />
+            </div>
+
+            {/* Image counter */}
+            <div className="absolute z-20 px-4 py-2 text-sm font-medium text-white transform -translate-x-1/2 bg-black bg-opacity-70 rounded-full bottom-6 left-1/2">
+              {currentImageIndex + 1} of{" "}
+              {request.images.filter((img) => img).length}
             </div>
           </div>
         )}

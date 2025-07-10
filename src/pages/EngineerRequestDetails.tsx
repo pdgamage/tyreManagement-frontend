@@ -19,6 +19,8 @@ const EngineerRequestDetails = () => {
   const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [notesError, setNotesError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,11 +61,27 @@ const EngineerRequestDetails = () => {
   }, [id]);
 
   const handleAction = async (approve: boolean) => {
+    // Clear previous error
+    setNotesError("");
+
+    // Validate notes
     if (!notes.trim()) {
-      alert("Please enter notes");
+      setNotesError("Please enter notes before proceeding");
       return;
     }
-    setIsApproving(true);
+
+    if (notes.trim().length < 10) {
+      setNotesError("Notes must be at least 10 characters long");
+      return;
+    }
+
+    // Set appropriate loading state
+    if (approve) {
+      setIsApproving(true);
+    } else {
+      setIsRejecting(true);
+    }
+
     try {
       if (approve) {
         // First approve as engineer
@@ -80,6 +98,7 @@ const EngineerRequestDetails = () => {
       alert("Failed to update request status");
     } finally {
       setIsApproving(false);
+      setIsRejecting(false);
     }
   };
 
@@ -144,6 +163,14 @@ const EngineerRequestDetails = () => {
 
   const handleMouseUp = () => {
     setIsDragging(false);
+  };
+
+  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNotes(e.target.value);
+    // Clear error when user starts typing
+    if (notesError) {
+      setNotesError("");
+    }
   };
 
   if (loading) return <div className="p-8 text-left">Loading...</div>;
@@ -409,17 +436,30 @@ const EngineerRequestDetails = () => {
           {/* Engineer Notes */}
           <div>
             <h3 className="mb-2 text-lg font-semibold text-gray-800">
-              Engineering Review Notes
+              Engineering Review Notes <span className="text-red-500">*</span>
             </h3>
             <div className="p-4 rounded-lg bg-gray-50">
               <textarea
                 value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Enter your engineering review notes..."
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={handleNotesChange}
+                placeholder="Enter your engineering review notes (minimum 10 characters)..."
+                className={`w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  notesError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-gray-300"
+                }`}
                 rows={4}
                 disabled={request.status !== "technical-manager approved"}
               />
+              {notesError && (
+                <p className="mt-2 text-sm text-red-600">{notesError}</p>
+              )}
+              {request.status === "technical-manager approved" && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Please provide detailed notes for your decision (minimum 10
+                  characters)
+                </p>
+              )}
             </div>
           </div>
 
@@ -429,16 +469,17 @@ const EngineerRequestDetails = () => {
               <>
                 <button
                   type="button"
-                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => handleAction(true)}
-                  disabled={isApproving}
+                  disabled={isApproving || isRejecting}
                 >
-                  {isApproving ? "Approving..." : "Approve"}
+                  {isApproving ? "Processing..." : "Approve & Complete"}
                 </button>
                 <button
                   type="button"
-                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowRejectConfirm(true)}
+                  disabled={isApproving || isRejecting}
                 >
                   Reject
                 </button>
@@ -465,19 +506,21 @@ const EngineerRequestDetails = () => {
               </p>
               <div className="flex justify-end gap-4">
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowRejectConfirm(false)}
+                  disabled={isRejecting}
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
                     setShowRejectConfirm(false);
                     handleAction(false);
                   }}
+                  disabled={isRejecting}
                 >
-                  Yes, Reject
+                  {isRejecting ? "Rejecting..." : "Yes, Reject"}
                 </button>
               </div>
             </div>

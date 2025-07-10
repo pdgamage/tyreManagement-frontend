@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { useRequests } from '../contexts/RequestContext';
-import RequestTable from '../components/RequestTable';
-import { UserCircle, ChevronDown, LogOut } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import type { Request } from '../types/request';
+import { useState, useEffect, useRef } from "react";
+import { useRequests } from "../contexts/RequestContext";
+import RequestTable from "../components/RequestTable";
+import { UserCircle, ChevronDown, LogOut } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import type { Request } from "../types/request";
 
 const EngineerDashboard = () => {
   const { requests, fetchRequests } = useRequests();
@@ -14,13 +14,16 @@ const EngineerDashboard = () => {
   const navigate = useNavigate();
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -28,13 +31,22 @@ const EngineerDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
   // Get requests that need engineer review (technical manager approved)
-  const pendingRequests = requests.filter(req => req.status === 'technical-manager approved');
-  // Get requests that are completed
-  const completedRequests = requests.filter(req => req.status === 'complete');
-  // Get requests rejected by engineer
-  const rejectedRequests = requests.filter(req =>
-    req.status === 'rejected' &&
-    req.engineer_note
+  const pendingRequests = requests.filter(
+    (req) => req.status === "technical-manager approved"
+  );
+
+  // Get requests completed by current engineer
+  const completedRequests = requests.filter(
+    (req) => req.status === "complete" && req.engineer_decision_by === user?.id
+  );
+
+  // Get requests rejected by current engineer
+  const rejectedRequests = requests.filter(
+    (req) =>
+      req.status === "rejected" &&
+      req.engineer_note &&
+      req.engineer_note.trim() !== "" &&
+      req.engineer_decision_by === user?.id
   );
 
   const handleApprove = (requestId: string) => {
@@ -49,15 +61,13 @@ const EngineerDashboard = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <div className="max-w-6xl p-4 mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Engineer Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800">Engineer Dashboard</h1>
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -65,9 +75,13 @@ const EngineerDashboard = () => {
           >
             <UserCircle className="w-8 h-8 text-gray-600" />
             <span className="font-medium text-gray-700">
-              {user?.name || 'Profile'}
+              {user?.name || "Profile"}
             </span>
-            <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`h-4 w-4 text-gray-500 transition-transform ${
+                isProfileOpen ? "rotate-180" : ""
+              }`}
+            />
           </button>
 
           {isProfileOpen && (
@@ -88,7 +102,9 @@ const EngineerDashboard = () => {
       <div className="space-y-8">
         {/* Pending Requests Table */}
         <div>
-          <h2 className="mb-4 text-xl font-semibold">Pending Engineering Review ({pendingRequests.length})</h2>
+          <h2 className="mb-4 text-xl font-semibold">
+            Pending Engineering Review ({pendingRequests.length})
+          </h2>
           <RequestTable
             requests={pendingRequests}
             title="Pending Requests"
@@ -102,7 +118,11 @@ const EngineerDashboard = () => {
         </div>
 
         {/* Approved Requests Table */}
-        <div>          <h2 className="mb-4 text-xl font-semibold">Completed Requests ({completedRequests.length})</h2>
+        <div>
+          {" "}
+          <h2 className="mb-4 text-xl font-semibold">
+            Completed Requests ({completedRequests.length})
+          </h2>
           <RequestTable
             requests={completedRequests}
             title="Completed Requests"
@@ -117,7 +137,9 @@ const EngineerDashboard = () => {
 
         {/* Rejected Requests Table */}
         <div>
-          <h2 className="mb-4 text-xl font-semibold">Engineering Rejected Requests ({rejectedRequests.length})</h2>
+          <h2 className="mb-4 text-xl font-semibold">
+            Engineering Rejected Requests ({rejectedRequests.length})
+          </h2>
           <RequestTable
             requests={rejectedRequests}
             title="Rejected Requests"
@@ -130,8 +152,6 @@ const EngineerDashboard = () => {
           />
         </div>
       </div>
-
-
     </div>
   );
 };

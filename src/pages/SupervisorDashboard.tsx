@@ -54,11 +54,21 @@ const SupervisorDashboard = () => {
   const pendingRequests = supervisorRequests.filter(
     (req) => req.status === "pending"
   );
+
+  // Show approved requests done by current supervisor
   const approvedRequests = supervisorRequests.filter(
-    (req) => req.status === "supervisor approved"
+    (req) =>
+      req.status === "supervisor approved" &&
+      req.supervisor_decision_by === user?.id
   );
+
+  // Show rejected requests done by current supervisor
   const rejectedRequests = supervisorRequests.filter(
-    (req) => req.status === "rejected"
+    (req) =>
+      req.status === "rejected" &&
+      req.supervisor_notes &&
+      req.supervisor_notes.trim() !== "" &&
+      req.supervisor_decision_by === user?.id
   );
 
   return (

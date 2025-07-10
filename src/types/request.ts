@@ -36,4 +36,6 @@ export interface Request {
   engineer_note?: string;
   supervisorId: string;
   technical_manager_id?: string;
+  supervisor_decision_by?: string;
+  engineer_decision_by?: string;
 }

@@ -1,12 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Request } from "../types/request";
 
 const SupervisorRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
   const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
+  const { user } = useAuth();
   const [request, setRequest] = useState<Request | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -81,7 +83,8 @@ const SupervisorRequestDetails = () => {
         id!,
         approve ? "supervisor approved" : "rejected",
         notes,
-        "supervisor"
+        "supervisor",
+        user?.id
       );
       await fetchRequests();
       navigate("/supervisor");

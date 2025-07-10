@@ -1,12 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Request } from "../types/request";
 
 const EngineerRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
   const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
+  const { user } = useAuth();
   const [request, setRequest] = useState<Request | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -85,12 +87,18 @@ const EngineerRequestDetails = () => {
     try {
       if (approve) {
         // First approve as engineer
-        await updateRequestStatus(id!, "engineer approved", notes, "engineer");
+        await updateRequestStatus(
+          id!,
+          "engineer approved",
+          notes,
+          "engineer",
+          user?.id
+        );
         // Then mark as complete with the same engineer notes
-        await updateRequestStatus(id!, "complete", notes, "engineer");
+        await updateRequestStatus(id!, "complete", notes, "engineer", user?.id);
       } else {
         // Just reject
-        await updateRequestStatus(id!, "rejected", notes, "engineer");
+        await updateRequestStatus(id!, "rejected", notes, "engineer", user?.id);
       }
       await fetchRequests();
       navigate("/engineer");

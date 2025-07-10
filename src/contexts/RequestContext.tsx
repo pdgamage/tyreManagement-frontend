@@ -27,6 +27,8 @@ interface RequestsContextType {
     role: string,
     userId?: string
   ) => Promise<void>;
+  isRefreshing: boolean;
+  lastUpdate: number;
 }
 
 const RequestContext = createContext<RequestsContextType | undefined>(
@@ -38,47 +40,50 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [requests, setRequests] = useState<Request[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  // Handle real-time request updates
-  const handleRequestUpdate = useCallback(async (data: any) => {
-    console.log("Received request update:", data);
-
-    if (data.type === "REQUEST_UPDATE") {
-      const updatedRequest = data.request;
-
-      // Option 1: Update state directly
-      setRequests((prevRequests) => {
-        const existingIndex = prevRequests.findIndex(
-          (req) => req.id === updatedRequest.id
-        );
-
-        if (existingIndex >= 0) {
-          // Update existing request - create completely new array to force re-render
-          const newRequests = prevRequests.map((req, index) =>
-            index === existingIndex ? { ...updatedRequest } : req
-          );
-          console.log(
-            "Updated existing request:",
-            updatedRequest.id,
-            "Status:",
-            updatedRequest.status
-          );
-          return newRequests;
-        } else {
-          // Add new request if it doesn't exist
-          console.log("Adding new request:", updatedRequest.id);
-          return [...prevRequests, { ...updatedRequest }];
-        }
-      });
-
-      // Option 2: Force complete refresh immediately
-      console.log("Force refreshing requests after WebSocket update");
-      fetchRequests();
-
-      // Force re-render by updating timestamp
+  const fetchRequests = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+      console.log("🔄 Fetching requests...");
+      const res = await fetch(`${API_BASE_URL}/api/requests`);
+      const data = await res.json();
+      setRequests(data);
       setLastUpdate(Date.now());
+      console.log("✅ Requests updated:", data.length, "requests");
+    } catch (err) {
+      console.error("❌ Failed to fetch requests:", err);
+      setRequests([]);
+    } finally {
+      setIsRefreshing(false);
     }
   }, []);
+
+  // Handle real-time request updates
+  const handleRequestUpdate = useCallback(
+    async (data: any) => {
+      console.log("🔄 WEBSOCKET UPDATE RECEIVED:", data);
+
+      if (data.type === "REQUEST_UPDATE") {
+        console.log(
+          "🚀 Processing REQUEST_UPDATE - Force refreshing all requests"
+        );
+
+        // Force complete refresh immediately - this should work
+        try {
+          await fetchRequests();
+          console.log("✅ Force refresh completed successfully");
+        } catch (error) {
+          console.error("❌ Force refresh failed:", error);
+        }
+
+        // Also update timestamp to force re-render
+        setLastUpdate(Date.now());
+        console.log("🔄 Updated timestamp to force re-render");
+      }
+    },
+    [fetchRequests]
+  );
 
   // Initialize WebSocket connection
   useWebSocket({
@@ -87,27 +92,17 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     onDisconnect: () => console.log("RequestContext: WebSocket disconnected"),
   });
 
-  // Initialize SSE connection (more reliable for Railway)
-  useSSE({
-    onRequestUpdate: handleRequestUpdate,
-    onConnect: () => console.log("RequestContext: SSE connected"),
-    onDisconnect: () => console.log("RequestContext: SSE disconnected"),
-  });
+  // SSE disabled due to Railway connection issues
+  // useSSE({
+  //   onRequestUpdate: handleRequestUpdate,
+  //   onConnect: () => console.log("RequestContext: SSE connected"),
+  //   onDisconnect: () => console.log("RequestContext: SSE disconnected"),
+  // });
 
-  const fetchRequests = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/requests`);
-      const data = await res.json();
-      setRequests(data);
-    } catch (err) {
-      setRequests([]);
-    }
-  }, []);
-
-  // Backup polling mechanism (ensures updates even if WebSocket/SSE fails)
+  // Aggressive polling mechanism (ensures updates even if WebSocket fails)
   usePolling({
     onPoll: fetchRequests,
-    interval: 5000, // Poll every 5 seconds
+    interval: 1000, // Poll every 1 second for near real-time updates
     enabled: true,
   });
 
@@ -146,6 +141,8 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     requests,
     fetchRequests,
     updateRequestStatus,
+    isRefreshing,
+    lastUpdate,
   };
 
   return (

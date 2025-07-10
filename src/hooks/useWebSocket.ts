@@ -60,8 +60,13 @@ export const useWebSocket = ({
 
     // Handle request updates
     socket.on("requestUpdate", (data) => {
-      console.log("Received request update:", data);
-      onRequestUpdate?.(data);
+      console.log("🔥 WebSocket received requestUpdate event:", data);
+      if (onRequestUpdate) {
+        console.log("🔥 Calling onRequestUpdate handler");
+        onRequestUpdate(data);
+      } else {
+        console.log("❌ No onRequestUpdate handler provided");
+      }
     });
 
     // Handle reconnection

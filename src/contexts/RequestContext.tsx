@@ -22,6 +22,8 @@ interface RequestsContextType {
   ) => Promise<void>;
   isRefreshing: boolean;
   lastUpdate: number;
+  reconnectWebSocket: () => void;
+  wsConnected: boolean;
 }
 
 const RequestContext = createContext<RequestsContextType | undefined>(
@@ -86,7 +88,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   // Dynamic polling - more aggressive when WebSocket is disconnected
   usePolling({
     onPoll: fetchRequests,
-    interval: wsConnected ? 5000 : 1000, // 5s when WS connected, 1s when disconnected
+    interval: wsConnected ? 10000 : 2000, // 10s when WS connected, 2s when disconnected
     enabled: true,
   });
 
@@ -121,12 +123,20 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     [fetchRequests]
   );
 
+  // Manual reconnect function
+  const reconnectWebSocket = useCallback(() => {
+    // Force page reload to reset WebSocket connection
+    window.location.reload();
+  }, []);
+
   const contextValue = {
     requests,
     fetchRequests,
     updateRequestStatus,
     isRefreshing,
     lastUpdate,
+    reconnectWebSocket,
+    wsConnected,
   };
 
   return (

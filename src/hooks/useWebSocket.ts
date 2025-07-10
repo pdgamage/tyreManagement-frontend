@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -18,20 +18,60 @@ export const useWebSocket = ({
 }: WebSocketHookProps = {}) => {
   const socketRef = useRef<Socket | null>(null);
   const { user } = useAuth();
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
+  const lastPingRef = useRef<number>(Date.now());
+
+  const forceReconnect = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+
+    // Clear any existing timeouts
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
+
+    // Reconnect after a short delay
+    reconnectTimeoutRef.current = setTimeout(() => {
+      if (user) {
+        // Trigger re-initialization
+        window.location.reload();
+      }
+    }, 3000);
+  }, [user]);
+
+  const startHealthCheck = useCallback(() => {
+    if (healthCheckRef.current) {
+      clearInterval(healthCheckRef.current);
+    }
+
+    healthCheckRef.current = setInterval(() => {
+      const now = Date.now();
+      const timeSinceLastPing = now - lastPingRef.current;
+
+      // If no ping received in 60 seconds, force reconnect
+      if (timeSinceLastPing > 60000) {
+        forceReconnect();
+      }
+    }, 30000); // Check every 30 seconds
+  }, [forceReconnect]);
 
   useEffect(() => {
     // Only connect if user is authenticated
     if (!user) return;
 
-    // Initialize socket connection with stable settings
+    // Initialize socket connection with robust reconnection
     socketRef.current = io(API_BASE_URL, {
       transports: ["polling"], // Use only polling for Railway
-      timeout: 30000,
+      timeout: 20000,
       reconnection: true,
-      reconnectionDelay: 3000,
-      reconnectionAttempts: 5, // Limit attempts to prevent infinite loops
-      reconnectionDelayMax: 10000,
-      forceNew: false, // Don't force new connections
+      reconnectionDelay: 2000,
+      reconnectionAttempts: Infinity, // Keep trying forever
+      reconnectionDelayMax: 30000,
+      randomizationFactor: 0.5,
+      forceNew: false,
       autoConnect: true,
       withCredentials: false,
     });
@@ -48,11 +88,18 @@ export const useWebSocket = ({
         email: user.email,
       });
 
+      // Start health monitoring
+      startHealthCheck();
+      lastPingRef.current = Date.now();
+
       onConnect?.();
     });
 
     // Handle ping from server
     socket.on("ping", (data) => {
+      // Update last ping time for health check
+      lastPingRef.current = Date.now();
+
       // Respond with pong
       socket.emit("pong", {
         timestamp: new Date().toISOString(),
@@ -99,33 +146,22 @@ export const useWebSocket = ({
       // Connection error - will retry automatically
     });
 
-    // Handle reconnection events
-    socket.on("reconnect", (attemptNumber) => {
-      console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`);
-      window.dispatchEvent(new CustomEvent("ws-connect"));
-    });
-
-    socket.on("reconnect_attempt", (attemptNumber) => {
-      console.log(`🔄 WebSocket reconnection attempt #${attemptNumber}`);
-      window.dispatchEvent(new CustomEvent("ws-attempt"));
-    });
-
-    socket.on("reconnect_error", (error) => {
-      console.error("❌ WebSocket reconnection error:", error);
-    });
-
-    socket.on("reconnect_failed", () => {
-      console.error("❌ WebSocket reconnection failed completely");
-    });
-
     // Cleanup on unmount
     return () => {
       if (socket) {
         socket.disconnect();
         socketRef.current = null;
       }
+
+      // Clear timeouts and intervals
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (healthCheckRef.current) {
+        clearInterval(healthCheckRef.current);
+      }
     };
-  }, [user, onRequestUpdate, onConnect, onDisconnect]);
+  }, [user, onRequestUpdate, onConnect, onDisconnect, startHealthCheck]);
 
   // Function to manually emit events
   const emit = (eventName: string, data: any) => {

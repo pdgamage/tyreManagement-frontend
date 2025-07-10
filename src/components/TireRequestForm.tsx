@@ -650,7 +650,8 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const { vehicles, loading: vehiclesLoading } = useVehicles();
   const { user } = useAuth();
-  const { requests, fetchRequests } = useRequests();
+  const { requests, fetchRequests, reconnectWebSocket, wsConnected } =
+    useRequests();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -1158,6 +1159,30 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       </form>
 
       <div className="pt-8 mt-12 border-t">
+        {/* Connection Status */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                wsConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></div>
+            <span className="text-sm text-gray-600">
+              {wsConnected
+                ? "Real-time updates active"
+                : "Using backup sync (2s)"}
+            </span>
+          </div>
+          {!wsConnected && (
+            <button
+              onClick={reconnectWebSocket}
+              className="px-3 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600"
+            >
+              Reconnect
+            </button>
+          )}
+        </div>
+
         <RequestTable
           requests={requests.filter((req) => req.userId === user?.id)}
           title="Your Tire Requests"

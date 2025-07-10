@@ -62,13 +62,8 @@ const EngineerRequestDetails = () => {
       if (approve) {
         // First approve as engineer
         await updateRequestStatus(id!, "engineer approved", notes, "engineer");
-        // Then mark as complete
-        await updateRequestStatus(
-          id!,
-          "complete",
-          "Auto-completed after engineer approval",
-          "engineer"
-        );
+        // Then mark as complete with the same engineer notes
+        await updateRequestStatus(id!, "complete", notes, "engineer");
       } else {
         // Just reject
         await updateRequestStatus(id!, "rejected", notes, "engineer");

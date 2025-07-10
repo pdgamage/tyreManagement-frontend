@@ -19,6 +19,8 @@ const SupervisorRequestDetails = () => {
   const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [notesError, setNotesError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,11 +55,27 @@ const SupervisorRequestDetails = () => {
   }, [id]);
 
   const handleAction = async (approve: boolean) => {
+    // Clear previous error
+    setNotesError("");
+
+    // Validate notes
     if (!notes.trim()) {
-      alert("Please enter notes");
+      setNotesError("Please enter notes before proceeding");
       return;
     }
-    setIsApproving(true); // Start loading
+
+    if (notes.trim().length < 10) {
+      setNotesError("Notes must be at least 10 characters long");
+      return;
+    }
+
+    // Set appropriate loading state
+    if (approve) {
+      setIsApproving(true);
+    } else {
+      setIsRejecting(true);
+    }
+
     try {
       await updateRequestStatus(
         id!,
@@ -70,7 +88,8 @@ const SupervisorRequestDetails = () => {
     } catch {
       alert("Failed to update request status");
     } finally {
-      setIsApproving(false); // End loading
+      setIsApproving(false);
+      setIsRejecting(false);
     }
   };
 
@@ -135,6 +154,14 @@ const SupervisorRequestDetails = () => {
 
   const handleMouseUp = () => {
     setIsDragging(false);
+  };
+
+  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNotes(e.target.value);
+    // Clear error when user starts typing
+    if (notesError) {
+      setNotesError("");
+    }
   };
 
   if (loading) return <div className="p-8 text-left">Loading...</div>;
@@ -370,16 +397,29 @@ const SupervisorRequestDetails = () => {
           {/* Supervisor Notes */}
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
-              Supervisor Notes
+              Supervisor Notes <span className="text-red-500">*</span>
             </label>
             <textarea
-              className="w-full p-2 mt-1 border rounded"
-              placeholder="Enter notes..."
+              className={`w-full p-2 mt-1 border rounded ${
+                notesError
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300"
+              }`}
+              placeholder="Enter notes (minimum 10 characters)..."
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={handleNotesChange}
               rows={3}
               readOnly={request.status !== "pending"} // Make read-only if not pending
             />
+            {notesError && (
+              <p className="mt-1 text-sm text-red-600">{notesError}</p>
+            )}
+            {request.status === "pending" && (
+              <p className="mt-1 text-sm text-gray-500">
+                Please provide detailed notes for your decision (minimum 10
+                characters)
+              </p>
+            )}
           </div>
           {/* Action Buttons */}
           <div className="flex gap-4 mt-6">
@@ -387,16 +427,17 @@ const SupervisorRequestDetails = () => {
               <>
                 <button
                   type="button"
-                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700"
+                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => handleAction(true)}
-                  disabled={isApproving}
+                  disabled={isApproving || isRejecting}
                 >
                   {isApproving ? "Approving..." : "Approve"}
                 </button>
                 <button
                   type="button"
-                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700"
+                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowRejectConfirm(true)}
+                  disabled={isApproving || isRejecting}
                 >
                   Reject
                 </button>
@@ -423,19 +464,21 @@ const SupervisorRequestDetails = () => {
               </p>
               <div className="flex justify-end gap-4">
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowRejectConfirm(false)}
+                  disabled={isRejecting}
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
                     setShowRejectConfirm(false);
                     handleAction(false);
                   }}
+                  disabled={isRejecting}
                 >
-                  Yes, Reject
+                  {isRejecting ? "Rejecting..." : "Yes, Reject"}
                 </button>
               </div>
             </div>

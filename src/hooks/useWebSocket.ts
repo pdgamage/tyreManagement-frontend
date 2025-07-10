@@ -23,19 +23,17 @@ export const useWebSocket = ({
     // Only connect if user is authenticated
     if (!user) return;
 
-    // Initialize socket connection with more resilient settings
+    // Initialize socket connection with Railway-optimized settings
     socketRef.current = io(API_BASE_URL, {
-      transports: ["polling", "websocket"], // Try polling first for Railway
-      timeout: 30000,
+      transports: ["polling"], // Use only polling for Railway
+      timeout: 60000,
       reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: Infinity, // Keep trying to reconnect forever
-      reconnectionDelayMax: 5000,
-      randomizationFactor: 0.5,
-      forceNew: false,
+      reconnectionDelay: 2000,
+      reconnectionAttempts: Infinity,
+      reconnectionDelayMax: 10000,
+      forceNew: true, // Force new connection each time
       autoConnect: true,
-      path: "/socket.io/", // Default path
-      withCredentials: false, // Try without credentials
+      withCredentials: false,
     });
 
     console.log("🔌 Initializing WebSocket connection to:", API_BASE_URL);
@@ -115,7 +113,26 @@ export const useWebSocket = ({
 
     // Handle connection errors
     socket.on("connect_error", (error) => {
-      console.error("WebSocket connection error:", error);
+      console.error("❌ WebSocket connection error:", error);
+      console.log("🔄 Will retry connection automatically...");
+    });
+
+    // Handle reconnection events
+    socket.on("reconnect", (attemptNumber) => {
+      console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`);
+      window.dispatchEvent(new CustomEvent("ws-connect"));
+    });
+
+    socket.on("reconnect_attempt", (attemptNumber) => {
+      console.log(`🔄 WebSocket reconnection attempt #${attemptNumber}`);
+    });
+
+    socket.on("reconnect_error", (error) => {
+      console.error("❌ WebSocket reconnection error:", error);
+    });
+
+    socket.on("reconnect_failed", () => {
+      console.error("❌ WebSocket reconnection failed completely");
     });
 
     // Cleanup on unmount

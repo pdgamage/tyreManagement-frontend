@@ -41,6 +41,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const [requests, setRequests] = useState<Request[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [wsConnected, setWsConnected] = useState<boolean>(false);
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -88,8 +89,14 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   // Initialize WebSocket connection
   useWebSocket({
     onRequestUpdate: handleRequestUpdate,
-    onConnect: () => console.log("RequestContext: WebSocket connected"),
-    onDisconnect: () => console.log("RequestContext: WebSocket disconnected"),
+    onConnect: () => {
+      console.log("RequestContext: WebSocket connected");
+      setWsConnected(true);
+    },
+    onDisconnect: () => {
+      console.log("RequestContext: WebSocket disconnected");
+      setWsConnected(false);
+    },
   });
 
   // SSE disabled due to Railway connection issues
@@ -99,10 +106,10 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   //   onDisconnect: () => console.log("RequestContext: SSE disconnected"),
   // });
 
-  // Aggressive polling mechanism (ensures updates even if WebSocket fails)
+  // Dynamic polling - more aggressive when WebSocket is disconnected
   usePolling({
     onPoll: fetchRequests,
-    interval: 1000, // Poll every 1 second for near real-time updates
+    interval: wsConnected ? 5000 : 1000, // 5s when WS connected, 1s when disconnected
     enabled: true,
   });
 

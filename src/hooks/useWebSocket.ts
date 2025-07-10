@@ -23,23 +23,28 @@ export const useWebSocket = ({
     // Only connect if user is authenticated
     if (!user) return;
 
-    // Initialize socket connection
+    // Initialize socket connection with more resilient settings
     socketRef.current = io(API_BASE_URL, {
       transports: ["polling", "websocket"], // Try polling first for Railway
-      timeout: 20000,
+      timeout: 30000,
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
-      maxReconnectionAttempts: 5,
+      reconnectionAttempts: Infinity, // Keep trying to reconnect forever
+      reconnectionDelayMax: 5000,
+      randomizationFactor: 0.5,
       forceNew: false,
       autoConnect: true,
+      path: "/socket.io/", // Default path
+      withCredentials: false, // Try without credentials
     });
+
+    console.log("🔌 Initializing WebSocket connection to:", API_BASE_URL);
 
     const socket = socketRef.current;
 
     // Handle connection
     socket.on("connect", () => {
-      console.log("Connected to WebSocket server");
+      console.log("🟢 Connected to WebSocket server");
 
       // Authenticate user with server
       socket.emit("authenticate", {
@@ -49,12 +54,34 @@ export const useWebSocket = ({
         email: user.email,
       });
 
+      // Dispatch event for debug panel
+      window.dispatchEvent(new CustomEvent("ws-connect"));
+
       onConnect?.();
+    });
+
+    // Handle ping from server
+    socket.on("ping", (data) => {
+      console.log("📡 Received ping from server:", data);
+      // Respond with pong
+      socket.emit("pong", {
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+      });
+      // Dispatch event for debug panel
+      window.dispatchEvent(new CustomEvent("ws-ping"));
+    });
+
+    // Handle authentication confirmation
+    socket.on("authenticated", (data) => {
+      console.log("🔑 Authentication confirmed:", data);
     });
 
     // Handle disconnection
     socket.on("disconnect", (reason) => {
-      console.log("Disconnected from WebSocket server:", reason);
+      console.log("🔴 Disconnected from WebSocket server:", reason);
+      // Dispatch event for debug panel
+      window.dispatchEvent(new CustomEvent("ws-disconnect"));
       onDisconnect?.();
     });
 

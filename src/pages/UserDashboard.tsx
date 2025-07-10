@@ -5,7 +5,9 @@ import { TireRequest } from "../types/api";
 import DebugPanel from "../components/DebugPanel";
 
 const UserDashboard = () => {
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
+    null
+  );
 
   const closeDetailsModal = () => {
     setSelectedRequest(null);

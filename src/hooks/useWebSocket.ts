@@ -23,15 +23,15 @@ export const useWebSocket = ({
     // Only connect if user is authenticated
     if (!user) return;
 
-    // Initialize socket connection with Railway-optimized settings
+    // Initialize socket connection with stable settings
     socketRef.current = io(API_BASE_URL, {
       transports: ["polling"], // Use only polling for Railway
-      timeout: 60000,
+      timeout: 30000,
       reconnection: true,
-      reconnectionDelay: 2000,
-      reconnectionAttempts: Infinity,
+      reconnectionDelay: 3000,
+      reconnectionAttempts: 5, // Limit attempts to prevent infinite loops
       reconnectionDelayMax: 10000,
-      forceNew: true, // Force new connection each time
+      forceNew: false, // Don't force new connections
       autoConnect: true,
       withCredentials: false,
     });

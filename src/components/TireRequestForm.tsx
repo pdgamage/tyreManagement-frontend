@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useVehicles } from "../contexts/VehicleContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useRequests } from "../contexts/RequestContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
 import { Vehicle } from "../types/api";
@@ -649,15 +650,17 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const { vehicles, loading: vehiclesLoading } = useVehicles();
   const { user } = useAuth();
+  const { requests, fetchRequests } = useRequests();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
-  const [requests, setRequests] = useState<Request[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
+    null
+  );
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
   const [orderRequest, setOrderRequest] = useState<TireRequest | null>(null);
@@ -667,25 +670,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   // Fetch requests when component mounts
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch(
-          "https://tyremanagement-backend-production.up.railway.app/api/requests/user/" +
-            user?.id
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setRequests(data);
-        }
-      } catch (err) {
-        console.error("Error fetching requests:", err);
-      }
-    };
-
     if (user?.id) {
       fetchRequests();
     }
-  }, [user?.id]);
+  }, [user?.id, fetchRequests]);
 
   useEffect(() => {
     const fetchSupervisors = async () => {
@@ -721,9 +709,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
       userSection: request.userSection,
-      lastReplacementDate: typeof request.lastReplacementDate === 'string'
-        ? request.lastReplacementDate
-        : request.lastReplacementDate.toISOString(),
+      lastReplacementDate:
+        typeof request.lastReplacementDate === "string"
+          ? request.lastReplacementDate
+          : request.lastReplacementDate.toISOString(),
       existingTireMake: request.existingTireMake,
       tireSizeRequired: request.tireSizeRequired,
       costCenter: request.costCenter,
@@ -733,9 +722,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       comments: request.comments || undefined,
       images: request.images,
       status: request.status,
-      submittedAt: typeof request.submittedAt === 'string'
-        ? request.submittedAt
-        : request.submittedAt.toISOString(),
+      submittedAt:
+        typeof request.submittedAt === "string"
+          ? request.submittedAt
+          : request.submittedAt.toISOString(),
       supervisorNotes: request.supervisor_notes,
       technicalManagerNotes: request.technical_manager_note,
       engineerNotes: request.engineer_note,
@@ -760,20 +750,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const handleOrderPlaced = async () => {
     // Refresh the requests list after order is placed
-    if (user?.id) {
-      try {
-        const response = await fetch(
-          "https://tyremanagement-backend-production.up.railway.app/api/requests/user/" +
-            user.id
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setRequests(data);
-        }
-      } catch (err) {
-        console.error("Error fetching requests:", err);
-      }
-    }
+    fetchRequests();
   };
 
   const initialFormData = {
@@ -978,9 +955,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         throw new Error("Failed to submit request");
       }
 
-      // --- ADD THIS: Get the created request and update state ---
+      // --- ADD THIS: Get the created request and refresh requests ---
       const createdRequest = await response.json();
-      setRequests((prev) => [createdRequest, ...prev]); // User table updates instantly
+      fetchRequests(); // Refresh requests to show new request
 
       if (onSuccess) onSuccess(); // Supervisor dashboard will refetch requests
 
@@ -1049,7 +1026,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           method: "DELETE",
         }
       );
-      setRequests((prev) => prev.filter((req) => req.id !== deleteId));
+      fetchRequests(); // Refresh requests after deletion
     } catch {
       // Optionally show an error in your modal, but do NOT use alert()
     }
@@ -1183,7 +1160,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
       <div className="pt-8 mt-12 border-t">
         <RequestTable
-          requests={requests}
+          requests={requests.filter((req) => req.userId === user?.id)}
           title="Your Tire Requests"
           onView={handleView}
           onApprove={() => {}}

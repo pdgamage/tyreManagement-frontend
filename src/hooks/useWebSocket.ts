@@ -40,6 +40,9 @@ export const useWebSocket = ({
 
     const socket = socketRef.current;
 
+    // Expose socket globally for debugging
+    (window as any).debugSocket = socket;
+
     // Handle connection
     socket.on("connect", () => {
       console.log("🟢 Connected to WebSocket server");
@@ -125,6 +128,7 @@ export const useWebSocket = ({
 
     socket.on("reconnect_attempt", (attemptNumber) => {
       console.log(`🔄 WebSocket reconnection attempt #${attemptNumber}`);
+      window.dispatchEvent(new CustomEvent("ws-attempt"));
     });
 
     socket.on("reconnect_error", (error) => {

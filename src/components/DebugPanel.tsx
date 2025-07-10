@@ -7,22 +7,53 @@ const DebugPanel: React.FC = () => {
   const { fetchRequests, isRefreshing, lastUpdate } = useRequests();
   const [wsConnected, setWsConnected] = useState(false);
   const [lastPing, setLastPing] = useState<number>(0);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
 
-  // Listen for WebSocket events
+  // Listen for WebSocket events and check connection status
   useEffect(() => {
-    const handleConnect = () => setWsConnected(true);
-    const handleDisconnect = () => setWsConnected(false);
-    const handlePing = () => setLastPing(Date.now());
+    const handleConnect = () => {
+      console.log("🟢 Debug Panel: WebSocket connected");
+      setWsConnected(true);
+    };
+
+    const handleDisconnect = () => {
+      console.log("🔴 Debug Panel: WebSocket disconnected");
+      setWsConnected(false);
+    };
+
+    const handlePing = () => {
+      console.log("📡 Debug Panel: Received ping");
+      setLastPing(Date.now());
+      setWsConnected(true); // Ping means we're connected
+    };
+
+    const handleAttempt = () => {
+      setConnectionAttempts((prev) => prev + 1);
+    };
 
     // Add event listeners to window for WebSocket events
     window.addEventListener("ws-connect", handleConnect);
     window.addEventListener("ws-disconnect", handleDisconnect);
     window.addEventListener("ws-ping", handlePing);
+    window.addEventListener("ws-attempt", handleAttempt);
+
+    // Check connection status periodically
+    const statusCheck = setInterval(() => {
+      // Try to access the global socket if it exists
+      const globalSocket = (window as any).debugSocket;
+      if (globalSocket) {
+        const isConnected = globalSocket.connected;
+        console.log("🔍 Debug Panel: Socket status check:", isConnected);
+        setWsConnected(isConnected);
+      }
+    }, 2000);
 
     return () => {
       window.removeEventListener("ws-connect", handleConnect);
       window.removeEventListener("ws-disconnect", handleDisconnect);
       window.removeEventListener("ws-ping", handlePing);
+      window.removeEventListener("ws-attempt", handleAttempt);
+      clearInterval(statusCheck);
     };
   }, []);
 
@@ -46,7 +77,33 @@ const DebugPanel: React.FC = () => {
 
     testSocket.on("connect", () => {
       console.log("✅ Test connection successful!");
-      testSocket.disconnect();
+
+      // Test authentication
+      testSocket.emit("authenticate", {
+        id: "test-user",
+        role: "user",
+        name: "Test User",
+        email: "test@example.com",
+      });
+
+      // Listen for authentication confirmation
+      testSocket.on("authenticated", (data) => {
+        console.log("✅ Test authentication successful:", data);
+      });
+
+      // Listen for ping
+      testSocket.on("ping", (data) => {
+        console.log("✅ Test ping received:", data);
+        testSocket.emit("pong", {
+          timestamp: new Date().toISOString(),
+          userId: "test-user",
+        });
+      });
+
+      setTimeout(() => {
+        testSocket.disconnect();
+        console.log("🧪 Test completed");
+      }, 5000);
     });
 
     testSocket.on("connect_error", (error) => {
@@ -90,6 +147,18 @@ const DebugPanel: React.FC = () => {
         <div className="flex items-center justify-between">
           <span>Last Update:</span>
           <span className="text-gray-600">{formatTime(lastUpdate)}</span>
+        </div>
+
+        {lastPing > 0 && (
+          <div className="flex items-center justify-between">
+            <span>Last Ping:</span>
+            <span className="text-gray-600">{formatTime(lastPing)}</span>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between">
+          <span>Attempts:</span>
+          <span className="text-gray-600">{connectionAttempts}</span>
         </div>
 
         <div className="space-y-1">

@@ -53,8 +53,8 @@ const EngineerDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-6xl p-4 mx-auto">
+      <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-800">
           Engineer Dashboard
         </h1>
@@ -63,7 +63,7 @@ const EngineerDashboard = () => {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-2 focus:outline-none"
           >
-            <UserCircle className="h-8 w-8 text-gray-600" />
+            <UserCircle className="w-8 h-8 text-gray-600" />
             <span className="font-medium text-gray-700">
               {user?.name || 'Profile'}
             </span>
@@ -71,12 +71,12 @@ const EngineerDashboard = () => {
           </button>
 
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1">
+            <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-lg shadow-lg">
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </button>
             </div>
@@ -88,7 +88,7 @@ const EngineerDashboard = () => {
       <div className="space-y-8">
         {/* Pending Requests Table */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Pending Engineering Review ({pendingRequests.length})</h2>
+          <h2 className="mb-4 text-xl font-semibold">Pending Engineering Review ({pendingRequests.length})</h2>
           <RequestTable
             requests={pendingRequests}
             title="Pending Requests"
@@ -97,12 +97,12 @@ const EngineerDashboard = () => {
             onView={(request) => navigate(`/engineer/request/${request.id}`)}
             onDelete={() => {}}
             onPlaceOrder={() => {}}
-            showActions={true}
+            showActions={false}
           />
         </div>
 
         {/* Approved Requests Table */}
-        <div>          <h2 className="text-xl font-semibold mb-4">Completed Requests ({completedRequests.length})</h2>
+        <div>          <h2 className="mb-4 text-xl font-semibold">Completed Requests ({completedRequests.length})</h2>
           <RequestTable
             requests={completedRequests}
             title="Completed Requests"
@@ -117,7 +117,7 @@ const EngineerDashboard = () => {
 
         {/* Rejected Requests Table */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Engineering Rejected Requests ({rejectedRequests.length})</h2>
+          <h2 className="mb-4 text-xl font-semibold">Engineering Rejected Requests ({rejectedRequests.length})</h2>
           <RequestTable
             requests={rejectedRequests}
             title="Rejected Requests"

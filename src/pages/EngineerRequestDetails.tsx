@@ -369,7 +369,7 @@ const EngineerRequestDetails = () => {
                   onClick={() => handleAction(true)}
                   disabled={isApproving}
                 >
-                  {isApproving ? "Processing..." : "Approve & Complete"}
+                  {isApproving ? "Approving..." : "Approve"}
                 </button>
                 <button
                   type="button"

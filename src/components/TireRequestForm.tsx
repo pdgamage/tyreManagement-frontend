@@ -955,11 +955,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         throw new Error("Failed to submit request");
       }
 
-      // --- ADD THIS: Get the created request and refresh requests ---
-      const createdRequest = await response.json();
-      fetchRequests(); // Refresh requests to show new request
+      // Refresh requests to show new request
+      fetchRequests();
 
-      if (onSuccess) onSuccess(); // Supervisor dashboard will refetch requests
+      if (onSuccess) onSuccess();
 
       setFormLoading(false);
       setSuccess(true);

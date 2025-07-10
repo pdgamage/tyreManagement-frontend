@@ -36,17 +36,10 @@ export const useWebSocket = ({
       withCredentials: false,
     });
 
-    console.log("🔌 Initializing WebSocket connection to:", API_BASE_URL);
-
     const socket = socketRef.current;
-
-    // Expose socket globally for debugging
-    (window as any).debugSocket = socket;
 
     // Handle connection
     socket.on("connect", () => {
-      console.log("🟢 Connected to WebSocket server");
-
       // Authenticate user with server
       socket.emit("authenticate", {
         id: user.id,
@@ -55,69 +48,55 @@ export const useWebSocket = ({
         email: user.email,
       });
 
-      // Dispatch event for debug panel
-      window.dispatchEvent(new CustomEvent("ws-connect"));
-
       onConnect?.();
     });
 
     // Handle ping from server
     socket.on("ping", (data) => {
-      console.log("📡 Received ping from server:", data);
       // Respond with pong
       socket.emit("pong", {
         timestamp: new Date().toISOString(),
         userId: user.id,
       });
-      // Dispatch event for debug panel
-      window.dispatchEvent(new CustomEvent("ws-ping"));
     });
 
     // Handle authentication confirmation
     socket.on("authenticated", (data) => {
-      console.log("🔑 Authentication confirmed:", data);
+      // Authentication successful
     });
 
     // Handle disconnection
     socket.on("disconnect", (reason) => {
-      console.log("🔴 Disconnected from WebSocket server:", reason);
-      // Dispatch event for debug panel
-      window.dispatchEvent(new CustomEvent("ws-disconnect"));
       onDisconnect?.();
     });
 
     // Handle request updates
     socket.on("requestUpdate", (data) => {
-      console.log("🔥 WebSocket received requestUpdate event:", data);
       if (onRequestUpdate) {
-        console.log("🔥 Calling onRequestUpdate handler");
         onRequestUpdate(data);
-      } else {
-        console.log("❌ No onRequestUpdate handler provided");
       }
     });
 
     // Handle reconnection
     socket.on("reconnect", (attemptNumber) => {
-      console.log("WebSocket reconnected after", attemptNumber, "attempts");
+      // Reconnected successfully
     });
 
     socket.on("reconnect_attempt", (attemptNumber) => {
-      console.log("WebSocket reconnection attempt:", attemptNumber);
+      // Attempting to reconnect
     });
 
     socket.on("reconnect_error", (error) => {
-      console.error("WebSocket reconnection error:", error);
+      // Reconnection error
     });
 
     socket.on("reconnect_failed", () => {
-      console.error("WebSocket reconnection failed");
+      // Reconnection failed
     });
 
     // Handle connection errors
     socket.on("connect_error", (error) => {
-      console.error("❌ WebSocket connection error:", error);
-      console.log("🔄 Will retry connection automatically...");
+      // Connection error - will retry automatically
     });
 
     // Handle reconnection events

@@ -2,7 +2,6 @@ import { useState } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestDetailsModal from "../components/RequestDetailsModal";
 import { TireRequest } from "../types/api";
-import DebugPanel from "../components/DebugPanel";
 
 const UserDashboard = () => {
   const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
@@ -33,7 +32,7 @@ const UserDashboard = () => {
           <h2 className="text-lg font-medium text-gray-900">
             Submit New Tire Request
           </h2>
-          <DebugPanel />
+          
         </div>
         <div className="p-6">
           <TireRequestForm onSuccess={() => {}} />

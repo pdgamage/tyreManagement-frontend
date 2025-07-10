@@ -219,29 +219,20 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {(() => {
-                      console.log('Request status check:', {
-                        id: request.id,
-                        status: request.status,
-                        statusType: typeof request.status,
-                        trimmed: request.status?.toLowerCase().trim(),
-                        isComplete: request.status?.toLowerCase().trim() === "complete",
-                        orderPlaced: (request as any).order_placed
-                      });
-                      return (request.status?.toLowerCase().trim() === "complete" && !(request as any).order_placed);
-                    })() && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPlaceOrder(request);
-                        }}
-                        className="px-4 text-gray-500 hover:text-green-700"
-                        aria-label="Place Order"
-                        title="Place Order"
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                      </button>
-                    )}
+                    {request.status?.toLowerCase().trim() === "complete" &&
+                      !(request as any).order_placed && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onPlaceOrder(request);
+                          }}
+                          className="px-4 text-gray-500 hover:text-green-700"
+                          aria-label="Place Order"
+                          title="Place Order"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                        </button>
+                      )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

@@ -1,12 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
-import { useSSE } from "../hooks/useSSE";
 import { usePolling } from "../hooks/usePolling";
 
 const API_BASE_URL =
@@ -46,14 +39,11 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchRequests = useCallback(async () => {
     try {
       setIsRefreshing(true);
-      console.log("🔄 Fetching requests...");
       const res = await fetch(`${API_BASE_URL}/api/requests`);
       const data = await res.json();
       setRequests(data);
       setLastUpdate(Date.now());
-      console.log("✅ Requests updated:", data.length, "requests");
     } catch (err) {
-      console.error("❌ Failed to fetch requests:", err);
       setRequests([]);
     } finally {
       setIsRefreshing(false);
@@ -63,24 +53,13 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   // Handle real-time request updates
   const handleRequestUpdate = useCallback(
     async (data: any) => {
-      console.log("🔄 WEBSOCKET UPDATE RECEIVED:", data);
-
       if (data.type === "REQUEST_UPDATE") {
-        console.log(
-          "🚀 Processing REQUEST_UPDATE - Force refreshing all requests"
-        );
-
-        // Force complete refresh immediately - this should work
         try {
           await fetchRequests();
-          console.log("✅ Force refresh completed successfully");
         } catch (error) {
-          console.error("❌ Force refresh failed:", error);
+          // Error during refresh
         }
-
-        // Also update timestamp to force re-render
         setLastUpdate(Date.now());
-        console.log("🔄 Updated timestamp to force re-render");
       }
     },
     [fetchRequests]
@@ -90,11 +69,9 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   useWebSocket({
     onRequestUpdate: handleRequestUpdate,
     onConnect: () => {
-      console.log("RequestContext: WebSocket connected");
       setWsConnected(true);
     },
     onDisconnect: () => {
-      console.log("RequestContext: WebSocket disconnected");
       setWsConnected(false);
     },
   });

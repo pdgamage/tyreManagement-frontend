@@ -3,7 +3,6 @@ import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
-import { UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -22,7 +21,7 @@ interface RequestsContextType {
 
 const CustomerOfficerDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
@@ -86,7 +85,7 @@ const CustomerOfficerDashboard = () => {
               </button>
               <button
                 onClick={() => navigate("/customer-officer/stock")}
-                className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 font-medium text-gray-600 transition-colors rounded-lg hover:bg-blue-50"
               >
                 Stock Management
               </button>

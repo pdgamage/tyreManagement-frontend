@@ -8,6 +8,12 @@ const CustomerOfficerRequestDetails = () => {
   const [request, setRequest] = useState<Request | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageZoom, setImageZoom] = useState(1);
+  const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,10 +25,7 @@ const CustomerOfficerRequestDetails = () => {
           throw new Error("Invalid request ID.");
         }
         const res = await fetch(
-          `${
-            import.meta.env.VITE_API_BASE_URL ||
-            "https://tyremanagement-backend-production.up.railway.app"
-          }/api/requests/${numericId}`
+          `${import.meta.env.VITE_API_BASE_URL}/api/requests/${numericId}`
         );
         if (!res.ok) {
           if (res.status === 404) {
@@ -41,6 +44,62 @@ const CustomerOfficerRequestDetails = () => {
 
     fetchRequest();
   }, [numericId]);
+
+  const openImageModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setShowImageModal(true);
+    setImageZoom(1);
+    setImagePan({ x: 0, y: 0 });
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setImageZoom(1);
+    setImagePan({ x: 0, y: 0 });
+  };
+
+  const nextImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
+      setImageZoom(1);
+      setImagePan({ x: 0, y: 0 });
+    }
+  };
+
+  const prevImage = () => {
+    if (request?.images) {
+      const validImages = request.images.filter((img) => img);
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + validImages.length) % validImages.length
+      );
+      setImageZoom(1);
+      setImagePan({ x: 0, y: 0 });
+    }
+  };
+
+  const zoomIn = () => setImageZoom((prev) => Math.min(prev + 0.5, 3));
+  const zoomOut = () => setImageZoom((prev) => Math.max(prev - 0.5, 0.5));
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (imageZoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - imagePan.x, y: e.clientY - imagePan.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && imageZoom > 1) {
+      setImagePan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   if (loading) {
     return (
@@ -88,89 +147,197 @@ const CustomerOfficerRequestDetails = () => {
   return (
     <div className="min-h-screen py-8 bg-gray-50">
       <div className="max-w-4xl px-4 mx-auto sm:px-6 lg:px-8">
-        <form className="p-8 space-y-6 bg-white rounded-lg shadow-lg">
+        <div className="p-8 space-y-6 bg-white rounded-lg shadow-lg">
+          {/* Header */}
           <div className="pb-4 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-900">
               Request Details - #{request.id}
             </h1>
-            <p className="mt-2 text-gray-600">
-              Status:{" "}
+            <div className="flex items-center gap-4 mt-2">
               <span
-                className={`font-medium ${
+                className={`px-3 py-1 text-sm font-medium rounded-full ${
                   request.status === "complete"
-                    ? "text-green-600"
-                    : "text-gray-600"
+                    ? "bg-green-100 text-green-800"
+                    : request.status === "pending"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : request.status === "supervisor approved"
+                    ? "bg-blue-100 text-blue-800"
+                    : request.status === "technical-manager approved"
+                    ? "bg-purple-100 text-purple-800"
+                    : request.status === "engineer approved"
+                    ? "bg-indigo-100 text-indigo-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
                 {request.status.charAt(0).toUpperCase() +
                   request.status.slice(1)}
               </span>
-            </p>
-            <p className="text-gray-600">
-              Submitted: {new Date(request.submittedAt).toLocaleDateString()}
-            </p>
+            </div>
           </div>
 
-          {/* Request Information */}
+          {/* Vehicle & Requester Info */}
           <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-800">
-              Request Information
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Vehicle & Requester Info
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Number
                 </label>
-                <p className="mt-1 text-gray-900">{request.vehicleNumber}</p>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleNumber}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Tire Size
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Brand
                 </label>
-                <p className="mt-1 text-gray-900">{request.tireSize}</p>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleBrand}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Quantity
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Model
                 </label>
-                <p className="mt-1 text-gray-900">{request.quantity}</p>
+                <div className="p-2 bg-white rounded">
+                  {request.vehicleModel}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Requested By
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Year
                 </label>
-                <p className="mt-1 text-gray-900">{request.requesterName}</p>
+                <div className="p-2 bg-white rounded">{request.year}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Department/Section
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.userSection}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Cost Center
+                </label>
+                <div className="p-2 bg-white rounded">{request.costCenter}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Name
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterName}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Email
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterEmail}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Phone
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.requesterPhone}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Submitted At
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {new Date(request.submittedAt).toLocaleString()}
+                </div>
               </div>
             </div>
-            {request.comments && (
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">
+          </div>
+          <hr />
+
+          {/* Tire & Request Details */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Tire & Request Details
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Size Required
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tireSizeRequired}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Quantity
+                </label>
+                <div className="p-2 bg-white rounded">{request.quantity}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Brand
+                </label>
+                <div className="p-2 bg-white rounded">N/A</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Size
+                </label>
+                <div className="p-2 bg-white rounded">{request.tireSize}</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Condition
+                </label>
+                <div className="p-2 bg-white rounded">N/A</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Wear Pattern
+                </label>
+                <div className="p-2 bg-white rounded">N/A</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Request Reason
+                </label>
+                <div className="p-2 bg-white rounded">N/A</div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
                   Comments
                 </label>
-                <p className="p-3 mt-1 text-gray-900 rounded-lg bg-gray-50">
-                  {request.comments}
-                </p>
+                <div className="p-2 bg-white rounded">
+                  {request.comments || "N/A"}
+                </div>
               </div>
-            )}
+            </div>
           </div>
+          <hr />
 
-          {/* Images */}
+          {/* Images Section */}
           {request.images && request.images.length > 0 && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold text-gray-800">
-                Tire Images ({request.images.length})
+              <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                Images
               </h3>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {request.images.map((imagePath, idx) =>
-                  imagePath ? (
+              <div className="flex flex-wrap gap-3 p-4 mt-2 rounded-lg bg-gray-50">
+                {request.images.map((img, idx) =>
+                  img ? (
                     <img
                       key={idx}
-                      src={`${
-                        import.meta.env.VITE_API_BASE_URL ||
-                        "https://tyremanagement-backend-production.up.railway.app"
-                      }${imagePath}`}
+                      src={img}
                       alt={`Tire image ${idx + 1}`}
                       className="object-cover w-24 h-24 transition-opacity border rounded cursor-pointer hover:opacity-80"
+                      onClick={() => openImageModal(idx)}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "https://via.placeholder.com/96?text=Image+Not+Found";
@@ -181,45 +348,43 @@ const CustomerOfficerRequestDetails = () => {
               </div>
             </div>
           )}
+          <hr />
 
-          {/* Previous Notes */}
-          {(request.supervisor_notes ||
-            request.technical_manager_note ||
-            request.engineer_note) && (
-            <div>
-              <h3 className="mb-4 text-lg font-semibold text-gray-800">
-                Review Notes
-              </h3>
-              <div className="space-y-4">
-                {request.supervisor_notes && (
-                  <div className="p-4 rounded-lg bg-blue-50">
-                    <h4 className="font-semibold text-blue-800">
-                      Supervisor Notes:
-                    </h4>
-                    <p className="text-blue-700">{request.supervisor_notes}</p>
-                  </div>
-                )}
-                {request.technical_manager_note && (
-                  <div className="p-4 rounded-lg bg-purple-50">
-                    <h4 className="font-semibold text-purple-800">
-                      Technical Manager Notes:
-                    </h4>
-                    <p className="text-purple-700">
-                      {request.technical_manager_note}
-                    </p>
-                  </div>
-                )}
-                {request.engineer_note && (
-                  <div className="p-4 rounded-lg bg-green-50">
-                    <h4 className="font-semibold text-green-800">
-                      Engineer Notes:
-                    </h4>
-                    <p className="text-green-700">{request.engineer_note}</p>
-                  </div>
-                )}
+          {/* Notes Section */}
+          <div className="space-y-4">
+            {request.supervisor_notes && (
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Supervisor Notes
+                </label>
+                <div className="p-3 border border-blue-200 rounded bg-blue-50">
+                  {request.supervisor_notes}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {request.technical_manager_note && (
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Technical Manager Notes
+                </label>
+                <div className="p-3 border border-purple-200 rounded bg-purple-50">
+                  {request.technical_manager_note}
+                </div>
+              </div>
+            )}
+
+            {request.engineer_note && (
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Engineer Notes
+                </label>
+                <div className="p-3 border border-green-200 rounded bg-green-50">
+                  {request.engineer_note}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 mt-6">
@@ -231,8 +396,162 @@ const CustomerOfficerRequestDetails = () => {
               Cancel
             </button>
           </div>
-        </form>
+        </div>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && request?.images && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="relative w-full h-full max-w-6xl max-h-full p-4">
+            {/* Close button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute z-20 p-3 text-white transition-all bg-black rounded-full bg-opacity-70 top-4 right-4 hover:bg-opacity-90"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Zoom controls */}
+            <div className="absolute z-20 flex gap-2 top-4 left-4">
+              <button
+                onClick={zoomOut}
+                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
+                title="Zoom Out"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
+                </svg>
+              </button>
+              <span className="px-4 py-3 text-sm font-medium text-white bg-black rounded-full bg-opacity-70">
+                {Math.round(imageZoom * 100)}%
+              </span>
+              <button
+                onClick={zoomIn}
+                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
+                title="Zoom In"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Navigation arrows */}
+            {request.images.filter((img) => img).length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 left-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                >
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 right-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
+                >
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Image container */}
+            <div
+              className="flex items-center justify-center w-full h-full overflow-hidden"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{
+                cursor:
+                  imageZoom > 1
+                    ? isDragging
+                      ? "grabbing"
+                      : "grab"
+                    : "default",
+              }}
+            >
+              <img
+                src={request.images.filter((img) => img)[currentImageIndex]}
+                alt={`Tire image ${currentImageIndex + 1}`}
+                className="object-contain max-w-full max-h-full transition-transform duration-200 select-none"
+                style={{
+                  transform: `scale(${imageZoom}) translate(${
+                    imagePan.x / imageZoom
+                  }px, ${imagePan.y / imageZoom}px)`,
+                  transformOrigin: "center center",
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "https://via.placeholder.com/800x600?text=Image+Not+Found";
+                }}
+                draggable={false}
+              />
+            </div>
+
+            {/* Image counter */}
+            <div className="absolute z-20 px-4 py-2 text-sm font-medium text-white transform -translate-x-1/2 bg-black rounded-full bg-opacity-70 bottom-6 left-1/2">
+              {currentImageIndex + 1} of{" "}
+              {request.images.filter((img) => img).length}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

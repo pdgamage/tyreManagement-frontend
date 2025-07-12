@@ -9,6 +9,7 @@ import UserDashboard from "./pages/UserDashboard";
 import SupervisorDashboard from "./pages/SupervisorDashboard";
 import TechnicalManagerDashboard from "./pages/TechnicalManagerDashboard";
 import EngineerDashboard from "./pages/EngineerDashboard";
+import CustomerOfficerDashboard from "./pages/CustomerOfficerDashboard";
 import VehicleRegistration from "./pages/VehicleRegistration";
 import Layout from "./components/Layout";
 import { useAuth } from "./contexts/AuthContext";
@@ -18,6 +19,7 @@ import PageTransition from "./components/PageTransition";
 import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
+import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -108,6 +110,18 @@ export function App() {
                 }
               />
               <Route
+                path="/customer-officer/*"
+                element={
+                  <RequireAuth role="customer-officer">
+                    <Layout>
+                      <PageTransition>
+                        <CustomerOfficerDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/supervisor/request/:id"
                 element={<SupervisorRequestDetails />}
               />
@@ -118,6 +132,10 @@ export function App() {
               <Route
                 path="/engineer/request/:id"
                 element={<EngineerRequestDetails />}
+              />
+              <Route
+                path="/customer-officer/request/:id"
+                element={<CustomerOfficerRequestDetails />}
               />
             </Routes>
           </RequestProvider>

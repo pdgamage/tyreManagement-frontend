@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRequests } from "../contexts/RequestContext";
-import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
-import RequestReports from "../components/RequestReports";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -21,12 +19,8 @@ interface RequestsContextType {
 
 const CustomerOfficerDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
-  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
-    "requests"
-  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -47,68 +41,13 @@ const CustomerOfficerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Navigation Tabs */}
-            <div className="flex space-x-6">
-              <button
-                onClick={() => navigate("/customer-officer")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === "requests"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:bg-blue-50"
-                }`}
-              >
-                Home
-              </button>
-              <button
-                onClick={() => setActiveTab("requests")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === "requests"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:bg-blue-50"
-                }`}
-              >
-                Orders
-              </button>
-              <button
-                onClick={() => setActiveTab("reports")}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === "reports"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:bg-blue-50"
-                }`}
-              >
-                Reports
-              </button>
-              <button
-                onClick={() => navigate("/customer-officer/stock")}
-                className="px-4 py-2 font-medium text-gray-600 transition-colors rounded-lg hover:bg-blue-50"
-              >
-                Stock Management
-              </button>
-            </div>
-
-            {/* User Profile Section */}
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">{user?.name}</span>
-              <span className="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                Customer Officer
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main content */}
       <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {isLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="w-8 h-8 border-b-2 border-blue-500 rounded-full animate-spin" />
           </div>
-        ) : activeTab === "requests" ? (
+        ) : (
           <div className="space-y-6">
             {/* Complete Requests */}
             <RequestTable
@@ -122,8 +61,6 @@ const CustomerOfficerDashboard = () => {
               showActions={false}
             />
           </div>
-        ) : (
-          <RequestReports requests={completeRequests} role="customer-officer" />
         )}
       </main>
     </div>

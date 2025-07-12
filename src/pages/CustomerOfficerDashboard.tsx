@@ -3,7 +3,7 @@ import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
-import { UserCircle, ChevronDown, LogOut } from "lucide-react";
+import { UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -25,8 +25,9 @@ const CustomerOfficerDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"requests" | "reports">("requests");
+  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
+    "requests"
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -39,13 +40,7 @@ const CustomerOfficerDashboard = () => {
   }, [fetchRequests]);
 
   // Filter requests to only show those with status "complete"
-  const completeRequests = requests.filter(
-    (req) => req.status === "complete"
-  );
-
-  const handleLogout = () => {
-    logout();
-  };
+  const completeRequests = requests.filter((req) => req.status === "complete");
 
   const handleView = (request: Request) => {
     navigate(`/customer-officer/request/${request.id}`);
@@ -57,17 +52,18 @@ const CustomerOfficerDashboard = () => {
       <div className="bg-white shadow-sm">
         <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Customer Officer Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Manage completed tire requests and orders
-              </p>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex space-x-4">
+            {/* Navigation Tabs */}
+            <div className="flex space-x-6">
+              <button
+                onClick={() => navigate("/customer-officer")}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === "requests"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-600 hover:bg-blue-50"
+                }`}
+              >
+                Home
+              </button>
               <button
                 onClick={() => setActiveTab("requests")}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -76,7 +72,7 @@ const CustomerOfficerDashboard = () => {
                     : "text-gray-600 hover:bg-blue-50"
                 }`}
               >
-                Requests
+                Orders
               </button>
               <button
                 onClick={() => setActiveTab("reports")}
@@ -88,30 +84,20 @@ const CustomerOfficerDashboard = () => {
               >
                 Reports
               </button>
+              <button
+                onClick={() => navigate("/customer-officer/stock")}
+                className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-blue-50 transition-colors"
+              >
+                Stock Management
+              </button>
             </div>
 
-            {/* Profile dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
-              >
-                <UserCircle size={24} />
-                <span>{user?.name}</span>
-                <ChevronDown size={16} />
-              </button>
-
-              {isProfileOpen && (
-                <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-lg shadow-lg">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </button>
-                </div>
-              )}
+            {/* User Profile Section */}
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">{user?.name}</span>
+              <span className="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                Customer Officer
+              </span>
             </div>
           </div>
         </div>

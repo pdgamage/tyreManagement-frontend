@@ -39,8 +39,10 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
-  // Filter requests to only show those with status "complete"
-  const completeRequests = requests.filter((req) => req.status === "complete");
+  // Filter requests to show both "complete" and "order placed" status
+  const completeRequests = requests.filter((req) =>
+    req.status === "complete" || req.status === "order placed"
+  );
 
   const handleView = (request: Request) => {
     navigate(`/customer-officer/request/${request.id}`);
@@ -100,7 +102,7 @@ const CustomerOfficerDashboard = () => {
             {/* Complete Requests */}
             <RequestTable
               requests={completeRequests}
-              title={`Completed Requests (${completeRequests.length})`}
+              title={`Orders & Completed Requests (${completeRequests.length})`}
               onApprove={() => {}}
               onReject={() => {}}
               onView={handleView}

@@ -42,6 +42,13 @@ const getStatusStyles = (status: string) => {
         border: "border-blue-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
+    case "order placed":
+      return {
+        bg: "bg-purple-50",
+        text: "text-purple-700",
+        border: "border-purple-300",
+        icon: <ShoppingCart className="w-4 h-4" />,
+      };
     default:
       return {
         bg: "bg-gray-50",

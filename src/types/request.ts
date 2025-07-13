@@ -28,6 +28,7 @@ export interface Request {
     | "technical-manager approved"
     | "engineer approved"
     | "complete"
+    | "order placed"
     | "rejected";
   submittedAt: Date | string;
   images?: string[];
@@ -38,4 +39,6 @@ export interface Request {
   technical_manager_id?: string;
   supervisor_decision_by?: string;
   engineer_decision_by?: string;
+  order_placed?: boolean;
+  order_timestamp?: Date | string;
 }

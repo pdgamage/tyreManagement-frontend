@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
+import PlaceOrderModal from "../components/PlaceOrderModal";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -26,6 +27,8 @@ const CustomerOfficerDashboard = () => {
     "requests"
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
+  const [orderRequest, setOrderRequest] = useState<Request | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -41,6 +44,16 @@ const CustomerOfficerDashboard = () => {
 
   const handleView = (request: Request) => {
     navigate(`/customer-officer/request/${request.id}`);
+  };
+
+  const handlePlaceOrder = (request: Request) => {
+    setOrderRequest(request);
+    setShowPlaceOrderModal(true);
+  };
+
+  const handleOrderPlaced = async () => {
+    // Refresh the requests list after order is placed
+    await fetchRequests();
   };
 
   return (
@@ -92,14 +105,22 @@ const CustomerOfficerDashboard = () => {
               onReject={() => {}}
               onView={handleView}
               onDelete={() => {}}
-              onPlaceOrder={() => {}}
-              showActions={false}
+              onPlaceOrder={handlePlaceOrder}
+              showActions={true}
             />
           </div>
         ) : (
           <RequestReports requests={completeRequests} role="customer-officer" />
         )}
       </main>
+
+      {/* Place Order Modal */}
+      <PlaceOrderModal
+        request={orderRequest}
+        isOpen={showPlaceOrderModal}
+        onClose={() => setShowPlaceOrderModal(false)}
+        onOrderPlaced={handleOrderPlaced}
+      />
     </div>
   );
 };

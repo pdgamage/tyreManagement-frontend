@@ -109,6 +109,7 @@ const CustomerOfficerDashboard = () => {
               onDelete={() => {}}
               onPlaceOrder={handlePlaceOrder}
               showActions={true}
+              showPlaceOrderButton={true} // Enable place order button for customer officers
             />
           </div>
         ) : (

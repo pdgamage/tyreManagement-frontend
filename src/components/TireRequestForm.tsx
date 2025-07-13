@@ -10,7 +10,6 @@ import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 import RequestDetailsModal from "./RequestDetailsModal";
-import PlaceOrderModal from "./PlaceOrderModal";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -662,8 +661,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     null
   );
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
-  const [orderRequest, setOrderRequest] = useState<TireRequest | null>(null);
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
@@ -743,15 +740,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
-  const handlePlaceOrder = (request: any) => {
-    setOrderRequest(request);
-    setShowPlaceOrderModal(true);
-  };
 
-  const handleOrderPlaced = async () => {
-    // Refresh the requests list after order is placed
-    fetchRequests();
-  };
 
   const initialFormData = {
     vehicleNumber: "",
@@ -1175,8 +1164,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onApprove={() => {}}
           onReject={() => {}}
           onDelete={handleDelete}
-          onPlaceOrder={handlePlaceOrder}
+          onPlaceOrder={() => {}} // Empty function - no place order for users
           showActions={true}
+          showPlaceOrderButton={false} // Disable place order button for regular users
         />
       </div>
 
@@ -1217,13 +1207,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         onClose={handleCloseModal}
       />
 
-      {/* Place Order Modal */}
-      <PlaceOrderModal
-        request={orderRequest}
-        isOpen={showPlaceOrderModal}
-        onClose={() => setShowPlaceOrderModal(false)}
-        onOrderPlaced={handleOrderPlaced}
-      />
+
     </div>
   );
 };

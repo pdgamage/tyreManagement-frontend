@@ -68,6 +68,7 @@ interface RequestTableProps {
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
   showActions?: boolean;
+  showPlaceOrderButton?: boolean; // New prop to control place order button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -79,6 +80,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onDelete,
   onPlaceOrder,
   showActions = true,
+  showPlaceOrderButton = false, // Default to false for security
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -226,7 +228,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {request.status?.toLowerCase().trim() === "complete" &&
+                    {showPlaceOrderButton &&
+                      request.status?.toLowerCase().trim() === "complete" &&
                       !(request as any).order_placed && (
                         <button
                           onClick={(e) => {

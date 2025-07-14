@@ -40,12 +40,6 @@ interface TireFormData {
   images: (File | null)[];
   userId?: number;
   supervisorId: string;
-  deliveryOfficeName: string;
-  deliveryStreetName: string;
-  deliveryTown: string;
-  totalPrice: string;
-  warrantyDistance: string;
-  tireWearIndicatorAppeared: string;
 }
 
 interface StepProps {
@@ -413,132 +407,6 @@ const TireDetailsStep: React.FC<StepProps> = ({
         </select>
         {errors.tireWearPattern && (
           <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="deliveryOfficeName"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Delivery Office Name *
-        </label>
-        <input
-          type="text"
-          id="deliveryOfficeName"
-          name="deliveryOfficeName"
-          value={formData.deliveryOfficeName}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
-        {errors.deliveryOfficeName && (
-          <p className="mt-1 text-sm text-red-600">{errors.deliveryOfficeName}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="deliveryStreetName"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Delivery Street Name *
-        </label>
-        <input
-          type="text"
-          id="deliveryStreetName"
-          name="deliveryStreetName"
-          value={formData.deliveryStreetName}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
-        {errors.deliveryStreetName && (
-          <p className="mt-1 text-sm text-red-600">{errors.deliveryStreetName}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="deliveryTown"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Delivery Town *
-        </label>
-        <input
-          type="text"
-          id="deliveryTown"
-          name="deliveryTown"
-          value={formData.deliveryTown}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
-        {errors.deliveryTown && (
-          <p className="mt-1 text-sm text-red-600">{errors.deliveryTown}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="totalPrice"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Total Price *
-        </label>
-        <input
-          type="number"
-          id="totalPrice"
-          name="totalPrice"
-          value={formData.totalPrice}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          min="0"
-          step="0.01"
-          required
-        />
-        {errors.totalPrice && (
-          <p className="mt-1 text-sm text-red-600">{errors.totalPrice}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="warrantyDistance"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Warranty Distance (KM) *
-        </label>
-        <input
-          type="number"
-          id="warrantyDistance"
-          name="warrantyDistance"
-          value={formData.warrantyDistance}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          min="0"
-          required
-        />
-        {errors.warrantyDistance && (
-          <p className="mt-1 text-sm text-red-600">{errors.warrantyDistance}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="tireWearIndicatorAppeared"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Tire Wear Indicator Appeared *
-        </label>
-        <select
-          id="tireWearIndicatorAppeared"
-          name="tireWearIndicatorAppeared"
-          value={formData.tireWearIndicatorAppeared}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        >
-          <option value="">Select option</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-        {errors.tireWearIndicatorAppeared && (
-          <p className="mt-1 text-sm text-red-600">{errors.tireWearIndicatorAppeared}</p>
         )}
       </div>
     </div>
@@ -913,12 +781,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       supervisorNotes: request.supervisor_notes,
       technicalManagerNotes: request.technical_manager_note,
       engineerNotes: request.engineer_note,
-      deliveryOfficeName: request.deliveryOfficeName,
-      deliveryStreetName: request.deliveryStreetName,
-      deliveryTown: request.deliveryTown,
-      totalPrice: request.totalPrice,
-      warrantyDistance: request.warrantyDistance,
-      tireWearIndicatorAppeared: request.tireWearIndicatorAppeared,
     };
   };
 
@@ -958,12 +820,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     comments: "",
     images: Array(7).fill(null),
     supervisorId: "",
-    deliveryOfficeName: "",
-    deliveryStreetName: "",
-    deliveryTown: "",
-    totalPrice: "",
-    warrantyDistance: "",
-    tireWearIndicatorAppeared: "",
   };
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
@@ -1067,18 +923,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
-        if (!formData.deliveryOfficeName)
-          newErrors.deliveryOfficeName = "Delivery office name is required";
-        if (!formData.deliveryStreetName)
-          newErrors.deliveryStreetName = "Delivery street name is required";
-        if (!formData.deliveryTown)
-          newErrors.deliveryTown = "Delivery town is required";
-        if (!formData.totalPrice)
-          newErrors.totalPrice = "Total price is required";
-        if (!formData.warrantyDistance)
-          newErrors.warrantyDistance = "Warranty distance is required";
-        if (!formData.tireWearIndicatorAppeared)
-          newErrors.tireWearIndicatorAppeared = "Tire wear indicator selection is required";
         break;
       case 3:
         if (!formData.requestReason)
@@ -1148,17 +992,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
         images: imageUrls,
-        supervisorId: formData.supervisorId,
-        // Ensure new fields are included
-        deliveryOfficeName: formData.deliveryOfficeName,
-        deliveryStreetName: formData.deliveryStreetName,
-        deliveryTown: formData.deliveryTown,
-        totalPrice: formData.totalPrice,
-        warrantyDistance: formData.warrantyDistance,
-        tireWearIndicatorAppeared: formData.tireWearIndicatorAppeared,
+        supervisorId: formData.supervisorId, // <-- add this
       };
-
-      console.log('Submitting data:', submitData);
 
       // 3. Send to backend (as JSON)
       const response = await fetch(
@@ -1171,9 +1006,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
 
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Backend error:', errorData);
-        throw new Error(`Failed to submit request: ${response.status} - ${errorData}`);
+        throw new Error("Failed to submit request");
       }
 
       // Refresh requests to show new request
@@ -1190,19 +1023,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           ...initialFormData,
           requesterName: user.name || "",
           requesterEmail: user.email || "",
-          deliveryOfficeName: "",
-          deliveryStreetName: "",
-          deliveryTown: "",
-          totalPrice: "",
-          warrantyDistance: "",
-          tireWearIndicatorAppeared: "",
         });
         setCurrentStep(1);
       }, 2000);
     } catch (err) {
       setFormLoading(false);
-      console.error('Form submission error:', err);
-      setError(`An error occurred while submitting your request: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError("An error occurred while submitting your request");
     }
   };
 

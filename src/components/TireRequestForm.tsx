@@ -40,6 +40,13 @@ interface TireFormData {
   images: (File | null)[];
   userId?: number;
   supervisorId: string;
+  // New delivery and tire specification fields
+  deliveryOfficeName: string;
+  deliveryStreetName: string;
+  deliveryTown: string;
+  totalPrice: string;
+  warrantyDistance: string;
+  tireWearIndicatorAppeared: string;
 }
 
 interface StepProps {
@@ -408,6 +415,131 @@ const TireDetailsStep: React.FC<StepProps> = ({
         {errors.tireWearPattern && (
           <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
         )}
+      </div>
+      <div>
+        <label
+          htmlFor="totalPrice"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Total Price (LKR)
+        </label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          value={formData.totalPrice}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          step="0.01"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="warrantyDistance"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Warranty Distance (KM)
+        </label>
+        <input
+          type="number"
+          id="warrantyDistance"
+          name="warrantyDistance"
+          value={formData.warrantyDistance}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="tireWearIndicatorAppeared"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Wear Indicator Appeared? *
+        </label>
+        <select
+          id="tireWearIndicatorAppeared"
+          name="tireWearIndicatorAppeared"
+          value={formData.tireWearIndicatorAppeared}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        >
+          <option value="">Select option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        {errors.tireWearIndicatorAppeared && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireWearIndicatorAppeared}</p>
+        )}
+      </div>
+    </div>
+
+    {/* Delivery Information Section */}
+    <div className="mt-6">
+      <h4 className="mb-4 text-lg font-semibold text-gray-800">Delivery Information</h4>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label
+            htmlFor="deliveryOfficeName"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Place/Office Name *
+          </label>
+          <input
+            type="text"
+            id="deliveryOfficeName"
+            name="deliveryOfficeName"
+            value={formData.deliveryOfficeName}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          />
+          {errors.deliveryOfficeName && (
+            <p className="mt-1 text-sm text-red-600">{errors.deliveryOfficeName}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="deliveryStreetName"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Street Name *
+          </label>
+          <input
+            type="text"
+            id="deliveryStreetName"
+            name="deliveryStreetName"
+            value={formData.deliveryStreetName}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          />
+          {errors.deliveryStreetName && (
+            <p className="mt-1 text-sm text-red-600">{errors.deliveryStreetName}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="deliveryTown"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Town *
+          </label>
+          <input
+            type="text"
+            id="deliveryTown"
+            name="deliveryTown"
+            value={formData.deliveryTown}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          />
+          {errors.deliveryTown && (
+            <p className="mt-1 text-sm text-red-600">{errors.deliveryTown}</p>
+          )}
+        </div>
       </div>
     </div>
   </div>
@@ -820,6 +952,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     comments: "",
     images: Array(7).fill(null),
     supervisorId: "",
+    // New delivery and tire specification fields
+    deliveryOfficeName: "",
+    deliveryStreetName: "",
+    deliveryTown: "",
+    totalPrice: "",
+    warrantyDistance: "",
+    tireWearIndicatorAppeared: "",
   };
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
@@ -923,6 +1062,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
+        if (!formData.tireWearIndicatorAppeared)
+          newErrors.tireWearIndicatorAppeared = "Tire wear indicator status is required";
+        if (!formData.deliveryOfficeName)
+          newErrors.deliveryOfficeName = "Delivery office name is required";
+        if (!formData.deliveryStreetName)
+          newErrors.deliveryStreetName = "Delivery street name is required";
+        if (!formData.deliveryTown)
+          newErrors.deliveryTown = "Delivery town is required";
         break;
       case 3:
         if (!formData.requestReason)

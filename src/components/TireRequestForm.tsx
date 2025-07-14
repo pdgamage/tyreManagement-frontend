@@ -291,15 +291,42 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Brand name *
         </label>
-        <input
-          type="text"
+        <select
           id="existingTireMake"
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
-        />
+        >
+          <option value="">Select a tire brand</option>
+          <option value="Michelin">Michelin</option>
+          <option value="Bridgestone">Bridgestone</option>
+          <option value="Goodyear">Goodyear</option>
+          <option value="Continental">Continental</option>
+          <option value="Pirelli">Pirelli</option>
+          <option value="Dunlop">Dunlop</option>
+          <option value="Yokohama">Yokohama</option>
+          <option value="Hankook">Hankook</option>
+          <option value="Kumho">Kumho</option>
+          <option value="Toyo">Toyo</option>
+          <option value="Maxxis">Maxxis</option>
+          <option value="BFGoodrich">BFGoodrich</option>
+          <option value="Falken">Falken</option>
+          <option value="Nitto">Nitto</option>
+          <option value="Cooper">Cooper</option>
+          <option value="General">General</option>
+          <option value="Nexen">Nexen</option>
+          <option value="Firestone">Firestone</option>
+          <option value="Uniroyal">Uniroyal</option>
+          <option value="Nokian">Nokian</option>
+          <option value="Sumitomo">Sumitomo</option>
+          <option value="Hercules">Hercules</option>
+          <option value="Mastercraft">Mastercraft</option>
+          <option value="Dick Cepek">Dick Cepek</option>
+          <option value="Mickey Thompson">Mickey Thompson</option>
+          <option value="Other">Other</option>
+        </select>
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
         )}

@@ -233,91 +233,15 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Tire Size Required *
         </label>
-        <select
+        <input
+          type="text"
           id="tireSizeRequired"
           name="tireSizeRequired"
           value={formData.tireSizeRequired}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 rounded"
           required
-        >
-          <option value="">Select tire size</option>
-          {/* Passenger Car Tires */}
-          <option value="155/65R13">155/65R13</option>
-          <option value="155/70R13">155/70R13</option>
-          <option value="165/65R14">165/65R14</option>
-          <option value="165/70R14">165/70R14</option>
-          <option value="175/65R14">175/65R14</option>
-          <option value="175/70R14">175/70R14</option>
-          <option value="185/60R14">185/60R14</option>
-          <option value="185/65R14">185/65R14</option>
-          <option value="185/70R14">185/70R14</option>
-          <option value="195/60R14">195/60R14</option>
-          <option value="195/65R15">195/65R15</option>
-          <option value="195/70R15">195/70R15</option>
-          <option value="205/60R15">205/60R15</option>
-          <option value="205/65R15">205/65R15</option>
-          <option value="205/70R15">205/70R15</option>
-          <option value="215/60R15">215/60R15</option>
-          <option value="215/65R15">215/65R15</option>
-          <option value="215/70R15">215/70R15</option>
-          <option value="205/55R16">205/55R16</option>
-          <option value="205/60R16">205/60R16</option>
-          <option value="215/55R16">215/55R16</option>
-          <option value="215/60R16">215/60R16</option>
-          <option value="225/55R16">225/55R16</option>
-          <option value="225/60R16">225/60R16</option>
-          <option value="235/60R16">235/60R16</option>
-          <option value="205/50R17">205/50R17</option>
-          <option value="215/50R17">215/50R17</option>
-          <option value="215/55R17">215/55R17</option>
-          <option value="225/50R17">225/50R17</option>
-          <option value="225/55R17">225/55R17</option>
-          <option value="235/50R17">235/50R17</option>
-          <option value="235/55R17">235/55R17</option>
-          <option value="245/50R17">245/50R17</option>
-          <option value="215/45R18">215/45R18</option>
-          <option value="225/45R18">225/45R18</option>
-          <option value="235/45R18">235/45R18</option>
-          <option value="245/45R18">245/45R18</option>
-          <option value="255/45R18">255/45R18</option>
-          {/* SUV/Light Truck Tires */}
-          <option value="215/70R16">215/70R16</option>
-          <option value="225/70R16">225/70R16</option>
-          <option value="235/70R16">235/70R16</option>
-          <option value="245/70R16">245/70R16</option>
-          <option value="265/70R16">265/70R16</option>
-          <option value="215/65R17">215/65R17</option>
-          <option value="225/65R17">225/65R17</option>
-          <option value="235/65R17">235/65R17</option>
-          <option value="245/65R17">245/65R17</option>
-          <option value="265/65R17">265/65R17</option>
-          <option value="275/65R17">275/65R17</option>
-          <option value="235/60R18">235/60R18</option>
-          <option value="245/60R18">245/60R18</option>
-          <option value="255/60R18">255/60R18</option>
-          <option value="265/60R18">265/60R18</option>
-          <option value="275/60R18">275/60R18</option>
-          {/* Commercial/Truck Tires */}
-          <option value="7.50R16">7.50R16</option>
-          <option value="8.25R16">8.25R16</option>
-          <option value="9.00R20">9.00R20</option>
-          <option value="10.00R20">10.00R20</option>
-          <option value="11.00R20">11.00R20</option>
-          <option value="12.00R20">12.00R20</option>
-          <option value="275/70R22.5">275/70R22.5</option>
-          <option value="295/75R22.5">295/75R22.5</option>
-          <option value="315/70R22.5">315/70R22.5</option>
-          <option value="385/65R22.5">385/65R22.5</option>
-          {/* Motorcycle Tires */}
-          <option value="90/90-18">90/90-18</option>
-          <option value="100/90-18">100/90-18</option>
-          <option value="110/90-18">110/90-18</option>
-          <option value="120/80-18">120/80-18</option>
-          <option value="130/90-16">130/90-16</option>
-          <option value="140/80-17">140/80-17</option>
-          <option value="Other">Other</option>
-        </select>
+        />
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}

@@ -1148,8 +1148,17 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
         images: imageUrls,
-        supervisorId: formData.supervisorId, // <-- add this
+        supervisorId: formData.supervisorId,
+        // Ensure new fields are included
+        deliveryOfficeName: formData.deliveryOfficeName,
+        deliveryStreetName: formData.deliveryStreetName,
+        deliveryTown: formData.deliveryTown,
+        totalPrice: formData.totalPrice,
+        warrantyDistance: formData.warrantyDistance,
+        tireWearIndicatorAppeared: formData.tireWearIndicatorAppeared,
       };
+
+      console.log('Submitting data:', submitData);
 
       // 3. Send to backend (as JSON)
       const response = await fetch(
@@ -1162,7 +1171,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to submit request");
+        const errorData = await response.text();
+        console.error('Backend error:', errorData);
+        throw new Error(`Failed to submit request: ${response.status} - ${errorData}`);
       }
 
       // Refresh requests to show new request
@@ -1190,7 +1201,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       }, 2000);
     } catch (err) {
       setFormLoading(false);
-      setError("An error occurred while submitting your request");
+      console.error('Form submission error:', err);
+      setError(`An error occurred while submitting your request: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 

@@ -329,6 +329,61 @@ const TireDetailsStep: React.FC<StepProps> = ({
       </div>
       <div>
         <label
+          htmlFor="presentKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Current KM Reading *
+        </label>
+        <input
+          type="number"
+          id="presentKmReading"
+          name="presentKmReading"
+          value={formData.presentKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.presentKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.presentKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="previousKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Previous KM Reading *
+        </label>
+        <input
+          type="number"
+          id="previousKmReading"
+          name="previousKmReading"
+          value={formData.previousKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.previousKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.previousKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">
+          KM Difference
+        </label>
+        <div className="w-full p-3 border border-gray-200 rounded bg-gray-50 text-gray-700">
+          {(() => {
+            const current = parseInt(formData.presentKmReading) || 0;
+            const previous = parseInt(formData.previousKmReading) || 0;
+            const difference = current - previous;
+            return difference >= 0 ? difference.toLocaleString() : 0;
+          })()}
+        </div>
+      </div>
+      <div>
+        <label
           htmlFor="tireWearPattern"
           className="block mb-1 font-medium text-gray-700"
         >
@@ -856,6 +911,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.existingTireMake = "Existing tire make is required";
         if (!formData.lastReplacementDate)
           newErrors.lastReplacementDate = "Last replacement date is required";
+        if (!formData.presentKmReading)
+          newErrors.presentKmReading = "Current KM reading is required";
+        if (!formData.previousKmReading)
+          newErrors.previousKmReading = "Previous KM reading is required";
+        if (formData.presentKmReading && formData.previousKmReading) {
+          const current = parseInt(formData.presentKmReading);
+          const previous = parseInt(formData.previousKmReading);
+          if (current < previous)
+            newErrors.presentKmReading = "Current KM cannot be less than previous KM";
+        }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
         break;

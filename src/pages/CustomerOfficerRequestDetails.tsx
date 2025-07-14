@@ -285,7 +285,9 @@ const CustomerOfficerRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Brand
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.existingTireMake || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
@@ -297,19 +299,26 @@ const CustomerOfficerRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Condition
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearIndicatorAppeared !== undefined ?
+                    (request.tireWearIndicatorAppeared ? "Wear indicator appeared" : "Good condition") : "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Wear Pattern
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearPattern || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Request Reason
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.requestReason || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">

@@ -33,6 +33,12 @@ export interface Request {
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
+  deliveryOfficeName: string;
+  deliveryStreetName: string;
+  deliveryTown: string;
+  totalPrice: number;
+  warrantyDistance: number;
+  tireWearIndicatorAppeared: string;
   technical_manager_note?: string;
   engineer_note?: string;
   supervisorId: string;

@@ -1137,7 +1137,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         if (
           formData.tubesQuantity !== undefined &&
           formData.tubesQuantity !== null
-        ) {
+        )
+          newErrors.tubesQuantity = "Tubes quantity must be between 0 and 15";
+        {
           const qty = Number(formData.tubesQuantity);
           if (isNaN(qty) || qty < 0 || qty > 15) {
             newErrors.tubesQuantity = "Tubes quantity must be between 0 and 15";

@@ -31,10 +31,8 @@ interface TireFormData {
   requesterName: string;
   requesterEmail: string;
   requesterPhone: string;
-  userSection: string;
   lastReplacementDate: string;
   existingTireMake: string;
-  costCenter: string;
   presentKmReading: string;
   previousKmReading: string;
   tireWearPattern: string;
@@ -493,6 +491,43 @@ const TireDetailsStep: React.FC<StepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
         )}
       </div>
+      <div>
+        <label
+          htmlFor="totalPrice"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Total Price (LKR)
+        </label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          value={formData.totalPrice}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter total price"
+          min="0"
+          step="0.01"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="warrantyDistance"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Warranty Distance (KM)
+        </label>
+        <input
+          type="number"
+          id="warrantyDistance"
+          name="warrantyDistance"
+          value={formData.warrantyDistance}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter warranty distance"
+          min="0"
+        />
+      </div>
     </div>
   </div>
 );
@@ -532,62 +567,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
         )}
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="userSection"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Department/Section *
-          </label>
-          <select
-            id="userSection"
-            name="userSection"
-            value={formData.userSection}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          >
-            <option value="">Select Department</option>
-            <option value="Field Operations">
-              Field Operations / Service Delivery
-            </option>
-            <option value="Logistics & Distribution">
-              Logistics & Distribution
-            </option>
-            <option value="Sales & Marketing">Sales & Marketing</option>
-            <option value="Customer Support">Customer Support </option>
-            <option value="Maintenance & Technical Support">
-              Maintenance & Technical Support
-            </option>
-            <option value="Security">Security</option>
-            <option value="Training & HR">Training & HR</option>
-          </select>
-          {errors.userSection && (
-            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="costCenter"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Cost Center *
-          </label>
-          <input
-            type="text"
-            id="costCenter"
-            name="costCenter"
-            value={formData.costCenter}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
-          {errors.costCenter && (
-            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
-          )}
-        </div>
-      </div>
+
       {/* Supervisor select field removed from here */}
     </div>
     <div className="grid gap-4 md:grid-cols-3">
@@ -712,43 +692,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             placeholder="Enter delivery town/city"
           />
         </div>
-        <div>
-          <label
-            htmlFor="totalPrice"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Total Price (LKR)
-          </label>
-          <input
-            type="number"
-            id="totalPrice"
-            name="totalPrice"
-            value={formData.totalPrice}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter total price"
-            min="0"
-            step="0.01"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="warrantyDistance"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Warranty Distance (KM)
-          </label>
-          <input
-            type="number"
-            id="warrantyDistance"
-            name="warrantyDistance"
-            value={formData.warrantyDistance}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter warranty distance"
-            min="0"
-          />
-        </div>
+
         <div>
           <label className="block mb-1 font-medium text-gray-700">
             Tire Wear Indicator Appeared
@@ -980,14 +924,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       vehicleCostCentre: "",
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
-      userSection: request.userSection,
       lastReplacementDate:
         typeof request.lastReplacementDate === "string"
           ? request.lastReplacementDate
           : request.lastReplacementDate.toISOString(),
       existingTireMake: request.existingTireMake,
       tireSizeRequired: request.tireSizeRequired,
-      costCenter: request.costCenter,
       presentKmReading: request.presentKmReading,
       previousKmReading: request.previousKmReading,
       tireWearPattern: request.tireWearPattern,
@@ -1037,10 +979,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     requesterName: "",
     requesterEmail: "",
     requesterPhone: "",
-    userSection: "",
     lastReplacementDate: "",
     existingTireMake: "",
-    costCenter: "",
     presentKmReading: "",
     previousKmReading: "",
     tireWearPattern: "",
@@ -1169,10 +1109,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 3:
         if (!formData.requestReason)
           newErrors.requestReason = "Request reason is required";
-        if (!formData.userSection)
-          newErrors.userSection = "Department/Section is required";
-        if (!formData.costCenter)
-          newErrors.costCenter = "Cost center is required";
         break;
       case 4:
         if (!formData.requesterName)

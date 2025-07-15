@@ -26,11 +26,9 @@ export interface TireRequest {
   requesterPhone: string;
   vehicleBrand: string;
   vehicleModel: string;
-  userSection: string;
   lastReplacementDate: string;
   existingTireMake: string;
   tireSizeRequired: string;
-  costCenter: string;
   presentKmReading: number;
   previousKmReading: number;
   tireWearPattern: string;

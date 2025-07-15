@@ -285,7 +285,9 @@ const CustomerOfficerRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Brand
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.existingTireMake || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
@@ -297,19 +299,26 @@ const CustomerOfficerRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Condition
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearIndicatorAppeared !== undefined ?
+                    (request.tireWearIndicatorAppeared ? "Wear indicator appeared" : "Good condition") : "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Wear Pattern
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearPattern || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Request Reason
                 </label>
-                <div className="p-2 bg-white rounded">N/A</div>
+                <div className="p-2 bg-white rounded">
+                  {request.requestReason || "N/A"}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
@@ -317,6 +326,65 @@ const CustomerOfficerRequestDetails = () => {
                 </label>
                 <div className="p-2 bg-white rounded">
                   {request.comments || "N/A"}
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+
+          {/* Delivery & Pricing Information */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Delivery & Pricing Information
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Delivery Office Name
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.deliveryOfficeName || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Delivery Street Name
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.deliveryStreetName || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Delivery Town
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.deliveryTown || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Total Price (LKR)
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.totalPrice ? `LKR ${Number(request.totalPrice).toLocaleString()}` : "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Warranty Distance (KM)
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.warrantyDistance ? `${Number(request.warrantyDistance).toLocaleString()} KM` : "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Wear Indicator Appeared
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tireWearIndicatorAppeared !== undefined ?
+                    (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}
                 </div>
               </div>
             </div>

@@ -10,7 +10,6 @@ import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 import RequestDetailsModal from "./RequestDetailsModal";
-import PlaceOrderModal from "./PlaceOrderModal";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -41,6 +40,13 @@ interface TireFormData {
   images: (File | null)[];
   userId?: number;
   supervisorId: string;
+  // New delivery and pricing fields
+  deliveryOfficeName: string;
+  deliveryStreetName: string;
+  deliveryTown: string;
+  totalPrice: string;
+  warrantyDistance: string;
+  tireWearIndicatorAppeared: boolean;
 }
 
 interface StepProps {
@@ -292,15 +298,42 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Brand name *
         </label>
-        <input
-          type="text"
+        <select
           id="existingTireMake"
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
-        />
+        >
+          <option value="">Select a tire brand</option>
+          <option value="Michelin">Michelin</option>
+          <option value="Bridgestone">Bridgestone</option>
+          <option value="Goodyear">Goodyear</option>
+          <option value="Continental">Continental</option>
+          <option value="Pirelli">Pirelli</option>
+          <option value="Dunlop">Dunlop</option>
+          <option value="Yokohama">Yokohama</option>
+          <option value="Hankook">Hankook</option>
+          <option value="Kumho">Kumho</option>
+          <option value="Toyo">Toyo</option>
+          <option value="Maxxis">Maxxis</option>
+          <option value="BFGoodrich">BFGoodrich</option>
+          <option value="Falken">Falken</option>
+          <option value="Nitto">Nitto</option>
+          <option value="Cooper">Cooper</option>
+          <option value="General">General</option>
+          <option value="Nexen">Nexen</option>
+          <option value="Firestone">Firestone</option>
+          <option value="Uniroyal">Uniroyal</option>
+          <option value="Nokian">Nokian</option>
+          <option value="Sumitomo">Sumitomo</option>
+          <option value="Hercules">Hercules</option>
+          <option value="Mastercraft">Mastercraft</option>
+          <option value="Dick Cepek">Dick Cepek</option>
+          <option value="Mickey Thompson">Mickey Thompson</option>
+          <option value="Other">Other</option>
+        </select>
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
         )}
@@ -327,6 +360,61 @@ const TireDetailsStep: React.FC<StepProps> = ({
             {errors.lastReplacementDate}
           </p>
         )}
+      </div>
+      <div>
+        <label
+          htmlFor="presentKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Current KM Reading *
+        </label>
+        <input
+          type="number"
+          id="presentKmReading"
+          name="presentKmReading"
+          value={formData.presentKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.presentKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.presentKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="previousKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Previous KM Reading *
+        </label>
+        <input
+          type="number"
+          id="previousKmReading"
+          name="previousKmReading"
+          value={formData.previousKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.previousKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.previousKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">
+          KM Difference
+        </label>
+        <div className="w-full p-3 border border-gray-200 rounded bg-gray-50 text-gray-700">
+          {(() => {
+            const current = parseInt(formData.presentKmReading) || 0;
+            const previous = parseInt(formData.previousKmReading) || 0;
+            const difference = current - previous;
+            return difference >= 0 ? difference.toLocaleString() : 0;
+          })()}
+        </div>
       </div>
       <div>
         <label
@@ -516,6 +604,134 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
         )}
       </div>
     </div>
+
+    {/* New Section 2: Delivery and Pricing Information */}
+    <div className="mt-6 space-y-4">
+      <h4 className="text-lg font-semibold text-gray-800">Delivery & Pricing Information</h4>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label
+            htmlFor="deliveryOfficeName"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Office Name
+          </label>
+          <input
+            type="text"
+            id="deliveryOfficeName"
+            name="deliveryOfficeName"
+            value={formData.deliveryOfficeName}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            placeholder="Enter delivery office name"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="deliveryStreetName"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Street Name
+          </label>
+          <input
+            type="text"
+            id="deliveryStreetName"
+            name="deliveryStreetName"
+            value={formData.deliveryStreetName}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            placeholder="Enter delivery street address"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="deliveryTown"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Delivery Town
+          </label>
+          <input
+            type="text"
+            id="deliveryTown"
+            name="deliveryTown"
+            value={formData.deliveryTown}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            placeholder="Enter delivery town/city"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="totalPrice"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Total Price (LKR)
+          </label>
+          <input
+            type="number"
+            id="totalPrice"
+            name="totalPrice"
+            value={formData.totalPrice}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            placeholder="Enter total price"
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="warrantyDistance"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Warranty Distance (KM)
+          </label>
+          <input
+            type="number"
+            id="warrantyDistance"
+            name="warrantyDistance"
+            value={formData.warrantyDistance}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            placeholder="Enter warranty distance"
+            min="0"
+          />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium text-gray-700">
+            Tire Wear Indicator Appeared
+          </label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="tireWearIndicatorAppeared"
+                value="true"
+                checked={formData.tireWearIndicatorAppeared === true}
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: true }
+                } as any)}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="tireWearIndicatorAppeared"
+                value="false"
+                checked={formData.tireWearIndicatorAppeared === false}
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: false }
+                } as any)}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -662,8 +878,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     null
   );
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
-  const [orderRequest, setOrderRequest] = useState<TireRequest | null>(null);
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
@@ -729,6 +943,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       supervisorNotes: request.supervisor_notes,
       technicalManagerNotes: request.technical_manager_note,
       engineerNotes: request.engineer_note,
+      // New delivery and pricing fields
+      deliveryOfficeName: request.deliveryOfficeName,
+      deliveryStreetName: request.deliveryStreetName,
+      deliveryTown: request.deliveryTown,
+      totalPrice: request.totalPrice,
+      warrantyDistance: request.warrantyDistance,
+      tireWearIndicatorAppeared: request.tireWearIndicatorAppeared,
     };
   };
 
@@ -743,15 +964,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
-  const handlePlaceOrder = (request: any) => {
-    setOrderRequest(request);
-    setShowPlaceOrderModal(true);
-  };
 
-  const handleOrderPlaced = async () => {
-    // Refresh the requests list after order is placed
-    fetchRequests();
-  };
 
   const initialFormData = {
     vehicleNumber: "",
@@ -776,6 +989,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     comments: "",
     images: Array(7).fill(null),
     supervisorId: "",
+    // New delivery and pricing fields
+    deliveryOfficeName: "",
+    deliveryStreetName: "",
+    deliveryTown: "",
+    totalPrice: "",
+    warrantyDistance: "",
+    tireWearIndicatorAppeared: false,
   };
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
@@ -867,6 +1087,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.existingTireMake = "Existing tire make is required";
         if (!formData.lastReplacementDate)
           newErrors.lastReplacementDate = "Last replacement date is required";
+        if (!formData.presentKmReading)
+          newErrors.presentKmReading = "Current KM reading is required";
+        if (!formData.previousKmReading)
+          newErrors.previousKmReading = "Previous KM reading is required";
+        if (formData.presentKmReading && formData.previousKmReading) {
+          const current = parseInt(formData.presentKmReading);
+          const previous = parseInt(formData.previousKmReading);
+          if (current < previous)
+            newErrors.presentKmReading = "Current KM cannot be less than previous KM";
+        }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
         break;
@@ -1175,8 +1405,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onApprove={() => {}}
           onReject={() => {}}
           onDelete={handleDelete}
-          onPlaceOrder={handlePlaceOrder}
+          onPlaceOrder={() => {}} // Empty function - no place order for users
           showActions={true}
+          showPlaceOrderButton={false} // Disable place order button for regular users
         />
       </div>
 
@@ -1217,13 +1448,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         onClose={handleCloseModal}
       />
 
-      {/* Place Order Modal */}
-      <PlaceOrderModal
-        request={orderRequest}
-        isOpen={showPlaceOrderModal}
-        onClose={() => setShowPlaceOrderModal(false)}
-        onOrderPlaced={handleOrderPlaced}
-      />
+
     </div>
   );
 };

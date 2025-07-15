@@ -114,6 +114,19 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 </div>
               </div>
 
+              {/* Delivery & Pricing Information */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Delivery & Pricing Information</h4>
+                <div className="space-y-2">
+                  <p><span className="font-medium">Delivery Office:</span> {request.deliveryOfficeName || "N/A"}</p>
+                  <p><span className="font-medium">Delivery Street:</span> {request.deliveryStreetName || "N/A"}</p>
+                  <p><span className="font-medium">Delivery Town:</span> {request.deliveryTown || "N/A"}</p>
+                  <p><span className="font-medium">Total Price:</span> {request.totalPrice ? `LKR ${Number(request.totalPrice).toLocaleString()}` : "N/A"}</p>
+                  <p><span className="font-medium">Warranty Distance:</span> {request.warrantyDistance ? `${Number(request.warrantyDistance).toLocaleString()} KM` : "N/A"}</p>
+                  <p><span className="font-medium">Tire Wear Indicator:</span> {request.tireWearIndicatorAppeared !== undefined ? (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}</p>
+                </div>
+              </div>
+
               {/* Images Section */}
               {request.images && request.images.length > 0 && (
                 <div className="col-span-full space-y-4">

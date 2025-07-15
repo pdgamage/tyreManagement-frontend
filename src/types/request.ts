@@ -28,14 +28,24 @@ export interface Request {
     | "technical-manager approved"
     | "engineer approved"
     | "complete"
+    | "order placed"
     | "rejected";
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
+  // New delivery and pricing fields
+  deliveryOfficeName?: string;
+  deliveryStreetName?: string;
+  deliveryTown?: string;
+  totalPrice?: number;
+  warrantyDistance?: number;
+  tireWearIndicatorAppeared?: boolean;
   technical_manager_note?: string;
   engineer_note?: string;
   supervisorId: string;
   technical_manager_id?: string;
   supervisor_decision_by?: string;
   engineer_decision_by?: string;
+  order_placed?: boolean;
+  order_timestamp?: Date | string;
 }

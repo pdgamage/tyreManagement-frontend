@@ -42,6 +42,13 @@ export interface TireRequest {
   supervisorTimestamp?: string;
   technicalManagerApproved?: boolean;
   technicalManagerNotes?: string;
+  // New delivery and pricing fields
+  deliveryOfficeName?: string;
+  deliveryStreetName?: string;
+  deliveryTown?: string;
+  totalPrice?: number;
+  warrantyDistance?: number;
+  tireWearIndicatorAppeared?: boolean;
   technicalManagerTimestamp?: string;
   engineerApproved?: boolean;
   engineerNotes?: string;

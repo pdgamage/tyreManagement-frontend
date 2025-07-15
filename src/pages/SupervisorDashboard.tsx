@@ -124,6 +124,7 @@ const SupervisorDashboard = () => {
               onDelete={() => {}}
               onPlaceOrder={() => {}}
               showActions={false}
+              showPlaceOrderButton={false}
             />
 
             {/* Approved Requests */}
@@ -138,6 +139,7 @@ const SupervisorDashboard = () => {
               onDelete={() => {}}
               onPlaceOrder={() => {}}
               showActions={false}
+              showPlaceOrderButton={false}
             />
 
             {/* Rejected Requests */}
@@ -152,6 +154,7 @@ const SupervisorDashboard = () => {
               onDelete={() => {}}
               onPlaceOrder={() => {}}
               showActions={false}
+              showPlaceOrderButton={false}
             />
           </div>
         ) : (

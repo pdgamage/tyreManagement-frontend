@@ -5,7 +5,6 @@ import {
   HomeIcon,
   ClipboardListIcon,
   TruckIcon,
-  BarChart3Icon,
   UserIcon,
   Settings2Icon,
 } from "lucide-react";
@@ -96,12 +95,6 @@ const Navigation = () => {
               icon={<ClipboardListIcon size={20} />}
             >
               Orders
-            </NavLink>
-            <NavLink
-              to="/customer-officer/stock"
-              icon={<BarChart3Icon size={20} />}
-            >
-              Stock Management
             </NavLink>
           </>
         );

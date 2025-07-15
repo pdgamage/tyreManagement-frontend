@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
+import PlaceOrderModal from "../components/PlaceOrderModal";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -26,6 +27,8 @@ const CustomerOfficerDashboard = () => {
     "requests"
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
+  const [orderRequest, setOrderRequest] = useState<Request | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -36,11 +39,23 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
-  // Filter requests to only show those with status "complete"
-  const completeRequests = requests.filter((req) => req.status === "complete");
+  // Filter requests to show both "complete" and "order placed" status
+  const completeRequests = requests.filter((req) =>
+    req.status === "complete" || req.status === "order placed"
+  );
 
   const handleView = (request: Request) => {
     navigate(`/customer-officer/request/${request.id}`);
+  };
+
+  const handlePlaceOrder = (request: Request) => {
+    setOrderRequest(request);
+    setShowPlaceOrderModal(true);
+  };
+
+  const handleOrderPlaced = async () => {
+    // Refresh the requests list after order is placed
+    await fetchRequests();
   };
 
   return (
@@ -87,19 +102,28 @@ const CustomerOfficerDashboard = () => {
             {/* Complete Requests */}
             <RequestTable
               requests={completeRequests}
-              title={`Completed Requests (${completeRequests.length})`}
+              title={`Orders & Completed Requests (${completeRequests.length})`}
               onApprove={() => {}}
               onReject={() => {}}
               onView={handleView}
               onDelete={() => {}}
-              onPlaceOrder={() => {}}
-              showActions={false}
+              onPlaceOrder={handlePlaceOrder}
+              showActions={true}
+              showPlaceOrderButton={true} // Enable place order button for customer officers
             />
           </div>
         ) : (
           <RequestReports requests={completeRequests} role="customer-officer" />
         )}
       </main>
+
+      {/* Place Order Modal */}
+      <PlaceOrderModal
+        request={orderRequest}
+        isOpen={showPlaceOrderModal}
+        onClose={() => setShowPlaceOrderModal(false)}
+        onOrderPlaced={handleOrderPlaced}
+      />
     </div>
   );
 };

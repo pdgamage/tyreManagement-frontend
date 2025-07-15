@@ -520,38 +520,11 @@ const TireDetailsStep: React.FC<StepProps> = ({
           id="lastReplacementDate"
           name="lastReplacementDate"
           value={formData.lastReplacementDate}
-          onChange={(e) => {
-            const { name, value } = e.target;
-            const selectedDate = new Date(value);
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            yesterday.setHours(0, 0, 0, 0);
-
-            if (selectedDate > yesterday) {
-              setErrors((prev) => ({
-                ...prev,
-                lastReplacementDate: "Date must be before today.",
-              }));
-              setFormData((prev) => ({
-                ...prev,
-                [name]: "", // clear invalid date
-              }));
-              return;
-            }
-
-            setErrors((prev) => {
-              const { lastReplacementDate, ...rest } = prev;
-              return rest;
-            });
-
-            setFormData((prev) => ({
-              ...prev,
-              [name]: value,
-            }));
-          }}
+          onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
           max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
           required
+          onKeyDown={(e) => e.preventDefault()} // blocks keyboard typing
         />
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">

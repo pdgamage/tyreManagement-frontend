@@ -564,7 +564,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
         <textarea
           id="requestReason"
           name="requestReason"
-          maxLength={500}
+          maxLength={250}
           value={formData.requestReason}
           onChange={handleChange}
           rows={3}

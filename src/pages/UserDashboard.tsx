@@ -32,7 +32,6 @@ const UserDashboard = () => {
           <h2 className="text-lg font-medium text-gray-900">
             Submit New Tire Request
           </h2>
-          
         </div>
         <div className="p-6">
           <TireRequestForm onSuccess={() => {}} />

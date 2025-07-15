@@ -633,9 +633,20 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           id="requesterPhone"
           name="requesterPhone"
           value={formData.requesterPhone}
-          onChange={handleChange}
+          onChange={(e) => {
+            const input = e.target.value;
+
+            // Allow only digits
+            if (!/^\d*$/.test(input)) return;
+
+            // Limit to 10 digits
+            if (input.length > 10) return;
+
+            handleChange(e);
+          }}
           className="w-full p-3 border border-gray-300 rounded"
           required
+          placeholder="Enter 10-digit number starting with 0"
         />
         {errors.requesterPhone && (
           <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>

@@ -454,6 +454,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           id="quantity"
           name="quantity"
           min="1"
+          max="15"
           value={formData.quantity}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
@@ -475,6 +476,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           id="tubesQuantity"
           name="tubesQuantity"
           min="0"
+          max="15"
           value={formData.tubesQuantity}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
@@ -1119,8 +1121,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 2:
         if (!formData.tireSizeRequired)
           newErrors.tireSizeRequired = "Tire size is required";
-        if (!formData.quantity || formData.quantity < 1)
+        if (!formData.quantity || formData.quantity < 1 || formData.quantity > 15)
           newErrors.quantity = "Valid quantity is required";
+        if (formData.tubesQuantity !== undefined && formData.tubesQuantity !== null) {
+            const qty = Number(formData.tubesQuantity);
+        if (isNaN(qty) || qty < 0 || qty > 15) {
+            newErrors.tubesQuantity = "Tubes quantity must be between 0 and 15";
+          }
+        }
         if (!formData.existingTireMake)
           newErrors.existingTireMake = "Existing tire make is required";
         if (!formData.lastReplacementDate)

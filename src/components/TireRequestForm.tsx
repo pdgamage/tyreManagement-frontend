@@ -524,17 +524,9 @@ const TireDetailsStep: React.FC<StepProps> = ({
           className="w-full p-3 border border-gray-300 rounded"
           max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
           required
-          readOnly
-          onKeyDown={(e) => e.preventDefault()} // block typing
-          onPaste={(e) => e.preventDefault()} // block paste
-          onCut={(e) => e.preventDefault()} // block cut
-          onFocus={(e) => {
-            // auto‑open picker on focus (Chrome & some browsers)
-            const input = e.target as HTMLInputElement;
-            if (typeof input.showPicker === "function") {
-              input.showPicker();
-            }
-          }}
+          onKeyDown={(e) => e.preventDefault()} // ✅ block typing
+          onPaste={(e) => e.preventDefault()} // ✅ block pasting
+          onCut={(e) => e.preventDefault()} // ✅ block cutting
         />
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">

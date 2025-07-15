@@ -410,7 +410,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           htmlFor="totalPrice"
           className="block mb-1 font-medium text-gray-700"
         >
-          Total Price (LKR)
+          Price (LKR)
         </label>
         <input
           type="number"

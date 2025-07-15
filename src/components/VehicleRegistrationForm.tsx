@@ -205,7 +205,7 @@ const VehicleRegistrationForm = () => {
               className="block mb-2 text-sm font-bold text-gray-700"
               htmlFor="make"
             >
-              Make
+              Brand
             </label>
             <input
               id="make"

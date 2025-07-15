@@ -356,44 +356,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
       </div>
-      <div>
-        <label
-          htmlFor="quantity"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Quantity *
-        </label>
-        <input
-          type="number"
-          id="quantity"
-          name="quantity"
-          min="1"
-          value={formData.quantity}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
-        {errors.quantity && (
-          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="tubesQuantity"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Tubes Quantity
-        </label>
-        <input
-          type="number"
-          id="tubesQuantity"
-          name="tubesQuantity"
-          min="0"
-          value={formData.tubesQuantity}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-        />
-      </div>
+
       <div>
         <label
           htmlFor="existingTireMake"
@@ -441,56 +404,7 @@ const TireDetailsStep: React.FC<StepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
         )}
       </div>
-      <div>
-        <label
-          htmlFor="lastReplacementDate"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Last Replacement Date *
-        </label>
-        <input
-          type="date"
-          id="lastReplacementDate"
-          name="lastReplacementDate"
-          value={formData.lastReplacementDate}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
-          required
-        />
-        {errors.lastReplacementDate && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.lastReplacementDate}
-          </p>
-        )}
-      </div>
-      <div>
-        <label
-          htmlFor="tireWearPattern"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Tire Wear Pattern *
-        </label>
-        <select
-          id="tireWearPattern"
-          name="tireWearPattern"
-          value={formData.tireWearPattern}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        >
-          <option value="">Select wear pattern</option>
-          <option value="Even">Even</option>
-          <option value="Center">Center</option>
-          <option value="Edge">Edge</option>
-          <option value="One-Sided">One-Sided</option>
-          <option value="Patches">Patches</option>
-          <option value="Other">Other</option>
-        </select>
-        {errors.tireWearPattern && (
-          <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
-        )}
-      </div>
+
       <div>
         <label
           htmlFor="totalPrice"
@@ -527,6 +441,95 @@ const TireDetailsStep: React.FC<StepProps> = ({
           placeholder="Enter warranty distance"
           min="0"
         />
+      </div>
+      <div>
+        <label
+          htmlFor="quantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Quantity *
+        </label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          min="1"
+          value={formData.quantity}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        />
+        {errors.quantity && (
+          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="tubesQuantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tubes Quantity
+        </label>
+        <input
+          type="number"
+          id="tubesQuantity"
+          name="tubesQuantity"
+          min="0"
+          value={formData.tubesQuantity}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="tireWearPattern"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Wear Pattern *
+        </label>
+        <select
+          id="tireWearPattern"
+          name="tireWearPattern"
+          value={formData.tireWearPattern}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        >
+          <option value="">Select wear pattern</option>
+          <option value="Even">Even</option>
+          <option value="Center">Center</option>
+          <option value="Edge">Edge</option>
+          <option value="One-Sided">One-Sided</option>
+          <option value="Patches">Patches</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.tireWearPattern && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="lastReplacementDate"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Last Replacement Date *
+        </label>
+        <input
+          type="date"
+          id="lastReplacementDate"
+          name="lastReplacementDate"
+          value={formData.lastReplacementDate}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
+          required
+        />
+        {errors.lastReplacementDate && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.lastReplacementDate}
+          </p>
+        )}
       </div>
     </div>
   </div>

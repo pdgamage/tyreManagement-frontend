@@ -332,220 +332,218 @@ const TireDetailsStep: React.FC<StepProps> = ({
   formData,
   handleChange,
   errors,
-}) => {
-    return (
-      <div className="space-y-4">
-        <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label
-              htmlFor="tireSizeRequired"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Tire Size Required *
-            </label>
-            <input
-              type="text"
-              id="tireSizeRequired"
-              name="tireSizeRequired"
-              value={formData.tireSizeRequired}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded"
-              required />
-            {errors.tireSizeRequired && (
-              <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="existingTireMake"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Brand name *
-            </label>
-            <select
-              id="existingTireMake"
-              name="existingTireMake"
-              value={formData.existingTireMake}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select a tire brand</option>
-              <option value="Michelin">Michelin</option>
-              <option value="Bridgestone">Bridgestone</option>
-              <option value="Goodyear">Goodyear</option>
-              <option value="Continental">Continental</option>
-              <option value="Pirelli">Pirelli</option>
-              <option value="Dunlop">Dunlop</option>
-              <option value="Yokohama">Yokohama</option>
-              <option value="Hankook">Hankook</option>
-              <option value="Kumho">Kumho</option>
-              <option value="Toyo">Toyo</option>
-              <option value="Maxxis">Maxxis</option>
-              <option value="BFGoodrich">BFGoodrich</option>
-              <option value="Falken">Falken</option>
-              <option value="Nitto">Nitto</option>
-              <option value="Cooper">Cooper</option>
-              <option value="General">General</option>
-              <option value="Nexen">Nexen</option>
-              <option value="Firestone">Firestone</option>
-              <option value="Uniroyal">Uniroyal</option>
-              <option value="Nokian">Nokian</option>
-              <option value="Sumitomo">Sumitomo</option>
-              <option value="Hercules">Hercules</option>
-              <option value="Mastercraft">Mastercraft</option>
-              <option value="Dick Cepek">Dick Cepek</option>
-              <option value="Mickey Thompson">Mickey Thompson</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.existingTireMake && (
-              <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="totalPrice"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Price (LKR)
-            </label>
-            <input
-              type="number"
-              id="totalPrice"
-              name="totalPrice"
-              value={formData.totalPrice}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded"
-              placeholder="Enter total price"
-              min="0"
-              step="0.01" />
-          </div>
-          <div>
-            <label
-              htmlFor="warrantyDistance"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Warranty Distance (KM)
-            </label>
-            <input
-              type="number"
-              id="warrantyDistance"
-              name="warrantyDistance"
-              value={formData.warrantyDistance}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded"
-              placeholder="Enter warranty distance"
-              min="0" />
-          </div>
-          <div>
-            <label
-              htmlFor="quantity"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Quantity *
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              name="quantity"
-              min="1"
-              max="15"
-              value={formData.quantity}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-
-                if (isNaN(value) || value < 1 || value > 15) return;
-
-                handleChange(e);
-              } }
-              className="w-full p-3 border border-gray-300 rounded"
-              required />
-            {errors.quantity && (
-              <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-            )}
-          </div>
-          <div>
-            <label
-              htmlFor="tubesQuantity"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Tubes Quantity
-              <input
-                type="number"
-                id="tubesQuantity"
-                name="tubesQuantity"
-                min="0"
-                max="15"
-                value={formData.tubesQuantity}
-                onChange={(e) => {
-                  handleChange(e);
-                } }
-                className="w-full p-3 border border-gray-300 rounded" />
-                {errors.tubesQuantity && (
-                  <p className="mt-1 text-sm text-red-600">{errors.tubesQuantity}</p>
-                )}
-            </></div>
-          <div>
-            <label
-              htmlFor="tireWearPattern"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Tire Wear Pattern *
-            </label>
-            <select
-              id="tireWearPattern"
-              name="tireWearPattern"
-              value={formData.tireWearPattern}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded"
-              required
-            >
-              <option value="">Select wear pattern</option>
-              <option value="Even">Even</option>
-              <option value="Center">Center</option>
-              <option value="Edge">Edge</option>
-              <option value="One-Sided">One-Sided</option>
-              <option value="Patches">Patches</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.tireWearPattern && (
-              <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="lastReplacementDate"
-              className="block mb-1 font-medium text-gray-700"
-            >
-              Last Replacement Date *
-            </label>
-            <input
-              type="date"
-              id="lastReplacementDate"
-              name="lastReplacementDate"
-              value={formData.lastReplacementDate}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded"
-              max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
-              required
-              onKeyPress={(e) => e.preventDefault()}
-              onPaste={(e) => e.preventDefault()}
-              onCut={(e) => e.preventDefault()}
-              onDrop={(e) => e.preventDefault()} />
-            {errors.lastReplacementDate && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.lastReplacementDate}
-              </p>
-            )}
-          </div>
-        </div>
+}) => (
+  <div className="space-y-4">
+    <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
+    <div className="grid gap-4 md:grid-cols-2">
+      <div>
+        <label
+          htmlFor="tireSizeRequired"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Size Required *
+        </label>
+        <input
+          type="text"
+          id="tireSizeRequired"
+          name="tireSizeRequired"
+          value={formData.tireSizeRequired}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required />
+        {errors.tireSizeRequired && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
+        )}
       </div>
-    );
-  };
+
+      <div>
+        <label
+          htmlFor="existingTireMake"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Brand name *
+        </label>
+        <select
+          id="existingTireMake"
+          name="existingTireMake"
+          value={formData.existingTireMake}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Select a tire brand</option>
+          <option value="Michelin">Michelin</option>
+          <option value="Bridgestone">Bridgestone</option>
+          <option value="Goodyear">Goodyear</option>
+          <option value="Continental">Continental</option>
+          <option value="Pirelli">Pirelli</option>
+          <option value="Dunlop">Dunlop</option>
+          <option value="Yokohama">Yokohama</option>
+          <option value="Hankook">Hankook</option>
+          <option value="Kumho">Kumho</option>
+          <option value="Toyo">Toyo</option>
+          <option value="Maxxis">Maxxis</option>
+          <option value="BFGoodrich">BFGoodrich</option>
+          <option value="Falken">Falken</option>
+          <option value="Nitto">Nitto</option>
+          <option value="Cooper">Cooper</option>
+          <option value="General">General</option>
+          <option value="Nexen">Nexen</option>
+          <option value="Firestone">Firestone</option>
+          <option value="Uniroyal">Uniroyal</option>
+          <option value="Nokian">Nokian</option>
+          <option value="Sumitomo">Sumitomo</option>
+          <option value="Hercules">Hercules</option>
+          <option value="Mastercraft">Mastercraft</option>
+          <option value="Dick Cepek">Dick Cepek</option>
+          <option value="Mickey Thompson">Mickey Thompson</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.existingTireMake && (
+          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="totalPrice"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Price (LKR)
+        </label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          value={formData.totalPrice}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter total price"
+          min="0"
+          step="0.01" />
+      </div>
+      <div>
+        <label
+          htmlFor="warrantyDistance"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Warranty Distance (KM)
+        </label>
+        <input
+          type="number"
+          id="warrantyDistance"
+          name="warrantyDistance"
+          value={formData.warrantyDistance}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter warranty distance"
+          min="0" />
+      </div>
+      <div>
+        <label
+          htmlFor="quantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Quantity *
+        </label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          min="1"
+          max="15"
+          value={formData.quantity}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+
+            if (isNaN(value) || value < 1 || value > 15) return;
+
+            handleChange(e);
+          } }
+          className="w-full p-3 border border-gray-300 rounded"
+          required />
+        {errors.quantity && (
+          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="tubesQuantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tubes Quantity
+          <input
+            type="number"
+            id="tubesQuantity"
+            name="tubesQuantity"
+            min="0"
+            max="15"
+            value={formData.tubesQuantity}
+            onChange={(e) => {
+              handleChange(e);
+            } }
+            className="w-full p-3 border border-gray-300 rounded" />
+          {errors.tubesQuantity && (
+            <p className="mt-1 text-sm text-red-600">{errors.tubesQuantity}</p>
+          )}
+        </></div>
+      <div>
+        <label
+          htmlFor="tireWearPattern"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Wear Pattern *
+        </label>
+        <select
+          id="tireWearPattern"
+          name="tireWearPattern"
+          value={formData.tireWearPattern}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        >
+          <option value="">Select wear pattern</option>
+          <option value="Even">Even</option>
+          <option value="Center">Center</option>
+          <option value="Edge">Edge</option>
+          <option value="One-Sided">One-Sided</option>
+          <option value="Patches">Patches</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.tireWearPattern && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="lastReplacementDate"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Last Replacement Date *
+        </label>
+        <input
+          type="date"
+          id="lastReplacementDate"
+          name="lastReplacementDate"
+          value={formData.lastReplacementDate}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
+          required
+          onKeyPress={(e) => e.preventDefault()}
+          onPaste={(e) => e.preventDefault()}
+          onCut={(e) => e.preventDefault()}
+          onDrop={(e) => e.preventDefault()} />
+        {errors.lastReplacementDate && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.lastReplacementDate}
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 interface RequestInformationStepProps extends StepProps {
   supervisors: Supervisor[];

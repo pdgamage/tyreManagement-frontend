@@ -522,11 +522,12 @@ const TireDetailsStep: React.FC<StepProps> = ({
           value={formData.lastReplacementDate}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
-          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
           required
-          onKeyDown={(e) => e.preventDefault()} // ✅ block typing
-          onPaste={(e) => e.preventDefault()} // ✅ block pasting
-          onCut={(e) => e.preventDefault()} // ✅ block cutting
+          onKeyPress={(e) => e.preventDefault()}
+          onPaste={(e) => e.preventDefault()}
+          onCut={(e) => e.preventDefault()}
+          onDrop={(e) => e.preventDefault()}
         />
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">

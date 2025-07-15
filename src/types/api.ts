@@ -3,10 +3,11 @@ export interface Vehicle {
   vehicleNumber: string;
   make?: string;
   model?: string;
-  year?: number;
-  tireSize?: string;
+  type?: string;
+  costCentre?: string;
   department?: string;
   status?: string;
+  registeredBy?: number;
 }
 
 export interface TireRequest {
@@ -31,7 +32,8 @@ export interface TireRequest {
   costCenter: string;
   presentKmReading: number;
   previousKmReading: number;
-  tireWearPattern: string;  comments?: string;
+  tireWearPattern: string;
+  comments?: string;
   images?: (File | string | null)[];
   status?: string;
   submittedAt?: string;

@@ -11,8 +11,8 @@ const VehicleRegistrationForm = () => {
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [tireSize, setTireSize] = useState("");
+  const [type, setType] = useState("");
+  const [costCentre, setCostCentre] = useState("");
   const [department, setDepartment] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -58,11 +58,11 @@ const VehicleRegistrationForm = () => {
           vehicleNumber,
           make,
           model,
-          year,
-          tireSize,
+          type,
+          costCentre,
           department,
           status: "active",
-          registeredBy: user.id,
+          registeredBy: parseInt(user.id),
         }),
       });
 
@@ -78,11 +78,11 @@ const VehicleRegistrationForm = () => {
           vehicleNumber,
           make,
           model,
-          year,
-          tireSize,
+          type,
+          costCentre,
           department,
           status: "active",
-          registeredBy: user.id,
+          registeredBy: parseInt(user.id),
         });
         setSuccess(true);
         setFormLoading(false);
@@ -91,8 +91,8 @@ const VehicleRegistrationForm = () => {
         setVehicleNumber("");
         setMake("");
         setModel("");
-        setYear(new Date().getFullYear());
-        setTireSize("");
+        setType("");
+        setCostCentre("");
         setDepartment("");
 
         // Redirect after 2 seconds
@@ -239,35 +239,42 @@ const VehicleRegistrationForm = () => {
           <div>
             <label
               className="block mb-2 text-sm font-bold text-gray-700"
-              htmlFor="year"
+              htmlFor="type"
             >
-              Year
+              Vehicle Type
             </label>
-            <input
-              id="year"
-              type="number"
-              min="1990"
-              max={new Date().getFullYear() + 1}
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={year}
-              onChange={(e) => setYear(parseInt(e.target.value))}
               required
-            />
+            >
+              <option value="" disabled>
+                Select vehicle type
+              </option>
+              <option value="Truck">Truck</option>
+              <option value="Van">Van</option>
+              <option value="Car">Car</option>
+              <option value="Bus">Bus</option>
+              <option value="Motorcycle">Motorcycle</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
           <div>
             <label
               className="block mb-2 text-sm font-bold text-gray-700"
-              htmlFor="tireSize"
+              htmlFor="costCentre"
             >
-              Tire Size
+              Cost Centre
             </label>
             <input
-              id="tireSize"
+              id="costCentre"
               type="text"
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., 275/70R22.5"
-              value={tireSize}
-              onChange={(e) => setTireSize(e.target.value)}
+              placeholder="e.g., CC-001"
+              value={costCentre}
+              onChange={(e) => setCostCentre(e.target.value)}
               required
             />
           </div>

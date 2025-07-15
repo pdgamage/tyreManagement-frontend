@@ -812,10 +812,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      year: vehicle.year ? vehicle.year.toString() : "",
+      year: "", // Year is no longer stored in vehicle, user must enter manually
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
-      tireSizeRequired: vehicle.tireSize || "",
+      tireSizeRequired: "", // Tire size is no longer stored in vehicle, user must enter manually
     }));
   };
 

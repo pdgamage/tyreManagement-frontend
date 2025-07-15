@@ -636,10 +636,13 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           onChange={(e) => {
             const input = e.target.value;
 
-            // Allow only digits
+            // only digits
             if (!/^\d*$/.test(input)) return;
 
-            // Limit to 10 digits
+            // can't add non-zero
+            if (input.length === 1 && input !== "0") return;
+
+            // only 10 digits
             if (input.length > 10) return;
 
             handleChange(e);

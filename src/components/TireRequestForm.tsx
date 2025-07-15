@@ -1134,8 +1134,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
           newErrors.requesterEmail = "Email is required";
-        if (!formData.requesterPhone)
+        if (!formData.requesterPhone) {
           newErrors.requesterPhone = "Phone is required";
+        } else if (!/^0\d{9}$/.test(formData.requesterPhone)) {
+          newErrors.requesterPhone =
+            "Phone number must be 10 digits and start with 0";
+        }
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;

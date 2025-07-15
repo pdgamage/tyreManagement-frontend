@@ -18,7 +18,9 @@ interface TireRequestFormProps {
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
-  year: string;
+  vehicleType: string;
+  vehicleDepartment: string;
+  vehicleCostCentre: string;
   vehicleBrand: string;
   vehicleModel: string;
   tireSizeRequired: string;
@@ -202,22 +204,66 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
         </div>
         <div>
           <label
-            htmlFor="year"
+            htmlFor="vehicleType"
             className="block mb-1 font-medium text-gray-700"
           >
-            Year *
+            Vehicle Type *
           </label>
           <input
             type="text"
-            id="year"
-            name="year"
-            value={formData.year}
+            id="vehicleType"
+            name="vehicleType"
+            value={formData.vehicleType}
             className="w-full p-3 border border-gray-300 rounded"
             required
             readOnly
           />
-          {errors.year && (
-            <p className="mt-1 text-sm text-red-600">{errors.year}</p>
+          {errors.vehicleType && (
+            <p className="mt-1 text-sm text-red-600">{errors.vehicleType}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="vehicleDepartment"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Department *
+          </label>
+          <input
+            type="text"
+            id="vehicleDepartment"
+            name="vehicleDepartment"
+            value={formData.vehicleDepartment}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            readOnly
+          />
+          {errors.vehicleDepartment && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.vehicleDepartment}
+            </p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="vehicleCostCentre"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Cost Centre *
+          </label>
+          <input
+            type="text"
+            id="vehicleCostCentre"
+            name="vehicleCostCentre"
+            value={formData.vehicleCostCentre}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            readOnly
+          />
+          {errors.vehicleCostCentre && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.vehicleCostCentre}
+            </p>
           )}
         </div>
       </div>
@@ -400,14 +446,16 @@ const TireDetailsStep: React.FC<StepProps> = ({
           required
         />
         {errors.previousKmReading && (
-          <p className="mt-1 text-sm text-red-600">{errors.previousKmReading}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.previousKmReading}
+          </p>
         )}
       </div>
       <div>
         <label className="block mb-1 font-medium text-gray-700">
           KM Difference
         </label>
-        <div className="w-full p-3 border border-gray-200 rounded bg-gray-50 text-gray-700">
+        <div className="w-full p-3 text-gray-700 border border-gray-200 rounded bg-gray-50">
           {(() => {
             const current = parseInt(formData.presentKmReading) || 0;
             const previous = parseInt(formData.previousKmReading) || 0;
@@ -607,7 +655,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
 
     {/* New Section 2: Delivery and Pricing Information */}
     <div className="mt-6 space-y-4">
-      <h4 className="text-lg font-semibold text-gray-800">Delivery & Pricing Information</h4>
+      <h4 className="text-lg font-semibold text-gray-800">
+        Delivery & Pricing Information
+      </h4>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -708,9 +758,11 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="true"
                 checked={formData.tireWearIndicatorAppeared === true}
-                onChange={() => handleChange({
-                  target: { name: "tireWearIndicatorAppeared", value: true }
-                } as any)}
+                onChange={() =>
+                  handleChange({
+                    target: { name: "tireWearIndicatorAppeared", value: true },
+                  } as any)
+                }
                 className="mr-2"
               />
               Yes
@@ -721,9 +773,11 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="false"
                 checked={formData.tireWearIndicatorAppeared === false}
-                onChange={() => handleChange({
-                  target: { name: "tireWearIndicatorAppeared", value: false }
-                } as any)}
+                onChange={() =>
+                  handleChange({
+                    target: { name: "tireWearIndicatorAppeared", value: false },
+                  } as any)
+                }
                 className="mr-2"
               />
               No
@@ -919,7 +973,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       requesterName: request.requesterName,
       requesterEmail: request.requesterEmail,
       requesterPhone: request.requesterPhone,
-      year: request.year,
+      vehicleType: "", // These fields are not stored in requests, will be populated from vehicle data
+      vehicleDepartment: "",
+      vehicleCostCentre: "",
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
       userSection: request.userSection,
@@ -964,12 +1020,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
-
-
   const initialFormData = {
     vehicleNumber: "",
     vehicleId: "",
-    year: "",
+    vehicleType: "",
+    vehicleDepartment: "",
+    vehicleCostCentre: "",
     vehicleBrand: "",
     vehicleModel: "",
     tireSizeRequired: "",
@@ -1032,7 +1088,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      year: "", // Year is no longer stored in vehicle, user must enter manually
+      vehicleType: vehicle.type || "",
+      vehicleDepartment: vehicle.department || "",
+      vehicleCostCentre: vehicle.costCentre || "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
       tireSizeRequired: "", // Tire size is no longer stored in vehicle, user must enter manually
@@ -1076,7 +1134,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
           newErrors.vehicleModel = "Vehicle model is required";
-        if (!formData.year) newErrors.year = "Year is required";
+        if (!formData.vehicleType)
+          newErrors.vehicleType = "Vehicle type is required";
+        if (!formData.vehicleDepartment)
+          newErrors.vehicleDepartment = "Department is required";
+        if (!formData.vehicleCostCentre)
+          newErrors.vehicleCostCentre = "Cost centre is required";
         break;
       case 2:
         if (!formData.tireSizeRequired)
@@ -1095,7 +1158,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           const current = parseInt(formData.presentKmReading);
           const previous = parseInt(formData.previousKmReading);
           if (current < previous)
-            newErrors.presentKmReading = "Current KM cannot be less than previous KM";
+            newErrors.presentKmReading =
+              "Current KM cannot be less than previous KM";
         }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
@@ -1447,8 +1511,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         isOpen={showDetailsModal}
         onClose={handleCloseModal}
       />
-
-
     </div>
   );
 };

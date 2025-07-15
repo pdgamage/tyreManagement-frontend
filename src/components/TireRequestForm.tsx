@@ -1169,12 +1169,19 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       // 2. Prepare data to send to backend
       const submitData = {
         ...formData,
-        userId: user.id,
+        userId: parseInt(user.id),
+        vehicleId: parseInt(formData.vehicleId),
+        quantity: parseInt(formData.quantity.toString()),
+        tubesQuantity: parseInt(formData.tubesQuantity.toString()),
+        presentKmReading: parseInt(formData.presentKmReading),
+        previousKmReading: parseInt(formData.previousKmReading),
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
         images: imageUrls,
-        supervisorId: formData.supervisorId, // <-- add this
+        supervisorId: parseInt(formData.supervisorId),
       };
+
+      console.log("Submitting data:", submitData);
 
       // 3. Send to backend (as JSON)
       const response = await fetch(
@@ -1187,7 +1194,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to submit request");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `HTTP ${response.status}: Failed to submit request`
+        );
       }
 
       // Refresh requests to show new request
@@ -1208,8 +1218,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setCurrentStep(1);
       }, 2000);
     } catch (err) {
+      console.error("Request submission error:", err);
       setFormLoading(false);
-      setError("An error occurred while submitting your request");
+      setError(
+        err instanceof Error
+          ? `Error: ${err.message}`
+          : "An error occurred while submitting your request"
+      );
     }
   };
 

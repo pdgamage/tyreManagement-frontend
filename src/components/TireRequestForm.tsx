@@ -1084,7 +1084,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   };
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<{ images: string[] }>({
+    images: Array(7).fill(""), // for 7 image inputs
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -1126,15 +1129,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       newErrors[index] = "File size must be 5MB or less.";
       setErrors((prev) => ({
         ...prev,
-        images: `File size must be 2MB or less.`,
+        images: newErrors,
       }));
       e.target.value = ""; // Clear the input
       return;
     }
 
+    newErrors[index] = "";
     setErrors((prev) => ({
       ...prev,
-      images: "",
+      images: newErrors,
     }));
 
     const newImages = [...formData.images];

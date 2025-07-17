@@ -564,11 +564,22 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           id="requestReason"
           name="requestReason"
           value={formData.requestReason}
-          onChange={handleChange}
+          onChange={(e) => {
+            const words = e.target.value.trim().split(/\s+/);
+            if (words.length <= 250) {
+              handleChange(e); // Update state only if within 250 words
+            }
+          }}
           rows={3}
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
+        <p className="text-sm text-gray-500">
+          {formData.requestReason.trim() === ""
+            ? 0
+            : formData.requestReason.trim().split(/\s+/).length}{" "}
+          / 250 words
+        </p>
         {errors.requestReason && (
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
         )}

@@ -1062,15 +1062,17 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       }
     }
 
+    let newValue = value;
+
     if (
       (name === "quantity" || name === "tubesQuantity") &&
       Number(value) > 15
     ) {
-      return; // Do nothing if value > 15
+      newValue = "15"; // Force the value to 15 if greater
     }
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: newValue,
     }));
   };
 

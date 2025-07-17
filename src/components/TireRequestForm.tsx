@@ -482,7 +482,8 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 interface RequestInformationStepProps extends StepProps {
   supervisors: Supervisor[];

@@ -15,14 +15,6 @@ interface TireRequestFormProps {
   onSuccess?: () => void;
 }
 
-interface TireDetails {
-  id: number;
-  tire_size: string;
-  tire_brand: string;
-  total_price: number;
-  warranty_distance: number;
-}
-
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
@@ -74,10 +66,6 @@ interface StepProps {
 interface VehicleInformationStepProps extends StepProps {
   vehicles: Vehicle[];
   onVehicleSelect: (vehicle: Vehicle) => void;
-}
-
-interface TireDetailsStepProps extends StepProps {
-  loadingTireDetails?: boolean;
 }
 
 interface Supervisor {
@@ -237,11 +225,10 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
   );
 };
 
-const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
+const TireDetailsStep: React.FC<StepProps> = ({
   formData,
   handleChange,
   errors,
-  loadingTireDetails = false,
 }) => (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
@@ -253,23 +240,15 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
         >
           Tire Size Required *
         </label>
-        <div className="relative">
-          <input
-            type="text"
-            id="tireSizeRequired"
-            name="tireSizeRequired"
-            value={formData.tireSizeRequired}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            placeholder="Enter tire size (e.g., 100+90+17+6PR)"
-          />
-          {loadingTireDetails && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            </div>
-          )}
-        </div>
+        <input
+          type="text"
+          id="tireSizeRequired"
+          name="tireSizeRequired"
+          value={formData.tireSizeRequired}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        />
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
@@ -319,42 +298,17 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
         >
           Brand name *
         </label>
-        <select
+        <input
+          type="text"
           id="existingTireMake"
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Tire brand (auto-filled when tire size is selected)"
           required
-        >
-          <option value="">Select a tire brand</option>
-          <option value="Michelin">Michelin</option>
-          <option value="Bridgestone">Bridgestone</option>
-          <option value="Goodyear">Goodyear</option>
-          <option value="Continental">Continental</option>
-          <option value="Pirelli">Pirelli</option>
-          <option value="Dunlop">Dunlop</option>
-          <option value="Yokohama">Yokohama</option>
-          <option value="Hankook">Hankook</option>
-          <option value="Kumho">Kumho</option>
-          <option value="Toyo">Toyo</option>
-          <option value="Maxxis">Maxxis</option>
-          <option value="BFGoodrich">BFGoodrich</option>
-          <option value="Falken">Falken</option>
-          <option value="Nitto">Nitto</option>
-          <option value="Cooper">Cooper</option>
-          <option value="General">General</option>
-          <option value="Nexen">Nexen</option>
-          <option value="Firestone">Firestone</option>
-          <option value="Uniroyal">Uniroyal</option>
-          <option value="Nokian">Nokian</option>
-          <option value="Sumitomo">Sumitomo</option>
-          <option value="Hercules">Hercules</option>
-          <option value="Mastercraft">Mastercraft</option>
-          <option value="Dick Cepek">Dick Cepek</option>
-          <option value="Mickey Thompson">Mickey Thompson</option>
-          <option value="Other">Other</option>
-        </select>
+          readOnly
+        />
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
         )}
@@ -694,10 +648,11 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             name="totalPrice"
             value={formData.totalPrice}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter total price"
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Total price (auto-filled when tire size is selected)"
             min="0"
             step="0.01"
+            readOnly
           />
         </div>
         <div>
@@ -713,9 +668,10 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             name="warrantyDistance"
             value={formData.warrantyDistance}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter warranty distance"
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Warranty distance (auto-filled when tire size is selected)"
             min="0"
+            readOnly
           />
         </div>
         <div>
@@ -902,8 +858,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
-  const [tireDetails, setTireDetails] = useState<TireDetails[]>([]);
-  const [loadingTireDetails, setLoadingTireDetails] = useState(false);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -928,32 +882,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     };
     fetchSupervisors();
   }, []);
-
-  // Function to fetch tire details by tire size
-  const fetchTireDetailsBySize = async (tireSize: string) => {
-    if (!tireSize.trim()) return;
-
-    setLoadingTireDetails(true);
-    try {
-      const res = await fetch(
-        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(tireSize)}`
-      );
-      if (res.ok) {
-        const tireDetail = await res.json();
-        // Auto-fill the form fields
-        setFormData((prev) => ({
-          ...prev,
-          existingTireMake: tireDetail.tire_brand,
-          totalPrice: tireDetail.total_price.toString(),
-          warrantyDistance: tireDetail.warranty_distance.toString(),
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching tire details:", error);
-    } finally {
-      setLoadingTireDetails(false);
-    }
-  };
 
   // Convert Request type to TireRequest type for the modal
   const convertRequestToTireRequest = (request: Request): TireRequest => {
@@ -1062,60 +990,20 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }));
   };
 
-  // const handleFileChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   index: number
-  // ) => {
-  //   if (e.target.files && e.target.files[0]) {
-  //     const newImages = [...formData.images];
-  //     newImages[index] = e.target.files[0];
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       images: newImages,
-  //     }));
-  //   }
-  // };
-
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const newErrors = [...errors.images];
-
-    if (file.size > MAX_FILE_SIZE) {
-      newErrors[index] = "File size must be 5MB or less.";
-      setErrors({ images: newErrors });
-
-      e.target.value = "";
-      return;
+    if (e.target.files && e.target.files[0]) {
+      const newImages = [...formData.images];
+      newImages[index] = e.target.files[0];
+      setFormData((prev) => ({
+        ...prev,
+        images: newImages,
+      }));
     }
-
-    newErrors[index] = "";
-    setErrors({ images: newErrors });
-
-    const newImages = [...formData.images];
-    newImages[index] = file;
-
-    setFormData((prev) => ({
-      ...prev,
-      images: newImages,
-    }));
   };
 
-  const removeImage = (index: number) => {
-    const newImages = [...formData.images];
-    newImages[index] = null;
-
-    setFormData((prev) => ({
-      ...prev,
-      images: newImages,
-    }));
-  };
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,
@@ -1126,11 +1014,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       vehicleModel: vehicle.model || "",
       tireSizeRequired: vehicle.tireSize || "",
     }));
-
-    // Auto-fill tire details if vehicle has tire size
-    if (vehicle.tireSize && vehicle.tireSize.trim()) {
-      fetchTireDetailsBySize(vehicle.tireSize.trim());
-    }
   };
 
   const vehicleNumberExists = (number: string) =>
@@ -1423,7 +1306,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
-              loadingTireDetails={loadingTireDetails}
             />
           )}
           {currentStep === 3 && (

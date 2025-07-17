@@ -785,6 +785,7 @@ interface AdditionalInformationStepProps extends StepProps {
   supervisorsLoading: boolean;
 }
 
+const MAX_FILE_SIZE = 3 * 1024 * 1024;
 const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
   formData,
   handleChange,
@@ -799,6 +800,19 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     } as unknown as React.ChangeEvent<HTMLInputElement>;
     handleFileChange(e, index);
   };
+
+  if (file.size > MAX_FILE_SIZE) {
+    setErrors((prev) => ({
+      ...prev,
+      images: `File size should not exceed 5MB. Selected: ${(
+        file.size /
+      1024 /
+      1024
+      ).toFixed(2)}MB`,
+    }));
+    e.target.value = ""; // Reset input
+    return;
+  }
 
   return (
     <div className="space-y-4">
@@ -820,6 +834,60 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
             className="w-full p-3 border border-gray-300 rounded"
           />
         </div>
+        {/* <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Upload Images (Max 7)
+          </label>
+          <div className="grid gap-4 md:grid-cols-4">
+            {formData.images.map((_, index) => (
+              <div key={index} className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, index)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+            ))}
+          </div>
+          <p className="mt-1 mb-4 text-sm text-gray-500">
+            Upload images of tire wear, damage, or other relevant details
+          </p>
+
+          {/* Image Preview Grid */}
+        {/* <div className="grid gap-4 mt-4 md:grid-cols-4">
+            {formData.images.map(
+              (file, index) =>
+                file && (
+                  <div key={`preview-${index}`} className="relative group">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Uploaded preview ${index + 1}`}
+                      className="object-cover w-full h-40 border border-gray-300 rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute p-1 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-4 h-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )
+            )}
+          </div>
+        </div> */}
         <div>
           <label className="block mb-2 font-medium text-gray-700">
             Upload Images (Max 7)
@@ -836,6 +904,10 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Error Message */}
+          {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+
           <p className="mt-1 mb-4 text-sm text-gray-500">
             Upload images of tire wear, damage, or other relevant details
           </p>

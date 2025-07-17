@@ -30,6 +30,9 @@ export interface Request {
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
+  // Department and Cost Center fields
+  userSection?: string;
+  costCenter?: string;
   // New delivery and pricing fields
   deliveryOfficeName?: string;
   deliveryStreetName?: string;

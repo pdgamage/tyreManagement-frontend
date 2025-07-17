@@ -1201,6 +1201,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         supervisorId: formData.supervisorId, // <-- add this
       };
 
+      // Debug: Log the data being sent to check if userSection and costCenter are included
+      console.log("Submitting request data:", {
+        userSection: submitData.userSection,
+        costCenter: submitData.costCenter,
+        vehicleNumber: submitData.vehicleNumber,
+      });
+
       // 3. Send to backend (as JSON)
       const response = await fetch(
         "https://tyremanagement-backend-production.up.railway.app/api/requests",

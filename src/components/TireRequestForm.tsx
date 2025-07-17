@@ -1054,9 +1054,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const { name, value } = e.target;
     if (name === "lastReplacementDate") {
       const today = new Date().toISOString().split("T")[0];
+
       if (value > today) {
-        // Reset to today if user typed future date
-        setFormData((prev) => ({ ...prev, [name]: today }));
         return;
       }
     }

@@ -800,7 +800,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     handleFileChange(e, index);
   };
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,

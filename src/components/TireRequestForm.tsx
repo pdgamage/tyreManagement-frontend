@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
-import { Vehicle } from "../types/api";
+import { Vehicle, TireDetails } from "../types/api";
 import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
@@ -60,6 +60,10 @@ interface StepProps {
     index: number
   ) => void;
   errors: Record<string, string>;
+}
+
+interface TireDetailsStepProps extends StepProps {
+  onTireSizeSelect: (tireSize: string) => void;
 }
 
 interface VehicleInformationStepProps extends StepProps {
@@ -205,11 +209,43 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
   );
 };
 
-const TireDetailsStep: React.FC<StepProps> = ({
+const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
   formData,
   handleChange,
   errors,
-}) => (
+  onTireSizeSelect,
+}) => {
+  const [tireSizes, setTireSizes] = useState<string[]>([]);
+  const [tireSizesLoading, setTireSizesLoading] = useState(true);
+
+  // Fetch tire sizes when component mounts
+  useEffect(() => {
+    const fetchTireSizes = async () => {
+      try {
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/tire-details/sizes"
+        );
+        const sizes = await response.json();
+        setTireSizes(sizes);
+      } catch (error) {
+        console.error("Error fetching tire sizes:", error);
+        setTireSizes([]);
+      } finally {
+        setTireSizesLoading(false);
+      }
+    };
+    fetchTireSizes();
+  }, []);
+
+  const handleTireSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSize = e.target.value;
+    handleChange(e); // Update the form data
+    if (selectedSize) {
+      onTireSizeSelect(selectedSize); // Trigger auto-fill
+    }
+  };
+
+  return (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
     <div className="grid gap-4 md:grid-cols-2">
@@ -220,15 +256,22 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Tire Size Required *
         </label>
-        <input
-          type="text"
+        <select
           id="tireSizeRequired"
           name="tireSizeRequired"
           value={formData.tireSizeRequired}
-          onChange={handleChange}
+          onChange={handleTireSizeChange}
           className="w-full p-3 border border-gray-300 rounded"
           required
-        />
+          disabled={tireSizesLoading}
+        >
+          <option value="">Select tire size</option>
+          {tireSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
@@ -246,9 +289,10 @@ const TireDetailsStep: React.FC<StepProps> = ({
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter tire brand name"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Brand name (auto-filled when tire size is selected)"
           required
+          readOnly
         />
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
@@ -838,6 +882,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
+  const [tireDetailsLoading, setTireDetailsLoading] = useState(false);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -918,6 +963,48 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const handleCloseModal = () => {
     setShowDetailsModal(false);
     setSelectedRequest(null);
+  };
+
+  // Function to handle tire size selection and auto-fill tire details
+  const handleTireSizeSelect = async (tireSize: string) => {
+    setTireDetailsLoading(true);
+    try {
+      const response = await fetch(
+        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(tireSize)}`
+      );
+
+      if (response.ok) {
+        const tireDetails: TireDetails = await response.json();
+
+        // Auto-fill the form fields
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: tireDetails.tire_brand,
+          totalPrice: tireDetails.total_price.toString(),
+          warrantyDistance: tireDetails.warranty_distance.toString(),
+        }));
+      } else {
+        console.error("Tire details not found for size:", tireSize);
+        // Clear the auto-filled fields if no details found
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: "",
+          totalPrice: "",
+          warrantyDistance: "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching tire details:", error);
+      // Clear the auto-filled fields on error
+      setFormData((prev) => ({
+        ...prev,
+        existingTireMake: "",
+        totalPrice: "",
+        warrantyDistance: "",
+      }));
+    } finally {
+      setTireDetailsLoading(false);
+    }
   };
 
 
@@ -1282,6 +1369,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              onTireSizeSelect={handleTireSizeSelect}
             />
           )}
           {currentStep === 3 && (

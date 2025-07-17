@@ -870,7 +870,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                   onChange={(e) => handleFileChange(e, index)}
                   className="w-full p-2 border border-gray-300 rounded"
                 />
-                {errors.images && <p className="text-red-500 text-sm">{errors.images}</p>}
               </div>
             ))}
           </div>
@@ -1146,7 +1145,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       images: newImages,
     }));
   };
-
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,

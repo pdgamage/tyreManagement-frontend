@@ -785,7 +785,7 @@ interface AdditionalInformationStepProps extends StepProps {
   supervisorsLoading: boolean;
 }
 
-const MAX_FILE_SIZE = 3 * 1024 * 1024;
+
 const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
   formData,
   handleChange,
@@ -800,19 +800,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     } as unknown as React.ChangeEvent<HTMLInputElement>;
     handleFileChange(e, index);
   };
-
-  if (file.size > MAX_FILE_SIZE) {
-    setErrors((prev) => ({
-      ...prev,
-      images: `File size should not exceed 5MB. Selected: ${(
-        file.size /
-      1024 /
-      1024
-      ).toFixed(2)}MB`,
-    }));
-    e.target.value = ""; // Reset input
-    return;
-  }
 
   return (
     <div className="space-y-4">

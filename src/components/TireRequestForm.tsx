@@ -394,6 +394,7 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
             id="quantity"
             name="quantity"
             min="1"
+            max="15"
             value={formData.quantity}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded"
@@ -415,6 +416,7 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
             id="tubesQuantity"
             name="tubesQuantity"
             min="0"
+            max="15"
             value={formData.tubesQuantity}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded"
@@ -1058,6 +1060,13 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       if (value > today) {
         return;
       }
+    }
+
+    if (
+      (name === "quantity" || name === "tubesQuantity") &&
+      Number(value) > 15
+    ) {
+      return; // Do nothing if value > 15
     }
     setFormData((prev) => ({
       ...prev,

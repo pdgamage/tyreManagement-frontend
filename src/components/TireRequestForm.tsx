@@ -18,7 +18,6 @@ interface TireRequestFormProps {
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
-  year: string;
   vehicleBrand: string;
   vehicleModel: string;
   tireSizeRequired: string;
@@ -200,26 +199,7 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
             <p className="mt-1 text-sm text-red-600">{errors.vehicleModel}</p>
           )}
         </div>
-        <div>
-          <label
-            htmlFor="year"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Year *
-          </label>
-          <input
-            type="text"
-            id="year"
-            name="year"
-            value={formData.year}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.year && (
-            <p className="mt-1 text-sm text-red-600">{errors.year}</p>
-          )}
-        </div>
+
       </div>
     </div>
   );
@@ -896,7 +876,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       requesterName: request.requesterName,
       requesterEmail: request.requesterEmail,
       requesterPhone: request.requesterPhone,
-      year: request.year,
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
       userSection: request.userSection,
@@ -946,7 +925,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const initialFormData = {
     vehicleNumber: "",
     vehicleId: "",
-    year: "",
     vehicleBrand: "",
     vehicleModel: "",
     tireSizeRequired: "",
@@ -1009,7 +987,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      year: vehicle.year ? vehicle.year.toString() : "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
       tireSizeRequired: vehicle.tireSize || "",
@@ -1053,7 +1030,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
           newErrors.vehicleModel = "Vehicle model is required";
-        if (!formData.year) newErrors.year = "Year is required";
         break;
       case 2:
         if (!formData.tireSizeRequired)

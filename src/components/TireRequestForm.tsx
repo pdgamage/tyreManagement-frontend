@@ -870,9 +870,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                   onChange={(e) => handleFileChange(e, index)}
                   className="w-full p-2 border border-gray-300 rounded"
                 />
-                {errors.images[index] && (
-                  <p className="text-red-500 text-sm">{errors.images[index]}</p>
-                )}
               </div>
             ))}
           </div>
@@ -1083,15 +1080,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     tireWearIndicatorAppeared: false,
   };
 
-  // const [formData, setFormData] = useState<TireFormData>(initialFormData);
-  // const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState<TireFormData>({
-    images: Array(7).fill(null), // Max 7 slots for images
-    comments: "",
-  });
-  const [errors, setErrors] = useState<{ images: string[] }>({
-    images: Array(7).fill(""), // for 7 image inputs
-  });
+  const [formData, setFormData] = useState<TireFormData>(initialFormData);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -1104,6 +1094,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       [name]: value,
     }));
   };
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
   // const handleFileChange = (
   //   e: React.ChangeEvent<HTMLInputElement>,
@@ -1118,9 +1110,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   //     }));
   //   }
   // };
-
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -1128,18 +1117,25 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const newErrors = [...errors.images];
-
     if (file.size > MAX_FILE_SIZE) {
-      newErrors[index] = "File size must be 5MB or less.";
-      setErrors({ images: newErrors });
-
-      e.target.value = "";
+      setErrors((prev) => ({
+        ...prev,
+        images: `File size must be 2MB or less. Selected file: ${(
+          file.size /
+         1024 /
+1024
+        ).toFixed(2)} MB`,
+      }));
+      e.target.value = ""; // Clear the input
       return;
     }
 
-    newErrors[index] = "";
-    setErrors({ images: newErrors });
+
+    setErrors((prev) => ({
+      ...prev,
+      images: "",
+    }));
+
 
     const newImages = [...formData.images];
     newImages[index] = file;
@@ -1149,17 +1145,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       images: newImages,
     }));
   };
-
-  const removeImage = (index: number) => {
-    const newImages = [...formData.images];
-    newImages[index] = null;
-
-    setFormData((prev) => ({
-      ...prev,
-      images: newImages,
-    }));
-  };
-
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,

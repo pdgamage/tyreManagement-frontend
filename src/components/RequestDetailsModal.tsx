@@ -82,7 +82,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   <p><span className="font-medium">Number:</span> {request.vehicleNumber}</p>
                   <p><span className="font-medium">Brand:</span> {request.vehicleBrand}</p>
                   <p><span className="font-medium">Model:</span> {request.vehicleModel}</p>
-                  <p><span className="font-medium">Year:</span> {request.year}</p>
                   <p><span className="font-medium">Department/Section:</span> {request.userSection}</p>
                   <p><span className="font-medium">Cost Center:</span> {request.costCenter}</p>
                 </div>

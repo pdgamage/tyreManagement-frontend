@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
-import { Vehicle } from "../types/api";
+import { Vehicle, TireDetails } from "../types/api";
 import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
@@ -18,7 +18,6 @@ interface TireRequestFormProps {
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
-  year: string;
   vehicleBrand: string;
   vehicleModel: string;
   tireSizeRequired: string;
@@ -61,6 +60,10 @@ interface StepProps {
     index: number
   ) => void;
   errors: Record<string, string>;
+}
+
+interface TireDetailsStepProps extends StepProps {
+  onTireSizeSelect: (tireSize: string) => void;
 }
 
 interface VehicleInformationStepProps extends StepProps {
@@ -202,34 +205,89 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
         </div>
         <div>
           <label
-            htmlFor="year"
+            htmlFor="userSection"
             className="block mb-1 font-medium text-gray-700"
           >
-            Year *
+            Department *
           </label>
           <input
             type="text"
-            id="year"
-            name="year"
-            value={formData.year}
-            className="w-full p-3 border border-gray-300 rounded"
+            id="userSection"
+            name="userSection"
+            value={formData.userSection}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Department (auto-filled when vehicle is selected)"
             required
             readOnly
           />
-          {errors.year && (
-            <p className="mt-1 text-sm text-red-600">{errors.year}</p>
+          {errors.userSection && (
+            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
           )}
         </div>
+        <div>
+          <label
+            htmlFor="costCenter"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Cost Center *
+          </label>
+          <input
+            type="text"
+            id="costCenter"
+            name="costCenter"
+            value={formData.costCenter}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Cost center (auto-filled when vehicle is selected)"
+            required
+            readOnly
+          />
+          {errors.costCenter && (
+            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
+          )}
+        </div>
+
       </div>
     </div>
   );
 };
 
-const TireDetailsStep: React.FC<StepProps> = ({
+const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
   formData,
   handleChange,
   errors,
-}) => (
+  onTireSizeSelect,
+}) => {
+  const [tireSizes, setTireSizes] = useState<string[]>([]);
+  const [tireSizesLoading, setTireSizesLoading] = useState(true);
+
+  // Fetch tire sizes when component mounts
+  useEffect(() => {
+    const fetchTireSizes = async () => {
+      try {
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/tire-details/sizes"
+        );
+        const sizes = await response.json();
+        setTireSizes(sizes);
+      } catch (error) {
+        console.error("Error fetching tire sizes:", error);
+        setTireSizes([]);
+      } finally {
+        setTireSizesLoading(false);
+      }
+    };
+    fetchTireSizes();
+  }, []);
+
+  const handleTireSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSize = e.target.value;
+    handleChange(e); // Update the form data
+    if (selectedSize) {
+      onTireSizeSelect(selectedSize); // Trigger auto-fill
+    }
+  };
+
+  return (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
     <div className="grid gap-4 md:grid-cols-2">
@@ -240,18 +298,86 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Tire Size Required *
         </label>
-        <input
-          type="text"
+        <select
           id="tireSizeRequired"
           name="tireSizeRequired"
           value={formData.tireSizeRequired}
-          onChange={handleChange}
+          onChange={handleTireSizeChange}
           className="w-full p-3 border border-gray-300 rounded"
           required
-        />
+          disabled={tireSizesLoading}
+        >
+          <option value="">Select tire size</option>
+          {tireSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
+      </div>
+      <div>
+        <label
+          htmlFor="existingTireMake"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Brand name *
+        </label>
+        <input
+          type="text"
+          id="existingTireMake"
+          name="existingTireMake"
+          value={formData.existingTireMake}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Brand name (auto-filled when tire size is selected)"
+          required
+          readOnly
+        />
+        {errors.existingTireMake && (
+          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="totalPrice"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Total Price (LKR)
+        </label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          value={formData.totalPrice}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Total price (auto-filled when tire size is selected)"
+          min="0"
+          step="0.01"
+          readOnly
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="warrantyDistance"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Warranty Distance (KM)
+        </label>
+        <input
+          type="number"
+          id="warrantyDistance"
+          name="warrantyDistance"
+          value={formData.warrantyDistance}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Warranty distance (auto-filled when tire size is selected)"
+          min="0"
+          readOnly
+        />
       </div>
       <div>
         <label
@@ -290,28 +416,6 @@ const TireDetailsStep: React.FC<StepProps> = ({
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
         />
-      </div>
-      <div>
-        <label
-          htmlFor="existingTireMake"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Brand name *
-        </label>
-        <input
-          type="text"
-          id="existingTireMake"
-          name="existingTireMake"
-          value={formData.existingTireMake}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-          placeholder="Tire brand (auto-filled when tire size is selected)"
-          required
-          readOnly
-        />
-        {errors.existingTireMake && (
-          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
-        )}
       </div>
       <div>
         <label
@@ -420,7 +524,8 @@ const TireDetailsStep: React.FC<StepProps> = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 interface RequestInformationStepProps extends StepProps {
   supervisors: Supervisor[];
@@ -457,62 +562,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
         )}
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="userSection"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Department/Section *
-          </label>
-          <select
-            id="userSection"
-            name="userSection"
-            value={formData.userSection}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          >
-            <option value="">Select Department</option>
-            <option value="Field Operations">
-              Field Operations / Service Delivery
-            </option>
-            <option value="Logistics & Distribution">
-              Logistics & Distribution
-            </option>
-            <option value="Sales & Marketing">Sales & Marketing</option>
-            <option value="Customer Support">Customer Support </option>
-            <option value="Maintenance & Technical Support">
-              Maintenance & Technical Support
-            </option>
-            <option value="Security">Security</option>
-            <option value="Training & HR">Training & HR</option>
-          </select>
-          {errors.userSection && (
-            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="costCenter"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Cost Center *
-          </label>
-          <input
-            type="text"
-            id="costCenter"
-            name="costCenter"
-            value={formData.costCenter}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
-          {errors.costCenter && (
-            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
-          )}
-        </div>
-      </div>
+      {/* Department and Cost Center fields moved to Vehicle Information section */}
       {/* Supervisor select field removed from here */}
     </div>
     <div className="grid gap-4 md:grid-cols-3">
@@ -635,45 +685,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             placeholder="Enter delivery town/city"
           />
         </div>
-        <div>
-          <label
-            htmlFor="totalPrice"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Total Price (LKR)
-          </label>
-          <input
-            type="number"
-            id="totalPrice"
-            name="totalPrice"
-            value={formData.totalPrice}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-            placeholder="Total price (auto-filled when tire size is selected)"
-            min="0"
-            step="0.01"
-            readOnly
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="warrantyDistance"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Warranty Distance (KM)
-          </label>
-          <input
-            type="number"
-            id="warrantyDistance"
-            name="warrantyDistance"
-            value={formData.warrantyDistance}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-            placeholder="Warranty distance (auto-filled when tire size is selected)"
-            min="0"
-            readOnly
-          />
-        </div>
+
         <div>
           <label className="block mb-1 font-medium text-gray-700">
             Tire Wear Indicator Appeared
@@ -858,6 +870,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
+  const [tireDetailsLoading, setTireDetailsLoading] = useState(false);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -896,7 +909,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       requesterName: request.requesterName,
       requesterEmail: request.requesterEmail,
       requesterPhone: request.requesterPhone,
-      year: request.year,
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
       userSection: request.userSection,
@@ -941,12 +953,53 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
+  // Function to handle tire size selection and auto-fill tire details
+  const handleTireSizeSelect = async (tireSize: string) => {
+    setTireDetailsLoading(true);
+    try {
+      const response = await fetch(
+        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(tireSize)}`
+      );
+
+      if (response.ok) {
+        const tireDetails: TireDetails = await response.json();
+
+        // Auto-fill the form fields
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: tireDetails.tire_brand,
+          totalPrice: tireDetails.total_price.toString(),
+          warrantyDistance: tireDetails.warranty_distance.toString(),
+        }));
+      } else {
+        console.error("Tire details not found for size:", tireSize);
+        // Clear the auto-filled fields if no details found
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: "",
+          totalPrice: "",
+          warrantyDistance: "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching tire details:", error);
+      // Clear the auto-filled fields on error
+      setFormData((prev) => ({
+        ...prev,
+        existingTireMake: "",
+        totalPrice: "",
+        warrantyDistance: "",
+      }));
+    } finally {
+      setTireDetailsLoading(false);
+    }
+  };
+
 
 
   const initialFormData = {
     vehicleNumber: "",
     vehicleId: "",
-    year: "",
     vehicleBrand: "",
     vehicleModel: "",
     tireSizeRequired: "",
@@ -1031,10 +1084,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      year: vehicle.year ? vehicle.year.toString() : "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
       tireSizeRequired: vehicle.tireSize || "",
+      userSection: vehicle.department || "",
+      costCenter: vehicle.costCentre || "",
     }));
   };
 
@@ -1075,7 +1129,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
           newErrors.vehicleModel = "Vehicle model is required";
-        if (!formData.year) newErrors.year = "Year is required";
+        if (!formData.userSection)
+          newErrors.userSection = "Department is required";
+        if (!formData.costCenter)
+          newErrors.costCenter = "Cost center is required";
         break;
       case 2:
         if (!formData.tireSizeRequired)
@@ -1102,10 +1159,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 3:
         if (!formData.requestReason)
           newErrors.requestReason = "Request reason is required";
-        if (!formData.userSection)
-          newErrors.userSection = "Department/Section is required";
-        if (!formData.costCenter)
-          newErrors.costCenter = "Cost center is required";
         break;
       case 4:
         if (!formData.requesterName)
@@ -1328,6 +1381,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              onTireSizeSelect={handleTireSizeSelect}
             />
           )}
           {currentStep === 3 && (

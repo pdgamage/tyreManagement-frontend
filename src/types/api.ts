@@ -10,6 +10,14 @@ export interface Vehicle {
   registeredBy?: number;
 }
 
+export interface TireDetails {
+  id: number;
+  tire_size: string;
+  tire_brand: string;
+  total_price: number;
+  warranty_distance: number;
+}
+
 export interface TireRequest {
   id: number;
   vehicleId: number;

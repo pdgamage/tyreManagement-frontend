@@ -242,12 +242,6 @@ const EngineerRequestDetails = () => {
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
-                  Year
-                </label>
-                <div className="p-2 bg-white rounded">{request.year}</div>
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
                   Department/Section
                 </label>
                 <div className="p-2 bg-white rounded">

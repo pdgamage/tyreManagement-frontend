@@ -800,6 +800,41 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     handleFileChange(e, index);
   };
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    // ✅ Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert(
+        `File size must be 5MB or less. Selected file size: ${(
+          file.size /
+          1024 /
+          1024
+        ).toFixed(2)} MB`
+      );
+      e.target.value = ""; // Reset the file input
+      return;
+    }
+
+    // ✅ Update images in formData
+    const updatedImages = [...formData.images];
+    updatedImages[index] = file;
+    setFormData({ ...formData, images: updatedImages });
+  };
+
+  const removeImage = (index: number) => {
+    const updatedImages = [...formData.images];
+    updatedImages[index] = null;
+    setFormData({ ...formData, images: updatedImages });
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="mb-4 text-xl font-semibold">Additional Information</h3>
@@ -824,6 +859,8 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
           <label className="block mb-2 font-medium text-gray-700">
             Upload Images (Max 7)
           </label>
+
+          {/* Image Upload Inputs */}
           <div className="grid gap-4 md:grid-cols-4">
             {formData.images.map((_, index) => (
               <div key={index} className="relative">
@@ -836,8 +873,10 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
               </div>
             ))}
           </div>
+
           <p className="mt-1 mb-4 text-sm text-gray-500">
-            Upload images of tire wear, damage, or other relevant details
+            Upload images of tire wear, damage, or other relevant details (Max
+      size: 5MB per image)
           </p>
 
           {/* Image Preview Grid */}

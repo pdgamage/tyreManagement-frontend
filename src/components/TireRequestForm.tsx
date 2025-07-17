@@ -631,7 +631,19 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           id="requesterPhone"
           name="requesterPhone"
           value={formData.requesterPhone}
-          onChange={handleChange}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "");
+
+            // Restrict to 10 digits max
+            if (value.length <= 10) {
+              setFormData((prev) => ({
+                ...prev,
+                requesterPhone: value,
+              }));
+            }
+          }}
+          maxLength={10} // Extra safeguard
+          pattern="^[1-9][0-9]{9}$" // HTML validation: 10 digits, first not zero
           className="w-full p-3 border border-gray-300 rounded"
           required
         />

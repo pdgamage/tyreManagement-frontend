@@ -1060,27 +1060,62 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       [name]: value,
     }));
-
-    // Auto-fill tire details when tire size changes
-    if (name === "tireSizeRequired" && value.trim()) {
-      fetchTireDetailsBySize(value.trim());
-    }
   };
+
+  // const handleFileChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   index: number
+  // ) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const newImages = [...formData.images];
+  //     newImages[index] = e.target.files[0];
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       images: newImages,
+  //     }));
+  //   }
+  // };
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    if (e.target.files && e.target.files[0]) {
-      const newImages = [...formData.images];
-      newImages[index] = e.target.files[0];
-      setFormData((prev) => ({
-        ...prev,
-        images: newImages,
-      }));
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const newErrors = [...errors.images];
+
+    if (file.size > MAX_FILE_SIZE) {
+      newErrors[index] = "File size must be 5MB or less.";
+      setErrors({ images: newErrors });
+
+      e.target.value = "";
+      return;
     }
+
+    newErrors[index] = "";
+    setErrors({ images: newErrors });
+
+    const newImages = [...formData.images];
+    newImages[index] = file;
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
   };
 
+  const removeImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages[index] = null;
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,

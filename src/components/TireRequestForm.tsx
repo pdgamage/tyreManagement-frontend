@@ -565,20 +565,18 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           name="requestReason"
           value={formData.requestReason}
           onChange={(e) => {
-            const words = e.target.value.trim().split(/\s+/);
-            if (words.length <= 250) {
-              handleChange(e); // Update state only if within 250 words
+            const value = e.target.value;
+            if (value.length <= 250) {
+              handleChange(e); // Update only if within 250 chars
             }
           }}
+          maxLength={250}
           rows={3}
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
         <p className="text-sm text-gray-500">
-          {formData.requestReason.trim() === ""
-            ? 0
-            : formData.requestReason.trim().split(/\s+/).length}{" "}
-          / 250 words
+          {formData.requestReason.length} / 250 characters
         </p>
         {errors.requestReason && (
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
@@ -643,9 +641,12 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           name="requesterPhone"
           value={formData.requesterPhone}
           onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, "");
+            let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
 
-            // Restrict to 10 digits max
+            if (value.startsWith("0")) {
+              value = value.slice(1);
+            }
+
             if (value.length <= 10) {
               setFormData((prev) => ({
                 ...prev,
@@ -653,8 +654,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
               }));
             }
           }}
-          maxLength={10} // Extra safeguard
-          pattern="^[1-9][0-9]{9}$" // HTML validation: 10 digits, first not zero
+          maxLength={10}
+          inputMode="numeric"
+          pattern="^[1-9][0-9]{9}$" // Extra validation on submit
           className="w-full p-3 border border-gray-300 rounded"
           required
         />

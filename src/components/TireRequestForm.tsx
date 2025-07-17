@@ -800,40 +800,40 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     handleFileChange(e, index);
   };
 
-  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
+  // const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const file = e.target.files?.[0];
+  // const handleFileChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   index: number
+  // ) => {
+  //   const file = e.target.files?.[0];
 
-    if (!file) return;
+  //   if (!file) return;
 
-    // ✅ Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      alert(
-        `File size must be 5MB or less. Selected file size: ${(
-          file.size /
-          1024 /
-          1024
-        ).toFixed(2)} MB`
-      );
-      e.target.value = ""; // Reset the file input
-      return;
-    }
+  //   // ✅ Validate file size
+  //   if (file.size > MAX_FILE_SIZE) {
+  //     alert(
+  //       `File size must be 5MB or less. Selected file size: ${(
+  //         file.size /
+  //         1024 /
+  //         1024
+  //       ).toFixed(2)} MB`
+  //     );
+  //     e.target.value = ""; // Reset the file input
+  //     return;
+  //   }
 
-    // ✅ Update images in formData
-    const updatedImages = [...formData.images];
-    updatedImages[index] = file;
-    setFormData({ ...formData, images: updatedImages });
-  };
+  //   // ✅ Update images in formData
+  //   const updatedImages = [...formData.images];
+  //   updatedImages[index] = file;
+  //   setFormData({ ...formData, images: updatedImages });
+  // };
 
-  const removeImage = (index: number) => {
-    const updatedImages = [...formData.images];
-    updatedImages[index] = null;
-    setFormData({ ...formData, images: updatedImages });
-  };
+  // const removeImage = (index: number) => {
+  //   const updatedImages = [...formData.images];
+  //   updatedImages[index] = null;
+  //   setFormData({ ...formData, images: updatedImages });
+  // };
 
   return (
     <div className="space-y-4">
@@ -876,7 +876,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 
           <p className="mt-1 mb-4 text-sm text-gray-500">
             Upload images of tire wear, damage, or other relevant details (Max
-      size: 5MB per image)
+            size: 5MB per image)
           </p>
 
           {/* Image Preview Grid */}
@@ -1095,20 +1095,57 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }));
   };
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+  // const handleFileChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   index: number
+  // ) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const newImages = [...formData.images];
+  //     newImages[index] = e.target.files[0];
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       images: newImages,
+  //     }));
+  //   }
+  // };
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    if (e.target.files && e.target.files[0]) {
-      const newImages = [...formData.images];
-      newImages[index] = e.target.files[0];
-      setFormData((prev) => ({
-        ...prev,
-        images: newImages,
-      }));
-    }
-  };
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    // ✅ Validate size
+    if (file.size > MAX_FILE_SIZE) {
+      setErrors((prev) => ({
+        ...prev,
+        images: `File size must be 5MB or less. Selected file: ${(
+          file.size /
+         1024 /
+1024
+        ).toFixed(2)} MB`,
+      }));
+      e.target.value = ""; // Clear the input
+      return;
+    }
+
+    // ✅ Clear previous error if valid
+    setErrors((prev) => ({
+      ...prev,
+      images: "",
+    }));
+
+    // ✅ Update form data
+    const newImages = [...formData.images];
+    newImages[index] = file;
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,

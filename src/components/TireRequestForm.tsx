@@ -1120,7 +1120,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const newErrors = [...errors.images];
+
     if (file.size > MAX_FILE_SIZE) {
+      newErrors[index] = "File size must be 5MB or less.";
       setErrors((prev) => ({
         ...prev,
         images: `File size must be 2MB or less.`,

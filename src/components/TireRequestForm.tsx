@@ -1219,14 +1219,19 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.requesterEmail = "Email is required";
         if (!formData.requesterPhone)
           newErrors.requesterPhone = "Phone is required";
+        if (!formData.supervisorId)
+          newErrors.supervisorId = "Supervisor is required";
         if (
           formData.requesterPhone.length !== 10 ||
           formData.requesterPhone.startsWith("0")
-        )
-          newErrors.requesterPhone =
-            "Phone number must be 10 digits and cannot start with 0";
-        if (!formData.supervisorId)
-          newErrors.supervisorId = "Supervisor is required";
+        ) {
+          setErrors((prev) => ({
+            ...prev,
+            requesterPhone:
+     "Phone number must be 10 digits and cannot start with 0",
+          }));
+          return; // Stop navigation to next step
+        }
         break;
     }
 

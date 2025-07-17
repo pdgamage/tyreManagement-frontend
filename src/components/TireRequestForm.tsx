@@ -1083,8 +1083,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     tireWearIndicatorAppeared: false,
   };
 
-  const [formData, setFormData] = useState<TireFormData>(initialFormData);
+  // const [formData, setFormData] = useState<TireFormData>(initialFormData);
   // const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<TireFormData>({
+    images: Array(7).fill(null), // Max 7 slots for images
+    comments: "",
+  });
   const [errors, setErrors] = useState<{ images: string[] }>({
     images: Array(7).fill(""), // for 7 image inputs
   });
@@ -1126,7 +1130,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     const newErrors = [...errors.images];
 
-
     if (file.size > MAX_FILE_SIZE) {
       newErrors[index] = "File size must be 5MB or less.";
       setErrors({ images: newErrors });
@@ -1140,6 +1143,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     const newImages = [...formData.images];
     newImages[index] = file;
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages[index] = null;
 
     setFormData((prev) => ({
       ...prev,

@@ -870,9 +870,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                   onChange={(e) => handleFileChange(e, index)}
                   className="w-full p-2 border border-gray-300 rounded"
                 />
-                {errors.images[index] && (
-                  <p className="text-red-500 text-sm">{errors.images[index]}</p>
-                )}
+                {errors.images && <p className="text-red-500 text-sm">{errors.images}</p>}
               </div>
             ))}
           </div>
@@ -1125,18 +1123,20 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         ...prev,
         images: `File size must be 2MB or less. Selected file: ${(
           file.size /
-          1024 /
-          1024
+         1024 /
+1024
         ).toFixed(2)} MB`,
       }));
       e.target.value = ""; // Clear the input
       return;
     }
 
+
     setErrors((prev) => ({
       ...prev,
       images: "",
     }));
+
 
     const newImages = [...formData.images];
     newImages[index] = file;

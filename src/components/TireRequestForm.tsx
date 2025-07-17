@@ -1095,7 +1095,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }));
   };
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
   // const handleFileChange = (
   //   e: React.ChangeEvent<HTMLInputElement>,
@@ -1121,7 +1121,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     if (file.size > MAX_FILE_SIZE) {
       setErrors((prev) => ({
         ...prev,
-        images: `File size must be 5MB or less. Selected file: ${(
+        images: `File size must be 2MB or less. Selected file: ${(
           file.size /
          1024 /
 1024

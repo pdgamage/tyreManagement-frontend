@@ -304,9 +304,10 @@ const TireDetailsStep: React.FC<StepProps> = ({
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter tire brand name"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Tire brand (auto-filled when tire size is selected)"
           required
+          readOnly
         />
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>

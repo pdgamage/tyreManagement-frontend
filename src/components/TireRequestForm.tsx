@@ -235,6 +235,66 @@ const TireDetailsStep: React.FC<StepProps> = ({
       </div>
       <div>
         <label
+          htmlFor="existingTireMake"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Brand name *
+        </label>
+        <input
+          type="text"
+          id="existingTireMake"
+          name="existingTireMake"
+          value={formData.existingTireMake}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter tire brand name"
+          required
+        />
+        {errors.existingTireMake && (
+          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="totalPrice"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Total Price (LKR)
+        </label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          value={formData.totalPrice}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Total price (auto-filled when tire size is selected)"
+          min="0"
+          step="0.01"
+          readOnly
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="warrantyDistance"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Warranty Distance (KM)
+        </label>
+        <input
+          type="number"
+          id="warrantyDistance"
+          name="warrantyDistance"
+          value={formData.warrantyDistance}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Warranty distance (auto-filled when tire size is selected)"
+          min="0"
+          readOnly
+        />
+      </div>
+      <div>
+        <label
           htmlFor="quantity"
           className="block mb-1 font-medium text-gray-700"
         >
@@ -270,28 +330,6 @@ const TireDetailsStep: React.FC<StepProps> = ({
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
         />
-      </div>
-      <div>
-        <label
-          htmlFor="existingTireMake"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Brand name *
-        </label>
-        <input
-          type="text"
-          id="existingTireMake"
-          name="existingTireMake"
-          value={formData.existingTireMake}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-          placeholder="Tire brand (auto-filled when tire size is selected)"
-          required
-          readOnly
-        />
-        {errors.existingTireMake && (
-          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
-        )}
       </div>
       <div>
         <label
@@ -615,45 +653,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             placeholder="Enter delivery town/city"
           />
         </div>
-        <div>
-          <label
-            htmlFor="totalPrice"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Total Price (LKR)
-          </label>
-          <input
-            type="number"
-            id="totalPrice"
-            name="totalPrice"
-            value={formData.totalPrice}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-            placeholder="Total price (auto-filled when tire size is selected)"
-            min="0"
-            step="0.01"
-            readOnly
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="warrantyDistance"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Warranty Distance (KM)
-          </label>
-          <input
-            type="number"
-            id="warrantyDistance"
-            name="warrantyDistance"
-            value={formData.warrantyDistance}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-            placeholder="Warranty distance (auto-filled when tire size is selected)"
-            min="0"
-            readOnly
-          />
-        </div>
+
         <div>
           <label className="block mb-1 font-medium text-gray-700">
             Tire Wear Indicator Appeared

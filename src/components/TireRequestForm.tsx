@@ -15,6 +15,14 @@ interface TireRequestFormProps {
   onSuccess?: () => void;
 }
 
+interface TireDetails {
+  id: number;
+  tire_size: string;
+  tire_brand: string;
+  total_price: number;
+  warranty_distance: number;
+}
+
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
@@ -66,6 +74,10 @@ interface StepProps {
 interface VehicleInformationStepProps extends StepProps {
   vehicles: Vehicle[];
   onVehicleSelect: (vehicle: Vehicle) => void;
+}
+
+interface TireDetailsStepProps extends StepProps {
+  loadingTireDetails?: boolean;
 }
 
 interface Supervisor {
@@ -225,10 +237,11 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
   );
 };
 
-const TireDetailsStep: React.FC<StepProps> = ({
+const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
   formData,
   handleChange,
   errors,
+  loadingTireDetails = false,
 }) => (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
@@ -240,15 +253,23 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Tire Size Required *
         </label>
-        <input
-          type="text"
-          id="tireSizeRequired"
-          name="tireSizeRequired"
-          value={formData.tireSizeRequired}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          required
-        />
+        <div className="relative">
+          <input
+            type="text"
+            id="tireSizeRequired"
+            name="tireSizeRequired"
+            value={formData.tireSizeRequired}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+            placeholder="Enter tire size (e.g., 100+90+17+6PR)"
+          />
+          {loadingTireDetails && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+        </div>
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
@@ -881,6 +902,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
+  const [tireDetails, setTireDetails] = useState<TireDetails[]>([]);
+  const [loadingTireDetails, setLoadingTireDetails] = useState(false);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -905,6 +928,32 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     };
     fetchSupervisors();
   }, []);
+
+  // Function to fetch tire details by tire size
+  const fetchTireDetailsBySize = async (tireSize: string) => {
+    if (!tireSize.trim()) return;
+
+    setLoadingTireDetails(true);
+    try {
+      const res = await fetch(
+        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(tireSize)}`
+      );
+      if (res.ok) {
+        const tireDetail = await res.json();
+        // Auto-fill the form fields
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: tireDetail.tire_brand,
+          totalPrice: tireDetail.total_price.toString(),
+          warrantyDistance: tireDetail.warranty_distance.toString(),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching tire details:", error);
+    } finally {
+      setLoadingTireDetails(false);
+    }
+  };
 
   // Convert Request type to TireRequest type for the modal
   const convertRequestToTireRequest = (request: Request): TireRequest => {
@@ -1011,6 +1060,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       [name]: value,
     }));
+
+    // Auto-fill tire details when tire size changes
+    if (name === "tireSizeRequired" && value.trim()) {
+      fetchTireDetailsBySize(value.trim());
+    }
   };
 
   const handleFileChange = (
@@ -1037,6 +1091,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       vehicleModel: vehicle.model || "",
       tireSizeRequired: vehicle.tireSize || "",
     }));
+
+    // Auto-fill tire details if vehicle has tire size
+    if (vehicle.tireSize && vehicle.tireSize.trim()) {
+      fetchTireDetailsBySize(vehicle.tireSize.trim());
+    }
   };
 
   const vehicleNumberExists = (number: string) =>
@@ -1329,6 +1388,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              loadingTireDetails={loadingTireDetails}
             />
           )}
           {currentStep === 3 && (

@@ -643,23 +643,31 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           onChange={(e) => {
             let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
 
-            if (value.startsWith("0")) {
-              value = value.slice(1);
+            if (value.length > 10) {
+              value = value.slice(0, 10);
             }
 
-            if (value.length <= 10) {
-              setFormData((prev) => ({
-                ...prev,
-                requesterPhone: value,
-              }));
-            }
+            setFormData((prev) => ({
+              ...prev,
+              requesterPhone: value,
+            }));
           }}
           maxLength={10}
           inputMode="numeric"
-          pattern="^[1-9][0-9]{9}$" // Extra validation on submit
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
+        {/*  Live validation message */}
+        {formData.requesterPhone && formData.requesterPhone.length < 10 && (
+          <p className="text-sm text-gray-500">
+            Phone number must be 10 digits
+          </p>
+        )}
+        {formData.requesterPhone.startsWith("0") && (
+          <p className="text-sm text-red-600">
+            Phone number cannot start with 0
+          </p>
+        )}
         {errors.requesterPhone && (
           <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
         )}

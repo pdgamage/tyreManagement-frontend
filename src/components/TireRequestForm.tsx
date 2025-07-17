@@ -636,15 +636,15 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           Phone Number *
         </label>
         <input
-          type="tel"
+          type="text"
           id="requesterPhone"
           name="requesterPhone"
           value={formData.requesterPhone}
           onChange={(e) => {
-            let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+            let value = e.target.value.replace(/\D/g, ""); // Only digits
 
             if (value.length > 10) {
-              value = value.slice(0, 10);
+              value = value.slice(0, 10); // Limit to 10 digits
             }
 
             setFormData((prev) => ({
@@ -652,22 +652,11 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
               requesterPhone: value,
             }));
           }}
-          maxLength={10}
-          inputMode="numeric"
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-
-        {/* Real-time validation */}
-        {formData.requesterPhone && formData.requesterPhone.startsWith("0") && (
-          <p className="text-sm text-red-600">
-            Phone number cannot start with 0
-          </p>
-        )}
-        {formData.requesterPhone && formData.requesterPhone.length !== 10 && (
-          <p className="text-sm text-gray-500">
-            Phone number must be exactly 10 digits
-          </p>
+        {errors.requesterPhone && (
+          <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
         )}
       </div>
     </div>

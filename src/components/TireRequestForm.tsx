@@ -1101,8 +1101,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }));
   };
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
   // const handleFileChange = (
   //   e: React.ChangeEvent<HTMLInputElement>,
   //   index: number
@@ -1116,6 +1114,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   //     }));
   //   }
   // };
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -1125,10 +1126,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
     const newErrors = [...errors.images];
 
+
     if (file.size > MAX_FILE_SIZE) {
       newErrors[index] = "File size must be 5MB or less.";
       setErrors({ images: newErrors });
-      e.target.value = ""; // Clear the input
+
+      e.target.value = "";
       return;
     }
 
@@ -1143,6 +1146,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       images: newImages,
     }));
   };
+
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,

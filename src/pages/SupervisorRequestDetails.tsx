@@ -227,12 +227,7 @@ const SupervisorRequestDetails = () => {
                   {request.vehicleModel}
                 </div>
               </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
-                  Year
-                </label>
-                <div className="p-2 bg-white rounded">{request.year}</div>
-              </div>
+
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Department/Section
@@ -407,7 +402,9 @@ const SupervisorRequestDetails = () => {
                   Total Price (LKR)
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.totalPrice ? `LKR ${Number(request.totalPrice).toLocaleString()}` : "N/A"}
+                  {request.totalPrice
+                    ? `LKR ${Number(request.totalPrice).toLocaleString()}`
+                    : "N/A"}
                 </div>
               </div>
               <div>
@@ -415,7 +412,9 @@ const SupervisorRequestDetails = () => {
                   Warranty Distance (KM)
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.warrantyDistance ? `${Number(request.warrantyDistance).toLocaleString()} KM` : "N/A"}
+                  {request.warrantyDistance
+                    ? `${Number(request.warrantyDistance).toLocaleString()} KM`
+                    : "N/A"}
                 </div>
               </div>
               <div>
@@ -423,8 +422,11 @@ const SupervisorRequestDetails = () => {
                   Tire Wear Indicator Appeared
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.tireWearIndicatorAppeared !== undefined ?
-                    (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}
+                  {request.tireWearIndicatorAppeared !== undefined
+                    ? request.tireWearIndicatorAppeared
+                      ? "Yes"
+                      : "No"
+                    : "N/A"}
                 </div>
               </div>
             </div>

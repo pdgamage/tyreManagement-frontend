@@ -10,14 +10,11 @@ export interface Request {
   requesterName: string;
   requesterEmail: string;
   requesterPhone: string;
-  year: string;
   vehicleBrand: string;
   vehicleModel: string;
-  userSection: string;
   lastReplacementDate: Date | string;
   existingTireMake: string;
   tireSizeRequired: string;
-  costCenter: string;
   presentKmReading: number;
   previousKmReading: number;
   tireWearPattern: string;

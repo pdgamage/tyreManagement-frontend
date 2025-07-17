@@ -18,9 +18,7 @@ interface TireRequestFormProps {
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
-  vehicleType: string;
-  vehicleDepartment: string;
-  vehicleCostCentre: string;
+  year: string;
   vehicleBrand: string;
   vehicleModel: string;
   tireSizeRequired: string;
@@ -31,8 +29,10 @@ interface TireFormData {
   requesterName: string;
   requesterEmail: string;
   requesterPhone: string;
+  userSection: string;
   lastReplacementDate: string;
   existingTireMake: string;
+  costCenter: string;
   presentKmReading: string;
   previousKmReading: string;
   tireWearPattern: string;
@@ -202,126 +202,23 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
         </div>
         <div>
           <label
-            htmlFor="vehicleType"
+            htmlFor="year"
             className="block mb-1 font-medium text-gray-700"
           >
-            Vehicle Type *
+            Year *
           </label>
           <input
             type="text"
-            id="vehicleType"
-            name="vehicleType"
-            value={formData.vehicleType}
+            id="year"
+            name="year"
+            value={formData.year}
             className="w-full p-3 border border-gray-300 rounded"
             required
             readOnly
           />
-          {errors.vehicleType && (
-            <p className="mt-1 text-sm text-red-600">{errors.vehicleType}</p>
+          {errors.year && (
+            <p className="mt-1 text-sm text-red-600">{errors.year}</p>
           )}
-        </div>
-        <div>
-          <label
-            htmlFor="vehicleDepartment"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Department *
-          </label>
-          <input
-            type="text"
-            id="vehicleDepartment"
-            name="vehicleDepartment"
-            value={formData.vehicleDepartment}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.vehicleDepartment && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.vehicleDepartment}
-            </p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="vehicleCostCentre"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Cost Centre *
-          </label>
-          <input
-            type="text"
-            id="vehicleCostCentre"
-            name="vehicleCostCentre"
-            value={formData.vehicleCostCentre}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.vehicleCostCentre && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.vehicleCostCentre}
-            </p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="presentKmReading"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Current KM Reading *
-          </label>
-          <input
-            type="number"
-            id="presentKmReading"
-            name="presentKmReading"
-            value={formData.presentKmReading}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            min="0"
-            required
-          />
-          {errors.presentKmReading && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.presentKmReading}
-            </p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="previousKmReading"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Previous KM Reading *
-          </label>
-          <input
-            type="number"
-            id="previousKmReading"
-            name="previousKmReading"
-            value={formData.previousKmReading}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            min="0"
-            required
-          />
-          {errors.previousKmReading && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.previousKmReading}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">
-            KM Difference
-          </label>
-          <div className="w-full p-3 text-gray-700 border border-gray-200 rounded bg-gray-50">
-            {(() => {
-              const current = parseInt(formData.presentKmReading) || 0;
-              const previous = parseInt(formData.previousKmReading) || 0;
-              const difference = current - previous;
-              return difference >= 0 ? difference.toLocaleString() : 0;
-            })()}
-          </div>
         </div>
       </div>
     </div>
@@ -332,235 +229,198 @@ const TireDetailsStep: React.FC<StepProps> = ({
   formData,
   handleChange,
   errors,
-}) => {
-  return (
-    <div className="space-y-4">
-      <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="tireSizeRequired"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Tire Size Required *
-          </label>
-          <input
-            type="text"
-            id="tireSizeRequired"
-            name="tireSizeRequired"
-            value={formData.tireSizeRequired}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
-          {errors.tireSizeRequired && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.tireSizeRequired}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="existingTireMake"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Brand name *
-          </label>
-          <select
-            id="existingTireMake"
-            name="existingTireMake"
-            value={formData.existingTireMake}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select a tire brand</option>
-            <option value="Michelin">Michelin</option>
-            <option value="Bridgestone">Bridgestone</option>
-            <option value="Goodyear">Goodyear</option>
-            <option value="Continental">Continental</option>
-            <option value="Pirelli">Pirelli</option>
-            <option value="Dunlop">Dunlop</option>
-            <option value="Yokohama">Yokohama</option>
-            <option value="Hankook">Hankook</option>
-            <option value="Kumho">Kumho</option>
-            <option value="Toyo">Toyo</option>
-            <option value="Maxxis">Maxxis</option>
-            <option value="BFGoodrich">BFGoodrich</option>
-            <option value="Falken">Falken</option>
-            <option value="Nitto">Nitto</option>
-            <option value="Cooper">Cooper</option>
-            <option value="General">General</option>
-            <option value="Nexen">Nexen</option>
-            <option value="Firestone">Firestone</option>
-            <option value="Uniroyal">Uniroyal</option>
-            <option value="Nokian">Nokian</option>
-            <option value="Sumitomo">Sumitomo</option>
-            <option value="Hercules">Hercules</option>
-            <option value="Mastercraft">Mastercraft</option>
-            <option value="Dick Cepek">Dick Cepek</option>
-            <option value="Mickey Thompson">Mickey Thompson</option>
-            <option value="Other">Other</option>
-          </select>
-          {errors.existingTireMake && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.existingTireMake}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="totalPrice"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Price (LKR)
-          </label>
-          <input
-            type="number"
-            id="totalPrice"
-            name="totalPrice"
-            value={formData.totalPrice}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter total price"
-            min="0"
-            step="0.01"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="warrantyDistance"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Warranty Distance (KM)
-          </label>
-          <input
-            type="number"
-            id="warrantyDistance"
-            name="warrantyDistance"
-            value={formData.warrantyDistance}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            placeholder="Enter warranty distance"
-            min="0"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="quantity"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Quantity *
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            min="1"
-            max="15"
-            value={formData.quantity}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-
-              if (isNaN(value) || value < 1 || value > 15) return;
-
-              handleChange(e);
-            }}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
-          {errors.quantity && (
-            <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="tubesQuantity"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Tubes Quantity
-          </label>
-
-          <input
-            type="number"
-            id="tubesQuantity"
-            name="tubesQuantity"
-            min="0"
-            max="15"
-            value={formData.tubesQuantity}
-            onChange={(e) => {
-              handleChange(e);
-            }}
-            className="w-full p-3 border border-gray-300 rounded"
-          />
-
-          {errors.tubesQuantity && (
-            <p className="mt-1 text-sm text-red-600">{errors.tubesQuantity}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="tireWearPattern"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Tire Wear Pattern *
-          </label>
-          <select
-            id="tireWearPattern"
-            name="tireWearPattern"
-            value={formData.tireWearPattern}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          >
-            <option value="">Select wear pattern</option>
-            <option value="Even">Even</option>
-            <option value="Center">Center</option>
-            <option value="Edge">Edge</option>
-            <option value="One-Sided">One-Sided</option>
-            <option value="Patches">Patches</option>
-            <option value="Other">Other</option>
-          </select>
-          {errors.tireWearPattern && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.tireWearPattern}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="lastReplacementDate"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Last Replacement Date *
-          </label>
-          <input
-            type="date"
-            id="lastReplacementDate"
-            name="lastReplacementDate"
-            value={formData.lastReplacementDate}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            max={new Date(Date.now() - 86400000).toISOString().split("T")[0]}
-            required
-            onKeyPress={(e) => e.preventDefault()}
-            onPaste={(e) => e.preventDefault()}
-            onCut={(e) => e.preventDefault()}
-            onDrop={(e) => e.preventDefault()}
-          />
-          {errors.lastReplacementDate && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.lastReplacementDate}
-            </p>
-          )}
+}) => (
+  <div className="space-y-4">
+    <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
+    <div className="grid gap-4 md:grid-cols-2">
+      <div>
+        <label
+          htmlFor="tireSizeRequired"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Size Required *
+        </label>
+        <input
+          type="text"
+          id="tireSizeRequired"
+          name="tireSizeRequired"
+          value={formData.tireSizeRequired}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        />
+        {errors.tireSizeRequired && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="quantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Quantity *
+        </label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          min="1"
+          value={formData.quantity}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        />
+        {errors.quantity && (
+          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="tubesQuantity"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tubes Quantity
+        </label>
+        <input
+          type="number"
+          id="tubesQuantity"
+          name="tubesQuantity"
+          min="0"
+          value={formData.tubesQuantity}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="existingTireMake"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Brand name *
+        </label>
+        <input
+          type="text"
+          id="existingTireMake"
+          name="existingTireMake"
+          value={formData.existingTireMake}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Tire brand (auto-filled when tire size is selected)"
+          required
+          readOnly
+        />
+        {errors.existingTireMake && (
+          <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="lastReplacementDate"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Last Replacement Date *
+        </label>
+        <input
+          type="date"
+          id="lastReplacementDate"
+          name="lastReplacementDate"
+          value={formData.lastReplacementDate}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
+          required
+        />
+        {errors.lastReplacementDate && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.lastReplacementDate}
+          </p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="presentKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Current KM Reading *
+        </label>
+        <input
+          type="number"
+          id="presentKmReading"
+          name="presentKmReading"
+          value={formData.presentKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.presentKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.presentKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="previousKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Previous KM Reading *
+        </label>
+        <input
+          type="number"
+          id="previousKmReading"
+          name="previousKmReading"
+          value={formData.previousKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.previousKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.previousKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">
+          KM Difference
+        </label>
+        <div className="w-full p-3 border border-gray-200 rounded bg-gray-50 text-gray-700">
+          {(() => {
+            const current = parseInt(formData.presentKmReading) || 0;
+            const previous = parseInt(formData.previousKmReading) || 0;
+            const difference = current - previous;
+            return difference >= 0 ? difference.toLocaleString() : 0;
+          })()}
         </div>
       </div>
+      <div>
+        <label
+          htmlFor="tireWearPattern"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Tire Wear Pattern *
+        </label>
+        <select
+          id="tireWearPattern"
+          name="tireWearPattern"
+          value={formData.tireWearPattern}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          required
+        >
+          <option value="">Select wear pattern</option>
+          <option value="Even">Even</option>
+          <option value="Center">Center</option>
+          <option value="Edge">Edge</option>
+          <option value="One-Sided">One-Sided</option>
+          <option value="Patches">Patches</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.tireWearPattern && (
+          <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
+        )}
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 interface RequestInformationStepProps extends StepProps {
   supervisors: Supervisor[];
@@ -587,7 +447,6 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
         <textarea
           id="requestReason"
           name="requestReason"
-          maxLength={250}
           value={formData.requestReason}
           onChange={handleChange}
           rows={3}
@@ -598,7 +457,62 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
         )}
       </div>
-
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label
+            htmlFor="userSection"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Department/Section *
+          </label>
+          <select
+            id="userSection"
+            name="userSection"
+            value={formData.userSection}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          >
+            <option value="">Select Department</option>
+            <option value="Field Operations">
+              Field Operations / Service Delivery
+            </option>
+            <option value="Logistics & Distribution">
+              Logistics & Distribution
+            </option>
+            <option value="Sales & Marketing">Sales & Marketing</option>
+            <option value="Customer Support">Customer Support </option>
+            <option value="Maintenance & Technical Support">
+              Maintenance & Technical Support
+            </option>
+            <option value="Security">Security</option>
+            <option value="Training & HR">Training & HR</option>
+          </select>
+          {errors.userSection && (
+            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="costCenter"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Cost Center *
+          </label>
+          <input
+            type="text"
+            id="costCenter"
+            name="costCenter"
+            value={formData.costCenter}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            required
+          />
+          {errors.costCenter && (
+            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
+          )}
+        </div>
+      </div>
       {/* Supervisor select field removed from here */}
     </div>
     <div className="grid gap-4 md:grid-cols-3">
@@ -656,23 +570,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           id="requesterPhone"
           name="requesterPhone"
           value={formData.requesterPhone}
-          onChange={(e) => {
-            const input = e.target.value;
-
-            // only digits
-            if (!/^\d*$/.test(input)) return;
-
-            // can't add non-zero
-            if (input.length === 1 && input !== "0") return;
-
-            // only 10 digits
-            if (input.length > 10) return;
-
-            handleChange(e);
-          }}
+          onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
           required
-          placeholder="Enter 10-digit number starting with 0"
         />
         {errors.requesterPhone && (
           <p className="mt-1 text-sm text-red-600">{errors.requesterPhone}</p>
@@ -682,9 +582,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
 
     {/* New Section 2: Delivery and Pricing Information */}
     <div className="mt-6 space-y-4">
-      <h4 className="text-lg font-semibold text-gray-800">
-        Delivery & Pricing Information
-      </h4>
+      <h4 className="text-lg font-semibold text-gray-800">Delivery & Pricing Information</h4>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -737,7 +635,45 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
             placeholder="Enter delivery town/city"
           />
         </div>
-
+        <div>
+          <label
+            htmlFor="totalPrice"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Total Price (LKR)
+          </label>
+          <input
+            type="number"
+            id="totalPrice"
+            name="totalPrice"
+            value={formData.totalPrice}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Total price (auto-filled when tire size is selected)"
+            min="0"
+            step="0.01"
+            readOnly
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="warrantyDistance"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Warranty Distance (KM)
+          </label>
+          <input
+            type="number"
+            id="warrantyDistance"
+            name="warrantyDistance"
+            value={formData.warrantyDistance}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Warranty distance (auto-filled when tire size is selected)"
+            min="0"
+            readOnly
+          />
+        </div>
         <div>
           <label className="block mb-1 font-medium text-gray-700">
             Tire Wear Indicator Appeared
@@ -749,11 +685,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="true"
                 checked={formData.tireWearIndicatorAppeared === true}
-                onChange={() =>
-                  handleChange({
-                    target: { name: "tireWearIndicatorAppeared", value: true },
-                  } as any)
-                }
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: true }
+                } as any)}
                 className="mr-2"
               />
               Yes
@@ -764,11 +698,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="false"
                 checked={formData.tireWearIndicatorAppeared === false}
-                onChange={() =>
-                  handleChange({
-                    target: { name: "tireWearIndicatorAppeared", value: false },
-                  } as any)
-                }
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: false }
+                } as any)}
                 className="mr-2"
               />
               No
@@ -800,41 +732,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
     handleFileChange(e, index);
   };
 
-  // const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
-
-  // const handleFileChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   index: number
-  // ) => {
-  //   const file = e.target.files?.[0];
-
-  //   if (!file) return;
-
-  //   // ✅ Validate file size
-  //   if (file.size > MAX_FILE_SIZE) {
-  //     alert(
-  //       `File size must be 5MB or less. Selected file size: ${(
-  //         file.size /
-  //         1024 /
-  //         1024
-  //       ).toFixed(2)} MB`
-  //     );
-  //     e.target.value = ""; // Reset the file input
-  //     return;
-  //   }
-
-  //   // ✅ Update images in formData
-  //   const updatedImages = [...formData.images];
-  //   updatedImages[index] = file;
-  //   setFormData({ ...formData, images: updatedImages });
-  // };
-
-  // const removeImage = (index: number) => {
-  //   const updatedImages = [...formData.images];
-  //   updatedImages[index] = null;
-  //   setFormData({ ...formData, images: updatedImages });
-  // };
-
   return (
     <div className="space-y-4">
       <h3 className="mb-4 text-xl font-semibold">Additional Information</h3>
@@ -859,8 +756,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
           <label className="block mb-2 font-medium text-gray-700">
             Upload Images (Max 7)
           </label>
-
-          {/* Image Upload Inputs */}
           <div className="grid gap-4 md:grid-cols-4">
             {formData.images.map((_, index) => (
               <div key={index} className="relative">
@@ -873,10 +768,8 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
               </div>
             ))}
           </div>
-
           <p className="mt-1 mb-4 text-sm text-gray-500">
-            Upload images of tire wear, damage, or other relevant details (Max
-            size: 5MB per image)
+            Upload images of tire wear, damage, or other relevant details
           </p>
 
           {/* Image Preview Grid */}
@@ -1003,17 +896,17 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       requesterName: request.requesterName,
       requesterEmail: request.requesterEmail,
       requesterPhone: request.requesterPhone,
-      vehicleType: "", // These fields are not stored in requests, will be populated from vehicle data
-      vehicleDepartment: "",
-      vehicleCostCentre: "",
+      year: request.year,
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
+      userSection: request.userSection,
       lastReplacementDate:
         typeof request.lastReplacementDate === "string"
           ? request.lastReplacementDate
           : request.lastReplacementDate.toISOString(),
       existingTireMake: request.existingTireMake,
       tireSizeRequired: request.tireSizeRequired,
+      costCenter: request.costCenter,
       presentKmReading: request.presentKmReading,
       previousKmReading: request.previousKmReading,
       tireWearPattern: request.tireWearPattern,
@@ -1048,12 +941,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
+
+
   const initialFormData = {
     vehicleNumber: "",
     vehicleId: "",
-    vehicleType: "",
-    vehicleDepartment: "",
-    vehicleCostCentre: "",
+    year: "",
     vehicleBrand: "",
     vehicleModel: "",
     tireSizeRequired: "",
@@ -1063,8 +956,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     requesterName: "",
     requesterEmail: "",
     requesterPhone: "",
+    userSection: "",
     lastReplacementDate: "",
     existingTireMake: "",
+    costCenter: "",
     presentKmReading: "",
     previousKmReading: "",
     tireWearPattern: "",
@@ -1095,21 +990,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     }));
   };
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-  // const handleFileChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   index: number
-  // ) => {
-  //   if (e.target.files && e.target.files[0]) {
-  //     const newImages = [...formData.images];
-  //     newImages[index] = e.target.files[0];
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       images: newImages,
-  //     }));
-  //   }
-  // };
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -1120,7 +1000,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     if (file.size > MAX_FILE_SIZE) {
       setErrors((prev) => ({
         ...prev,
-        images: `File size must be 5MB or less. Selected file: ${(
+        images: `File size must be 2MB or less. Selected file: ${(
           file.size /
          1024 /
 1024
@@ -1145,17 +1025,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       images: newImages,
     }));
   };
+
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setFormData((prev) => ({
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      vehicleType: vehicle.type || "",
-      vehicleDepartment: vehicle.department || "",
-      vehicleCostCentre: vehicle.costCentre || "",
+      year: vehicle.year ? vehicle.year.toString() : "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
-      tireSizeRequired: "", // Tire size is no longer stored in vehicle, user must enter manually
+      tireSizeRequired: vehicle.tireSize || "",
     }));
   };
 
@@ -1196,12 +1075,17 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
           newErrors.vehicleModel = "Vehicle model is required";
-        if (!formData.vehicleType)
-          newErrors.vehicleType = "Vehicle type is required";
-        if (!formData.vehicleDepartment)
-          newErrors.vehicleDepartment = "Department is required";
-        if (!formData.vehicleCostCentre)
-          newErrors.vehicleCostCentre = "Cost centre is required";
+        if (!formData.year) newErrors.year = "Year is required";
+        break;
+      case 2:
+        if (!formData.tireSizeRequired)
+          newErrors.tireSizeRequired = "Tire size is required";
+        if (!formData.quantity || formData.quantity < 1)
+          newErrors.quantity = "Valid quantity is required";
+        if (!formData.existingTireMake)
+          newErrors.existingTireMake = "Existing tire make is required";
+        if (!formData.lastReplacementDate)
+          newErrors.lastReplacementDate = "Last replacement date is required";
         if (!formData.presentKmReading)
           newErrors.presentKmReading = "Current KM reading is required";
         if (!formData.previousKmReading)
@@ -1210,45 +1094,26 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           const current = parseInt(formData.presentKmReading);
           const previous = parseInt(formData.previousKmReading);
           if (current < previous)
-            newErrors.presentKmReading =
-              "Current KM cannot be less than previous KM";
+            newErrors.presentKmReading = "Current KM cannot be less than previous KM";
         }
-        break;
-      case 2:
-        if (!formData.tireSizeRequired)
-          newErrors.tireSizeRequired = "Tire size is required";
-        if (
-          !formData.quantity ||
-          formData.quantity < 1 ||
-          formData.quantity > 15
-        )
-          newErrors.quantity = "Valid quantity is required";
-        const tubesQty = Number(formData.tubesQuantity);
-        if (isNaN(tubesQty) || tubesQty < 0 || tubesQty > 15) {
-          newErrors.tubesQuantity = "Tubes quantity must be between 0 and 15";
-        }
-        if (!formData.existingTireMake)
-          newErrors.existingTireMake = "Existing tire make is required";
-        if (!formData.lastReplacementDate)
-          newErrors.lastReplacementDate = "Last replacement date is required";
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
         break;
       case 3:
         if (!formData.requestReason)
           newErrors.requestReason = "Request reason is required";
+        if (!formData.userSection)
+          newErrors.userSection = "Department/Section is required";
+        if (!formData.costCenter)
+          newErrors.costCenter = "Cost center is required";
         break;
       case 4:
         if (!formData.requesterName)
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
           newErrors.requesterEmail = "Email is required";
-        if (!formData.requesterPhone) {
+        if (!formData.requesterPhone)
           newErrors.requesterPhone = "Phone is required";
-        } else if (!/^0\d{9}$/.test(formData.requesterPhone)) {
-          newErrors.requesterPhone =
-            "Phone number must be 10 digits and start with 0";
-        }
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;
@@ -1298,19 +1163,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       // 2. Prepare data to send to backend
       const submitData = {
         ...formData,
-        userId: parseInt(user.id),
-        vehicleId: parseInt(formData.vehicleId),
-        quantity: parseInt(formData.quantity.toString()),
-        tubesQuantity: parseInt(formData.tubesQuantity.toString()),
-        presentKmReading: parseInt(formData.presentKmReading),
-        previousKmReading: parseInt(formData.previousKmReading),
+        userId: user.id,
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
         images: imageUrls,
-        supervisorId: parseInt(formData.supervisorId),
+        supervisorId: formData.supervisorId, // <-- add this
       };
-
-      console.log("Submitting data:", submitData);
 
       // 3. Send to backend (as JSON)
       const response = await fetch(
@@ -1323,10 +1181,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `HTTP ${response.status}: Failed to submit request`
-        );
+        throw new Error("Failed to submit request");
       }
 
       // Refresh requests to show new request
@@ -1347,13 +1202,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setCurrentStep(1);
       }, 2000);
     } catch (err) {
-      console.error("Request submission error:", err);
       setFormLoading(false);
-      setError(
-        err instanceof Error
-          ? `Error: ${err.message}`
-          : "An error occurred while submitting your request"
-      );
+      setError("An error occurred while submitting your request");
     }
   };
 
@@ -1596,6 +1446,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         isOpen={showDetailsModal}
         onClose={handleCloseModal}
       />
+
+
     </div>
   );
 };

@@ -167,7 +167,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
   const sectionStats = useMemo(() => {
     const sections = requests.reduce((acc: { [key: string]: number }, curr) => {
-      acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
+      // Only include sections that have valid names
+      if (curr.userSection && curr.userSection.trim() !== '') {
+        acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
+      }
       return acc;
     }, {});
 
@@ -384,10 +387,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               Most Active Section
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {sectionStats[0]?.name || "N/A"}
+              {sectionStats.length > 0 && sectionStats[0]?.name ? sectionStats[0].name : "No Data"}
             </p>
             <p className="text-sm text-gray-500">
-              {sectionStats[0]?.value || 0} tires requested
+              {sectionStats.length > 0 ? `${sectionStats[0]?.value || 0} tires requested` : "No requests found"}
             </p>
           </div>
           <div>
@@ -395,10 +398,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               Most Common Tire Size
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {tireSizeStats[0]?.size || "N/A"}
+              {tireSizeStats.length > 0 && tireSizeStats[0]?.size ? tireSizeStats[0].size : "No Data"}
             </p>
             <p className="text-sm text-gray-500">
-              {tireSizeStats[0]?.quantity || 0} units
+              {tireSizeStats.length > 0 ? `${tireSizeStats[0]?.quantity || 0} units` : "No requests found"}
             </p>
           </div>
           <div>
@@ -406,10 +409,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               Average Request Processing
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {(
+              {monthlyStats.length > 0 ? (
                 (stats.approvedRequests + stats.pendingRequests) /
                 Math.max(monthlyStats.length, 1)
-              ).toFixed(1)}
+              ).toFixed(1) : "0.0"}
             </p>
             <p className="text-sm text-gray-500">requests per month</p>
           </div>

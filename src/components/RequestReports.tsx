@@ -379,42 +379,87 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       </div>
 
       {/* Key Insights */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Key Insights</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <h4 className="text-sm font-medium text-gray-500">
-              Most Active Section
-            </h4>
-            <p className="text-xl font-semibold mt-1">
-              {sectionStats.length > 0 && sectionStats[0]?.name ? sectionStats[0].name : "No Data"}
-            </p>
-            <p className="text-sm text-gray-500">
-              {sectionStats.length > 0 ? `${sectionStats[0]?.value || 0} tires requested` : "No requests found"}
-            </p>
+      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-xl shadow-lg border border-gray-100">
+        <div className="flex items-center mb-6">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-gray-500">
-              Most Common Tire Size
-            </h4>
-            <p className="text-xl font-semibold mt-1">
-              {tireSizeStats.length > 0 && tireSizeStats[0]?.size ? tireSizeStats[0].size : "No Data"}
-            </p>
-            <p className="text-sm text-gray-500">
-              {tireSizeStats.length > 0 ? `${tireSizeStats[0]?.quantity || 0} units` : "No requests found"}
-            </p>
+          <h3 className="text-xl font-bold text-gray-800">Key Insights</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Most Active Section */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Most Active Section
+              </h4>
+            </div>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-gray-900">
+                {sectionStats.length > 0 && sectionStats[0]?.name ? sectionStats[0].name : "No Data"}
+              </p>
+              <p className="text-sm text-gray-500 flex items-center">
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                {sectionStats.length > 0 ? `${sectionStats[0]?.value || 0} tires requested` : "No requests found"}
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-gray-500">
-              Average Request Processing
-            </h4>
-            <p className="text-xl font-semibold mt-1">
-              {monthlyStats.length > 0 ? (
-                (stats.approvedRequests + stats.pendingRequests) /
-                Math.max(monthlyStats.length, 1)
-              ).toFixed(1) : "0.0"}
-            </p>
-            <p className="text-sm text-gray-500">requests per month</p>
+
+          {/* Most Common Tire Size */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+                </svg>
+              </div>
+              <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Most Common Tire Size
+              </h4>
+            </div>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-gray-900">
+                {tireSizeStats.length > 0 && tireSizeStats[0]?.size ? tireSizeStats[0].size : "No Data"}
+              </p>
+              <p className="text-sm text-gray-500 flex items-center">
+                <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                {tireSizeStats.length > 0 ? `${tireSizeStats[0]?.quantity || 0} units` : "No requests found"}
+              </p>
+            </div>
+          </div>
+
+          {/* Average Request Processing */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Average Processing
+              </h4>
+            </div>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-gray-900">
+                {monthlyStats.length > 0 ? (
+                  (stats.approvedRequests + stats.pendingRequests) /
+                  Math.max(monthlyStats.length, 1)
+                ).toFixed(1) : "0.0"}
+              </p>
+              <p className="text-sm text-gray-500 flex items-center">
+                <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                requests per month
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -21,7 +21,22 @@ interface RequestReportsProps {
   role: "supervisor" | "technical-manager" | "customer-officer";
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+// Professional color palette for modern dashboard
+const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#84CC16"];
+const CHART_COLORS = {
+  primary: "#3B82F6",
+  success: "#10B981",
+  warning: "#F59E0B",
+  danger: "#EF4444",
+  purple: "#8B5CF6",
+  cyan: "#06B6D4",
+  lime: "#84CC16",
+  gradient: {
+    blue: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    green: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    purple: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+  }
+};
 
 const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const stats = useMemo(() => {
@@ -201,57 +216,326 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   }, [requests]);
 
   return (
-    <div className="space-y-6">
-      {/* Stats Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Total Requests</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.totalRequests}
-            </span>
-            <span className="ml-2 text-sm font-medium text-gray-500">
-              ({stats.yearlyRequests} this year)
-            </span>
-          </div>
-          <div className="mt-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              Active workflow only
-            </span>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 p-6 space-y-8">
+      {/* Professional Dashboard Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="absolute top-0 right-0 transform translate-x-16 -translate-y-8">
+          <div className="w-40 h-40 bg-white opacity-10 rounded-full"></div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Pending Review</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.pendingRequests}
-            </span>
-            <span className="ml-2 text-sm font-medium text-yellow-600">
-              Needs attention
-            </span>
-          </div>
+        <div className="absolute bottom-0 left-0 transform -translate-x-16 translate-y-8">
+          <div className="w-32 h-32 bg-white opacity-10 rounded-full"></div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Approval Rate</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.approvalRate.toFixed(1)}%
-            </span>
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight">
+                  Supervisor Analytics
+                </h1>
+                <p className="text-blue-100 text-lg font-medium">
+                  Professional Dashboard & Insights
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-6">
+              <div className="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                <span className="text-sm font-semibold">🔴 Live Data</span>
+              </div>
+              <div className="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                <span className="text-sm font-semibold">📅 {new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Monthly Average</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.monthlyAverage.toFixed(1)}
-            </span>
-            <span className="ml-2 text-sm">requests/month</span>
+          <div className="hidden lg:block relative z-10">
+            <div className="w-24 h-24 bg-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center">
+              <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Enhanced KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Requests Card */}
+        <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="bg-blue-100 p-3 rounded-xl group-hover:bg-blue-200 transition-colors duration-300">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Requests</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.totalRequests}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                ✨ Active Workflow
+              </span>
+              <span className="text-sm text-gray-600 font-medium">
+                {stats.yearlyRequests} this year
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Review Card */}
+        <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="bg-yellow-100 p-3 rounded-xl group-hover:bg-yellow-200 transition-colors duration-300">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Pending Review</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.pendingRequests}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                ⚡ Needs Attention
+              </span>
+              <span className="text-sm text-gray-600 font-medium">
+                Priority items
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Approval Rate Card */}
+        <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="bg-green-100 p-3 rounded-xl group-hover:bg-green-200 transition-colors duration-300">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Approval Rate</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.approvalRate.toFixed(1)}%</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${Math.min(stats.approvalRate, 100)}%` }}
+                ></div>
+              </div>
+              <span className="text-xs text-gray-600 font-medium">
+                {stats.approvedRequests} of {stats.totalRequests} approved
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Monthly Average Card */}
+        <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-indigo-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="bg-purple-100 p-3 rounded-xl group-hover:bg-purple-200 transition-colors duration-300">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Monthly Average</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.monthlyAverage.toFixed(1)}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                📊 Trend Analysis
+              </span>
+              <span className="text-sm text-gray-600 font-medium">
+                requests/month
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Professional Secondary Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-8">
+            <div className="w-24 h-24 bg-white opacity-20 rounded-full"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <h3 className="text-emerald-100 text-sm font-bold uppercase tracking-wider">Total Tires Managed</h3>
+              <p className="text-4xl font-bold mt-2">{stats.totalTires.toLocaleString()}</p>
+              <p className="text-emerald-100 text-sm mt-2 font-medium">
+                📦 Avg {stats.avgTiresPerRequest ? stats.avgTiresPerRequest.toFixed(1) : '0'} per request
+              </p>
+            </div>
+            <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-8">
+            <div className="w-24 h-24 bg-white opacity-20 rounded-full"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <h3 className="text-blue-100 text-sm font-bold uppercase tracking-wider">Recent Activity</h3>
+              <p className="text-4xl font-bold mt-2">{stats.recentRequests}</p>
+              <p className="text-blue-100 text-sm mt-2 font-medium">
+                📈 Last 30 days
+              </p>
+            </div>
+            <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-8">
+            <div className="w-24 h-24 bg-white opacity-20 rounded-full"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <h3 className="text-purple-100 text-sm font-bold uppercase tracking-wider">Quality Score</h3>
+              <p className="text-4xl font-bold mt-2">{(100 - (stats.rejectionRate || 0)).toFixed(1)}%</p>
+              <p className="text-purple-100 text-sm mt-2 font-medium">
+                ⭐ Excellence rating
+              </p>
+            </div>
+            <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Charts Section */}
+      <div className="space-y-8">
+        {/* Primary Chart - Monthly Trends */}
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-8 py-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">📊 Monthly Request Trends</h3>
+                <p className="text-gray-600 mt-2">Track request volume and approval patterns over the last 6 months</p>
+              </div>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
+                  <span className="text-sm font-semibold text-gray-700">Total Requests</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
+                  <span className="text-sm font-semibold text-gray-700">Approved</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
+                  <span className="text-sm font-semibold text-gray-700">Rejected</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-8">
+            <ResponsiveContainer width="100%" height={450}>
+              <AreaChart data={monthlyStats} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <defs>
+                  <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorRejected" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 500 }}
+                  axisLine={{ stroke: '#E5E7EB' }}
+                  tickLine={{ stroke: '#E5E7EB' }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 500 }}
+                  axisLine={{ stroke: '#E5E7EB' }}
+                  tickLine={{ stroke: '#E5E7EB' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="requests"
+                  stroke="#3B82F6"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorRequests)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="approved"
+                  stroke="#10B981"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorApproved)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="rejected"
+                  stroke="#EF4444"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorRejected)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Secondary Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Monthly Trends */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Monthly Request Trends</h3>

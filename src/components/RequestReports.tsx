@@ -25,6 +25,21 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const stats = useMemo(() => {
+    if (!requests || requests.length === 0) {
+      return {
+        totalRequests: 0,
+        pendingRequests: 0,
+        approvedRequests: 0,
+        rejectedRequests: 0,
+        recentRequests: 0,
+        yearlyRequests: 0,
+        totalTires: 0,
+        approvalRate: 0,
+        rejectionRate: 0,
+        monthlyAverage: 0,
+      };
+    }
+
     const today = new Date();
     const lastMonth = new Date(
       today.getFullYear(),
@@ -33,31 +48,71 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     );
     const thisYear = new Date(today.getFullYear(), 0, 1);
 
-    const totalRequests = requests.length;
+    // For supervisor role, only count requests that are in supervisor's workflow
+    // (pending, supervisor approved, or rejected by supervisor)
+    const supervisorWorkflowRequests = requests.filter((r) => {
+      if (role === "supervisor") {
+        return (
+          r.status === "pending" ||
+          r.status === "supervisor approved" ||
+          (r.status === "rejected" &&
+           r.supervisor_notes &&
+           r.supervisor_notes.trim() !== "")
+        );
+      }
+      return true; // For other roles, count all requests
+    });
+
+    const totalRequests = supervisorWorkflowRequests.length;
+
     const pendingRequests = requests.filter((r) =>
       role === "supervisor"
         ? r.status === "pending"
         : r.status === "supervisor approved"
     ).length;
+
     const approvedRequests = requests.filter((r) =>
       role === "supervisor"
         ? r.status === "supervisor approved"
         : r.status === "technical-manager approved"
     ).length;
-    const recentRequests = requests.filter(
+
+    const rejectedRequests = requests.filter((r) =>
+      r.status === "rejected" &&
+      r.supervisor_notes &&
+      r.supervisor_notes.trim() !== ""
+    ).length;
+
+    const recentRequests = supervisorWorkflowRequests.filter(
       (r) => new Date(r.submittedAt) > lastMonth
     ).length;
-    const yearlyRequests = requests.filter(
+
+    const yearlyRequests = supervisorWorkflowRequests.filter(
       (r) => new Date(r.submittedAt) > thisYear
     ).length;
+
+    // Calculate total tires for supervisor workflow requests only
+    const totalTires = supervisorWorkflowRequests.reduce((sum, r) => sum + (r.quantity || 0), 0);
+
+    // Calculate rates based on supervisor workflow requests
+    const approvalRate = totalRequests > 0 ? (approvedRequests / totalRequests) * 100 : 0;
+    const rejectionRate = totalRequests > 0 ? (rejectedRequests / totalRequests) * 100 : 0;
+
+    // Monthly average calculation
+    const currentMonth = new Date().getMonth() + 1;
+    const monthlyAverage = currentMonth > 0 ? yearlyRequests / currentMonth : 0;
 
     return {
       totalRequests,
       pendingRequests,
       approvedRequests,
+      rejectedRequests,
       recentRequests,
       yearlyRequests,
-      approvalRate: (approvedRequests / totalRequests) * 100 || 0,
+      totalTires,
+      approvalRate,
+      rejectionRate,
+      monthlyAverage,
     };
   }, [requests, role]);
 
@@ -159,6 +214,11 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               ({stats.yearlyRequests} this year)
             </span>
           </div>
+          <div className="mt-2">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              Active workflow only
+            </span>
+          </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-gray-500 text-sm font-medium">Pending Review</h3>
@@ -183,9 +243,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           <h3 className="text-gray-500 text-sm font-medium">Monthly Average</h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-gray-900">
-              {(
-                stats.yearlyRequests / Math.max(new Date().getMonth() + 1, 1)
-              ).toFixed(1)}
+              {stats.monthlyAverage.toFixed(1)}
             </span>
             <span className="ml-2 text-sm">requests/month</span>
           </div>

@@ -60,10 +60,11 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
            r.supervisor_notes.trim() !== "")
         );
       } else if (role === "technical-manager") {
-        // Technical manager sees: supervisor approved, technical-manager approved, or rejected by technical manager
+        // Technical manager sees: supervisor approved, technical-manager approved, complete, or rejected by technical manager
         return (
           r.status === "supervisor approved" ||
           r.status === "technical-manager approved" ||
+          r.status === "complete" ||
           (r.status === "rejected" &&
            r.technical_manager_notes &&
            r.technical_manager_notes.trim() !== "")
@@ -87,9 +88,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       if (role === "supervisor") {
         return r.status === "supervisor approved";
       } else if (role === "technical-manager") {
-        return r.status === "technical-manager approved";
+        // Technical manager approved requests include both "technical-manager approved" and "complete"
+        return r.status === "technical-manager approved" || r.status === "complete";
       }
-      return r.status === "technical-manager approved"; // Default for other roles
+      return r.status === "technical-manager approved" || r.status === "complete"; // Default for other roles
     }).length;
 
     const rejectedRequests = requests.filter((r) => {

@@ -205,8 +205,14 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       d = new Date(d.getFullYear(), d.getMonth() + 1, 1); // create a new Date object for the next month
     }
 
+    // Use role-specific data filtering
+    const dataToUse = role === "customer-officer" ?
+      requests.filter((r) => r.status === "complete" || r.status === "order placed" ||
+        (r.status === "rejected" && r.customer_officer_note && r.customer_officer_note.trim() !== "")) :
+      requests;
+
     // Fill in actual data
-    requests.forEach((request) => {
+    dataToUse.forEach((request) => {
       const date = new Date(request.submittedAt);
       if (date >= sixMonthsAgo) {
         const key = date.toLocaleDateString("en-US", {
@@ -216,13 +222,25 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         if (monthCounts[key]) {
           monthCounts[key].requests++;
           monthCounts[key].totalTires += request.quantity;
-          if (
-            request.status === "supervisor approved" ||
-            request.status === "technical-manager approved"
-          ) {
-            monthCounts[key].approved++;
-          } else if (request.status === "rejected") {
-            monthCounts[key].rejected++;
+
+          // Role-specific approval/rejection logic
+          if (role === "customer-officer") {
+            if (request.status === "order placed") {
+              monthCounts[key].approved++;
+            } else if (request.status === "rejected" && request.customer_officer_note) {
+              monthCounts[key].rejected++;
+            }
+          } else {
+            // Default logic for other roles
+            if (
+              request.status === "supervisor approved" ||
+              request.status === "technical-manager approved" ||
+              request.status === "complete"
+            ) {
+              monthCounts[key].approved++;
+            } else if (request.status === "rejected") {
+              monthCounts[key].rejected++;
+            }
           }
         }
       }
@@ -230,7 +248,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     // Return months in chronological order
     return Object.values(monthCounts);
-  }, [requests]);
+  }, [requests, role]);
 
   const sectionStats = useMemo(() => {
     // Use appropriate data based on role
@@ -253,27 +271,37 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   }, [requests, role]);
 
   const vehicleStats = useMemo(() => {
-    const vehicles = requests.reduce((acc: { [key: string]: number }, curr) => {
+    // Use role-specific data
+    const dataToUse = role === "customer-officer" ?
+      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests;
+
+    const vehicles = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
       acc[curr.vehicleNumber] = (acc[curr.vehicleNumber] || 0) + curr.quantity;
       return acc;
     }, {});
 
     return Object.entries(vehicles)
-      .map(([vehicle, quantity]) => ({ vehicle, quantity }))
+      .map(([vehicle, quantity]) => ({ vehicle, quantity: quantity as number }))
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 10);
-  }, [requests]);
+  }, [requests, role]);
 
   const tireSizeStats = useMemo(() => {
+    // Use role-specific data
+    const dataToUse = role === "customer-officer" ?
+      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests;
+
     return Object.entries(
-      requests.reduce((acc: { [key: string]: number }, curr) => {
+      dataToUse.reduce((acc: { [key: string]: number }, curr) => {
         acc[curr.tireSize] = (acc[curr.tireSize] || 0) + curr.quantity;
         return acc;
       }, {})
     )
-      .map(([size, quantity]) => ({ size, quantity }))
+      .map(([size, quantity]) => ({ size, quantity: quantity as number }))
       .sort((a, b) => b.quantity - a.quantity);
-  }, [requests]);
+  }, [requests, role]);
 
   return (
     <div className="space-y-6">

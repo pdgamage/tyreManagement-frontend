@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
-import { UserCircle, ChevronDown, LogOut } from "lucide-react";
+import RequestReports from "../components/RequestReports";
+import { UserCircle, ChevronDown, LogOut, ClipboardList, BarChart3 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import type { Request } from "../types/request";
@@ -10,6 +11,7 @@ const EngineerDashboard = () => {
   const { requests, fetchRequests } = useRequests();
   const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"requests" | "analytics">("requests");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -44,8 +46,8 @@ const EngineerDashboard = () => {
   const rejectedRequests = requests.filter(
     (req) =>
       req.status === "rejected" &&
-      req.engineer_note &&
-      req.engineer_note.trim() !== "" &&
+      req.engineer_notes &&
+      req.engineer_notes.trim() !== "" &&
       req.engineer_decision_by === user?.id
   );
 
@@ -98,60 +100,91 @@ const EngineerDashboard = () => {
         </div>
       </div>
 
-      {/* Display approval tables */}
-      <div className="space-y-8">
-        {/* Pending Requests Table */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">
-            Pending Engineering Review ({pendingRequests.length})
-          </h2>
-          <RequestTable
-            requests={pendingRequests}
-            title="Pending Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
-        </div>
-
-        {/* Approved Requests Table */}
-        <div>
-          {" "}
-          <h2 className="mb-4 text-xl font-semibold">
-            Completed Requests ({completedRequests.length})
-          </h2>
-          <RequestTable
-            requests={completedRequests}
-            title="Completed Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
-        </div>
-
-        {/* Rejected Requests Table */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">
-            Engineering Rejected Requests ({rejectedRequests.length})
-          </h2>
-          <RequestTable
-            requests={rejectedRequests}
-            title="Rejected Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
-        </div>
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab("requests")}
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "requests"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            <ClipboardList className="inline w-5 h-5 mr-2" />
+            Engineering Requests
+          </button>
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "analytics"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            <BarChart3 className="inline w-5 h-5 mr-2" />
+            Reports & Analytics
+          </button>
+        </nav>
       </div>
+
+      {/* Main Content */}
+      {activeTab === "requests" ? (
+        <div className="space-y-8">
+          {/* Pending Requests Table */}
+          <div>
+            <h2 className="mb-4 text-xl font-semibold">
+              Pending Engineering Review ({pendingRequests.length})
+            </h2>
+            <RequestTable
+              requests={pendingRequests}
+              title="Pending Requests"
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onView={(request) => navigate(`/engineer/request/${request.id}`)}
+              onDelete={() => {}}
+              onPlaceOrder={() => {}}
+              showActions={false}
+            />
+          </div>
+
+          {/* Approved Requests Table */}
+          <div>
+            <h2 className="mb-4 text-xl font-semibold">
+              Completed Requests ({completedRequests.length})
+            </h2>
+            <RequestTable
+              requests={completedRequests}
+              title="Completed Requests"
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onView={(request) => navigate(`/engineer/request/${request.id}`)}
+              onDelete={() => {}}
+              onPlaceOrder={() => {}}
+              showActions={false}
+            />
+          </div>
+
+          {/* Rejected Requests Table */}
+          <div>
+            <h2 className="mb-4 text-xl font-semibold">
+              Engineering Rejected Requests ({rejectedRequests.length})
+            </h2>
+            <RequestTable
+              requests={rejectedRequests}
+              title="Rejected Requests"
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onView={(request) => navigate(`/engineer/request/${request.id}`)}
+              onDelete={() => {}}
+              onPlaceOrder={() => {}}
+              showActions={false}
+            />
+          </div>
+        </div>
+      ) : (
+        <RequestReports requests={requests} role="engineer" />
+      )}
     </div>
   );
 };

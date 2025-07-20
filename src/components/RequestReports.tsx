@@ -18,7 +18,7 @@ import { Request } from "../types/request";
 
 interface RequestReportsProps {
   requests: Request[];
-  role: "supervisor" | "technical-manager" | "customer-officer";
+  role: "supervisor" | "technical-manager" | "customer-officer" | "engineer";
 }
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
@@ -68,6 +68,15 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
            r.technical_manager_notes &&
            r.technical_manager_notes.trim() !== "")
         );
+      } else if (role === "engineer") {
+        // Engineer sees: technical-manager approved (pending work), complete (finished work), and rejected by engineer
+        return (
+          r.status === "technical-manager approved" ||
+          r.status === "complete" ||
+          (r.status === "rejected" &&
+           r.engineer_notes &&
+           r.engineer_notes.trim() !== "")
+        );
       }
       return true; // For other roles, count all requests
     });
@@ -79,6 +88,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         return r.status === "pending";
       } else if (role === "technical-manager") {
         return r.status === "supervisor approved";
+      } else if (role === "engineer") {
+        return r.status === "technical-manager approved"; // Engineer sees technical-manager approved as pending work
       }
       return r.status === "supervisor approved"; // Default for other roles
     }).length;
@@ -87,9 +98,13 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       if (role === "supervisor") {
         return r.status === "supervisor approved";
       } else if (role === "technical-manager") {
-        return r.status === "technical-manager approved";
+        // Technical manager approved requests include both "technical-manager approved" and "complete"
+        return r.status === "technical-manager approved" || r.status === "complete";
+      } else if (role === "engineer") {
+        // Engineer completed requests
+        return r.status === "complete";
       }
-      return r.status === "technical-manager approved"; // Default for other roles
+      return r.status === "technical-manager approved" || r.status === "complete"; // Default for other roles
     }).length;
 
     const rejectedRequests = requests.filter((r) => {
@@ -104,6 +119,12 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           r.status === "rejected" &&
           r.technical_manager_notes &&
           r.technical_manager_notes.trim() !== ""
+        );
+      } else if (role === "engineer") {
+        return (
+          r.status === "rejected" &&
+          r.engineer_notes &&
+          r.engineer_notes.trim() !== ""
         );
       }
       return r.status === "rejected"; // Default for other roles

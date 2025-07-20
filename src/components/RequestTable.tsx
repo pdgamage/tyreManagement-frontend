@@ -9,7 +9,6 @@ import {
   XCircle,
   Eye,
   ShoppingCart,
-  X,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -50,13 +49,6 @@ const getStatusStyles = (status: string) => {
         border: "border-purple-300",
         icon: <ShoppingCart className="w-4 h-4" />,
       };
-    case "cancelled":
-      return {
-        bg: "bg-orange-50",
-        text: "text-orange-700",
-        border: "border-orange-300",
-        icon: <X className="w-4 h-4" />,
-      };
     default:
       return {
         bg: "bg-gray-50",
@@ -75,10 +67,8 @@ interface RequestTableProps {
   onView: (request: Request) => void;
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
-  onCancelOrder?: (request: Request) => void;
   showActions?: boolean;
   showPlaceOrderButton?: boolean; // New prop to control place order button visibility
-  showCancelOrderButton?: boolean; // New prop to control cancel order button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -89,10 +79,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onView,
   onDelete,
   onPlaceOrder,
-  onCancelOrder,
   showActions = true,
   showPlaceOrderButton = false, // Default to false for security
-  showCancelOrderButton = false, // Default to false for security
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -253,21 +241,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           title="Place Order"
                         >
                           <ShoppingCart className="w-5 h-5" />
-                        </button>
-                      )}
-                    {showCancelOrderButton &&
-                      request.status?.toLowerCase().trim() === "order placed" &&
-                      onCancelOrder && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onCancelOrder(request);
-                          }}
-                          className="px-4 text-gray-500 hover:text-orange-700"
-                          aria-label="Cancel Order"
-                          title="Cancel Order"
-                        >
-                          <X className="w-5 h-5" />
                         </button>
                       )}
                     <button

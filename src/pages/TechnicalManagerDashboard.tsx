@@ -189,7 +189,6 @@ const TechnicalManagerDashboard = () => {
               }
               onPlaceOrder={() => {}}
               showActions={false}
-              showCancelOrderButton={false}
             />
 
             {/* Rejected Requests */}
@@ -204,7 +203,6 @@ const TechnicalManagerDashboard = () => {
               onDelete={() => {}}
               onPlaceOrder={() => {}}
               showActions={false}
-              showCancelOrderButton={false}
             />
           </div>
         ) : (

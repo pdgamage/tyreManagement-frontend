@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useVehicles } from "../contexts/VehicleContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
@@ -772,7 +772,6 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
             {formData.images.map((_, index) => (
               <div key={index} className="relative">
                 <input
-                  ref={(el) => (fileInputRefs.current[index] = el)}
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, index)}
@@ -1037,9 +1036,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Create refs for file inputs to reset them when images are removed
-  const fileInputRefs = useRef<(HTMLInputElement | null)[]>(Array(7).fill(null));
-
   // Helper function to format file size
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -1095,11 +1091,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           [`image_${index}`]: `Image size must be less than 5MB. Current size: ${formatFileSize(file.size)}`
         }));
 
-        // Clear the file input to reset the "Choose File" text
+        // Clear the file input
         e.target.value = '';
-        if (fileInputRefs.current[index]) {
-          fileInputRefs.current[index]!.value = '';
-        }
         return;
       }
 
@@ -1133,11 +1126,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const removeImage = (index: number) => {
     const newImages = [...formData.images];
     newImages[index] = null;
-
-    // Clear the file input to reset the "Choose File" text
-    if (fileInputRefs.current[index]) {
-      fileInputRefs.current[index]!.value = '';
-    }
 
     // Clear any error for this image
     setErrors((prev) => {
@@ -1232,6 +1220,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 3:
         if (!formData.requestReason)
           newErrors.requestReason = "Request reason is required";
+        break;
+      case 4:
         if (!formData.requesterName)
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
@@ -1252,8 +1242,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           }
           // Note: Leading zeros are automatically removed
         }
-        break;
-      case 4:
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;

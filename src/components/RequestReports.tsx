@@ -77,6 +77,15 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
            r.engineer_note &&
            r.engineer_note.trim() !== "")
         );
+      } else if (role === "customer-officer") {
+        // Customer officer sees: complete (ready for orders), order placed, and rejected by customer officer
+        return (
+          r.status === "complete" ||
+          r.status === "order placed" ||
+          (r.status === "rejected" &&
+           r.customer_officer_note &&
+           r.customer_officer_note.trim() !== "")
+        );
       }
       return true; // For other roles, count all requests
     });
@@ -90,6 +99,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         return r.status === "supervisor approved";
       } else if (role === "engineer") {
         return r.status === "technical-manager approved"; // Engineer sees technical-manager approved as pending work
+      } else if (role === "customer-officer") {
+        return r.status === "complete"; // Customer officer sees complete requests as pending orders
       }
       return r.status === "supervisor approved"; // Default for other roles
     }).length;
@@ -103,6 +114,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       } else if (role === "engineer") {
         // Engineer completed requests
         return r.status === "complete";
+      } else if (role === "customer-officer") {
+        // Customer officer placed orders
+        return r.status === "order placed";
       }
       return r.status === "technical-manager approved" || r.status === "complete"; // Default for other roles
     }).length;
@@ -125,6 +139,12 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           r.status === "rejected" &&
           r.engineer_note &&
           r.engineer_note.trim() !== ""
+        );
+      } else if (role === "customer-officer") {
+        return (
+          r.status === "rejected" &&
+          r.customer_officer_note &&
+          r.customer_officer_note.trim() !== ""
         );
       }
       return r.status === "rejected"; // Default for other roles
@@ -255,7 +275,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       {/* Stats Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Total Requests</h3>
+          <h3 className="text-gray-500 text-sm font-medium">
+            {role === "customer-officer" ? "Total Orders" : "Total Requests"}
+          </h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-gray-900">
               {stats.totalRequests}
@@ -266,50 +288,56 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           </div>
           <div className="mt-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              Active workflow only
+              {role === "customer-officer" ? "Order workflow" : "Active workflow only"}
             </span>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Pending Review</h3>
+          <h3 className="text-gray-500 text-sm font-medium">
+            {role === "customer-officer" ? "Pending Orders" : "Pending Review"}
+          </h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-gray-900">
               {stats.pendingRequests}
             </span>
             <span className="ml-2 text-sm font-medium text-yellow-600">
-              Needs attention
+              {role === "customer-officer" ? "Ready to order" : "Needs attention"}
             </span>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Approved Requests</h3>
+          <h3 className="text-gray-500 text-sm font-medium">
+            {role === "customer-officer" ? "Orders Placed" : "Approved Requests"}
+          </h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-green-600">
               {stats.approvedRequests}
             </span>
             <span className="ml-2 text-sm font-medium text-green-500">
-              {stats.approvalRate.toFixed(1)}% approval rate
+              {stats.approvalRate.toFixed(1)}% {role === "customer-officer" ? "order rate" : "approval rate"}
             </span>
           </div>
           <div className="mt-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              Successfully processed
+              {role === "customer-officer" ? "Orders completed" : "Successfully processed"}
             </span>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Rejected Requests</h3>
+          <h3 className="text-gray-500 text-sm font-medium">
+            {role === "customer-officer" ? "Cancelled Orders" : "Rejected Requests"}
+          </h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-red-600">
               {stats.rejectedRequests}
             </span>
             <span className="ml-2 text-sm font-medium text-red-500">
-              {stats.rejectionRate.toFixed(1)}% rejection rate
+              {stats.rejectionRate.toFixed(1)}% {role === "customer-officer" ? "cancellation rate" : "rejection rate"}
             </span>
           </div>
           <div className="mt-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-              Declined requests
+              {role === "customer-officer" ? "Cancelled orders" : "Declined requests"}
             </span>
           </div>
         </div>

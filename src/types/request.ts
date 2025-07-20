@@ -42,10 +42,12 @@ export interface Request {
   tireWearIndicatorAppeared?: boolean;
   technical_manager_note?: string;
   engineer_note?: string;
+  customer_officer_note?: string;
   supervisorId: string;
   technical_manager_id?: string;
   supervisor_decision_by?: string;
   engineer_decision_by?: string;
+  customer_officer_decision_by?: string;
   order_placed?: boolean;
   order_timestamp?: Date | string;
 }

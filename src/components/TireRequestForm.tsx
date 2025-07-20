@@ -425,18 +425,39 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
         >
           Last Replacement Date *
         </label>
-        <input
-          type="date"
-          id="lastReplacementDate"
-          name="lastReplacementDate"
-          value={formData.lastReplacementDate}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
-          required
-          readOnly
-          onKeyDown={(e) => e.preventDefault()}
-        />
+        <div className="relative">
+          <input
+            type="date"
+            id="lastReplacementDate"
+            name="lastReplacementDate"
+            value={formData.lastReplacementDate}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded"
+            max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
+            required
+            readOnly
+            style={{
+              caretColor: 'transparent',
+              pointerEvents: 'none'
+            }}
+          />
+          <div
+            className="absolute inset-0 cursor-pointer"
+            onClick={() => {
+              const input = document.getElementById('lastReplacementDate') as HTMLInputElement;
+              if (input) {
+                input.style.pointerEvents = 'auto';
+                input.focus();
+                if (input.showPicker) {
+                  input.showPicker();
+                }
+                setTimeout(() => {
+                  input.style.pointerEvents = 'none';
+                }, 100);
+              }
+            }}
+          />
+        </div>
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">
             {errors.lastReplacementDate}
@@ -1074,6 +1095,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       [name]: value,
     }));
   };
+
+
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,

@@ -24,6 +24,30 @@ interface RequestReportsProps {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
+  // Early return if no requests
+  if (!requests || requests.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-gray-600 mb-2">No Data Available</h3>
+          <p className="text-gray-500">No tire requests found to generate reports.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Data validation and cleaning utility
+  const cleanRequestData = (requests: Request[]) => {
+    return requests.map(request => ({
+      ...request,
+      userSection: request.userSection || "Unknown Department",
+      tireSize: request.tireSize || "Unknown Size",
+      vehicleNumber: request.vehicleNumber || "Unknown Vehicle",
+      quantity: request.quantity || 0
+    }));
+  };
+
+  const cleanedRequests = cleanRequestData(requests);
   const stats = useMemo(() => {
     const today = new Date();
     const lastMonth = new Date(
@@ -33,21 +57,21 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     );
     const thisYear = new Date(today.getFullYear(), 0, 1);
 
-    const totalRequests = requests.length;
-    const pendingRequests = requests.filter((r) =>
+    const totalRequests = cleanedRequests.length;
+    const pendingRequests = cleanedRequests.filter((r) =>
       role === "supervisor"
         ? r.status === "pending"
         : r.status === "supervisor approved"
     ).length;
-    const approvedRequests = requests.filter((r) =>
+    const approvedRequests = cleanedRequests.filter((r) =>
       role === "supervisor"
         ? r.status === "supervisor approved"
         : r.status === "technical-manager approved"
     ).length;
-    const recentRequests = requests.filter(
+    const recentRequests = cleanedRequests.filter(
       (r) => new Date(r.submittedAt) > lastMonth
     ).length;
-    const yearlyRequests = requests.filter(
+    const yearlyRequests = cleanedRequests.filter(
       (r) => new Date(r.submittedAt) > thisYear
     ).length;
 
@@ -59,7 +83,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       yearlyRequests,
       approvalRate: (approvedRequests / totalRequests) * 100 || 0,
     };
-  }, [requests, role]);
+  }, [cleanedRequests, role]);
 
   const monthlyStats = useMemo(() => {
     const monthCounts: { [key: string]: any } = {};
@@ -84,7 +108,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     }
 
     // Fill in actual data
-    requests.forEach((request) => {
+    cleanedRequests.forEach((request) => {
       const date = new Date(request.submittedAt);
       if (date >= sixMonthsAgo) {
         const key = date.toLocaleDateString("en-US", {
@@ -108,42 +132,45 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     // Return months in chronological order
     return Object.values(monthCounts);
-  }, [requests]);
+  }, [cleanedRequests]);
 
   const sectionStats = useMemo(() => {
-    const sections = requests.reduce((acc: { [key: string]: number }, curr) => {
+    const sections = cleanedRequests.reduce((acc: { [key: string]: number }, curr) => {
       acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
       return acc;
     }, {});
 
     return Object.entries(sections)
       .map(([name, value]) => ({ name, value }))
+      .filter(([name]) => name && name.trim() !== "" && name !== "Unknown Department") // Filter out unknown departments
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
-  }, [requests]);
+  }, [cleanedRequests]);
 
   const vehicleStats = useMemo(() => {
-    const vehicles = requests.reduce((acc: { [key: string]: number }, curr) => {
+    const vehicles = cleanedRequests.reduce((acc: { [key: string]: number }, curr) => {
       acc[curr.vehicleNumber] = (acc[curr.vehicleNumber] || 0) + curr.quantity;
       return acc;
     }, {});
 
     return Object.entries(vehicles)
       .map(([vehicle, quantity]) => ({ vehicle, quantity }))
+      .filter(([vehicle]) => vehicle && vehicle.trim() !== "" && vehicle !== "Unknown Vehicle") // Filter out unknown vehicles
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 10);
-  }, [requests]);
+  }, [cleanedRequests]);
 
   const tireSizeStats = useMemo(() => {
     return Object.entries(
-      requests.reduce((acc: { [key: string]: number }, curr) => {
+      cleanedRequests.reduce((acc: { [key: string]: number }, curr) => {
         acc[curr.tireSize] = (acc[curr.tireSize] || 0) + curr.quantity;
         return acc;
       }, {})
     )
       .map(([size, quantity]) => ({ size, quantity }))
+      .filter(([size]) => size && size.trim() !== "" && size !== "Unknown Size") // Filter out unknown sizes
       .sort((a, b) => b.quantity - a.quantity);
-  }, [requests]);
+  }, [cleanedRequests]);
 
   return (
     <div className="space-y-6">
@@ -227,31 +254,37 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           <h3 className="text-lg font-semibold mb-4">
             Top Sections by Tire Requests
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={sectionStats}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) =>
-                  `${name} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {sectionStats.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          {sectionStats.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={sectionStats}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name || 'Unknown'} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {sectionStats.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <p>No section data available</p>
+            </div>
+          )}
         </div>
 
         {/* Vehicle Analysis */}
@@ -274,31 +307,37 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         {/* Tire Size Distribution */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Tire Size Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={tireSizeStats}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ size, percent }) =>
-                  `${size} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="quantity"
-              >
-                {tireSizeStats.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          {tireSizeStats.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={tireSizeStats}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ size, percent }) =>
+                    `${size || 'Unknown'} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="quantity"
+                >
+                  {tireSizeStats.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <p>No tire size data available</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -311,7 +350,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               Most Active Section
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {sectionStats[0]?.name || "N/A"}
+              {sectionStats.length > 0 && sectionStats[0]?.name !== "Unknown Department"
+                ? sectionStats[0].name
+                : "No Data"}
             </p>
             <p className="text-sm text-gray-500">
               {sectionStats[0]?.value || 0} tires requested
@@ -322,7 +363,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               Most Common Tire Size
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {tireSizeStats[0]?.size || "N/A"}
+              {tireSizeStats.length > 0 && tireSizeStats[0]?.size !== "Unknown Size"
+                ? tireSizeStats[0].size
+                : "No Data"}
             </p>
             <p className="text-sm text-gray-500">
               {tireSizeStats[0]?.quantity || 0} units

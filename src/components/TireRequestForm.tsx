@@ -775,13 +775,18 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, index)}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className={`w-full p-2 border rounded ${
+                    errors[`image_${index}`] ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors[`image_${index}`] && (
+                  <p className="mt-1 text-xs text-red-600">{errors[`image_${index}`]}</p>
+                )}
               </div>
             ))}
           </div>
           <p className="mt-1 mb-4 text-sm text-gray-500">
-            Upload images of tire wear, damage, or other relevant details
+            Upload images of tire wear, damage, or other relevant details (Max size: 5MB per image)
           </p>
 
           {/* Image Preview Grid */}
@@ -1031,6 +1036,15 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Helper function to format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -1066,11 +1080,41 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     const newImages = [...formData.images];
 
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const maxSizeInBytes = 5 * 1024 * 1024; // 5MB in bytes
+
+      // Check file size
+      if (file.size > maxSizeInBytes) {
+        // Show error message
+        setErrors((prev) => ({
+          ...prev,
+          [`image_${index}`]: `Image size must be less than 5MB. Current size: ${formatFileSize(file.size)}`
+        }));
+
+        // Clear the file input
+        e.target.value = '';
+        return;
+      }
+
+      // Clear any previous error for this image
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
+
       // Adding a new image
-      newImages[index] = e.target.files[0];
+      newImages[index] = file;
     } else {
       // Removing an image (when files is null or empty)
       newImages[index] = null;
+
+      // Clear any error for this image
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
     }
 
     setFormData((prev) => ({
@@ -1082,6 +1126,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const removeImage = (index: number) => {
     const newImages = [...formData.images];
     newImages[index] = null;
+
+    // Clear any error for this image
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[`image_${index}`];
+      return newErrors;
+    });
+
     setFormData((prev) => ({
       ...prev,
       images: newImages,
@@ -1223,6 +1275,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setCurrentStep(step);
         return;
       }
+    }
+
+    // Check for image size errors
+    const imageErrors = Object.keys(errors).filter(key => key.startsWith('image_'));
+    if (imageErrors.length > 0) {
+      setError("Please fix image size errors before submitting.");
+      setCurrentStep(4); // Go to the step with image uploads
+      return;
     }
 
     setFormLoading(true);

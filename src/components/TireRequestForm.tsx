@@ -434,6 +434,8 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
           className="w-full p-3 border border-gray-300 rounded"
           max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
           required
+          readOnly
+          onKeyDown={(e) => e.preventDefault()}
         />
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">

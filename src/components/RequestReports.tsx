@@ -203,49 +203,37 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   return (
     <div className="space-y-6">
       {/* Stats Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Total Requests</h3>
+          <h3 className="text-gray-500 text-sm font-medium">Approved Requests</h3>
           <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.totalRequests}
+            <span className="text-3xl font-bold text-green-600">
+              {stats.approvedRequests}
             </span>
-            <span className="ml-2 text-sm font-medium text-gray-500">
-              ({stats.yearlyRequests} this year)
+            <span className="ml-2 text-sm font-medium text-green-500">
+              {stats.approvalRate.toFixed(1)}% approval rate
             </span>
           </div>
           <div className="mt-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              Active workflow only
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Successfully processed
             </span>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Pending Review</h3>
+          <h3 className="text-gray-500 text-sm font-medium">Rejected Requests</h3>
           <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.pendingRequests}
+            <span className="text-3xl font-bold text-red-600">
+              {stats.rejectedRequests}
             </span>
-            <span className="ml-2 text-sm font-medium text-yellow-600">
-              Needs attention
+            <span className="ml-2 text-sm font-medium text-red-500">
+              {stats.rejectionRate.toFixed(1)}% rejection rate
             </span>
           </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Approval Rate</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.approvalRate.toFixed(1)}%
+          <div className="mt-2">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Declined requests
             </span>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-gray-500 text-sm font-medium">Monthly Average</h3>
-          <div className="mt-2 flex items-center">
-            <span className="text-3xl font-bold text-gray-900">
-              {stats.monthlyAverage.toFixed(1)}
-            </span>
-            <span className="ml-2 text-sm">requests/month</span>
           </div>
         </div>
       </div>

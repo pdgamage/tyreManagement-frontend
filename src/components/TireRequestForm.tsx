@@ -1180,6 +1180,58 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         v.vehicleNumber.trim().toLowerCase() === number.trim().toLowerCase()
     );
 
+  // Check for duplicate/recent requests for the same vehicle
+  const checkVehicleRequestRestrictions = (vehicleNumber: string) => {
+    if (!vehicleNumber || !requests) return null;
+
+    const vehicleRequests = requests.filter(
+      (req) => req.vehicleNumber.trim().toLowerCase() === vehicleNumber.trim().toLowerCase()
+    );
+
+    // Check for pending requests
+    const pendingRequests = vehicleRequests.filter(
+      (req) => !['rejected', 'complete', 'order placed'].includes(req.status)
+    );
+
+    if (pendingRequests.length > 0) {
+      const latestPending = pendingRequests[0];
+      return {
+        type: 'pending',
+        message: `Vehicle ${vehicleNumber} already has a pending tire request (Status: ${latestPending.status.replace(/_/g, ' ')}). Please wait for the current request to be processed.`,
+        requestId: latestPending.id,
+        status: latestPending.status
+      };
+    }
+
+    // Check for recent completed requests (within 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentCompletedRequests = vehicleRequests.filter(
+      (req) => {
+        const isCompleted = ['complete', 'order placed'].includes(req.status);
+        const requestDate = new Date(req.submittedAt);
+        return isCompleted && requestDate >= thirtyDaysAgo;
+      }
+    );
+
+    if (recentCompletedRequests.length > 0) {
+      const latestCompleted = recentCompletedRequests[0];
+      const requestDate = new Date(latestCompleted.submittedAt);
+      const daysSince = Math.ceil((new Date().getTime() - requestDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysRemaining = 30 - daysSince;
+
+      return {
+        type: 'recent',
+        message: `Vehicle ${vehicleNumber} had a tire request completed ${daysSince} days ago. Please wait ${daysRemaining} more days before submitting a new request.`,
+        lastRequestDate: latestCompleted.submittedAt,
+        daysRemaining: daysRemaining
+      };
+    }
+
+    return null;
+  };
+
   // Real-time validation for vehicle number
   useEffect(() => {
     if (formData.vehicleNumber) {
@@ -1189,24 +1241,40 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           vehicleNumber: "Vehicle not registered",
         }));
       } else {
-        setErrors((prev) => {
-          const { vehicleNumber, ...rest } = prev;
-          return rest;
-        });
+        // Check for duplicate/recent requests
+        const restriction = checkVehicleRequestRestrictions(formData.vehicleNumber);
+        if (restriction) {
+          setErrors((prev) => ({
+            ...prev,
+            vehicleNumber: restriction.message,
+          }));
+        } else {
+          setErrors((prev) => {
+            const { vehicleNumber, ...rest } = prev;
+            return rest;
+          });
+        }
       }
     }
     // eslint-disable-next-line
-  }, [formData.vehicleNumber, vehicles]);
+  }, [formData.vehicleNumber, vehicles, requests]);
 
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
 
     switch (step) {
       case 1:
-        if (!formData.vehicleNumber)
+        if (!formData.vehicleNumber) {
           newErrors.vehicleNumber = "Vehicle number is required";
-        else if (!vehicleNumberExists(formData.vehicleNumber))
+        } else if (!vehicleNumberExists(formData.vehicleNumber)) {
           newErrors.vehicleNumber = "Vehicle not registered";
+        } else {
+          // Check for duplicate/recent requests
+          const restriction = checkVehicleRequestRestrictions(formData.vehicleNumber);
+          if (restriction) {
+            newErrors.vehicleNumber = restriction.message;
+          }
+        }
         if (!formData.vehicleBrand)
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)

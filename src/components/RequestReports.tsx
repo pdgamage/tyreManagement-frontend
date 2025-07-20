@@ -13,28 +13,8 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-  LineChart,
-  Line,
 } from "recharts";
 import { Request } from "../types/request";
-import {
-  FileText,
-  Clock,
-  CheckCircle,
-  BarChart3,
-  Truck,
-  Building,
-  Settings,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Eye,
-  Calendar,
-  Users,
-  Target,
-  Activity,
-  Zap,
-} from "lucide-react";
 
 interface RequestReportsProps {
   requests: Request[];

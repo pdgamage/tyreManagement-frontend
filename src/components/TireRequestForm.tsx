@@ -59,6 +59,7 @@ interface StepProps {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => void;
+  removeImage?: (index: number) => void;
   errors: Record<string, string>;
 }
 
@@ -737,16 +738,11 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
   formData,
   handleChange,
   handleFileChange,
+  removeImage,
   errors,
   supervisors,
   supervisorsLoading,
 }) => {
-  const removeImage = (index: number) => {
-    const e = {
-      target: { files: null },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    handleFileChange(e, index);
-  };
 
   return (
     <div className="space-y-4">
@@ -801,7 +797,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() => removeImage && removeImage(index)}
                       className="absolute p-1 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
                     >
                       <svg
@@ -1067,14 +1063,29 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
+    const newImages = [...formData.images];
+
     if (e.target.files && e.target.files[0]) {
-      const newImages = [...formData.images];
+      // Adding a new image
       newImages[index] = e.target.files[0];
-      setFormData((prev) => ({
-        ...prev,
-        images: newImages,
-      }));
+    } else {
+      // Removing an image (when files is null or empty)
+      newImages[index] = null;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages[index] = null;
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
   };
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
@@ -1412,6 +1423,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               formData={formData}
               handleChange={handleChange}
               handleFileChange={handleFileChange}
+              removeImage={removeImage}
               errors={errors}
               supervisors={supervisors}
               supervisorsLoading={supervisorsLoading}

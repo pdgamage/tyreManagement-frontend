@@ -1,9 +1,12 @@
 import React, { useMemo } from "react";
 import {
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   PieChart,
   Pie,
   Cell,
@@ -18,14 +21,7 @@ interface RequestReportsProps {
   role: "supervisor" | "technical-manager" | "customer-officer";
 }
 
-// Professional color palette
-const COLORS = [
-  "#3B82F6", // Blue
-  "#10B981", // Emerald
-  "#F59E0B", // Amber
-  "#EF4444", // Red
-  "#8B5CF6", // Violet
-];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const stats = useMemo(() => {
@@ -36,7 +32,6 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       today.getDate()
     );
     const thisYear = new Date(today.getFullYear(), 0, 1);
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     const totalRequests = requests.length;
     const pendingRequests = requests.filter((r) =>
@@ -49,30 +44,20 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         ? r.status === "supervisor approved"
         : r.status === "technical-manager approved"
     ).length;
-    const rejectedRequests = requests.filter((r) => r.status === "rejected").length;
     const recentRequests = requests.filter(
       (r) => new Date(r.submittedAt) > lastMonth
-    ).length;
-    const weeklyRequests = requests.filter(
-      (r) => new Date(r.submittedAt) > lastWeek
     ).length;
     const yearlyRequests = requests.filter(
       (r) => new Date(r.submittedAt) > thisYear
     ).length;
-    const totalTires = requests.reduce((sum, r) => sum + r.quantity, 0);
 
     return {
       totalRequests,
       pendingRequests,
       approvedRequests,
-      rejectedRequests,
       recentRequests,
-      weeklyRequests,
       yearlyRequests,
-      totalTires,
-      approvalRate: totalRequests > 0 ? (approvedRequests / totalRequests) * 100 : 0,
-      rejectionRate: totalRequests > 0 ? (rejectedRequests / totalRequests) * 100 : 0,
-      avgTiresPerRequest: totalRequests > 0 ? totalTires / totalRequests : 0,
+      approvalRate: (approvedRequests / totalRequests) * 100 || 0,
     };
   }, [requests, role]);
 
@@ -127,9 +112,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
   const sectionStats = useMemo(() => {
     const sections = requests.reduce((acc: { [key: string]: number }, curr) => {
-      // Handle null/undefined userSection
-      const section = curr.userSection || 'Unknown Section';
-      acc[section] = (acc[section] || 0) + curr.quantity;
+      acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
       return acc;
     }, {});
 
@@ -139,89 +122,124 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       .slice(0, 5);
   }, [requests]);
 
+  const vehicleStats = useMemo(() => {
+    const vehicles = requests.reduce((acc: { [key: string]: number }, curr) => {
+      acc[curr.vehicleNumber] = (acc[curr.vehicleNumber] || 0) + curr.quantity;
+      return acc;
+    }, {});
 
+    return Object.entries(vehicles)
+      .map(([vehicle, quantity]) => ({ vehicle, quantity }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 10);
+  }, [requests]);
+
+  const tireSizeStats = useMemo(() => {
+    return Object.entries(
+      requests.reduce((acc: { [key: string]: number }, curr) => {
+        acc[curr.tireSize] = (acc[curr.tireSize] || 0) + curr.quantity;
+        return acc;
+      }, {})
+    )
+      .map(([size, quantity]) => ({ size, quantity }))
+      .sort((a, b) => b.quantity - a.quantity);
+  }, [requests]);
 
   return (
     <div className="space-y-6">
-      {/* Compact Header */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {role === "supervisor" ? "Supervisor" : role === "technical-manager" ? "Technical Manager" : "Customer Officer"} Analytics
-        </h2>
+      {/* Stats Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-gray-500 text-sm font-medium">Total Requests</h3>
+          <div className="mt-2 flex items-center">
+            <span className="text-3xl font-bold text-gray-900">
+              {stats.totalRequests}
+            </span>
+            <span className="ml-2 text-sm font-medium text-gray-500">
+              ({stats.yearlyRequests} this year)
+            </span>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-gray-500 text-sm font-medium">Pending Review</h3>
+          <div className="mt-2 flex items-center">
+            <span className="text-3xl font-bold text-gray-900">
+              {stats.pendingRequests}
+            </span>
+            <span className="ml-2 text-sm font-medium text-yellow-600">
+              Needs attention
+            </span>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-gray-500 text-sm font-medium">Approval Rate</h3>
+          <div className="mt-2 flex items-center">
+            <span className="text-3xl font-bold text-gray-900">
+              {stats.approvalRate.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-gray-500 text-sm font-medium">Monthly Average</h3>
+          <div className="mt-2 flex items-center">
+            <span className="text-3xl font-bold text-gray-900">
+              {(
+                stats.yearlyRequests / Math.max(new Date().getMonth() + 1, 1)
+              ).toFixed(1)}
+            </span>
+            <span className="ml-2 text-sm">requests/month</span>
+          </div>
+        </div>
       </div>
 
-      {/* Compact KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Requests */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-gray-500 text-xs font-medium uppercase">Total Requests</h3>
-          <div className="mt-1">
-            <span className="text-2xl font-bold text-blue-600">{stats.totalRequests}</span>
-          </div>
-        </div>
-
-        {/* Approved */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-gray-500 text-xs font-medium uppercase">Approved</h3>
-          <div className="mt-1">
-            <span className="text-2xl font-bold text-green-600">{stats.approvedRequests}</span>
-          </div>
-        </div>
-
-        {/* Pending */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-gray-500 text-xs font-medium uppercase">Pending</h3>
-          <div className="mt-1">
-            <span className="text-2xl font-bold text-amber-600">{stats.pendingRequests}</span>
-          </div>
-        </div>
-
-        {/* Total Tires */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-gray-500 text-xs font-medium uppercase">Total Tires</h3>
-          <div className="mt-1">
-            <span className="text-2xl font-bold text-purple-600">{stats.totalTires}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Simplified Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Trends */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Monthly Trends</h4>
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">Monthly Request Trends</h3>
+          <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={monthlyStats}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} />
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
               <Tooltip />
+              <Legend />
               <Area
                 type="monotone"
                 dataKey="requests"
-                stroke="#3B82F6"
-                fill="#3B82F6"
-                fillOpacity={0.3}
+                stackId="1"
+                stroke="#8884d8"
+                fill="#8884d8"
+              />
+              <Area
+                type="monotone"
+                dataKey="approved"
+                stackId="2"
+                stroke="#82ca9d"
+                fill="#82ca9d"
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Section Distribution */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Top Sections</h4>
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            Top Sections by Tire Requests
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={sectionStats}
                 cx="50%"
                 cy="50%"
-                outerRadius={60}
-                fill="#8884d8"
-                dataKey="value"
+                labelLine={false}
                 label={({ name, percent }) =>
                   `${name} (${(percent * 100).toFixed(0)}%)`
                 }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
               >
                 {sectionStats.map((_, index) => (
                   <Cell
@@ -231,22 +249,96 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                 ))}
               </Pie>
               <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Vehicle Analysis */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            Top 10 Vehicles by Tire Requests
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={vehicleStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="vehicle" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="quantity" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Tire Size Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">Tire Size Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={tireSizeStats}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ size, percent }) =>
+                  `${size} (${(percent * 100).toFixed(0)}%)`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="quantity"
+              >
+                {tireSizeStats.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Simple Summary */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <h4 className="text-sm font-medium text-gray-900 mb-3">Quick Summary</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+      {/* Key Insights */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-semibold mb-4">Key Insights</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <span className="text-gray-500">Most Active Section:</span>
-            <p className="font-medium">{sectionStats[0]?.name || "No data"}</p>
+            <h4 className="text-sm font-medium text-gray-500">
+              Most Active Section
+            </h4>
+            <p className="text-xl font-semibold mt-1">
+              {sectionStats[0]?.name || "N/A"}
+            </p>
+            <p className="text-sm text-gray-500">
+              {sectionStats[0]?.value || 0} tires requested
+            </p>
           </div>
           <div>
-            <span className="text-gray-500">Approval Rate:</span>
-            <p className="font-medium">{stats.approvalRate.toFixed(1)}%</p>
+            <h4 className="text-sm font-medium text-gray-500">
+              Most Common Tire Size
+            </h4>
+            <p className="text-xl font-semibold mt-1">
+              {tireSizeStats[0]?.size || "N/A"}
+            </p>
+            <p className="text-sm text-gray-500">
+              {tireSizeStats[0]?.quantity || 0} units
+            </p>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-500">
+              Average Request Processing
+            </h4>
+            <p className="text-xl font-semibold mt-1">
+              {(
+                (stats.approvedRequests + stats.pendingRequests) /
+                Math.max(monthlyStats.length, 1)
+              ).toFixed(1)}
+            </p>
+            <p className="text-sm text-gray-500">requests per month</p>
           </div>
         </div>
       </div>

@@ -48,10 +48,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     );
     const thisYear = new Date(today.getFullYear(), 0, 1);
 
-    // For supervisor role, only count requests that are in supervisor's workflow
-    // (pending, supervisor approved, or rejected by supervisor)
-    const supervisorWorkflowRequests = requests.filter((r) => {
+    // Filter requests based on role workflow
+    const workflowRequests = requests.filter((r) => {
       if (role === "supervisor") {
+        // Supervisor sees: pending, supervisor approved, or rejected by supervisor
         return (
           r.status === "pending" ||
           r.status === "supervisor approved" ||
@@ -59,42 +59,68 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
            r.supervisor_notes &&
            r.supervisor_notes.trim() !== "")
         );
+      } else if (role === "technical-manager") {
+        // Technical manager sees: supervisor approved, technical-manager approved, or rejected by technical manager
+        return (
+          r.status === "supervisor approved" ||
+          r.status === "technical-manager approved" ||
+          (r.status === "rejected" &&
+           r.technical_manager_notes &&
+           r.technical_manager_notes.trim() !== "")
+        );
       }
       return true; // For other roles, count all requests
     });
 
-    const totalRequests = supervisorWorkflowRequests.length;
+    const totalRequests = workflowRequests.length;
 
-    const pendingRequests = requests.filter((r) =>
-      role === "supervisor"
-        ? r.status === "pending"
-        : r.status === "supervisor approved"
-    ).length;
+    const pendingRequests = requests.filter((r) => {
+      if (role === "supervisor") {
+        return r.status === "pending";
+      } else if (role === "technical-manager") {
+        return r.status === "supervisor approved";
+      }
+      return r.status === "supervisor approved"; // Default for other roles
+    }).length;
 
-    const approvedRequests = requests.filter((r) =>
-      role === "supervisor"
-        ? r.status === "supervisor approved"
-        : r.status === "technical-manager approved"
-    ).length;
+    const approvedRequests = requests.filter((r) => {
+      if (role === "supervisor") {
+        return r.status === "supervisor approved";
+      } else if (role === "technical-manager") {
+        return r.status === "technical-manager approved";
+      }
+      return r.status === "technical-manager approved"; // Default for other roles
+    }).length;
 
-    const rejectedRequests = requests.filter((r) =>
-      r.status === "rejected" &&
-      r.supervisor_notes &&
-      r.supervisor_notes.trim() !== ""
-    ).length;
+    const rejectedRequests = requests.filter((r) => {
+      if (role === "supervisor") {
+        return (
+          r.status === "rejected" &&
+          r.supervisor_notes &&
+          r.supervisor_notes.trim() !== ""
+        );
+      } else if (role === "technical-manager") {
+        return (
+          r.status === "rejected" &&
+          r.technical_manager_notes &&
+          r.technical_manager_notes.trim() !== ""
+        );
+      }
+      return r.status === "rejected"; // Default for other roles
+    }).length;
 
-    const recentRequests = supervisorWorkflowRequests.filter(
+    const recentRequests = workflowRequests.filter(
       (r) => new Date(r.submittedAt) > lastMonth
     ).length;
 
-    const yearlyRequests = supervisorWorkflowRequests.filter(
+    const yearlyRequests = workflowRequests.filter(
       (r) => new Date(r.submittedAt) > thisYear
     ).length;
 
-    // Calculate total tires for supervisor workflow requests only
-    const totalTires = supervisorWorkflowRequests.reduce((sum, r) => sum + (r.quantity || 0), 0);
+    // Calculate total tires for workflow requests only
+    const totalTires = workflowRequests.reduce((sum, r) => sum + (r.quantity || 0), 0);
 
-    // Calculate rates based on supervisor workflow requests
+    // Calculate rates based on workflow requests
     const approvalRate = totalRequests > 0 ? (approvedRequests / totalRequests) * 100 : 0;
     const rejectionRate = totalRequests > 0 ? (rejectedRequests / totalRequests) * 100 : 0;
 

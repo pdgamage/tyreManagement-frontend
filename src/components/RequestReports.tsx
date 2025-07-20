@@ -74,8 +74,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           r.status === "technical-manager approved" ||
           r.status === "complete" ||
           (r.status === "rejected" &&
-           r.engineer_notes &&
-           r.engineer_notes.trim() !== "")
+           r.engineer_note &&
+           r.engineer_note.trim() !== "")
         );
       }
       return true; // For other roles, count all requests
@@ -123,8 +123,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       } else if (role === "engineer") {
         return (
           r.status === "rejected" &&
-          r.engineer_notes &&
-          r.engineer_notes.trim() !== ""
+          r.engineer_note &&
+          r.engineer_note.trim() !== ""
         );
       }
       return r.status === "rejected"; // Default for other roles

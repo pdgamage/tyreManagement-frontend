@@ -39,16 +39,15 @@ const EngineerDashboard = () => {
 
   // Get requests completed by current engineer
   const completedRequests = requests.filter(
-    (req) => req.status === "complete" && req.engineer_decision_by === user?.id
+    (req) => req.status === "complete"
   );
 
   // Get requests rejected by current engineer
   const rejectedRequests = requests.filter(
     (req) =>
       req.status === "rejected" &&
-      req.engineer_notes &&
-      req.engineer_notes.trim() !== "" &&
-      req.engineer_decision_by === user?.id
+      req.engineer_note &&
+      req.engineer_note.trim() !== ""
   );
 
   const handleApprove = (requestId: string) => {

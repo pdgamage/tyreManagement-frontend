@@ -621,7 +621,8 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           name="requesterPhone"
           value={formData.requesterPhone}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          placeholder="Enter your phone number"
           required
         />
         {errors.requesterPhone && (

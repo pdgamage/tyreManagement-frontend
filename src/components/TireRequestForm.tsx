@@ -1232,8 +1232,6 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       case 3:
         if (!formData.requestReason)
           newErrors.requestReason = "Request reason is required";
-        break;
-      case 4:
         if (!formData.requesterName)
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
@@ -1254,6 +1252,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           }
           // Note: Leading zeros are automatically removed
         }
+        break;
+      case 4:
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;

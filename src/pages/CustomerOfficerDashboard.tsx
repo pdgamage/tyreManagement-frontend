@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRequests } from "../contexts/RequestContext";
+import { useAuth } from "../contexts/AuthContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import PlaceOrderModal from "../components/PlaceOrderModal";
@@ -21,6 +22,7 @@ interface RequestsContextType {
 
 const CustomerOfficerDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
@@ -56,6 +58,42 @@ const CustomerOfficerDashboard = () => {
   const handleOrderPlaced = async () => {
     // Refresh the requests list after order is placed
     await fetchRequests();
+  };
+
+  const handleCancelOrder = async (request: Request) => {
+    const notes = prompt("Please provide a reason for cancelling this order:");
+    if (!notes || notes.trim() === "") {
+      alert("Cancellation reason is required");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/requests/${request.id}/cancel-order`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            role: 'customer-officer',
+            userId: user?.id,
+            notes: notes.trim(),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to cancel order');
+      }
+
+      alert('Order cancelled successfully');
+      await fetchRequests(); // Refresh the requests list
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      alert(`Failed to cancel order: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   return (
@@ -108,8 +146,10 @@ const CustomerOfficerDashboard = () => {
               onView={handleView}
               onDelete={() => {}}
               onPlaceOrder={handlePlaceOrder}
+              onCancelOrder={handleCancelOrder}
               showActions={true}
               showPlaceOrderButton={true} // Enable place order button for customer officers
+              showCancelOrderButton={true} // Enable cancel order button for customer officers
             />
           </div>
         ) : (

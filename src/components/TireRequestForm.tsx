@@ -431,9 +431,13 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
           name="lastReplacementDate"
           value={formData.lastReplacementDate}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.preventDefault()} // Prevent typing
+          onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => e.preventDefault()} // Prevent pasting
+          className="w-full p-3 border border-gray-300 rounded cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
           required
+          readOnly={false} // Keep as false to allow date picker interaction
+          style={{ caretColor: 'transparent' }} // Hide text cursor
         />
         {errors.lastReplacementDate && (
           <p className="mt-1 text-sm text-red-600">
@@ -1065,6 +1069,23 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         [name]: limitedValue,
       }));
       return;
+    }
+
+    // Special handling for date fields to ensure proper formatting
+    if (name === 'lastReplacementDate') {
+      // Ensure the date is in YYYY-MM-DD format and set time to start of day
+      if (value) {
+        const dateObj = new Date(value);
+        if (!isNaN(dateObj.getTime())) {
+          // Format as YYYY-MM-DD to ensure consistency
+          const formattedDate = dateObj.toISOString().split('T')[0];
+          setFormData((prev) => ({
+            ...prev,
+            [name]: formattedDate,
+          }));
+          return;
+        }
+      }
     }
 
     setFormData((prev) => ({

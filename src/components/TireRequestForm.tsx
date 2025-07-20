@@ -1632,8 +1632,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           onReject={() => {}}
           onDelete={handleDelete}
           onPlaceOrder={() => {}} // Empty function - no place order for users
+          onCancelOrder={() => {}} // Empty function - no cancel order for users
           showActions={true}
           showPlaceOrderButton={false} // Disable place order button for regular users
+          showCancelOrderButton={false} // Disable cancel order button for regular users
         />
       </div>
 

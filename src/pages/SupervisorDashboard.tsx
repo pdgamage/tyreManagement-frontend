@@ -125,6 +125,7 @@ const SupervisorDashboard = () => {
               onPlaceOrder={() => {}}
               showActions={false}
               showPlaceOrderButton={false}
+              showCancelOrderButton={false}
             />
 
             {/* Approved Requests */}
@@ -140,6 +141,7 @@ const SupervisorDashboard = () => {
               onPlaceOrder={() => {}}
               showActions={false}
               showPlaceOrderButton={false}
+              showCancelOrderButton={false}
             />
 
             {/* Rejected Requests */}

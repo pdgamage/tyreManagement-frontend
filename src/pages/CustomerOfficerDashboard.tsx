@@ -3,6 +3,7 @@ import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import PlaceOrderModal from "../components/PlaceOrderModal";
+import CancelOrderModal from "../components/CancelOrderModal";
 import { useNavigate } from "react-router-dom";
 
 import { Request } from "../types/request";
@@ -29,6 +30,9 @@ const CustomerOfficerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
   const [orderRequest, setOrderRequest] = useState<Request | null>(null);
+  const [showCancelOrderModal, setShowCancelOrderModal] = useState(false);
+  const [cancelRequest, setCancelRequest] = useState<Request | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -56,6 +60,49 @@ const CustomerOfficerDashboard = () => {
   const handleOrderPlaced = async () => {
     // Refresh the requests list after order is placed
     await fetchRequests();
+  };
+
+  const handleCancelOrder = (request: Request) => {
+    setCancelRequest(request);
+    setShowCancelOrderModal(true);
+  };
+
+  const handleConfirmCancelOrder = async (cancelReason: string) => {
+    if (!cancelRequest) return;
+
+    setIsCancelling(true);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/requests/${cancelRequest.id}/cancel-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cancelReason }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to cancel order");
+      }
+
+      // Refresh the requests data
+      await fetchRequests();
+
+      // Close modal and reset state
+      setShowCancelOrderModal(false);
+      setCancelRequest(null);
+
+      // Show success message (you can add a toast notification here)
+      alert("Order cancelled successfully");
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      alert(error instanceof Error ? error.message : "Failed to cancel order");
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   return (
@@ -108,8 +155,10 @@ const CustomerOfficerDashboard = () => {
               onView={handleView}
               onDelete={() => {}}
               onPlaceOrder={handlePlaceOrder}
+              onCancelOrder={handleCancelOrder}
               showActions={true}
               showPlaceOrderButton={true} // Enable place order button for customer officers
+              showCancelOrderButton={true} // Enable cancel order button for customer officers
             />
           </div>
         ) : (
@@ -123,6 +172,18 @@ const CustomerOfficerDashboard = () => {
         isOpen={showPlaceOrderModal}
         onClose={() => setShowPlaceOrderModal(false)}
         onOrderPlaced={handleOrderPlaced}
+      />
+
+      {/* Cancel Order Modal */}
+      <CancelOrderModal
+        request={cancelRequest}
+        isOpen={showCancelOrderModal}
+        onClose={() => {
+          setShowCancelOrderModal(false);
+          setCancelRequest(null);
+        }}
+        onConfirm={handleConfirmCancelOrder}
+        isLoading={isCancelling}
       />
     </div>
   );

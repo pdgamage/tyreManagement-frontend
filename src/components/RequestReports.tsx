@@ -344,114 +344,213 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Monthly Trends */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Monthly Request Trends</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={monthlyStats}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Area
-                type="monotone"
-                dataKey="requests"
-                stackId="1"
-                stroke="#8884d8"
-                fill="#8884d8"
-              />
-              <Area
-                type="monotone"
-                dataKey="approved"
-                stackId="2"
-                stroke="#82ca9d"
-                fill="#82ca9d"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+      {role === "customer-officer" ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Monthly Order Trends */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Monthly Order Trends</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={monthlyStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="requests"
+                  stackId="1"
+                  stroke="#3B82F6"
+                  fill="#3B82F6"
+                  name="Total Orders"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="approved"
+                  stackId="2"
+                  stroke="#10B981"
+                  fill="#10B981"
+                  name="Orders Placed"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Section Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">
-            Top Sections by Tire Requests
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={sectionStats}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) =>
-                  `${name} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {sectionStats.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+          {/* Department Order Distribution */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">
+              Department Order Distribution
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={sectionStats}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {sectionStats.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Vehicle Analysis */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">
-            Top 10 Vehicles by Tire Requests
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={vehicleStats}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="vehicle" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="quantity" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+          {/* Order Status Overview */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Order Status Overview</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={[
+                { status: 'Ready to Order', count: stats.pendingRequests, fill: '#F59E0B' },
+                { status: 'Orders Placed', count: stats.approvedRequests, fill: '#10B981' },
+                { status: 'Cancelled', count: stats.rejectedRequests, fill: '#EF4444' }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="status" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Tire Size Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Tire Size Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={tireSizeStats}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ size, percent }) =>
-                  `${size} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="quantity"
-              >
-                {tireSizeStats.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          {/* Most Ordered Tire Sizes */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Most Ordered Tire Sizes</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={tireSizeStats.slice(0, 8)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="size" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="quantity" fill="#6366F1" name="Quantity Ordered" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Monthly Trends */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Monthly Request Trends</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={monthlyStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="requests"
+                  stackId="1"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="approved"
+                  stackId="2"
+                  stroke="#82ca9d"
+                  fill="#82ca9d"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Section Distribution */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">
+              Top Sections by Tire Requests
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={sectionStats}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {sectionStats.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Vehicle Analysis */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">
+              Top 10 Vehicles by Tire Requests
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={vehicleStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="vehicle" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="quantity" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Tire Size Distribution */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Tire Size Distribution</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={tireSizeStats}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ size, percent }) =>
+                    `${size} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="quantity"
+                >
+                  {tireSizeStats.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Key Insights */}
       <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-xl shadow-lg border border-gray-100">
@@ -474,7 +573,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                 </svg>
               </div>
               <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Most Active Section
+                {role === "customer-officer" ? "Top Ordering Department" : "Most Active Section"}
               </h4>
             </div>
             <div className="space-y-2">
@@ -483,7 +582,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               </p>
               <p className="text-sm text-gray-500 flex items-center">
                 <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                {sectionStats.length > 0 ? `${sectionStats[0]?.value || 0} tires requested` : "No requests found"}
+                {sectionStats.length > 0 ? `${sectionStats[0]?.value || 0} ${role === "customer-officer" ? "tires ordered" : "tires requested"}` : "No data found"}
               </p>
             </div>
           </div>
@@ -497,7 +596,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                 </svg>
               </div>
               <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Most Common Tire Size
+                {role === "customer-officer" ? "Most Ordered Size" : "Most Common Tire Size"}
               </h4>
             </div>
             <div className="space-y-2">
@@ -506,12 +605,12 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               </p>
               <p className="text-sm text-gray-500 flex items-center">
                 <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                {tireSizeStats.length > 0 ? `${tireSizeStats[0]?.quantity || 0} units` : "No requests found"}
+                {tireSizeStats.length > 0 ? `${tireSizeStats[0]?.quantity || 0} ${role === "customer-officer" ? "units ordered" : "units"}` : "No data found"}
               </p>
             </div>
           </div>
 
-          {/* Average Request Processing */}
+          {/* Average Processing */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
@@ -520,7 +619,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                 </svg>
               </div>
               <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Average Processing
+                {role === "customer-officer" ? "Average Order Volume" : "Average Processing"}
               </h4>
             </div>
             <div className="space-y-2">
@@ -532,7 +631,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
               </p>
               <p className="text-sm text-gray-500 flex items-center">
                 <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
-                requests per month
+                {role === "customer-officer" ? "orders per month" : "requests per month"}
               </p>
             </div>
           </div>

@@ -321,7 +321,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           </div>
         </div>
 
-        {/* Approval Rate Card */}
+        {/* Approved Requests Card */}
         <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
           <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
           <div className="relative p-6 space-y-4">
@@ -332,45 +332,42 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                 </svg>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Approval Rate</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.approvalRate.toFixed(1)}%</p>
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Approved Requests</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.approvedRequests}</p>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${Math.min(stats.approvalRate, 100)}%` }}
-                ></div>
-              </div>
-              <span className="text-xs text-gray-600 font-medium">
-                {stats.approvedRequests} of {stats.totalRequests} approved
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                ✅ Successfully Approved
+              </span>
+              <span className="text-sm text-gray-600 font-medium">
+                {stats.totalRequests > 0 ? ((stats.approvedRequests / stats.totalRequests) * 100).toFixed(1) : 0}% of total
               </span>
             </div>
           </div>
         </div>
 
-        {/* Monthly Average Card */}
+        {/* Rejected Requests Card */}
         <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-2">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-indigo-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-rose-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
           <div className="relative p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="bg-purple-100 p-3 rounded-xl group-hover:bg-purple-200 transition-colors duration-300">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <div className="bg-red-100 p-3 rounded-xl group-hover:bg-red-200 transition-colors duration-300">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Monthly Average</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.monthlyAverage.toFixed(1)}</p>
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Rejected Requests</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.rejectedRequests}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                📊 Trend Analysis
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                ❌ Quality Control
               </span>
               <span className="text-sm text-gray-600 font-medium">
-                requests/month
+                {stats.totalRequests > 0 ? ((stats.rejectedRequests / stats.totalRequests) * 100).toFixed(1) : 0}% of total
               </span>
             </div>
           </div>
@@ -419,21 +416,21 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           </div>
         </div>
 
-        <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-8">
             <div className="w-24 h-24 bg-white opacity-20 rounded-full"></div>
           </div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
-              <h3 className="text-purple-100 text-sm font-bold uppercase tracking-wider">Quality Score</h3>
-              <p className="text-4xl font-bold mt-2">{(100 - (stats.rejectionRate || 0)).toFixed(1)}%</p>
+              <h3 className="text-purple-100 text-sm font-bold uppercase tracking-wider">Workflow Efficiency</h3>
+              <p className="text-4xl font-bold mt-2">{stats.totalRequests > 0 ? (((stats.approvedRequests + stats.rejectedRequests) / stats.totalRequests) * 100).toFixed(1) : 0}%</p>
               <p className="text-purple-100 text-sm mt-2 font-medium">
-                ⭐ Excellence rating
+                ⚡ Processed requests
               </p>
             </div>
             <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
           </div>
@@ -672,15 +669,14 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">
-              Average Request Processing
+              Decision Summary
             </h4>
             <p className="text-xl font-semibold mt-1">
-              {(
-                (stats.approvedRequests + stats.pendingRequests) /
-                Math.max(monthlyStats.length, 1)
-              ).toFixed(1)}
+              {stats.approvedRequests + stats.rejectedRequests}
             </p>
-            <p className="text-sm text-gray-500">requests per month</p>
+            <p className="text-sm text-gray-500">
+              {stats.approvedRequests} approved, {stats.rejectedRequests} rejected
+            </p>
           </div>
         </div>
       </div>

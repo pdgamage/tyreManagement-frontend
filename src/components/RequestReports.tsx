@@ -233,7 +233,12 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   }, [requests]);
 
   const sectionStats = useMemo(() => {
-    const sections = requests.reduce((acc: { [key: string]: number }, curr) => {
+    // Use appropriate data based on role
+    const dataToUse = role === "customer-officer" ?
+      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests;
+
+    const sections = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
       // Only include sections that have valid names
       if (curr.userSection && curr.userSection.trim() !== '') {
         acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
@@ -242,10 +247,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     }, {});
 
     return Object.entries(sections)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name, value: value as number }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
-  }, [requests]);
+  }, [requests, role]);
 
   const vehicleStats = useMemo(() => {
     const vehicles = requests.reduce((acc: { [key: string]: number }, curr) => {
@@ -412,17 +417,30 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold mb-4">Order Status Overview</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[
-                { status: 'Ready to Order', count: stats.pendingRequests, fill: '#F59E0B' },
-                { status: 'Orders Placed', count: stats.approvedRequests, fill: '#10B981' },
-                { status: 'Cancelled', count: stats.rejectedRequests, fill: '#EF4444' }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="status" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Ready to Order', value: stats.pendingRequests },
+                    { name: 'Orders Placed', value: stats.approvedRequests },
+                    { name: 'Cancelled', value: stats.rejectedRequests }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  <Cell fill="#F59E0B" />
+                  <Cell fill="#10B981" />
+                  <Cell fill="#EF4444" />
+                </Pie>
                 <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" />
-              </BarChart>
+                <Legend />
+              </PieChart>
             </ResponsiveContainer>
           </div>
 
@@ -430,14 +448,32 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold mb-4">Most Ordered Tire Sizes</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={tireSizeStats.slice(0, 8)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="size" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={tireSizeStats.slice(0, 6).map((item, index) => ({
+                    name: item.size,
+                    value: item.quantity
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {tireSizeStats.slice(0, 6).map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="quantity" fill="#6366F1" name="Quantity Ordered" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>

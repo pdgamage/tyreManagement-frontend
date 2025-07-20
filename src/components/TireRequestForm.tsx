@@ -622,6 +622,10 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           value={formData.requesterPhone}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter phone number (max 10 digits, no leading zeros)"
+          maxLength={10}
+          pattern="[1-9][0-9]*"
+          inputMode="numeric"
           required
         />
         {errors.requesterPhone && (
@@ -1037,6 +1041,22 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     >
   ) => {
     const { name, value } = e.target;
+
+    // Special handling for phone number to limit to 10 digits and remove leading zeros
+    if (name === 'requesterPhone') {
+      // Remove any non-digit characters
+      const digitsOnly = value.replace(/\D/g, '');
+      // Remove leading zeros
+      const withoutLeadingZeros = digitsOnly.replace(/^0+/, '');
+      // Limit to 10 digits maximum
+      const limitedValue = withoutLeadingZeros.slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: limitedValue,
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -1143,8 +1163,22 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
           newErrors.requesterEmail = "Email is required";
-        if (!formData.requesterPhone)
+        if (!formData.requesterPhone) {
           newErrors.requesterPhone = "Phone is required";
+        } else {
+          // Validate phone number format (digits only, max 10 digits, no leading zeros)
+          const phoneDigits = formData.requesterPhone.replace(/\D/g, '');
+          if (phoneDigits.length === 0) {
+            newErrors.requesterPhone = "Phone number is required";
+          } else if (phoneDigits.length > 10) {
+            newErrors.requesterPhone = "Phone number cannot exceed 10 digits";
+          } else if (phoneDigits.startsWith('0')) {
+            newErrors.requesterPhone = "Phone number cannot start with zero";
+          } else if (!/^\d+$/.test(phoneDigits)) {
+            newErrors.requesterPhone = "Phone number must contain only digits";
+          }
+          // Note: Leading zeros are automatically removed
+        }
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;

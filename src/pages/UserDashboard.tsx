@@ -77,22 +77,42 @@ const UserDashboard = () => {
   const placeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
   const completeOrderRequests = userRequests.filter((req: any) => req.status === "order placed");
 
+  // Debug: Log the status values to see what we have
+  console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
+  console.log("Place order requests (complete):", placeOrderRequests.length);
+  console.log("Complete order requests (order placed):", completeOrderRequests.length);
+  console.log("Active filter:", activeFilter);
+
+  // Debug: Show detailed info about requests
+  if (userRequests.length > 0) {
+    console.log("Sample request:", userRequests[0]);
+    console.log("All unique statuses:", [...new Set(userRequests.map((req: any) => req.status))]);
+  }
+
   // Filter requests based on active filter
   const getFilteredRequests = () => {
+    let result;
     switch (activeFilter) {
       case "pending":
-        return pendingRequests;
+        result = pendingRequests;
+        break;
       case "approved":
-        return approvedRequests;
+        result = approvedRequests;
+        break;
       case "rejected":
-        return rejectedRequests;
+        result = rejectedRequests;
+        break;
       case "place-orders":
-        return completeOrderRequests; // When clicking "Place Orders" card, show "order placed" requests
+        result = completeOrderRequests; // When clicking "Place Orders" card, show "order placed" requests
+        break;
       case "complete-orders":
-        return placeOrderRequests; // When clicking "Complete Orders" card, show "complete" requests
+        result = placeOrderRequests; // When clicking "Complete Orders" card, show "complete" requests
+        break;
       default:
-        return userRequests;
+        result = userRequests;
     }
+    console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
+    return result;
   };
 
   const filteredRequests = getFilteredRequests();

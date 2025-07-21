@@ -127,8 +127,8 @@ const UserDashboard = () => {
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
-      // userSection should now come correctly from backend with vehicle department info
-      userSection: tireRequest.userSection || 'IT Department'
+      // Only show department if it actually exists, otherwise show "Unknown Department"
+      userSection: tireRequest.userSection || 'Unknown Department'
     };
   };
 

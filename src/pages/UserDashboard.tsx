@@ -79,18 +79,12 @@ const UserDashboard = () => {
   const completeOrderRequests = userRequests.filter((req: any) => req.status === "order placed");
   const cancelOrderRequests = userRequests.filter((req: any) => req.status === "order cancelled");
 
-  // Debug: Log the status values to see what we have
-  console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
-  console.log("Place order requests (complete):", placeOrderRequests.length);
-  console.log("Complete order requests (order placed):", completeOrderRequests.length);
-  console.log("Cancel order requests (order cancelled):", cancelOrderRequests.length);
-  console.log("Active filter:", activeFilter);
-
-  // Debug: Show detailed info about requests
-  if (userRequests.length > 0) {
-    console.log("Sample request:", userRequests[0]);
-    console.log("All unique statuses:", [...new Set(userRequests.map((req: any) => req.status))]);
-  }
+  // Debug: Log the status values to see what we have (can be removed in production)
+  // console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
+  // console.log("Place order requests (complete):", placeOrderRequests.length);
+  // console.log("Complete order requests (order placed):", completeOrderRequests.length);
+  // console.log("Cancel order requests (order cancelled):", cancelOrderRequests.length);
+  // console.log("Active filter:", activeFilter);
 
   // Filter requests based on active filter
   const getFilteredRequests = () => {
@@ -117,7 +111,7 @@ const UserDashboard = () => {
       default:
         result = userRequests;
     }
-    console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
+    // console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
     return result;
   };
 
@@ -144,9 +138,16 @@ const UserDashboard = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this request?')) {
       try {
-        // Add your delete logic here
-        console.log('Deleting request:', id);
-        await fetchRequests(); // Refresh the list
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+        const response = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          await fetchRequests(); // Refresh the list
+        } else {
+          console.error('Failed to delete request');
+        }
       } catch (error) {
         console.error('Error deleting request:', error);
       }

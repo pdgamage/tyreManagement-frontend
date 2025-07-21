@@ -35,6 +35,8 @@ const UserDashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -136,22 +138,35 @@ const UserDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this request?')) {
-      try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
-        const response = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
-          method: "DELETE",
-        });
+    setDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
 
-        if (response.ok) {
-          await fetchRequests(); // Refresh the list
-        } else {
-          console.error('Failed to delete request');
-        }
-      } catch (error) {
-        console.error('Error deleting request:', error);
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+      const response = await fetch(`${API_BASE_URL}/api/requests/${deleteId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await fetchRequests(); // Refresh the list
+      } else {
+        console.error('Failed to delete request');
       }
+    } catch (error) {
+      console.error('Error deleting request:', error);
     }
+
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
   };
 
   const handleApprove = (id: string) => {
@@ -519,6 +534,53 @@ const UserDashboard = () => {
           onClose={closeDetailsModal}
           isOpen={!!selectedRequest}
         />
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={cancelDelete}
+        >
+          <div
+            className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl border border-gray-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <XCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Deletion
+                </h3>
+                <p className="text-sm text-gray-500">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this tire request? All associated data will be permanently removed.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                onClick={cancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center space-x-2"
+                onClick={confirmDelete}
+              >
+                <XCircle className="w-4 h-4" />
+                <span>Delete Request</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -33,6 +33,7 @@ const CustomerOfficerDashboard = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelId, setCancelId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -108,13 +109,13 @@ const CustomerOfficerDashboard = () => {
   };
 
   const confirmCancelOrder = async () => {
-    if (!cancelId) return;
+    if (!cancelId || !cancelReason.trim()) return;
 
     try {
       await updateRequestStatus(
         cancelId,
         "order cancelled",
-        "Order cancelled by customer officer",
+        cancelReason.trim(),
         "customer-officer"
       );
 
@@ -126,11 +127,13 @@ const CustomerOfficerDashboard = () => {
 
     setShowCancelConfirm(false);
     setCancelId(null);
+    setCancelReason("");
   };
 
   const cancelOrderCancel = () => {
     setShowCancelConfirm(false);
     setCancelId(null);
+    setCancelReason("");
   };
 
   return (
@@ -249,12 +252,23 @@ const CustomerOfficerDashboard = () => {
       {/* Cancel Order Confirmation Modal */}
       {showCancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+          <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
             <h3 className="mb-4 text-lg font-semibold text-orange-700">
-              Confirm Order Cancellation
+              Cancel Order
             </h3>
-            <p className="mb-6 text-gray-600">
-              Are you sure you want to cancel this order? This action will update the status to "order cancelled".
+            <p className="mb-4 text-gray-600">
+              Please provide a reason for cancelling this order:
+            </p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Enter cancellation reason..."
+              className="w-full p-3 mb-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              rows={4}
+              required
+            />
+            <p className="mb-6 text-sm text-gray-500">
+              This action will update the order status to "order cancelled".
             </p>
             <div className="flex justify-end gap-4">
               <button
@@ -264,10 +278,11 @@ const CustomerOfficerDashboard = () => {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 text-white bg-orange-600 rounded hover:bg-orange-700 transition-colors"
+                className="px-4 py-2 text-white bg-orange-600 rounded hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={confirmCancelOrder}
+                disabled={!cancelReason.trim()}
               >
-                Yes, Cancel Order
+                Confirm Cancellation
               </button>
             </div>
           </div>

@@ -75,6 +75,9 @@ const SupervisorDashboard = () => {
       (!req.engineer_note || req.engineer_note.trim() === "")
   );
 
+  // Calculate total displayed requests (only the ones shown in the dashboard)
+  const totalDisplayedRequests = pendingRequests.length + approvedRequests.length + rejectedRequests.length;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
@@ -223,8 +226,8 @@ const SupervisorDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100 text-sm font-medium">Total Requests</p>
-                    <p className="text-4xl font-bold mt-2">{supervisorRequests.length}</p>
-                    <p className="text-blue-200 text-xs mt-1">All time requests</p>
+                    <p className="text-4xl font-bold mt-2">{totalDisplayedRequests}</p>
+                    <p className="text-blue-200 text-xs mt-1">Displayed requests</p>
                   </div>
                   <div className="w-14 h-14 bg-blue-400/30 rounded-xl flex items-center justify-center">
                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

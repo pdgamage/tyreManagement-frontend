@@ -67,6 +67,22 @@ const getStatusStyles = (status: string) => {
   }
 };
 
+// Function to get descriptive status text based on who made the decision
+const getDescriptiveStatus = (request: Request) => {
+  if (request.status === "rejected") {
+    // Check who rejected it based on notes and decision_by fields
+    if (request.supervisor_notes && request.supervisor_decision_by) {
+      return "supervisor rejected";
+    } else if (request.technical_manager_note && request.technical_manager_decision_by) {
+      return "technical manager rejected";
+    } else if (request.engineer_note && request.engineer_decision_by) {
+      return "engineer rejected";
+    }
+    return "rejected";
+  }
+  return request.status;
+};
+
 interface RequestTableProps {
   requests: Request[];
   title: string;
@@ -225,7 +241,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     `}
                   >
                     {getStatusStyles(request.status).icon}
-                    <span className="ml-1">{request.status}</span>
+                    <span className="ml-1">{getDescriptiveStatus(request)}</span>
                   </span>
                 </td>
                 {showActions && (

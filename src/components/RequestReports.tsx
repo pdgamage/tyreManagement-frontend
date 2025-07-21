@@ -193,6 +193,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     const dataToUse = role === "customer-officer" ?
       requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled" ||
         (r.status === "rejected" && r.customer_officer_note && r.customer_officer_note.trim() !== "")) :
+      role === "engineer" ?
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       requests;
 
     // Fill in actual data
@@ -212,6 +214,13 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
             if (request.status === "order placed") {
               monthCounts[key].approved++;
             } else if ((request.status === "rejected" && request.customer_officer_note) || request.status === "order cancelled") {
+              monthCounts[key].rejected++;
+            }
+          } else if (role === "engineer") {
+            // Engineer-specific logic
+            if (request.status === "complete") {
+              monthCounts[key].approved++;
+            } else if (request.status === "engineer rejected") {
               monthCounts[key].rejected++;
             }
           } else {
@@ -238,6 +247,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     // Use appropriate data based on role
     const dataToUse = role === "customer-officer" ?
       requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      role === "engineer" ?
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       requests;
 
     const sections = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
@@ -261,6 +272,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
       requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      role === "engineer" ?
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       requests;
 
     const vehicles = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
@@ -278,6 +291,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
       requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      role === "engineer" ?
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       requests;
 
     return Object.entries(

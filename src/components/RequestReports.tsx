@@ -197,6 +197,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
+      role === "supervisor" ?
+      requests.filter((r) => r.status === "pending" || r.status === "supervisor approved" || r.status === "supervisor rejected") :
       requests;
 
     // Fill in actual data
@@ -232,6 +234,13 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
             } else if (request.status === "technical-manager rejected") {
               monthCounts[key].rejected++;
             }
+          } else if (role === "supervisor") {
+            // Supervisor-specific logic
+            if (request.status === "supervisor approved") {
+              monthCounts[key].approved++;
+            } else if (request.status === "supervisor rejected") {
+              monthCounts[key].rejected++;
+            }
           } else {
             // Default logic for other roles
             if (
@@ -260,6 +269,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
+      role === "supervisor" ?
+      requests.filter((r) => r.status === "pending" || r.status === "supervisor approved" || r.status === "supervisor rejected") :
       requests;
 
     const sections = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
@@ -287,6 +298,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
+      role === "supervisor" ?
+      requests.filter((r) => r.status === "pending" || r.status === "supervisor approved" || r.status === "supervisor rejected") :
       requests;
 
     const vehicles = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
@@ -308,6 +321,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
+      role === "supervisor" ?
+      requests.filter((r) => r.status === "pending" || r.status === "supervisor approved" || r.status === "supervisor rejected") :
       requests;
 
     return Object.entries(

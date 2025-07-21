@@ -67,8 +67,7 @@ const UserDashboard = () => {
   const approvedRequests = userRequests.filter((req: any) =>
     req.status === "supervisor approved" ||
     req.status === "technical-manager approved" ||
-    req.status === "engineer approved" ||
-    req.status === "complete"
+    req.status === "engineer approved"
   );
   const rejectedRequests = userRequests.filter((req: any) =>
     req.status === "supervisor rejected" ||
@@ -88,9 +87,9 @@ const UserDashboard = () => {
       case "rejected":
         return rejectedRequests;
       case "place-orders":
-        return placeOrderRequests;
+        return completeOrderRequests; // When clicking "Place Orders" card, show "order placed" requests
       case "complete-orders":
-        return completeOrderRequests;
+        return placeOrderRequests; // When clicking "Complete Orders" card, show "complete" requests
       default:
         return userRequests;
     }
@@ -351,15 +350,15 @@ const UserDashboard = () => {
                         {activeFilter === "pending" && "Pending"}
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
-                        {activeFilter === "place-orders" && "Place Orders"}
-                        {activeFilter === "complete-orders" && "Complete Orders"}
+                        {activeFilter === "place-orders" && "Orders Placed"}
+                        {activeFilter === "complete-orders" && "Ready for Orders"}
                       </span>
                     )}
                   </h2>
                   <p className="text-blue-700 text-sm">
                     {activeFilter === "all"
                       ? "Track the status of your tire requests with color-coded indicators"
-                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests`
+                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "orders that have been placed" : "requests ready for ordering"} requests`
                     }
                     {activeFilter !== "all" && (
                       <button
@@ -386,12 +385,12 @@ const UserDashboard = () => {
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
                   <div className="text-gray-500 text-lg mb-2 font-medium">
-                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests`}
+                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : "requests ready for ordering"} found`}
                   </div>
                   <p className="text-gray-400 text-sm mb-6">
                     {activeFilter === "all"
                       ? "Submit your first tire request using the form above"
-                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests at the moment.`
+                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : "requests ready for ordering"} at the moment.`
                     }
                   </p>
                   <button

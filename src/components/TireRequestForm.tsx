@@ -5,7 +5,6 @@ import { useRequests } from "../contexts/RequestContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
 import { Vehicle, TireDetails } from "../types/api";
-import RequestTable from "./RequestTable";
 import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
@@ -1625,17 +1624,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           </div>
         </div>
 
-        <RequestTable
-          requests={requests.filter((req) => req.userId === user?.id)}
-          title="Your Tire Requests"
-          onView={handleView}
-          onApprove={() => {}}
-          onReject={() => {}}
-          onDelete={handleDelete}
-          onPlaceOrder={() => {}} // Empty function - no place order for users
-          showActions={true}
-          showPlaceOrderButton={false} // Disable place order button for regular users
-        />
+
       </div>
 
       {showDeleteConfirm && (

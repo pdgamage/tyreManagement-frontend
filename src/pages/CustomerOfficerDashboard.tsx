@@ -209,7 +209,7 @@ const CustomerOfficerDashboard = () => {
             )}
           </div>
         ) : (
-          <RequestReports requests={completeRequests} role="customer-officer" />
+          <RequestReports requests={[...completeRequests, ...cancelledRequests]} role="customer-officer" />
         )}
       </main>
 

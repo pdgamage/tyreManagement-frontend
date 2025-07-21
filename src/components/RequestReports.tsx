@@ -78,10 +78,11 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
            r.engineer_note.trim() !== "")
         );
       } else if (role === "customer-officer") {
-        // Customer officer sees: complete (ready for orders), order placed, and rejected by customer officer
+        // Customer officer sees: complete (ready for orders), order placed, order cancelled, and rejected by customer officer
         return (
           r.status === "complete" ||
           r.status === "order placed" ||
+          r.status === "order cancelled" ||
           (r.status === "rejected" &&
            r.customer_officer_note &&
            r.customer_officer_note.trim() !== "")
@@ -142,9 +143,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         );
       } else if (role === "customer-officer") {
         return (
-          r.status === "rejected" &&
-          r.customer_officer_note &&
-          r.customer_officer_note.trim() !== ""
+          (r.status === "rejected" &&
+           r.customer_officer_note &&
+           r.customer_officer_note.trim() !== "") ||
+          r.status === "order cancelled"
         );
       }
       return r.status === "rejected"; // Default for other roles
@@ -207,7 +209,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     // Use role-specific data filtering
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed" ||
+      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled" ||
         (r.status === "rejected" && r.customer_officer_note && r.customer_officer_note.trim() !== "")) :
       requests;
 
@@ -227,7 +229,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           if (role === "customer-officer") {
             if (request.status === "order placed") {
               monthCounts[key].approved++;
-            } else if (request.status === "rejected" && request.customer_officer_note) {
+            } else if ((request.status === "rejected" && request.customer_officer_note) || request.status === "order cancelled") {
               monthCounts[key].rejected++;
             }
           } else {
@@ -253,13 +255,16 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const sectionStats = useMemo(() => {
     // Use appropriate data based on role
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
       requests;
 
     const sections = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
+      // Check multiple possible field names for department/section
+      const sectionName = curr.userSection || curr.vehicleDepartment || curr.Department || curr.department;
+
       // Only include sections that have valid names
-      if (curr.userSection && curr.userSection.trim() !== '') {
-        acc[curr.userSection] = (acc[curr.userSection] || 0) + curr.quantity;
+      if (sectionName && sectionName.trim() !== '') {
+        acc[sectionName] = (acc[sectionName] || 0) + curr.quantity;
       }
       return acc;
     }, {});
@@ -273,7 +278,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const vehicleStats = useMemo(() => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
       requests;
 
     const vehicles = dataToUse.reduce((acc: { [key: string]: number }, curr) => {
@@ -290,7 +295,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const tireSizeStats = useMemo(() => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed") :
+      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
       requests;
 
     return Object.entries(

@@ -71,11 +71,9 @@ const TechnicalManagerDashboard = () => {
     (req) => req.status === "supervisor approved"
   );
 
-  // Filter approved requests to only show those approved by the current technical manager
+  // Filter approved requests to show all technically approved requests
   const approvedRequests = requests.filter(
-    (req) =>
-      req.status === "technical-manager approved" &&
-      req.technical_manager_id === user?.id
+    (req) => req.status === "technical-manager approved"
   );
 
   // Filter rejected requests to only show those rejected by the current technical manager

@@ -29,6 +29,8 @@ const CustomerOfficerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
   const [orderRequest, setOrderRequest] = useState<Request | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -56,6 +58,41 @@ const CustomerOfficerDashboard = () => {
   const handleOrderPlaced = async () => {
     // Refresh the requests list after order is placed
     await fetchRequests();
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${deleteId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        // Refresh the requests list after deletion
+        await fetchRequests();
+      } else {
+        console.error("Failed to delete request");
+      }
+    } catch (error) {
+      console.error("Error deleting request:", error);
+    }
+
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
   };
 
   return (
@@ -106,7 +143,7 @@ const CustomerOfficerDashboard = () => {
               onApprove={() => {}}
               onReject={() => {}}
               onView={handleView}
-              onDelete={() => {}}
+              onDelete={handleDelete}
               onPlaceOrder={handlePlaceOrder}
               showActions={true}
               showPlaceOrderButton={true} // Enable place order button for customer officers
@@ -124,6 +161,34 @@ const CustomerOfficerDashboard = () => {
         onClose={() => setShowPlaceOrderModal(false)}
         onOrderPlaced={handleOrderPlaced}
       />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold text-red-700">
+              Confirm Deletion
+            </h3>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to delete this request? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                onClick={cancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                onClick={confirmDelete}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

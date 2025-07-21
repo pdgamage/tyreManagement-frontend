@@ -127,6 +127,44 @@ const UserDashboard = () => {
     setSelectedRequest(null);
   };
 
+  // Convert TireRequest to Request format for RequestTable
+  const convertTireRequestToRequest = (tireRequest: any) => {
+    return {
+      ...tireRequest,
+      submittedAt: tireRequest.submittedAt || new Date().toISOString(),
+      userSection: tireRequest.vehicleDepartment || 'Unknown Department'
+    };
+  };
+
+  // Handler functions for RequestTable
+  const handleView = (request: any) => {
+    setSelectedRequest(request);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this request?')) {
+      try {
+        // Add your delete logic here
+        console.log('Deleting request:', id);
+        await fetchRequests(); // Refresh the list
+      } catch (error) {
+        console.error('Error deleting request:', error);
+      }
+    }
+  };
+
+  const handleApprove = (id: string) => {
+    console.log('Approve request:', id);
+  };
+
+  const handleReject = (id: string) => {
+    console.log('Reject request:', id);
+  };
+
+  const handlePlaceOrder = (request: any) => {
+    console.log('Place order for request:', request);
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate("/login");
@@ -402,9 +440,16 @@ const UserDashboard = () => {
             <div className="p-8">
               {filteredRequests.length > 0 ? (
                 <RequestTable
-                  requests={filteredRequests}
-                  onRequestSelect={setSelectedRequest}
-                  role="user"
+                  requests={filteredRequests.map(convertTireRequestToRequest)}
+                  title=""
+                  onView={handleView}
+                  onDelete={handleDelete}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                  onPlaceOrder={handlePlaceOrder}
+                  showActions={true}
+                  showPlaceOrderButton={false}
+                  showCancelButton={false}
                 />
               ) : (
                 <div className="text-center py-12">

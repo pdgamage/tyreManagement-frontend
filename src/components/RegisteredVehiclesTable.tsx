@@ -17,11 +17,9 @@ const RegisteredVehiclesTable = () => {
   const { vehicles, loading } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [showAll, setShowAll] = useState(false);
 
-  // Limit display to 5 vehicles unless "Show All" is clicked
-  const displayedVehicles = showAll ? vehicles : vehicles.slice(0, 5);
-  const hasMoreVehicles = vehicles.length > 5;
+  // Display all vehicles by default
+  const displayedVehicles = vehicles;
 
   const handleViewDetails = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -39,19 +37,9 @@ const RegisteredVehiclesTable = () => {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            Registered Vehicles ({vehicles.length})
-          </h2>
-          {hasMoreVehicles && (
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
-            >
-              {showAll ? 'Show Less' : `Show All (${vehicles.length})`}
-            </button>
-          )}
-        </div>
+        <h2 className="text-xl font-semibold mb-4">
+          Registered Vehicles ({vehicles.length})
+        </h2>
 
         {/* Scrollable container with max height */}
         <div className="overflow-x-auto">
@@ -129,13 +117,6 @@ const RegisteredVehiclesTable = () => {
           </table>
           </div>
         </div>
-
-        {/* Show count info when limited */}
-        {!showAll && hasMoreVehicles && (
-          <div className="mt-3 text-sm text-gray-500 text-center">
-            Showing {displayedVehicles.length} of {vehicles.length} vehicles
-          </div>
-        )}
       </div>
 
       {/* Vehicle Details Modal */}

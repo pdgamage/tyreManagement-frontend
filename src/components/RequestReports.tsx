@@ -69,9 +69,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         return (
           r.status === "technical-manager approved" ||
           r.status === "complete" ||
-          (r.status === "rejected" &&
-           r.engineer_note &&
-           r.engineer_note.trim() !== "")
+          r.status === "engineer rejected"
         );
       } else if (role === "customer-officer") {
         // Customer officer sees: complete (ready for orders), order placed, order cancelled, and rejected by customer officer
@@ -124,11 +122,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       } else if (role === "technical-manager") {
         return r.status === "technical-manager rejected";
       } else if (role === "engineer") {
-        return (
-          r.status === "rejected" &&
-          r.engineer_note &&
-          r.engineer_note.trim() !== ""
-        );
+        return r.status === "engineer rejected";
       } else if (role === "customer-officer") {
         return (
           (r.status === "rejected" &&

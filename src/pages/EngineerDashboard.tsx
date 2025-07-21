@@ -66,57 +66,38 @@ const EngineerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Modern Header with Gradient */}
-      <header className="bg-gradient-to-r from-cyan-600 to-blue-700 shadow-lg">
-        <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          {/* Header Title */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Engineer Dashboard</h1>
-              <p className="text-cyan-100 mt-1">Complete technical assessments and tire installations</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* User Profile Dropdown */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-3 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium"
-                >
-                  <UserCircle className="w-6 h-6" />
-                  <span>{user?.name || "Profile"}</span>
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${
-                      isProfileOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+    <div className="max-w-6xl p-4 mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">Engineer Dashboard</h1>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center space-x-2 focus:outline-none"
+          >
+            <UserCircle className="w-8 h-8 text-gray-600" />
+            <span className="font-medium text-gray-700">
+              {user?.name || "Profile"}
+            </span>
+            <ChevronDown
+              className={`h-4 w-4 text-gray-500 transition-transform ${
+                isProfileOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
 
-                {isProfileOpen && (
-                  <div className="absolute right-0 w-48 py-2 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-              {/* User Avatar */}
-              <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
+          {isProfileOpen && (
+            <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-lg shadow-lg">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
             </div>
-          </div>
+          )}
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-4">
+      </div>
 
       {/* Tab Navigation */}
       <div className="mb-6">

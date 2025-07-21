@@ -20,7 +20,8 @@ import {
   Calendar,
   Activity,
   ShoppingCart,
-  Package
+  Package,
+  X
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -76,11 +77,13 @@ const UserDashboard = () => {
   );
   const placeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
   const completeOrderRequests = userRequests.filter((req: any) => req.status === "order placed");
+  const cancelOrderRequests = userRequests.filter((req: any) => req.status === "order cancelled");
 
   // Debug: Log the status values to see what we have
   console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
   console.log("Place order requests (complete):", placeOrderRequests.length);
   console.log("Complete order requests (order placed):", completeOrderRequests.length);
+  console.log("Cancel order requests (order cancelled):", cancelOrderRequests.length);
   console.log("Active filter:", activeFilter);
 
   // Debug: Show detailed info about requests
@@ -107,6 +110,9 @@ const UserDashboard = () => {
         break;
       case "complete-orders":
         result = placeOrderRequests; // When clicking "Complete Orders" card, show "complete" requests
+        break;
+      case "cancel-orders":
+        result = cancelOrderRequests; // When clicking "Cancel Orders" card, show "order cancelled" requests
         break;
       default:
         result = userRequests;
@@ -314,19 +320,19 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "all" ? "all" : "all")}
-              className={`bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "all" ? "ring-4 ring-purple-300 ring-opacity-50" : ""
+              onClick={() => setActiveFilter(activeFilter === "cancel-orders" ? "all" : "cancel-orders")}
+              className={`bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-8 text-white shadow-xl border border-rose-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "cancel-orders" ? "ring-4 ring-rose-300 ring-opacity-50" : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-2">Total Requests</p>
-                  <p className="text-4xl font-bold mb-1">{userRequests.length}</p>
-                  <p className="text-purple-200 text-xs">All submissions</p>
+                  <p className="text-rose-100 text-sm font-medium mb-2">Cancel Orders</p>
+                  <p className="text-4xl font-bold mb-1">{cancelOrderRequests.length}</p>
+                  <p className="text-rose-200 text-xs">Orders cancelled</p>
                 </div>
-                <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
-                  <FileText className="w-8 h-8" />
+                <div className="w-16 h-16 bg-rose-400/30 rounded-xl flex items-center justify-center">
+                  <X className="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -372,13 +378,14 @@ const UserDashboard = () => {
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}
                         {activeFilter === "complete-orders" && "Ready for Orders"}
+                        {activeFilter === "cancel-orders" && "Cancelled Orders"}
                       </span>
                     )}
                   </h2>
                   <p className="text-blue-700 text-sm">
                     {activeFilter === "all"
                       ? "Track the status of your tire requests with color-coded indicators"
-                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "orders that have been placed" : "requests ready for ordering"} requests`
+                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "orders that have been placed" : activeFilter === "complete-orders" ? "requests ready for ordering" : "cancelled orders"} requests`
                     }
                     {activeFilter !== "all" && (
                       <button
@@ -405,12 +412,12 @@ const UserDashboard = () => {
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
                   <div className="text-gray-500 text-lg mb-2 font-medium">
-                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : "requests ready for ordering"} found`}
+                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : activeFilter === "complete-orders" ? "requests ready for ordering" : "cancelled orders"} found`}
                   </div>
                   <p className="text-gray-400 text-sm mb-6">
                     {activeFilter === "all"
                       ? "Submit your first tire request using the form above"
-                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : "requests ready for ordering"} at the moment.`
+                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : activeFilter === "complete-orders" ? "requests ready for ordering" : "cancelled orders"} at the moment.`
                     }
                   </p>
                   <button

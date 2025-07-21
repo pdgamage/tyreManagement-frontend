@@ -268,7 +268,7 @@ const CustomerOfficerDashboard = () => {
               required
             />
             <p className="mb-6 text-sm text-gray-500">
-              This action will update the order status to "order cancelled".
+              The customer will be notified about the cancellation and the reason provided.
             </p>
             <div className="flex justify-end gap-4">
               <button

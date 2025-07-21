@@ -17,30 +17,68 @@ const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
     case "pending":
       return {
-        bg: "bg-yellow-50",
-        text: "text-yellow-700",
-        border: "border-yellow-300",
+        bg: "bg-amber-50",
+        text: "text-amber-700",
+        border: "border-amber-300",
         icon: <Clock className="w-4 h-4" />,
       };
-    case "approved":
+
+    // Supervisor Level
+    case "supervisor approved":
       return {
-        bg: "bg-green-50",
-        text: "text-green-700",
-        border: "border-green-300",
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        border: "border-emerald-300",
         icon: <CheckCircle2 className="w-4 h-4" />,
       };
-    case "rejected":
+    case "supervisor rejected":
       return {
         bg: "bg-red-50",
         text: "text-red-700",
         border: "border-red-300",
         icon: <XCircle className="w-4 h-4" />,
       };
-    case "complete":
+
+    // Technical Manager Level
+    case "technical-manager approved":
+    case "technical manager approved":
       return {
         bg: "bg-blue-50",
         text: "text-blue-700",
         border: "border-blue-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "technical-manager rejected":
+    case "technical manager rejected":
+      return {
+        bg: "bg-orange-50",
+        text: "text-orange-700",
+        border: "border-orange-300",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+
+    // Engineer Level
+    case "engineer approved":
+      return {
+        bg: "bg-cyan-50",
+        text: "text-cyan-700",
+        border: "border-cyan-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "engineer rejected":
+      return {
+        bg: "bg-pink-50",
+        text: "text-pink-700",
+        border: "border-pink-300",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+
+    // Final States
+    case "complete":
+      return {
+        bg: "bg-green-50",
+        text: "text-green-700",
+        border: "border-green-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
     case "order placed":
@@ -52,16 +90,33 @@ const getStatusStyles = (status: string) => {
       };
     case "order cancelled":
       return {
-        bg: "bg-orange-50",
-        text: "text-orange-700",
-        border: "border-orange-300",
+        bg: "bg-rose-50",
+        text: "text-rose-700",
+        border: "border-rose-300",
+        icon: <X className="w-4 h-4" />,
+      };
+
+    // Legacy statuses
+    case "approved":
+      return {
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        border: "border-emerald-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "rejected":
+      return {
+        bg: "bg-red-50",
+        text: "text-red-700",
+        border: "border-red-300",
         icon: <XCircle className="w-4 h-4" />,
       };
+
     default:
       return {
-        bg: "bg-gray-50",
-        text: "text-gray-700",
-        border: "border-gray-300",
+        bg: "bg-slate-50",
+        text: "text-slate-700",
+        border: "border-slate-300",
         icon: <Clock className="w-4 h-4" />,
       };
   }

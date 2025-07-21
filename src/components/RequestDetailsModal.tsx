@@ -126,6 +126,17 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 </div>
               </div>
 
+              {/* Cancellation Information - Only show for cancelled orders */}
+              {request.status === 'order cancelled' && request.customer_officer_note && (
+                <div className="col-span-full space-y-4">
+                  <h4 className="text-lg font-semibold text-orange-700 border-b border-orange-200 pb-2">Cancellation Information</h4>
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <p className="text-sm text-orange-600 font-medium mb-2">Reason for Cancellation:</p>
+                    <p className="text-gray-800">{request.customer_officer_note}</p>
+                  </div>
+                </div>
+              )}
+
               {/* Images Section */}
               {request.images && request.images.length > 0 && (
                 <div className="col-span-full space-y-4">

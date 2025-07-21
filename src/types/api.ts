@@ -62,6 +62,7 @@ export interface TireRequest {
   engineerTimestamp?: string;
   orderPlaced?: boolean;
   orderTimestamp?: string;
+  customer_officer_note?: string;
 }
 
 export interface ApiResponse<T> {

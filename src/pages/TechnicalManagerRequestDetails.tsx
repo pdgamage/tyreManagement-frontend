@@ -84,7 +84,7 @@ const TechnicalManagerRequestDetails = () => {
     try {
       await updateRequestStatus(
         id!,
-        approve ? "technical-manager approved" : "rejected",
+        approve ? "technical-manager approved" : "technical-manager rejected",
         notes,
         "technical-manager",
         user?.id

@@ -27,7 +27,11 @@ export interface Request {
     | "complete"
     | "order placed"
     | "order cancelled"
-    | "rejected";
+    | "rejected"
+    | "supervisor rejected"
+    | "technical-manager rejected"
+    | "engineer rejected"
+    | "customer-officer rejected";
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;

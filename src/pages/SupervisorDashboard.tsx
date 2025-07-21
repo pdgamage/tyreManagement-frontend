@@ -65,14 +65,10 @@ const SupervisorDashboard = () => {
   // Show rejected requests done by current supervisor only
   const rejectedRequests = supervisorRequests.filter(
     (req) =>
-      req.status === "rejected" &&
+      req.status === "supervisor rejected" &&
       req.supervisor_notes &&
       req.supervisor_notes.trim() !== "" &&
-      req.supervisor_decision_by === user?.id &&
-      // Ensure this was actually rejected by supervisor, not by technical manager or engineer
-      (!req.technical_manager_note ||
-        req.technical_manager_note.trim() === "") &&
-      (!req.engineer_note || req.engineer_note.trim() === "")
+      req.supervisor_decision_by === user?.id
   );
 
   // Calculate total displayed requests (only the ones shown in the dashboard)

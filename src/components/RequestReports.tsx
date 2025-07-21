@@ -55,18 +55,14 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         return (
           r.status === "pending" ||
           r.status === "supervisor approved" ||
-          (r.status === "rejected" &&
-           r.supervisor_notes &&
-           r.supervisor_notes.trim() !== "")
+          r.status === "supervisor rejected"
         );
       } else if (role === "technical-manager") {
         // Technical manager sees: supervisor approved, technical-manager approved, or rejected by technical manager
         return (
           r.status === "supervisor approved" ||
           r.status === "technical-manager approved" ||
-          (r.status === "rejected" &&
-           r.technical_manager_note &&
-           r.technical_manager_note.trim() !== "")
+          r.status === "technical-manager rejected"
         );
       } else if (role === "engineer") {
         // Engineer sees: technical-manager approved (pending work), complete (finished work), and rejected by engineer
@@ -124,17 +120,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     const rejectedRequests = requests.filter((r) => {
       if (role === "supervisor") {
-        return (
-          r.status === "rejected" &&
-          r.supervisor_notes &&
-          r.supervisor_notes.trim() !== ""
-        );
+        return r.status === "supervisor rejected";
       } else if (role === "technical-manager") {
-        return (
-          r.status === "rejected" &&
-          r.technical_manager_note &&
-          r.technical_manager_note.trim() !== ""
-        );
+        return r.status === "technical-manager rejected";
       } else if (role === "engineer") {
         return (
           r.status === "rejected" &&

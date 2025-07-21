@@ -81,7 +81,7 @@ const SupervisorRequestDetails = () => {
     try {
       await updateRequestStatus(
         id!,
-        approve ? "supervisor approved" : "rejected",
+        approve ? "supervisor approved" : "supervisor rejected",
         notes,
         "supervisor",
         user?.id

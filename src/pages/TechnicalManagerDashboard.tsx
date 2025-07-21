@@ -79,7 +79,7 @@ const TechnicalManagerDashboard = () => {
   // Filter rejected requests to only show those rejected by the current technical manager
   const rejectedRequests = requests.filter(
     (req) =>
-      req.status === "rejected" &&
+      req.status === "technical-manager rejected" &&
       req.technical_manager_note &&
       req.technical_manager_note.trim() !== "" &&
       req.technical_manager_id === user?.id
@@ -109,7 +109,7 @@ const TechnicalManagerDashboard = () => {
     try {
       await updateRequestStatus(
         selectedRequest.id,
-        isApproving ? "technical-manager approved" : "rejected",
+        isApproving ? "technical-manager approved" : "technical-manager rejected",
         notes,
         "technical-manager",
         user?.id

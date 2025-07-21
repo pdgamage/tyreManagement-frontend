@@ -98,7 +98,7 @@ const EngineerRequestDetails = () => {
         await updateRequestStatus(id!, "complete", notes, "engineer", user?.id);
       } else {
         // Just reject
-        await updateRequestStatus(id!, "rejected", notes, "engineer", user?.id);
+        await updateRequestStatus(id!, "engineer rejected", notes, "engineer", user?.id);
       }
       await fetchRequests();
       navigate("/engineer");

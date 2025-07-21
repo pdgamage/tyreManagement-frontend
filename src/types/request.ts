@@ -26,6 +26,7 @@ export interface Request {
     | "engineer approved"
     | "complete"
     | "order placed"
+    | "order cancelled"
     | "rejected";
   submittedAt: Date | string;
   images?: string[];

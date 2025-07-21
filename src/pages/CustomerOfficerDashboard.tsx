@@ -20,7 +20,7 @@ interface RequestsContextType {
 }
 
 const CustomerOfficerDashboard = () => {
-  const { requests, fetchRequests } = useRequests() as RequestsContextType;
+  const { requests, fetchRequests, updateRequestStatus } = useRequests() as RequestsContextType;
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
@@ -31,6 +31,8 @@ const CustomerOfficerDashboard = () => {
   const [orderRequest, setOrderRequest] = useState<Request | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelId, setCancelId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,6 +46,11 @@ const CustomerOfficerDashboard = () => {
   // Filter requests to show both "complete" and "order placed" status
   const completeRequests = requests.filter((req) =>
     req.status === "complete" || req.status === "order placed"
+  );
+
+  // Filter cancelled orders
+  const cancelledRequests = requests.filter((req) =>
+    req.status === "order cancelled"
   );
 
   const handleView = (request: Request) => {
@@ -93,6 +100,37 @@ const CustomerOfficerDashboard = () => {
   const cancelDelete = () => {
     setShowDeleteConfirm(false);
     setDeleteId(null);
+  };
+
+  const handleCancelOrder = async (id: string) => {
+    setCancelId(id);
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!cancelId) return;
+
+    try {
+      await updateRequestStatus(
+        cancelId,
+        "order cancelled",
+        "Order cancelled by customer officer",
+        "customer-officer"
+      );
+
+      // Refresh the requests list after cancellation
+      await fetchRequests();
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+    }
+
+    setShowCancelConfirm(false);
+    setCancelId(null);
+  };
+
+  const cancelOrderCancel = () => {
+    setShowCancelConfirm(false);
+    setCancelId(null);
   };
 
   return (
@@ -145,9 +183,27 @@ const CustomerOfficerDashboard = () => {
               onView={handleView}
               onDelete={handleDelete}
               onPlaceOrder={handlePlaceOrder}
+              onCancelOrder={handleCancelOrder}
               showActions={true}
               showPlaceOrderButton={true} // Enable place order button for customer officers
+              showCancelButton={true} // Enable cancel button for customer officers
             />
+
+            {/* Cancelled Orders */}
+            {cancelledRequests.length > 0 && (
+              <RequestTable
+                requests={cancelledRequests}
+                title={`Cancelled Orders (${cancelledRequests.length})`}
+                onApprove={() => {}}
+                onReject={() => {}}
+                onView={handleView}
+                onDelete={handleDelete}
+                onPlaceOrder={() => {}}
+                showActions={true}
+                showPlaceOrderButton={false}
+                showCancelButton={false}
+              />
+            )}
           </div>
         ) : (
           <RequestReports requests={completeRequests} role="customer-officer" />
@@ -184,6 +240,34 @@ const CustomerOfficerDashboard = () => {
                 onClick={confirmDelete}
               >
                 Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Order Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold text-orange-700">
+              Confirm Order Cancellation
+            </h3>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to cancel this order? This action will update the status to "order cancelled".
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                onClick={cancelOrderCancel}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-orange-600 rounded hover:bg-orange-700 transition-colors"
+                onClick={confirmCancelOrder}
+              >
+                Yes, Cancel Order
               </button>
             </div>
           </div>

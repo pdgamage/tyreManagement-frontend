@@ -10,7 +10,6 @@ import {
   UserCircle,
   LogOut,
   Plus,
-  Car,
   FileText,
   Clock,
   CheckCircle2,
@@ -186,10 +185,6 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  const handleVehicleRegistration = () => {
-    navigate("/vehicle-registration");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
@@ -266,13 +261,6 @@ const UserDashboard = () => {
             >
               <Plus className="w-5 h-5" />
               <span>{showRequestForm ? 'Hide Request Form' : 'New Tire Request'}</span>
-            </button>
-            <button
-              onClick={handleVehicleRegistration}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <Car className="w-5 h-5" />
-              <span>Register Vehicle</span>
             </button>
           </div>
         </div>

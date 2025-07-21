@@ -1,42 +1,272 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestDetailsModal from "../components/RequestDetailsModal";
 import { TireRequest } from "../types/api";
+import { useAuth } from "../contexts/AuthContext";
+import { useRequests } from "../contexts/RequestContext";
+import { useNavigate } from "react-router-dom";
+import { UserCircle, LogOut, Plus, Car, FileText, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 const UserDashboard = () => {
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
-    null
+  const { user, logout } = useAuth();
+  const { requests, fetchRequests } = useRequests();
+  const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  // Filter user's own requests
+  const userRequests = requests.filter(req => req.userId === user?.id);
+  const pendingRequests = userRequests.filter(req => req.status === "pending");
+  const approvedRequests = userRequests.filter(req =>
+    req.status === "supervisor approved" ||
+    req.status === "technical-manager approved" ||
+    req.status === "engineer approved" ||
+    req.status === "complete"
+  );
+  const rejectedRequests = userRequests.filter(req =>
+    req.status === "supervisor rejected" ||
+    req.status === "technical-manager rejected" ||
+    req.status === "engineer rejected"
   );
 
   const closeDetailsModal = () => {
     setSelectedRequest(null);
   };
 
-  return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">User Dashboard</h1>
-        <div className="space-x-3">
-          <button
-            onClick={() => (window.location.href = "/vehicle-registration")}
-            className="px-4 py-2 text-white transition-colors bg-green-600 rounded hover:bg-green-700"
-          >
-            Register Vehicle
-          </button>
-        </div>
-      </div>
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
-      {/* Tire Request Form Section */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">
-            Submit New Tire Request
-          </h2>
+  const handleVehicleRegistration = () => {
+    navigate("/vehicle-registration");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Professional Header with Enhanced Design */}
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          {/* Enhanced Header Title Section */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
+                <FileText className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white tracking-tight">
+                  User Dashboard
+                </h1>
+                <p className="text-slate-300 text-lg font-medium mt-1">
+                  Submit tire requests and track your applications
+                </p>
+                <div className="flex items-center mt-2 space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-slate-400 font-medium">User Level Access</span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-sm text-slate-400">Welcome back, {user?.name || 'User'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-6">
+              {/* Quick Actions */}
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleTimeString()}</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString()}</div>
+                </div>
+              </div>
+              {/* Enhanced User Profile */}
+              <div className="flex items-center space-x-3">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-medium text-white">{user?.name || 'User'}</div>
+                  <div className="text-xs text-slate-300">User</div>
+                </div>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg border-2 border-white/20 hover:shadow-xl transition-all duration-200"
+                  >
+                    <UserCircle className="w-6 h-6 text-white" />
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Professional Action Buttons */}
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setShowRequestForm(!showRequestForm)}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span>{showRequestForm ? 'Hide Request Form' : 'New Tire Request'}</span>
+            </button>
+            <button
+              onClick={handleVehicleRegistration}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+            >
+              <Car className="w-5 h-5" />
+              <span>Register Vehicle</span>
+            </button>
+          </div>
         </div>
-        <div className="p-6">
-          <TireRequestForm onSuccess={() => {}} />
+      </header>
+
+      {/* Enhanced Main Content */}
+      <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
+        <div className="space-y-8">
+          {/* Professional Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-amber-100 text-sm font-medium mb-2">Pending Requests</p>
+                  <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
+                  <p className="text-amber-200 text-xs">Awaiting review</p>
+                </div>
+                <div className="w-16 h-16 bg-amber-400/30 rounded-xl flex items-center justify-center">
+                  <Clock className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-emerald-100 text-sm font-medium mb-2">Approved</p>
+                  <p className="text-4xl font-bold mb-1">{approvedRequests.length}</p>
+                  <p className="text-emerald-200 text-xs">Successfully approved</p>
+                </div>
+                <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-red-100 text-sm font-medium mb-2">Rejected</p>
+                  <p className="text-4xl font-bold mb-1">{rejectedRequests.length}</p>
+                  <p className="text-red-200 text-xs">Needs revision</p>
+                </div>
+                <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                  <XCircle className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm font-medium mb-2">Total Requests</p>
+                  <p className="text-4xl font-bold mb-1">{userRequests.length}</p>
+                  <p className="text-purple-200 text-xs">All submissions</p>
+                </div>
+                <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
+                  <FileText className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tire Request Form Section */}
+          {showRequestForm && (
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-6 border-b border-green-100">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                    <Plus className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-green-900">Submit New Tire Request</h2>
+                    <p className="text-green-700 text-sm">Fill out the form below to request new tires for your vehicle</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-8">
+                <TireRequestForm onSuccess={() => {
+                  setShowRequestForm(false);
+                  fetchRequests(); // Refresh the requests to update counts
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Quick Tips Section */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-blue-900">Quick Tips</h3>
+                <p className="text-blue-700 text-sm">Important information for tire requests</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+                <h4 className="font-semibold text-gray-900 mb-2">Before Submitting</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Ensure your vehicle is registered in the system</li>
+                  <li>• Check current tire condition and wear patterns</li>
+                  <li>• Have your vehicle's current KM reading ready</li>
+                  <li>• Take photos of tire damage if applicable</li>
+                </ul>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+                <h4 className="font-semibold text-gray-900 mb-2">Request Process</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Requests are reviewed by supervisors first</li>
+                  <li>• Technical managers verify technical requirements</li>
+                  <li>• Engineers handle implementation details</li>
+                  <li>• Customer officers manage final orders</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
 
       {selectedRequest && (
         <RequestDetailsModal

@@ -87,16 +87,6 @@ const UserDashboard = () => {
   // console.log("Cancel order requests (order cancelled):", cancelOrderRequests.length);
   // console.log("Active filter:", activeFilter);
 
-  // Debug: Check department data
-  if (userRequests.length > 0) {
-    console.log("Sample request data:", {
-      userSection: userRequests[0]?.userSection,
-      vehicleDepartment: userRequests[0]?.vehicleDepartment,
-      Department: userRequests[0]?.Department,
-      allFields: Object.keys(userRequests[0] || {})
-    });
-  }
-
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     let result;
@@ -134,16 +124,11 @@ const UserDashboard = () => {
 
   // Convert TireRequest to Request format for RequestTable
   const convertTireRequestToRequest = (tireRequest: any) => {
-    // Try multiple sources for department information
-    const department = tireRequest.userSection ||
-                      tireRequest.vehicleDepartment ||
-                      tireRequest.Department ||
-                      'IT Department'; // Default to IT Department instead of Unknown
-
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
-      userSection: department
+      // userSection should now come correctly from backend with vehicle department info
+      userSection: tireRequest.userSection || 'IT Department'
     };
   };
 

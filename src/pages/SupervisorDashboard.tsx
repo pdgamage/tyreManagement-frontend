@@ -106,19 +106,15 @@ const SupervisorDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-6">
-              {/* Enhanced Quick Stats */}
-              <div className="hidden lg:flex items-center space-x-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
-                  <div className="text-3xl font-bold text-white">{pendingRequests.length}</div>
-                  <div className="text-xs text-slate-300 font-medium">Pending Review</div>
+              {/* Quick Actions */}
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleTimeString()}</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
-                  <div className="text-3xl font-bold text-white">{approvedRequests.length}</div>
-                  <div className="text-xs text-slate-300 font-medium">Approved Today</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
-                  <div className="text-3xl font-bold text-white">{rejectedRequests.length}</div>
-                  <div className="text-xs text-slate-300 font-medium">Rejected</div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString()}</div>
                 </div>
               </div>
               {/* Enhanced User Profile */}
@@ -175,62 +171,62 @@ const SupervisorDashboard = () => {
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         {activeTab === "requests" ? (
           <div className="space-y-8">
-            {/* Professional Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-              <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl border border-amber-200">
+            {/* Professional Overview Cards with Enhanced Spacing */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-amber-100 text-sm font-medium">Pending Review</p>
-                    <p className="text-4xl font-bold mt-2">{pendingRequests.length}</p>
-                    <p className="text-amber-200 text-xs mt-1">Requires immediate attention</p>
+                    <p className="text-amber-100 text-sm font-medium mb-2">Pending Review</p>
+                    <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
+                    <p className="text-amber-200 text-xs">Requires immediate attention</p>
                   </div>
-                  <div className="w-14 h-14 bg-amber-400/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-amber-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-xl border border-emerald-200">
+              <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-emerald-100 text-sm font-medium">Approved</p>
-                    <p className="text-4xl font-bold mt-2">{approvedRequests.length}</p>
-                    <p className="text-emerald-200 text-xs mt-1">Successfully processed</p>
+                    <p className="text-emerald-100 text-sm font-medium mb-2">Approved</p>
+                    <p className="text-4xl font-bold mb-1">{approvedRequests.length}</p>
+                    <p className="text-emerald-200 text-xs">Successfully processed</p>
                   </div>
-                  <div className="w-14 h-14 bg-emerald-400/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl border border-red-200">
+              <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-red-100 text-sm font-medium">Rejected</p>
-                    <p className="text-4xl font-bold mt-2">{rejectedRequests.length}</p>
-                    <p className="text-red-200 text-xs mt-1">Declined requests</p>
+                    <p className="text-red-100 text-sm font-medium mb-2">Rejected</p>
+                    <p className="text-4xl font-bold mb-1">{rejectedRequests.length}</p>
+                    <p className="text-red-200 text-xs">Declined requests</p>
                   </div>
-                  <div className="w-14 h-14 bg-red-400/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl border border-blue-200">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100 text-sm font-medium">Total Requests</p>
-                    <p className="text-4xl font-bold mt-2">{totalDisplayedRequests}</p>
-                    <p className="text-blue-200 text-xs mt-1">Displayed requests</p>
+                    <p className="text-blue-100 text-sm font-medium mb-2">Total Requests</p>
+                    <p className="text-4xl font-bold mb-1">{totalDisplayedRequests}</p>
+                    <p className="text-blue-200 text-xs">All requests displayed</p>
                   </div>
-                  <div className="w-14 h-14 bg-blue-400/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>

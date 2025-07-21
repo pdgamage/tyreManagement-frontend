@@ -18,7 +18,9 @@ import {
   AlertCircle,
   TrendingUp,
   Calendar,
-  Activity
+  Activity,
+  ShoppingCart,
+  Package
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -31,6 +33,7 @@ const UserDashboard = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchRequests();
@@ -72,6 +75,28 @@ const UserDashboard = () => {
     req.status === "technical-manager rejected" ||
     req.status === "engineer rejected"
   );
+  const placeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
+  const completeOrderRequests = userRequests.filter((req: any) => req.status === "order placed");
+
+  // Filter requests based on active filter
+  const getFilteredRequests = () => {
+    switch (activeFilter) {
+      case "pending":
+        return pendingRequests;
+      case "approved":
+        return approvedRequests;
+      case "rejected":
+        return rejectedRequests;
+      case "place-orders":
+        return placeOrderRequests;
+      case "complete-orders":
+        return completeOrderRequests;
+      default:
+        return userRequests;
+    }
+  };
+
+  const filteredRequests = getFilteredRequests();
 
   const closeDetailsModal = () => {
     setSelectedRequest(null);
@@ -178,8 +203,13 @@ const UserDashboard = () => {
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         <div className="space-y-8">
           {/* Professional Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div
+              onClick={() => setActiveFilter(activeFilter === "pending" ? "all" : "pending")}
+              className={`bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "pending" ? "ring-4 ring-amber-300 ring-opacity-50" : ""
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-amber-100 text-sm font-medium mb-2">Pending Requests</p>
@@ -192,7 +222,12 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
+            <div
+              onClick={() => setActiveFilter(activeFilter === "approved" ? "all" : "approved")}
+              className={`bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "approved" ? "ring-4 ring-emerald-300 ring-opacity-50" : ""
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-emerald-100 text-sm font-medium mb-2">Approved</p>
@@ -205,7 +240,12 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
+            <div
+              onClick={() => setActiveFilter(activeFilter === "rejected" ? "all" : "rejected")}
+              className={`bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "rejected" ? "ring-4 ring-red-300 ring-opacity-50" : ""
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-red-100 text-sm font-medium mb-2">Rejected</p>
@@ -218,7 +258,48 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300">
+            <div
+              onClick={() => setActiveFilter(activeFilter === "place-orders" ? "all" : "place-orders")}
+              className={`bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "place-orders" ? "ring-4 ring-blue-300 ring-opacity-50" : ""
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm font-medium mb-2">Place Orders</p>
+                  <p className="text-4xl font-bold mb-1">{placeOrderRequests.length}</p>
+                  <p className="text-blue-200 text-xs">Ready for ordering</p>
+                </div>
+                <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">
+                  <ShoppingCart className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => setActiveFilter(activeFilter === "complete-orders" ? "all" : "complete-orders")}
+              className={`bg-gradient-to-br from-teal-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-teal-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "complete-orders" ? "ring-4 ring-teal-300 ring-opacity-50" : ""
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-teal-100 text-sm font-medium mb-2">Complete Orders</p>
+                  <p className="text-4xl font-bold mb-1">{completeOrderRequests.length}</p>
+                  <p className="text-teal-200 text-xs">Orders placed</p>
+                </div>
+                <div className="w-16 h-16 bg-teal-400/30 rounded-xl flex items-center justify-center">
+                  <Package className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => setActiveFilter(activeFilter === "all" ? "all" : "all")}
+              className={`bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "all" ? "ring-4 ring-purple-300 ring-opacity-50" : ""
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm font-medium mb-2">Total Requests</p>
@@ -263,15 +344,39 @@ const UserDashboard = () => {
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-blue-900">Your Tire Requests</h2>
-                  <p className="text-blue-700 text-sm">Track the status of your tire requests with color-coded indicators</p>
+                  <h2 className="text-xl font-bold text-blue-900">
+                    Your Tire Requests
+                    {activeFilter !== "all" && (
+                      <span className="ml-2 text-sm font-medium bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                        {activeFilter === "pending" && "Pending"}
+                        {activeFilter === "approved" && "Approved"}
+                        {activeFilter === "rejected" && "Rejected"}
+                        {activeFilter === "place-orders" && "Place Orders"}
+                        {activeFilter === "complete-orders" && "Complete Orders"}
+                      </span>
+                    )}
+                  </h2>
+                  <p className="text-blue-700 text-sm">
+                    {activeFilter === "all"
+                      ? "Track the status of your tire requests with color-coded indicators"
+                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests`
+                    }
+                    {activeFilter !== "all" && (
+                      <button
+                        onClick={() => setActiveFilter("all")}
+                        className="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+                      >
+                        Show All
+                      </button>
+                    )}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="p-8">
-              {userRequests.length > 0 ? (
+              {filteredRequests.length > 0 ? (
                 <RequestTable
-                  requests={userRequests}
+                  requests={filteredRequests}
                   onRequestSelect={setSelectedRequest}
                   role="user"
                 />
@@ -280,9 +385,14 @@ const UserDashboard = () => {
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
-                  <div className="text-gray-500 text-lg mb-2 font-medium">No requests found</div>
+                  <div className="text-gray-500 text-lg mb-2 font-medium">
+                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests`}
+                  </div>
                   <p className="text-gray-400 text-sm mb-6">
-                    Submit your first tire request using the form above
+                    {activeFilter === "all"
+                      ? "Submit your first tire request using the form above"
+                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "ready for ordering" : "completed order"} requests at the moment.`
+                    }
                   </p>
                   <button
                     onClick={() => setShowRequestForm(true)}

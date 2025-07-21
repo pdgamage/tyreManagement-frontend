@@ -409,212 +409,189 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       </div>
 
       {/* Charts Grid */}
-      {role === "customer-officer" ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Monthly Order Trends */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Monthly Order Trends</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={monthlyStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="requests"
-                  stackId="1"
-                  stroke="#3B82F6"
-                  fill="#3B82F6"
-                  name="Total Orders"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="approved"
-                  stackId="2"
-                  stroke="#10B981"
-                  fill="#10B981"
-                  name="Orders Placed"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Trends */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            {role === "customer-officer" ? "Monthly Order Trends" : "Monthly Request Trends"}
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={monthlyStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="requests"
+                stackId="1"
+                stroke={role === "customer-officer" ? "#3B82F6" : "#8884d8"}
+                fill={role === "customer-officer" ? "#3B82F6" : "#8884d8"}
+                name={role === "customer-officer" ? "Total Orders" : "Total Requests"}
+              />
+              <Area
+                type="monotone"
+                dataKey="approved"
+                stackId="2"
+                stroke={role === "customer-officer" ? "#10B981" : "#82ca9d"}
+                fill={role === "customer-officer" ? "#10B981" : "#82ca9d"}
+                name={role === "customer-officer" ? "Orders Placed" : "Approved"}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
 
-          {/* Order Status Overview */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Order Status Overview</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Ready to Order', value: stats.pendingRequests },
-                    { name: 'Orders Placed', value: stats.approvedRequests },
-                    { name: 'Cancelled', value: stats.rejectedRequests }
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} (${(percent * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  <Cell fill="#F59E0B" />
-                  <Cell fill="#10B981" />
-                  <Cell fill="#EF4444" />
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        {/* Status Overview */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            {role === "customer-officer" ? "Order Status Overview" : "Request Status Overview"}
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={role === "customer-officer" ? [
+                  { name: 'Ready to Order', value: stats.pendingRequests },
+                  { name: 'Orders Placed', value: stats.approvedRequests },
+                  { name: 'Cancelled', value: stats.rejectedRequests }
+                ] : [
+                  { name: 'Pending', value: stats.pendingRequests },
+                  { name: 'Approved', value: stats.approvedRequests },
+                  { name: 'Rejected', value: stats.rejectedRequests }
+                ]}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name} (${(percent * 100).toFixed(0)}%)`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                <Cell fill="#F59E0B" />
+                <Cell fill="#10B981" />
+                <Cell fill="#EF4444" />
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-          {/* Most Ordered Tire Sizes */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Most Ordered Tire Sizes</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={tireSizeStats.slice(0, 6).map((item, index) => ({
+        {/* Section Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            {role === "customer-officer" ? "Top Departments by Orders" : "Top Sections by Tire Requests"}
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={sectionStats}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name} (${(percent * 100).toFixed(0)}%)`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {sectionStats.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Vehicle Analysis */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            {role === "customer-officer" ? "Top 10 Vehicles by Orders" : "Top 10 Vehicles by Tire Requests"}
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={vehicleStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="vehicle" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="quantity" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Tire Size Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">
+            {role === "customer-officer" ? "Most Ordered Tire Sizes" : "Tire Size Distribution"}
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={role === "customer-officer" ?
+                  tireSizeStats.slice(0, 6).map((item) => ({
                     name: item.size,
                     value: item.quantity
-                  }))}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} (${(percent * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {tireSizeStats.slice(0, 6).map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+                  })) :
+                  tireSizeStats
+                }
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name} (${(percent * 100).toFixed(0)}%)`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey={role === "customer-officer" ? "value" : "quantity"}
+              >
+                {(role === "customer-officer" ? tireSizeStats.slice(0, 6) : tireSizeStats).map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Monthly Trends */}
+
+        {/* Additional Customer Officer Specific Chart - Order Fulfillment Rate */}
+        {role === "customer-officer" && (
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Monthly Request Trends</h3>
+            <h3 className="text-lg font-semibold mb-4">Order Fulfillment Performance</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={monthlyStats}>
+              <BarChart data={[
+                {
+                  name: 'Fulfillment Rate',
+                  'Orders Placed': stats.approvedRequests,
+                  'Cancelled': stats.rejectedRequests,
+                  'Ready to Order': stats.pendingRequests
+                }
+              ]}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="requests"
-                  stackId="1"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="approved"
-                  stackId="2"
-                  stroke="#82ca9d"
-                  fill="#82ca9d"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Section Distribution */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">
-              Top Sections by Tire Requests
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={sectionStats}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} (${(percent * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {sectionStats.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Vehicle Analysis */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">
-              Top 10 Vehicles by Tire Requests
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={vehicleStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="vehicle" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="quantity" fill="#8884d8" />
+                <Bar dataKey="Orders Placed" fill="#10B981" />
+                <Bar dataKey="Ready to Order" fill="#F59E0B" />
+                <Bar dataKey="Cancelled" fill="#EF4444" />
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Tire Size Distribution */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Tire Size Distribution</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={tireSizeStats}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ size, percent }) =>
-                    `${size} (${(percent * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="quantity"
-                >
-                  {tireSizeStats.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Key Insights */}
       <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-xl shadow-lg border border-gray-100">

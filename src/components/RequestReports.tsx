@@ -110,8 +110,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       if (role === "supervisor") {
         return r.status === "supervisor approved";
       } else if (role === "technical-manager") {
-        // Technical manager approved requests include both "technical-manager approved" and "complete"
-        return r.status === "technical-manager approved" || r.status === "complete";
+        // Technical manager approved requests are only those with "technical-manager approved" status
+        return r.status === "technical-manager approved";
       } else if (role === "engineer") {
         // Engineer completed requests
         return r.status === "complete";

@@ -941,6 +941,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       supervisorNotes: request.supervisor_notes,
       technicalManagerNotes: request.technical_manager_note,
       engineerNotes: request.engineer_note,
+      customer_officer_note: request.customer_officer_note,
       // New delivery and pricing fields
       deliveryOfficeName: request.deliveryOfficeName,
       deliveryStreetName: request.deliveryStreetName,

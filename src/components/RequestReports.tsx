@@ -65,8 +65,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           r.status === "supervisor approved" ||
           r.status === "technical-manager approved" ||
           (r.status === "rejected" &&
-           r.technical_manager_notes &&
-           r.technical_manager_notes.trim() !== "")
+           r.technical_manager_note &&
+           r.technical_manager_note.trim() !== "")
         );
       } else if (role === "engineer") {
         // Engineer sees: technical-manager approved (pending work), complete (finished work), and rejected by engineer
@@ -132,8 +132,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       } else if (role === "technical-manager") {
         return (
           r.status === "rejected" &&
-          r.technical_manager_notes &&
-          r.technical_manager_notes.trim() !== ""
+          r.technical_manager_note &&
+          r.technical_manager_note.trim() !== ""
         );
       } else if (role === "engineer") {
         return (

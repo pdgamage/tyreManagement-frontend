@@ -191,6 +191,14 @@ const CustomerOfficerDashboard = () => {
               {/* Quick Actions */}
               <div className="hidden lg:flex items-center space-x-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleTimeString()}</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString()}</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
                   <div className="text-xs text-slate-300 font-medium">Active Orders</div>
                   <div className="text-sm font-semibold text-white">{completeRequests.length}</div>
                 </div>

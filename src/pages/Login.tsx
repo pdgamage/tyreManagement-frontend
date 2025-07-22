@@ -34,32 +34,6 @@ const Login = () => {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 blur-3xl animate-breathe animate-morph" style={{animationDelay: '2s'}}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 blur-3xl animate-breathe animate-morph" style={{animationDelay: '1s'}}></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20 animate-rotate-glow"></div>
-
-        {/* Realistic tire images */}
-        <div className="absolute bottom-10 left-10 opacity-15 animate-float hidden lg:block">
-          <img
-            src="https://purepng.com/public/uploads/large/purepng.com-car-wheelcar-wheelwheeltirerubberautomobilevehicle-1701527532669hgfqr.png"
-            alt="Car Tire"
-            className="h-32 w-32 object-contain"
-            style={{animationDelay: '0.5s'}}
-            onError={(e) => {
-              // Fallback to a different image if this one fails
-              e.currentTarget.src = "https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png";
-            }}
-          />
-        </div>
-        <div className="absolute top-20 right-20 opacity-15 animate-float hidden lg:block">
-          <img
-            src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
-            alt="Car Tire"
-            className="h-24 w-24 object-contain"
-            style={{animationDelay: '1.5s'}}
-            onError={(e) => {
-              // Fallback SVG if image fails to load
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </div>
       </div>
 
       {/* Main Content */}
@@ -70,23 +44,12 @@ const Login = () => {
             {/* Left Side - Branding & Info */}
             <div className="hidden lg:block space-y-6 animate-slide-in-up">
               <div className="text-center lg:text-left">
-                <div className="mb-6 flex items-center justify-center lg:justify-start space-x-4">
+                <div className="mb-6">
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
                     alt="SLT Mobitel"
-                    className="h-16 animate-float"
+                    className="h-16 mx-auto lg:mx-0 animate-float"
                   />
-                  <div className="hidden lg:block">
-                    <img
-                      src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
-                      alt="Car Tire"
-                      className="h-12 w-12 object-contain animate-pulse opacity-60"
-                      onError={(e) => {
-                        // Fallback to another tire image
-                        e.currentTarget.src = "https://purepng.com/public/uploads/large/purepng.com-car-wheelcar-wheelwheeltirerubberautomobilevehicle-1701527532669hgfqr.png";
-                      }}
-                    />
-                  </div>
                 </div>
                 <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
                   Tire Management
@@ -161,29 +124,11 @@ const Login = () => {
 
                     {/* Mobile Logo */}
                     <div className="lg:hidden mb-6">
-                      <div className="flex items-center justify-center space-x-3 mb-4">
-                        <img
-                          src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
-                          alt="Car Tire"
-                          className="h-8 w-8 object-contain opacity-60"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        <img
-                          src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
-                          alt="SLT Mobitel"
-                          className="h-12"
-                        />
-                        <img
-                          src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
-                          alt="Car Tire"
-                          className="h-8 w-8 object-contain opacity-60"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      </div>
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
+                        alt="SLT Mobitel"
+                        className="h-12 mx-auto"
+                      />
                     </div>
 
                     <div className="space-y-3">

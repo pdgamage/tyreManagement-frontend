@@ -528,43 +528,66 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Tire Size Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">
-            {role === "customer-officer" ? "Most Ordered Tire Sizes" : "Tire Size Distribution"}
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={role === "customer-officer" ?
-                  tireSizeStats.slice(0, 6).map((item) => ({
+        {/* Role-specific additional charts */}
+        {role === "supervisor" && (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Request Processing Performance</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={[
+                {
+                  name: 'Processing Status',
+                  'Pending Review': stats.pendingRequests,
+                  'Approved': stats.approvedRequests,
+                  'Rejected': stats.rejectedRequests
+                }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Pending Review" fill="#F59E0B" />
+                <Bar dataKey="Approved" fill="#10B981" />
+                <Bar dataKey="Rejected" fill="#EF4444" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Tire Size Distribution - Only show for customer-officer role */}
+        {role === "customer-officer" && (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Most Ordered Tire Sizes</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={tireSizeStats.slice(0, 6).map((item) => ({
                     name: item.size,
                     value: item.quantity
-                  })) :
-                  tireSizeStats
-                }
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) =>
-                  `${name} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey={role === "customer-officer" ? "value" : "quantity"}
-              >
-                {(role === "customer-officer" ? tireSizeStats.slice(0, 6) : tireSizeStats).map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {tireSizeStats.slice(0, 6).map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Additional Customer Officer Specific Chart - Order Fulfillment Rate */}
         {role === "customer-officer" && (

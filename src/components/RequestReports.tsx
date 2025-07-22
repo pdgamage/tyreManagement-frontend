@@ -529,30 +529,6 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         </div>
 
         {/* Role-specific additional charts */}
-        {role === "supervisor" && (
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Request Processing Performance</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[
-                {
-                  name: 'Processing Status',
-                  'Pending Review': stats.pendingRequests,
-                  'Approved': stats.approvedRequests,
-                  'Rejected': stats.rejectedRequests
-                }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Pending Review" fill="#F59E0B" />
-                <Bar dataKey="Approved" fill="#10B981" />
-                <Bar dataKey="Rejected" fill="#EF4444" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
 
         {/* Tire Size Distribution - Only show for customer-officer role */}
         {role === "customer-officer" && (

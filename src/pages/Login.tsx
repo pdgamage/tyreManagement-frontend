@@ -35,41 +35,30 @@ const Login = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 blur-3xl animate-breathe animate-morph" style={{animationDelay: '1s'}}></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20 animate-rotate-glow"></div>
 
-        {/* Decorative tire SVG elements */}
-        <div className="absolute bottom-10 left-10 opacity-10 animate-float hidden lg:block">
-          <svg
-            className="h-32 w-32 text-blue-300"
+        {/* Realistic tire images */}
+        <div className="absolute bottom-10 left-10 opacity-15 animate-float hidden lg:block">
+          <img
+            src="https://purepng.com/public/uploads/large/purepng.com-car-wheelcar-wheelwheeltirerubberautomobilevehicle-1701527532669hgfqr.png"
+            alt="Car Tire"
+            className="h-32 w-32 object-contain"
             style={{animationDelay: '0.5s'}}
-            viewBox="0 0 100 100"
-            fill="currentColor"
-          >
-            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8"/>
-            <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="4"/>
-            <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="2"/>
-            <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" strokeWidth="1"/>
-            <circle cx="50" cy="50" r="8" fill="currentColor"/>
-            {/* Tire tread pattern */}
-            <g stroke="currentColor" strokeWidth="2" fill="none">
-              <path d="M20 50 L30 45 L30 55 Z"/>
-              <path d="M70 50 L80 45 L80 55 Z"/>
-              <path d="M50 20 L45 30 L55 30 Z"/>
-              <path d="M50 80 L45 70 L55 70 Z"/>
-            </g>
-          </svg>
+            onError={(e) => {
+              // Fallback to a different image if this one fails
+              e.currentTarget.src = "https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png";
+            }}
+          />
         </div>
-        <div className="absolute top-20 right-20 opacity-10 animate-float hidden lg:block">
-          <svg
-            className="h-24 w-24 text-purple-300"
+        <div className="absolute top-20 right-20 opacity-15 animate-float hidden lg:block">
+          <img
+            src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
+            alt="Car Tire"
+            className="h-24 w-24 object-contain"
             style={{animationDelay: '1.5s'}}
-            viewBox="0 0 100 100"
-            fill="currentColor"
-          >
-            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="6"/>
-            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="3"/>
-            <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2"/>
-            <circle cx="50" cy="50" r="12" fill="none" stroke="currentColor" strokeWidth="1"/>
-            <circle cx="50" cy="50" r="6" fill="currentColor"/>
-          </svg>
+            onError={(e) => {
+              // Fallback SVG if image fails to load
+              e.currentTarget.style.display = 'none';
+            }}
+          />
         </div>
       </div>
 
@@ -88,23 +77,15 @@ const Login = () => {
                     className="h-16 animate-float"
                   />
                   <div className="hidden lg:block">
-                    <svg
-                      className="h-12 w-12 text-blue-400 animate-pulse opacity-60"
-                      viewBox="0 0 100 100"
-                      fill="currentColor"
-                    >
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="6"/>
-                      <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="3"/>
-                      <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2"/>
-                      <circle cx="50" cy="50" r="10" fill="currentColor"/>
-                      {/* Tire spokes */}
-                      <g stroke="currentColor" strokeWidth="1" fill="none">
-                        <line x1="50" y1="20" x2="50" y2="35"/>
-                        <line x1="50" y1="65" x2="50" y2="80"/>
-                        <line x1="20" y1="50" x2="35" y2="50"/>
-                        <line x1="65" y1="50" x2="80" y2="50"/>
-                      </g>
-                    </svg>
+                    <img
+                      src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
+                      alt="Car Tire"
+                      className="h-12 w-12 object-contain animate-pulse opacity-60"
+                      onError={(e) => {
+                        // Fallback to another tire image
+                        e.currentTarget.src = "https://purepng.com/public/uploads/large/purepng.com-car-wheelcar-wheelwheeltirerubberautomobilevehicle-1701527532669hgfqr.png";
+                      }}
+                    />
                   </div>
                 </div>
                 <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
@@ -181,29 +162,27 @@ const Login = () => {
                     {/* Mobile Logo */}
                     <div className="lg:hidden mb-6">
                       <div className="flex items-center justify-center space-x-3 mb-4">
-                        <svg
-                          className="h-8 w-8 text-blue-400 opacity-60"
-                          viewBox="0 0 100 100"
-                          fill="currentColor"
-                        >
-                          <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="8"/>
-                          <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="4"/>
-                          <circle cx="50" cy="50" r="8" fill="currentColor"/>
-                        </svg>
+                        <img
+                          src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
+                          alt="Car Tire"
+                          className="h-8 w-8 object-contain opacity-60"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
                           alt="SLT Mobitel"
                           className="h-12"
                         />
-                        <svg
-                          className="h-8 w-8 text-blue-400 opacity-60"
-                          viewBox="0 0 100 100"
-                          fill="currentColor"
-                        >
-                          <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="8"/>
-                          <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="4"/>
-                          <circle cx="50" cy="50" r="8" fill="currentColor"/>
-                        </svg>
+                        <img
+                          src="https://www.pngarts.com/files/3/Car-Tire-PNG-High-Quality-Image.png"
+                          alt="Car Tire"
+                          className="h-8 w-8 object-contain opacity-60"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
                       </div>
                     </div>
 

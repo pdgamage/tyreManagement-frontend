@@ -45,13 +45,11 @@ const Login = () => {
             <div className="hidden lg:block space-y-10 animate-slide-in-up">
               <div className="text-center lg:text-left">
                 <div className="mb-8">
-                  <div className="bg-white rounded-2xl p-6 shadow-lg inline-block">
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
-                      alt="SLT Mobitel"
-                      className="h-16 mx-auto lg:mx-0 animate-float"
-                    />
-                  </div>
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
+                    alt="SLT Mobitel"
+                    className="h-20 mx-auto lg:mx-0 animate-float"
+                  />
                 </div>
                 <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
                   Tire Management
@@ -126,13 +124,11 @@ const Login = () => {
 
                     {/* Mobile Logo */}
                     <div className="lg:hidden mb-8">
-                      <div className="bg-white rounded-2xl p-4 shadow-lg inline-block mx-auto">
-                        <img
-                          src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
-                          alt="SLT Mobitel"
-                          className="h-12"
-                        />
-                      </div>
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
+                        alt="SLT Mobitel"
+                        className="h-16 mx-auto"
+                      />
                     </div>
 
                     <div className="space-y-4">

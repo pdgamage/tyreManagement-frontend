@@ -12,10 +12,10 @@ const AzureLoginButton = () => {
   return (
     <button
       onClick={handleLogin}
-      className="group relative w-full flex items-center justify-center px-8 py-5 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl shadow-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 btn-professional transform hover:scale-[1.02] hover:shadow-2xl border border-blue-500/20"
+      className="group relative w-full flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-xl shadow-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 btn-professional transform hover:scale-[1.02] hover:shadow-2xl border border-blue-500/20"
     >
       {/* Background gradient animation */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-800 via-purple-700 to-indigo-800 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-800 via-purple-700 to-indigo-800 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
       {/* Microsoft Logo */}
       <span className="relative z-10 mr-4">
@@ -36,9 +36,9 @@ const AzureLoginButton = () => {
 
       {/* Button Text */}
       <span className="relative z-10 flex items-center">
-        <span className="text-lg font-semibold">Sign in with Microsoft</span>
+        <span className="text-base font-semibold">Sign in with Microsoft</span>
         <svg
-          className="ml-3 w-6 h-6 transform group-hover:translate-x-1 transition-transform duration-300"
+          className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -48,12 +48,12 @@ const AzureLoginButton = () => {
       </span>
 
       {/* Enhanced shine effect */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
       </div>
 
       {/* Glow effect */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300">
+      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 blur-xl"></div>
       </div>
     </button>

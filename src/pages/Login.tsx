@@ -37,110 +37,110 @@ const Login = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8 min-h-screen">
-        <div className="w-full max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 flex items-center justify-center px-4 py-4 sm:px-6 lg:px-8 min-h-screen">
+        <div className="w-full max-w-6xl h-full flex items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center w-full">
 
             {/* Left Side - Branding & Info */}
-            <div className="hidden lg:block space-y-10 animate-slide-in-up">
+            <div className="hidden lg:block space-y-6 animate-slide-in-up">
               <div className="text-center lg:text-left">
-                <div className="mb-8">
+                <div className="mb-6">
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
                     alt="SLT Mobitel"
-                    className="h-20 mx-auto lg:mx-0 animate-float"
+                    className="h-16 mx-auto lg:mx-0 animate-float"
                   />
                 </div>
-                <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+                <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
                   Tire Management
                   <span className="block text-blue-300">System</span>
                 </h1>
-                <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-                  Streamline your fleet tire management with our comprehensive digital solution designed for modern enterprises
+                <p className="text-lg text-slate-300 mb-6 leading-relaxed">
+                  Streamline your fleet tire management with our comprehensive digital solution
                 </p>
               </div>
 
               {/* Features */}
-              <div className="space-y-8">
-                <div className="flex items-start space-x-5">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-blue-400" />
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-blue-400" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Secure Access</h3>
-                    <p className="text-slate-300 leading-relaxed">Enterprise-grade security with Microsoft Azure AD integration and multi-factor authentication</p>
+                    <h3 className="text-lg font-semibold text-white mb-1">Secure Access</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Enterprise-grade security with Microsoft Azure AD integration</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-5">
+                <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                      <Users className="w-6 h-6 text-green-400" />
+                    <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-green-400" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Role-Based Access</h3>
-                    <p className="text-slate-300 leading-relaxed">Customized dashboards and permissions for different user roles and responsibilities</p>
+                    <h3 className="text-lg font-semibold text-white mb-1">Role-Based Access</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Customized dashboards for different user roles</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-5">
+                <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-purple-400" />
+                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-purple-400" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Approval Workflow</h3>
-                    <p className="text-slate-300 leading-relaxed">Streamlined multi-level approval process from request submission to order placement</p>
+                    <h3 className="text-lg font-semibold text-white mb-1">Approval Workflow</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Streamlined approval process from request to order</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-5">
+                <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center">
-                      <Settings className="w-6 h-6 text-orange-400" />
+                    <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                      <Settings className="w-5 h-5 text-orange-400" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Fleet Management</h3>
-                    <p className="text-slate-300 leading-relaxed">Complete vehicle and tire inventory management with real-time tracking and analytics</p>
+                    <h3 className="text-lg font-semibold text-white mb-1">Fleet Management</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Complete vehicle and tire inventory management</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Right Side - Login Form */}
-            <div className="w-full max-w-lg mx-auto animate-scale-in">
+            <div className="w-full max-w-md mx-auto animate-scale-in">
               <div className="relative">
                 {/* Enhanced glassmorphism background effect */}
-                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-3xl blur-xl opacity-30 animate-pulse"></div>
-                <div className="absolute -inset-1 bg-gradient-to-r from-white/10 to-white/5 rounded-3xl"></div>
+                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl"></div>
 
-                <div className="relative bg-white/95 backdrop-blur-2xl shadow-2xl rounded-3xl p-10 border border-white/30 hover:shadow-3xl transition-all duration-500">
-                  <div className="text-center space-y-8">
+                <div className="relative bg-white/95 backdrop-blur-2xl shadow-2xl rounded-2xl p-8 border border-white/30 hover:shadow-3xl transition-all duration-500">
+                  <div className="text-center space-y-6">
 
                     {/* Mobile Logo */}
-                    <div className="lg:hidden mb-8">
+                    <div className="lg:hidden mb-6">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
                         alt="SLT Mobitel"
-                        className="h-16 mx-auto"
+                        className="h-12 mx-auto"
                       />
                     </div>
 
-                    <div className="space-y-4">
-                      <h2 className="text-4xl font-bold text-gray-900 leading-tight">
+                    <div className="space-y-3">
+                      <h2 className="text-3xl font-bold text-gray-900 leading-tight">
                         Welcome Back
                       </h2>
-                      <p className="text-lg text-gray-600">
+                      <p className="text-gray-600">
                         Sign in to access your dashboard
                       </p>
                     </div>
 
-                    <div className="space-y-8">
+                    <div className="space-y-6">
                       <div className="relative">
                         <AzureLoginButton />
                       </div>
@@ -187,21 +187,21 @@ const Login = () => {
               </div>
 
               {/* Help Section */}
-              <div className="mt-10 text-center">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-white/40 shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Need Help?</h3>
-                  <p className="text-gray-600 mb-6">
-                    Contact our support team for assistance
+              <div className="mt-6 text-center">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/40 shadow-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Need Help?</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Contact our support team
                   </p>
-                  <div className="grid grid-cols-1 gap-4 text-sm">
-                    <div className="flex items-center justify-center space-x-3 text-gray-700 bg-gray-50 rounded-lg p-3">
-                      <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="grid grid-cols-1 gap-3 text-sm">
+                    <div className="flex items-center justify-center space-x-2 text-gray-700 bg-gray-50 rounded-lg p-2">
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                       </svg>
                       <span className="font-medium">1717 (24x7)</span>
                     </div>
-                    <div className="flex items-center justify-center space-x-3 text-gray-700 bg-gray-50 rounded-lg p-3">
-                      <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center justify-center space-x-2 text-gray-700 bg-gray-50 rounded-lg p-2">
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                       </svg>

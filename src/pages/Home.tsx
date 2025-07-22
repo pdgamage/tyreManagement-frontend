@@ -2,14 +2,12 @@ import { Link } from "react-router-dom";
 import tireImage from "../images/car-tire-png-469.png";
 import {
   TruckIcon,
-  BarChart3Icon,
   ClipboardListIcon,
   PhoneIcon,
   MailIcon,
   ArrowRight,
   CheckCircle,
   Users,
-  Settings,
   FileText,
   Shield,
   Database,
@@ -63,24 +61,6 @@ const Home = () => {
       gradient: "from-emerald-500 via-emerald-600 to-emerald-700",
       iconBg: "bg-emerald-100",
       iconColor: "text-emerald-600"
-    },
-    {
-      icon: <BarChart3Icon className="w-8 h-8" />,
-      title: "Analytics Dashboard",
-      description: "View reports and insights",
-      link: "/login",
-      gradient: "from-purple-500 via-purple-600 to-purple-700",
-      iconBg: "bg-purple-100",
-      iconColor: "text-purple-600"
-    },
-    {
-      icon: <Settings className="w-8 h-8" />,
-      title: "System Settings",
-      description: "Manage system configuration",
-      link: "/login",
-      gradient: "from-orange-500 via-orange-600 to-orange-700",
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600"
     }
   ];
 
@@ -246,7 +226,7 @@ const Home = () => {
       {/* Quick Actions Section */}
       <section className="py-20 -mt-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {quickActions.map((action, index) => (
               <Link
                 key={index}

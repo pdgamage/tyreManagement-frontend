@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import tireImage from "../images/car-tire-png-469.png";
+import { useVehicles } from "../contexts/VehicleContext";
+import { useRequests } from "../contexts/RequestContext";
 import {
   TruckIcon,
   ClipboardListIcon,
@@ -25,6 +27,9 @@ import {
 } from "lucide-react";
 
 const Home = () => {
+  const { vehicles } = useVehicles();
+  const { requests } = useRequests();
+
   const heroFeatures = [
     {
       icon: <Zap className="w-6 h-6" />,
@@ -43,20 +48,27 @@ const Home = () => {
     }
   ];
 
-
+  // Calculate real statistics
+  const totalVehicles = vehicles.length;
+  const totalRequests = requests.length;
+  const activeRequests = requests.filter(req =>
+    req.status === 'pending' || req.status === 'in_progress' || req.status === 'approved'
+  ).length;
+  const completedRequests = requests.filter(req => req.status === 'completed').length;
+  const successRate = totalRequests > 0 ? ((completedRequests / totalRequests) * 100).toFixed(1) : "0.0";
 
   const stats = [
     {
       icon: <Users className="w-8 h-8" />,
-      number: "1,247",
-      label: "Active Users",
+      number: totalRequests.toLocaleString(),
+      label: "Total Requests",
       trend: "+12%",
       trendUp: true,
       color: "blue"
     },
     {
       icon: <TruckIcon className="w-8 h-8" />,
-      number: "856",
+      number: totalVehicles.toLocaleString(),
       label: "Fleet Vehicles",
       trend: "+8%",
       trendUp: true,
@@ -64,7 +76,7 @@ const Home = () => {
     },
     {
       icon: <Activity className="w-8 h-8" />,
-      number: "342",
+      number: activeRequests.toLocaleString(),
       label: "Active Requests",
       trend: "+15%",
       trendUp: true,
@@ -72,7 +84,7 @@ const Home = () => {
     },
     {
       icon: <Award className="w-8 h-8" />,
-      number: "99.2%",
+      number: `${successRate}%`,
       label: "Success Rate",
       trend: "+2%",
       trendUp: true,

@@ -71,7 +71,7 @@ const VehicleRegistration = () => {
       {/* Main Content */}
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-6 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
@@ -81,19 +81,6 @@ const VehicleRegistration = () => {
               </div>
               <div className="w-12 h-12 bg-blue-400/30 rounded-xl flex items-center justify-center">
                 <Car className="w-6 h-6" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-emerald-100 text-sm font-medium mb-1">Active Vehicles</p>
-                <p className="text-3xl font-bold">{activeVehicles}</p>
-                <p className="text-emerald-200 text-xs">Currently operational</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-400/30 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6" />
               </div>
             </div>
           </div>

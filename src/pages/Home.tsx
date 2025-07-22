@@ -19,9 +19,7 @@ import {
   Activity,
   Clock,
   Globe,
-  Sparkles,
-  Target,
-  Gauge
+  Target
 } from "lucide-react";
 
 const Home = () => {
@@ -47,26 +45,7 @@ const Home = () => {
 
 
 
-  const features = [
-    {
-      icon: <Sparkles className="w-12 h-12" />,
-      title: "Smart Automation",
-      description: "AI-powered request processing with intelligent routing and automated approvals",
-      color: "blue"
-    },
-    {
-      icon: <Gauge className="w-12 h-12" />,
-      title: "Real-time Monitoring",
-      description: "Live dashboard with instant notifications and comprehensive tracking",
-      color: "emerald"
-    },
-    {
-      icon: <Shield className="w-12 h-12" />,
-      title: "Enterprise Security",
-      description: "Bank-level security with role-based access and complete audit trails",
-      color: "purple"
-    }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -175,46 +154,7 @@ const Home = () => {
 
 
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Powerful <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Features</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to manage your fleet's tire operations efficiently and effectively
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {features.map((feature, index) => (
-              <div key={index} className="group relative text-center">
-                <div className="relative bg-white rounded-3xl p-10 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${
-                    feature.color === 'blue' ? 'from-blue-500 to-cyan-600' :
-                    feature.color === 'emerald' ? 'from-emerald-500 to-teal-600' :
-                    'from-purple-500 to-violet-600'
-                  } opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
-
-                  <div className="relative">
-                    <div className={`inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-8 group-hover:scale-110 transition-transform duration-300 ${
-                      feature.color === 'blue' ? 'bg-blue-100 text-blue-600' :
-                      feature.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' :
-                      'bg-purple-100 text-purple-600'
-                    }`}>
-                      {feature.icon}
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6 group-hover:text-gray-800">{feature.title}</h3>
-                    <p className="text-gray-600 text-lg leading-relaxed group-hover:text-gray-700">{feature.description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Support Section */}
       <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">

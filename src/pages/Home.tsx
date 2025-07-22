@@ -45,40 +45,7 @@ const Home = () => {
 
 
 
-  const stats = [
-    {
-      icon: <Users className="w-8 h-8" />,
-      number: "1,247",
-      label: "Active Users",
-      trend: "+12%",
-      trendUp: true,
-      color: "blue"
-    },
-    {
-      icon: <TruckIcon className="w-8 h-8" />,
-      number: "856",
-      label: "Fleet Vehicles",
-      trend: "+8%",
-      trendUp: true,
-      color: "emerald"
-    },
-    {
-      icon: <Activity className="w-8 h-8" />,
-      number: "342",
-      label: "Active Requests",
-      trend: "+15%",
-      trendUp: true,
-      color: "purple"
-    },
-    {
-      icon: <Award className="w-8 h-8" />,
-      number: "99.2%",
-      label: "Success Rate",
-      trend: "+2%",
-      trendUp: true,
-      color: "orange"
-    }
-  ];
+
 
   const features = [
     {
@@ -206,63 +173,7 @@ const Home = () => {
 
 
 
-      {/* Statistics Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Real-time <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Performance</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Monitor your fleet's performance with live statistics and comprehensive analytics
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="group relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                <div className={`absolute inset-0 bg-gradient-to-r ${
-                  stat.color === 'blue' ? 'from-blue-500 to-cyan-600' :
-                  stat.color === 'emerald' ? 'from-emerald-500 to-teal-600' :
-                  stat.color === 'purple' ? 'from-purple-500 to-violet-600' :
-                  'from-orange-500 to-red-500'
-                } opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
-
-                <div className="relative">
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 group-hover:scale-110 transition-transform duration-300 ${
-                    stat.color === 'blue' ? 'bg-blue-100 text-blue-600' :
-                    stat.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' :
-                    stat.color === 'purple' ? 'bg-purple-100 text-purple-600' :
-                    'bg-orange-100 text-orange-600'
-                  }`}>
-                    {stat.icon}
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-4xl font-bold text-gray-900">{stat.number}</h3>
-                    <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      stat.trendUp ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                      {stat.trend}
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 font-medium">{stat.label}</p>
-
-                  <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-1000 group-hover:w-full ${
-                      stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-cyan-600 w-3/4' :
-                      stat.color === 'emerald' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 w-4/5' :
-                      stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-violet-600 w-2/3' :
-                      'bg-gradient-to-r from-orange-500 to-red-500 w-5/6'
-                    }`}></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="py-20 bg-white">

@@ -1,220 +1,199 @@
 import { Link } from "react-router-dom";
-import tireImage from "../images/car-tire-png-469.png";
 import {
   TruckIcon,
   BarChart3Icon,
   ClipboardListIcon,
   PhoneIcon,
   MailIcon,
-  ShieldCheckIcon,
   ArrowRight,
   CheckCircle,
-  Clock,
   Users,
-  Zap,
-  Award,
-  TrendingUp,
   Settings,
-  Globe,
-  Star,
-  Activity,
-  Target
+  FileText,
+  Shield,
+  Database,
+  Monitor
 } from "lucide-react";
 
 const Home = () => {
-  const features = [
+  const quickActions = [
     {
-      icon: <ClipboardListIcon size={32} className="text-blue-600" />,
-      title: "Request Management",
-      description: "Streamlined tire request and approval workflow with real-time tracking",
-      color: "from-blue-500 to-cyan-600"
-    },
-    {
-      icon: <TruckIcon size={32} className="text-emerald-600" />,
-      title: "Vehicle Registration",
-      description: "Comprehensive vehicle information management and fleet tracking",
-      color: "from-emerald-500 to-teal-600"
-    },
-    {
-      icon: <BarChart3Icon size={32} className="text-purple-600" />,
-      title: "Analytics & Reports",
-      description: "Real-time inventory tracking and comprehensive reporting",
-      color: "from-purple-500 to-violet-600"
-    },
-    {
-      icon: <ShieldCheckIcon size={32} className="text-orange-600" />,
-      title: "Multi-level Security",
-      description: "Secure and efficient approval process with role-based access",
-      color: "from-orange-500 to-red-500"
-    },
-  ];
-
-  const stats = [
-    {
-      icon: <Users className="w-8 h-8" />,
-      number: "500+",
-      label: "Active Users",
-      color: "from-blue-500 to-cyan-600"
+      icon: <ClipboardListIcon className="w-8 h-8" />,
+      title: "Submit Request",
+      description: "Create new tire request",
+      link: "/user",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600"
     },
     {
       icon: <TruckIcon className="w-8 h-8" />,
-      number: "1,200+",
-      label: "Vehicles Managed",
-      color: "from-emerald-500 to-teal-600"
+      title: "Register Vehicle",
+      description: "Add new vehicle to fleet",
+      link: "/vehicle-registration",
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600"
     },
     {
-      icon: <CheckCircle className="w-8 h-8" />,
-      number: "5,000+",
-      label: "Requests Processed",
-      color: "from-purple-500 to-violet-600"
+      icon: <BarChart3Icon className="w-8 h-8" />,
+      title: "View Reports",
+      description: "Access analytics dashboard",
+      link: "/login",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-600"
     },
     {
-      icon: <Award className="w-8 h-8" />,
-      number: "99.9%",
-      label: "System Uptime",
-      color: "from-orange-500 to-red-500"
+      icon: <Settings className="w-8 h-8" />,
+      title: "System Admin",
+      description: "Manage system settings",
+      link: "/login",
+      color: "from-orange-500 to-orange-600",
+      bgColor: "bg-orange-50",
+      textColor: "text-orange-600"
     }
   ];
 
-  const benefits = [
+  const systemStats = [
     {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Lightning Fast",
-      description: "Process requests in under 24 hours"
+      icon: <Users className="w-6 h-6" />,
+      value: "1,247",
+      label: "Active Users",
+      change: "+12%",
+      changeType: "positive",
+      color: "text-blue-600"
     },
     {
-      icon: <Target className="w-6 h-6" />,
-      title: "Precision Tracking",
-      description: "Real-time status updates and notifications"
+      icon: <TruckIcon className="w-6 h-6" />,
+      value: "856",
+      label: "Fleet Vehicles",
+      change: "+8%",
+      changeType: "positive",
+      color: "text-emerald-600"
     },
     {
-      icon: <Globe className="w-6 h-6" />,
-      title: "Enterprise Ready",
-      description: "Scalable solution for large fleets"
+      icon: <ClipboardListIcon className="w-6 h-6" />,
+      value: "342",
+      label: "Pending Requests",
+      change: "-5%",
+      changeType: "negative",
+      color: "text-purple-600"
+    },
+    {
+      icon: <CheckCircle className="w-6 h-6" />,
+      value: "98.5%",
+      label: "Approval Rate",
+      change: "+2%",
+      changeType: "positive",
+      color: "text-orange-600"
+    }
+  ];
+
+  const features = [
+    {
+      icon: <FileText className="w-12 h-12" />,
+      title: "Smart Request Management",
+      description: "Automated workflow with intelligent routing and real-time status tracking for all tire requests.",
+      benefits: ["Automated approvals", "Real-time tracking", "Mobile notifications"]
+    },
+    {
+      icon: <Database className="w-12 h-12" />,
+      title: "Inventory Management",
+      description: "Complete tire inventory control with predictive analytics and automated reorder points.",
+      benefits: ["Stock optimization", "Predictive analytics", "Automated alerts"]
+    },
+    {
+      icon: <Shield className="w-12 h-12" />,
+      title: "Security & Compliance",
+      description: "Enterprise-grade security with role-based access control and audit trails.",
+      benefits: ["Role-based access", "Audit logging", "Data encryption"]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white py-20 md:py-32 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Professional Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+                <TruckIcon className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">SLT Mobitel</h1>
+                <p className="text-sm text-gray-600">Tire Management System</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-600">System Online</span>
+            </div>
+          </div>
         </div>
+      </header>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Content Section */}
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 rounded-full text-blue-200 text-sm font-medium mb-6 backdrop-blur-sm border border-blue-400/20">
-                <Star className="w-4 h-4 mr-2" />
-                Enterprise Tire Management Solution
-              </div>
+      {/* Hero Dashboard Section */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Fleet Tire Management Dashboard</h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Comprehensive tire management solution for modern fleet operations.
+              Monitor, manage, and optimize your tire inventory and requests.
+            </p>
+          </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                  SLT Mobitel
-                </span>
-                <br />
-                <span className="text-white">Tire Management</span>
-                <br />
-                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  System
-                </span>
-              </h1>
-
-              <p className="text-xl text-blue-100 mb-8 max-w-2xl">
-                Transform your fleet operations with our intelligent tire management platform.
-                Streamline requests, optimize inventory, and ensure maximum uptime.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  to="/user"
-                  className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl flex items-center justify-center"
-                >
-                  Get Started
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link
-                  to="/vehicle-registration"
-                  className="group border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 backdrop-blur-sm flex items-center justify-center"
-                >
-                  Register Vehicle
-                  <TruckIcon className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
-                </Link>
-              </div>
-
-              {/* Quick Benefits */}
-              <div className="grid grid-cols-3 gap-4 mt-12 pt-8 border-t border-white/20">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-3 backdrop-blur-sm">
-                      <div className="text-blue-300">{benefit.icon}</div>
-                    </div>
-                    <h3 className="font-semibold text-white text-sm mb-1">{benefit.title}</h3>
-                    <p className="text-blue-200 text-xs">{benefit.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Enhanced Image Section */}
-            <div className="relative">
-              <div className="relative z-10">
-                <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-                  <img
-                    src={tireImage}
-                    alt="Professional Tire Management"
-                    className="w-full h-auto max-h-96 object-contain transition-transform duration-500 hover:scale-105 hover:rotate-3"
-                  />
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {quickActions.map((action, index) => (
+              <Link
+                key={index}
+                to={action.link}
+                className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className={`inline-flex items-center justify-center w-16 h-16 ${action.bgColor} rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={action.textColor}>{action.icon}</div>
                 </div>
-              </div>
-
-              {/* Floating Stats Cards */}
-              <div className="absolute -top-6 -right-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/20">
-                <div className="flex items-center space-x-3">
-                  <Activity className="w-6 h-6" />
-                  <div>
-                    <p className="text-sm font-medium">System Status</p>
-                    <p className="text-xs opacity-90">99.9% Uptime</p>
-                  </div>
+                <h3 className="text-lg font-semibold text-white mb-2">{action.title}</h3>
+                <p className="text-blue-100 text-sm">{action.description}</p>
+                <div className="mt-4 flex items-center text-white/80 group-hover:text-white transition-colors">
+                  <span className="text-sm">Access now</span>
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
-              </div>
-
-              <div className="absolute -bottom-6 -left-6 bg-gradient-to-r from-purple-500 to-violet-600 text-white p-4 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/20">
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-6 h-6" />
-                  <div>
-                    <p className="text-sm font-medium">Efficiency</p>
-                    <p className="text-xs opacity-90">45% Faster</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-16 -mt-16 relative z-10">
+      {/* System Statistics */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">System Overview</h3>
+            <p className="text-lg text-gray-600">Real-time statistics and performance metrics</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <div key={index} className="group">
-                <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl mb-4 shadow-lg`}>
-                    <div className="text-white">{stat.icon}</div>
+            {systemStats.map((stat, index) => (
+              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl bg-gray-50 ${stat.color}`}>
+                    {stat.icon}
                   </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.number}</h3>
-                  <p className="text-gray-600 font-medium">{stat.label}</p>
-                  <div className="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
-                    <div className={`h-full bg-gradient-to-r ${stat.color} rounded-full transform transition-transform duration-1000 group-hover:scale-x-100 scale-x-75`}></div>
+                  <div className={`text-sm font-medium px-2 py-1 rounded-full ${
+                    stat.changeType === 'positive'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {stat.change}
                   </div>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
+                  <p className="text-gray-600 text-sm">{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -222,210 +201,142 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Enhanced Support Section */}
-      <section className="py-16">
+      {/* Key Features Section */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-white to-blue-50 rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="p-8 lg:p-12">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">24/7 Professional Support</h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Our dedicated support team is always ready to assist you with any questions or technical issues.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="group text-center">
-                  <div className="bg-gradient-to-r from-blue-500 to-cyan-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                    <PhoneIcon size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Phone Support</h3>
-                  <p className="text-gray-600 mb-4">Immediate assistance for urgent matters</p>
-                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                    <p className="text-2xl font-bold text-blue-600">1717</p>
-                    <p className="text-sm text-blue-500">Available 24/7</p>
-                  </div>
-                </div>
-
-                <div className="group text-center">
-                  <div className="bg-gradient-to-r from-emerald-500 to-teal-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                    <MailIcon size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Email Support</h3>
-                  <p className="text-gray-600 mb-4">Detailed technical assistance and documentation</p>
-                  <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-                    <p className="text-lg font-semibold text-emerald-600">support@mobitel.lk</p>
-                    <p className="text-sm text-emerald-500">Response within 2 hours</p>
-                  </div>
-                </div>
-
-                <div className="group text-center">
-                  <div className="bg-gradient-to-r from-purple-500 to-violet-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                    <Settings size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">System Status</h3>
-                  <p className="text-gray-600 mb-4">Real-time system monitoring and updates</p>
-                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                      <p className="text-lg font-semibold text-purple-600">All Systems Operational</p>
-                    </div>
-                    <p className="text-sm text-purple-500">Last updated: Just now</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Features Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-600 text-sm font-medium mb-6">
-              <Star className="w-4 h-4 mr-2" />
-              Powerful Features
-            </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Everything You Need for
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Tire Management</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our comprehensive platform provides all the tools and features you need to efficiently manage your fleet's tire operations.
-            </p>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">Key Features</h3>
+            <p className="text-lg text-gray-600">Comprehensive tools for efficient tire management</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="group relative">
-                <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 h-full">
-                  {/* Gradient Background */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
-
-                  {/* Icon Container */}
-                  <div className={`relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <div className="text-white">{feature.icon}</div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-800 transition-colors">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors">
-                      {feature.description}
-                    </p>
-                  </div>
-
-                  {/* Hover Arrow */}
-                  <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ArrowRight className="w-5 h-5 text-blue-600" />
-                  </div>
-
-                  {/* Border Animation */}
-                  <div className={`absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                       style={{mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'xor'}}>
-                  </div>
-                </div>
+              <div key={index} className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                <div className="text-blue-600 mb-6">{feature.icon}</div>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h4>
+                <p className="text-gray-600 mb-6">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Call to Action */}
-          <div className="text-center mt-16">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-white shadow-2xl">
-              <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Fleet Management?</h3>
-              <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-                Join hundreds of organizations already using our platform to streamline their tire management operations.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/user"
-                  className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-colors transform hover:-translate-y-1 shadow-lg"
-                >
-                  Start Your First Request
-                </Link>
-                <Link
-                  to="/login"
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-colors transform hover:-translate-y-1"
-                >
-                  Access Dashboard
-                </Link>
+      {/* Support Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 lg:p-12">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">24/7 Support Available</h3>
+              <p className="text-lg text-gray-600">Get help when you need it most</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <PhoneIcon className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Phone Support</h4>
+                <p className="text-gray-600 mb-3">24/7 emergency support</p>
+                <p className="text-2xl font-bold text-blue-600">1717</p>
+              </div>
+
+              <div className="text-center">
+                <div className="bg-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <MailIcon className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Email Support</h4>
+                <p className="text-gray-600 mb-3">Technical assistance</p>
+                <p className="text-lg font-semibold text-emerald-600">support@mobitel.lk</p>
+              </div>
+
+              <div className="text-center">
+                <div className="bg-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Monitor className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">System Status</h4>
+                <p className="text-gray-600 mb-3">Real-time monitoring</p>
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-600 font-medium">Online</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer Section */}
-      <footer className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white py-16">
+      {/* Call to Action Section */}
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h3 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h3>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join hundreds of organizations using our platform for efficient tire management
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/user"
+              className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Submit Your First Request
+            </Link>
+            <Link
+              to="/login"
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-colors"
+            >
+              Access Dashboard
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Simple Footer */}
+      <footer className="bg-gray-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <TruckIcon className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <TruckIcon className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold">SLT Mobitel</h3>
+                <h4 className="text-xl font-bold">SLT Mobitel</h4>
               </div>
-              <p className="text-blue-200 mb-6 max-w-md">
-                Leading the way in innovative tire management solutions for modern fleets.
-                Trusted by organizations across Sri Lanka.
+              <p className="text-gray-300">
+                Professional tire management solutions for modern fleets.
               </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <MailIcon className="w-5 h-5" />
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <PhoneIcon className="w-5 h-5" />
+            </div>
+
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><Link to="/user" className="text-gray-300 hover:text-white transition-colors">Submit Request</Link></li>
+                <li><Link to="/vehicle-registration" className="text-gray-300 hover:text-white transition-colors">Register Vehicle</Link></li>
+                <li><Link to="/login" className="text-gray-300 hover:text-white transition-colors">Dashboard</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
+              <div className="space-y-2">
+                <p className="text-gray-300">Phone: 1717</p>
+                <p className="text-gray-300">Email: support@mobitel.lk</p>
+                <div className="flex items-center space-x-2 mt-4">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-400 text-sm">System Online</span>
                 </div>
               </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
-              <ul className="space-y-3">
-                <li><Link to="/user" className="text-blue-200 hover:text-white transition-colors">Submit Request</Link></li>
-                <li><Link to="/vehicle-registration" className="text-blue-200 hover:text-white transition-colors">Register Vehicle</Link></li>
-                <li><Link to="/login" className="text-blue-200 hover:text-white transition-colors">Dashboard Login</Link></li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Support</h4>
-              <ul className="space-y-3">
-                <li className="flex items-center space-x-2">
-                  <PhoneIcon className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-200">1717 (24/7)</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <MailIcon className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-200">support@mobitel.lk</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-200">Mon-Fri 8AM-6PM</span>
-                </li>
-              </ul>
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-blue-200 text-sm">
-              © 2024 SLT Mobitel. All rights reserved. | Tire Management System v2.0
-            </p>
-            <div className="flex items-center space-x-2 mt-4 md:mt-0">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-blue-200 text-sm">System Status: Operational</span>
-            </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+            <p className="text-gray-400">© 2024 SLT Mobitel. All rights reserved.</p>
           </div>
         </div>
       </footer>

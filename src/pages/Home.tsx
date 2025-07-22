@@ -43,26 +43,7 @@ const Home = () => {
     }
   ];
 
-  const quickActions = [
-    {
-      icon: <ClipboardListIcon className="w-8 h-8" />,
-      title: "Submit Tire Request",
-      description: "Create and track new tire requests",
-      link: "/user",
-      gradient: "from-blue-500 via-blue-600 to-blue-700",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600"
-    },
-    {
-      icon: <TruckIcon className="w-8 h-8" />,
-      title: "Register Vehicle",
-      description: "Add vehicles to your fleet",
-      link: "/vehicle-registration",
-      gradient: "from-emerald-500 via-emerald-600 to-emerald-700",
-      iconBg: "bg-emerald-100",
-      iconColor: "text-emerald-600"
-    }
-  ];
+
 
   const stats = [
     {
@@ -223,40 +204,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Quick Actions Section */}
-      <section className="py-20 -mt-16 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {quickActions.map((action, index) => (
-              <Link
-                key={index}
-                to={action.link}
-                className="group relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-r ${action.gradient} opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
 
-                <div className="relative">
-                  <div className={`inline-flex items-center justify-center w-20 h-20 ${action.iconBg} rounded-3xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <div className={action.iconColor}>{action.icon}</div>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-800">{action.title}</h3>
-                  <p className="text-gray-600 mb-6 group-hover:text-gray-700">{action.description}</p>
-
-                  <div className="flex items-center text-blue-600 group-hover:text-blue-700 font-semibold">
-                    <span>Get Started</span>
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                  </div>
-                </div>
-
-                <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Statistics Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">

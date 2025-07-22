@@ -122,12 +122,12 @@ const Login = () => {
                 <div className="relative bg-white/95 backdrop-blur-2xl shadow-2xl rounded-2xl p-8 border border-white/30 hover:shadow-3xl transition-all duration-500">
                   <div className="text-center space-y-6">
 
-                    {/* Mobile Logo */}
-                    <div className="lg:hidden mb-6">
+                    {/* Mobitel Logo - Always visible above Welcome Back */}
+                    <div className="mb-6">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg"
                         alt="SLT Mobitel"
-                        className="h-12 mx-auto"
+                        className="h-16 mx-auto animate-float"
                       />
                     </div>
 

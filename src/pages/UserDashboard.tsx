@@ -274,17 +274,17 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             <div
               onClick={() => setActiveFilter(activeFilter === "pending" ? "all" : "pending")}
-              className={`bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "pending" ? "ring-4 ring-amber-300 ring-opacity-50" : ""
+              className={`bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-8 text-white shadow-xl border border-yellow-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "pending" ? "ring-4 ring-yellow-300 ring-opacity-50" : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-amber-100 text-sm font-medium mb-2">Pending Requests</p>
+                  <p className="text-yellow-100 text-sm font-medium mb-2">Pending Requests</p>
                   <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
-                  <p className="text-amber-200 text-xs">Awaiting review</p>
+                  <p className="text-yellow-200 text-xs">Awaiting review</p>
                 </div>
-                <div className="w-16 h-16 bg-amber-400/30 rounded-xl flex items-center justify-center">
+                <div className="w-16 h-16 bg-yellow-400/30 rounded-xl flex items-center justify-center">
                   <Clock className="w-8 h-8" />
                 </div>
               </div>
@@ -292,7 +292,7 @@ const UserDashboard = () => {
 
             <div
               onClick={() => setActiveFilter(activeFilter === "approved" ? "all" : "approved")}
-              className={`bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+              className={`bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
                 activeFilter === "approved" ? "ring-4 ring-emerald-300 ring-opacity-50" : ""
               }`}
             >
@@ -310,17 +310,17 @@ const UserDashboard = () => {
 
             <div
               onClick={() => setActiveFilter(activeFilter === "rejected" ? "all" : "rejected")}
-              className={`bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "rejected" ? "ring-4 ring-red-300 ring-opacity-50" : ""
+              className={`bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-8 text-white shadow-xl border border-rose-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "rejected" ? "ring-4 ring-rose-300 ring-opacity-50" : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-red-100 text-sm font-medium mb-2">Rejected</p>
+                  <p className="text-rose-100 text-sm font-medium mb-2">Rejected</p>
                   <p className="text-4xl font-bold mb-1">{rejectedRequests.length}</p>
-                  <p className="text-red-200 text-xs">Needs revision</p>
+                  <p className="text-rose-200 text-xs">Needs revision</p>
                 </div>
-                <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                <div className="w-16 h-16 bg-rose-400/30 rounded-xl flex items-center justify-center">
                   <XCircle className="w-8 h-8" />
                 </div>
               </div>
@@ -346,17 +346,17 @@ const UserDashboard = () => {
 
             <div
               onClick={() => setActiveFilter(activeFilter === "complete-orders" ? "all" : "complete-orders")}
-              className={`bg-gradient-to-br from-teal-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-teal-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "complete-orders" ? "ring-4 ring-teal-300 ring-opacity-50" : ""
+              className={`bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "complete-orders" ? "ring-4 ring-purple-300 ring-opacity-50" : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-teal-100 text-sm font-medium mb-2">Complete Orders</p>
+                  <p className="text-purple-100 text-sm font-medium mb-2">Complete Orders</p>
                   <p className="text-4xl font-bold mb-1">{completeOrderRequests.length}</p>
-                  <p className="text-teal-200 text-xs">Orders placed</p>
+                  <p className="text-purple-200 text-xs">Orders placed</p>
                 </div>
-                <div className="w-16 h-16 bg-teal-400/30 rounded-xl flex items-center justify-center">
+                <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
                   <Package className="w-8 h-8" />
                 </div>
               </div>
@@ -364,17 +364,17 @@ const UserDashboard = () => {
 
             <div
               onClick={() => setActiveFilter(activeFilter === "cancel-orders" ? "all" : "cancel-orders")}
-              className={`bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-8 text-white shadow-xl border border-rose-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "cancel-orders" ? "ring-4 ring-rose-300 ring-opacity-50" : ""
+              className={`bg-gradient-to-br from-slate-500 to-gray-600 rounded-2xl p-8 text-white shadow-xl border border-slate-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                activeFilter === "cancel-orders" ? "ring-4 ring-slate-300 ring-opacity-50" : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-rose-100 text-sm font-medium mb-2">Cancel Orders</p>
+                  <p className="text-slate-100 text-sm font-medium mb-2">Cancel Orders</p>
                   <p className="text-4xl font-bold mb-1">{cancelOrderRequests.length}</p>
-                  <p className="text-rose-200 text-xs">Orders cancelled</p>
+                  <p className="text-slate-200 text-xs">Orders cancelled</p>
                 </div>
-                <div className="w-16 h-16 bg-rose-400/30 rounded-xl flex items-center justify-center">
+                <div className="w-16 h-16 bg-slate-400/30 rounded-xl flex items-center justify-center">
                   <X className="w-8 h-8" />
                 </div>
               </div>

@@ -150,6 +150,7 @@ interface RequestTableProps {
   showActions?: boolean;
   showPlaceOrderButton?: boolean; // New prop to control place order button visibility
   showCancelButton?: boolean; // New prop to control cancel order button visibility
+  showDeleteButton?: boolean; // New prop to control delete button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -164,6 +165,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
   showActions = true,
   showPlaceOrderButton = false, // Default to false for security
   showCancelButton = false, // Default to false for security
+  showDeleteButton = true, // Default to true for backward compatibility
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -341,16 +343,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <X className="w-5 h-5" />
                         </button>
                       )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(request.id); // <-- Remove window.confirm, just call onDelete
-                      }}
-                      className="px-4 text-gray-500 hover:text-red-700"
-                      aria-label="Delete"
-                    >
-                      <Trash className="w-5 h-5" />
-                    </button>
+                    {showDeleteButton && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(request.id); // <-- Remove window.confirm, just call onDelete
+                        }}
+                        className="px-4 text-gray-500 hover:text-red-700"
+                        aria-label="Delete"
+                      >
+                        <Trash className="w-5 h-5" />
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>

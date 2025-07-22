@@ -309,6 +309,7 @@ const TechnicalManagerDashboard = () => {
                       }
                       onPlaceOrder={() => {}}
                       showActions={true}
+                      showDeleteButton={false}
                     />
                   </div>
                 </div>
@@ -336,7 +337,8 @@ const TechnicalManagerDashboard = () => {
                         navigate(`/technical-manager/request/${request.id}`)
                       }
                       onPlaceOrder={() => {}}
-                      showActions={false}
+                      showActions={true}
+                      showDeleteButton={false}
                     />
                   </div>
                 </div>
@@ -364,7 +366,8 @@ const TechnicalManagerDashboard = () => {
                       }
                       onDelete={() => {}}
                       onPlaceOrder={() => {}}
-                      showActions={false}
+                      showActions={true}
+                      showDeleteButton={false}
                     />
                   </div>
                 </div>

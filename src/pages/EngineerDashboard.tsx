@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
-import { UserCircle, ChevronDown, LogOut } from "lucide-react";
+import RequestReports from "../components/RequestReports";
+import { UserCircle, ChevronDown, LogOut, ClipboardList, BarChart3, Clock, CheckCircle2, XCircle, Wrench } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import type { Request } from "../types/request";
@@ -10,6 +11,7 @@ const EngineerDashboard = () => {
   const { requests, fetchRequests } = useRequests();
   const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"requests" | "analytics">("requests");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -37,17 +39,16 @@ const EngineerDashboard = () => {
 
   // Get requests completed by current engineer
   const completedRequests = requests.filter(
-    (req) => req.status === "complete" && req.engineer_decision_by === user?.id
+    (req) => req.status === "complete"
   );
 
   // Get requests rejected by current engineer
   const rejectedRequests = requests.filter(
-    (req) =>
-      req.status === "rejected" &&
-      req.engineer_note &&
-      req.engineer_note.trim() !== "" &&
-      req.engineer_decision_by === user?.id
+    (req) => req.status === "engineer rejected"
   );
+
+  // Calculate total displayed requests
+  const totalDisplayedRequests = pendingRequests.length + completedRequests.length + rejectedRequests.length;
 
   const handleApprove = (requestId: string) => {
     // Navigate to detail page for approval
@@ -65,93 +66,277 @@ const EngineerDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl p-4 mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Engineer Dashboard</h1>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center space-x-2 focus:outline-none"
-          >
-            <UserCircle className="w-8 h-8 text-gray-600" />
-            <span className="font-medium text-gray-700">
-              {user?.name || "Profile"}
-            </span>
-            <ChevronDown
-              className={`h-4 w-4 text-gray-500 transition-transform ${
-                isProfileOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {isProfileOpen && (
-            <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-lg shadow-lg">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Professional Header with Enhanced Design */}
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          {/* Enhanced Header Title Section */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
+                <Wrench className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white tracking-tight">
+                  Engineer Dashboard
+                </h1>
+                <p className="text-slate-300 text-lg font-medium mt-1">
+                  Complete technical implementations and manage engineering tasks
+                </p>
+                <div className="flex items-center mt-2 space-x-2">
+                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-slate-400 font-medium">Engineering Level Access</span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-sm text-slate-400">Welcome back, {user?.name || 'Engineer'}</span>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+            <div className="flex items-center space-x-6">
+              {/* Quick Actions */}
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleTimeString()}</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
+                  <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString()}</div>
+                </div>
+              </div>
+              {/* Enhanced User Profile */}
+              <div className="flex items-center space-x-3">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-medium text-white">{user?.name || 'Engineer'}</div>
+                  <div className="text-xs text-slate-300">Engineer</div>
+                </div>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg border-2 border-white/20 hover:shadow-xl transition-all duration-200"
+                  >
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </button>
 
-      {/* Display approval tables */}
-      <div className="space-y-8">
-        {/* Pending Requests Table */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">
-            Pending Engineering Review ({pendingRequests.length})
-          </h2>
-          <RequestTable
-            requests={pendingRequests}
-            title="Pending Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
-        </div>
+                  {isProfileOpen && (
+                    <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Approved Requests Table */}
-        <div>
-          {" "}
-          <h2 className="mb-4 text-xl font-semibold">
-            Completed Requests ({completedRequests.length})
-          </h2>
-          <RequestTable
-            requests={completedRequests}
-            title="Completed Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
+          {/* Professional Tab Navigation */}
+          <div className="flex space-x-2 bg-white/10 backdrop-blur-sm p-2 rounded-2xl border border-white/20">
+            <button
+              onClick={() => setActiveTab("requests")}
+              className={`${
+                activeTab === "requests"
+                  ? "bg-white text-slate-700 shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-white/20"
+              } flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span>Engineering Tasks</span>
+              <span className="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">
+                {pendingRequests.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`${
+                activeTab === "analytics"
+                  ? "bg-white text-slate-700 shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-white/20"
+              } flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span>Engineering Analytics</span>
+            </button>
+          </div>
         </div>
+      </header>
 
-        {/* Rejected Requests Table */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">
-            Engineering Rejected Requests ({rejectedRequests.length})
-          </h2>
-          <RequestTable
-            requests={rejectedRequests}
-            title="Rejected Requests"
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onView={(request) => navigate(`/engineer/request/${request.id}`)}
-            onDelete={() => {}}
-            onPlaceOrder={() => {}}
-            showActions={false}
-          />
-        </div>
-      </div>
+      {/* Enhanced Main Content */}
+      <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
+        {activeTab === "requests" ? (
+          <div className="space-y-8">
+            {/* Professional Overview Cards with Enhanced Spacing */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-amber-100 text-sm font-medium mb-2">Pending Tasks</p>
+                    <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
+                    <p className="text-amber-200 text-xs">Awaiting implementation</p>
+                  </div>
+                  <div className="w-16 h-16 bg-amber-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-emerald-100 text-sm font-medium mb-2">Completed</p>
+                    <p className="text-4xl font-bold mb-1">{completedRequests.length}</p>
+                    <p className="text-emerald-200 text-xs">Successfully implemented</p>
+                  </div>
+                  <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-100 text-sm font-medium mb-2">Rejected</p>
+                    <p className="text-4xl font-bold mb-1">{rejectedRequests.length}</p>
+                    <p className="text-red-200 text-xs">Implementation issues</p>
+                  </div>
+                  <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm font-medium mb-2">Total Tasks</p>
+                    <p className="text-4xl font-bold mb-1">{totalDisplayedRequests}</p>
+                    <p className="text-purple-200 text-xs">All engineering tasks</p>
+                  </div>
+                  <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              {/* Enhanced Request Tables */}
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-8 py-6 border-b border-amber-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-amber-900">Pending Engineering Tasks</h2>
+                      <p className="text-amber-700 text-sm">Requests ready for implementation</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-0">
+                  <RequestTable
+                    requests={pendingRequests}
+                    title=""
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    onView={(request) => navigate(`/engineer/request/${request.id}`)}
+                    onDelete={() => {}}
+                    onPlaceOrder={() => {}}
+                    showActions={false}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-50 to-green-50 px-8 py-6 border-b border-emerald-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-emerald-900">Completed Engineering Tasks</h2>
+                      <p className="text-emerald-700 text-sm">Successfully implemented requests</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-0">
+                  <RequestTable
+                    requests={completedRequests}
+                    title=""
+                    onApprove={() => {}}
+                    onReject={() => {}}
+                    onView={(request) => navigate(`/engineer/request/${request.id}`)}
+                    onDelete={() => {}}
+                    onPlaceOrder={() => {}}
+                    showActions={false}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 px-8 py-6 border-b border-red-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
+                      <XCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-red-900">Engineering Rejected Tasks</h2>
+                      <p className="text-red-700 text-sm">Tasks with implementation issues</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-0">
+                  <RequestTable
+                    requests={rejectedRequests}
+                    title=""
+                    onApprove={() => {}}
+                    onReject={() => {}}
+                    onView={(request) => navigate(`/engineer/request/${request.id}`)}
+                    onDelete={() => {}}
+                    onPlaceOrder={() => {}}
+                    showActions={false}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-8 py-6 border-b border-purple-100">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-purple-900">Engineering Analytics & Reports</h2>
+                  <p className="text-purple-700 text-sm">Comprehensive engineering performance insights</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <RequestReports requests={requests} role="engineer" />
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

@@ -10,6 +10,14 @@ export interface Vehicle {
   registeredBy?: number;
 }
 
+export interface TireDetails {
+  id: number;
+  tire_size: string;
+  tire_brand: string;
+  total_price: number;
+  warranty_distance: number;
+}
+
 export interface TireRequest {
   id: number;
   vehicleId: number;
@@ -54,6 +62,7 @@ export interface TireRequest {
   engineerTimestamp?: string;
   orderPlaced?: boolean;
   orderTimestamp?: string;
+  customer_officer_note?: string;
 }
 
 export interface ApiResponse<T> {

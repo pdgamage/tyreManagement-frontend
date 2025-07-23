@@ -9,6 +9,7 @@ import {
   XCircle,
   Eye,
   ShoppingCart,
+  X,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -16,30 +17,68 @@ const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
     case "pending":
       return {
-        bg: "bg-yellow-50",
-        text: "text-yellow-700",
-        border: "border-yellow-300",
+        bg: "bg-amber-50",
+        text: "text-amber-700",
+        border: "border-amber-300",
         icon: <Clock className="w-4 h-4" />,
       };
-    case "approved":
+
+    // Supervisor Level
+    case "supervisor approved":
       return {
-        bg: "bg-green-50",
-        text: "text-green-700",
-        border: "border-green-300",
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        border: "border-emerald-300",
         icon: <CheckCircle2 className="w-4 h-4" />,
       };
-    case "rejected":
+    case "supervisor rejected":
       return {
         bg: "bg-red-50",
         text: "text-red-700",
         border: "border-red-300",
         icon: <XCircle className="w-4 h-4" />,
       };
-    case "complete":
+
+    // Technical Manager Level
+    case "technical-manager approved":
+    case "technical manager approved":
       return {
         bg: "bg-blue-50",
         text: "text-blue-700",
         border: "border-blue-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "technical-manager rejected":
+    case "technical manager rejected":
+      return {
+        bg: "bg-orange-50",
+        text: "text-orange-700",
+        border: "border-orange-300",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+
+    // Engineer Level
+    case "engineer approved":
+      return {
+        bg: "bg-cyan-50",
+        text: "text-cyan-700",
+        border: "border-cyan-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "engineer rejected":
+      return {
+        bg: "bg-pink-50",
+        text: "text-pink-700",
+        border: "border-pink-300",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+
+    // Final States
+    case "complete":
+      return {
+        bg: "bg-green-50",
+        text: "text-green-700",
+        border: "border-green-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
     case "order placed":
@@ -49,14 +88,54 @@ const getStatusStyles = (status: string) => {
         border: "border-purple-300",
         icon: <ShoppingCart className="w-4 h-4" />,
       };
+    case "order cancelled":
+      return {
+        bg: "bg-rose-50",
+        text: "text-rose-700",
+        border: "border-rose-300",
+        icon: <X className="w-4 h-4" />,
+      };
+
+    // Legacy statuses
+    case "approved":
+      return {
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        border: "border-emerald-300",
+        icon: <CheckCircle2 className="w-4 h-4" />,
+      };
+    case "rejected":
+      return {
+        bg: "bg-red-50",
+        text: "text-red-700",
+        border: "border-red-300",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+
     default:
       return {
-        bg: "bg-gray-50",
-        text: "text-gray-700",
-        border: "border-gray-300",
+        bg: "bg-slate-50",
+        text: "text-slate-700",
+        border: "border-slate-300",
         icon: <Clock className="w-4 h-4" />,
       };
   }
+};
+
+// Function to get descriptive status text based on who made the decision
+const getDescriptiveStatus = (request: Request) => {
+  if (request.status === "rejected") {
+    // Check who rejected it based on notes and decision_by fields
+    if (request.supervisor_notes && request.supervisor_decision_by) {
+      return "supervisor rejected";
+    } else if (request.technical_manager_note && request.technical_manager_decision_by) {
+      return "technical manager rejected";
+    } else if (request.engineer_note && request.engineer_decision_by) {
+      return "engineer rejected";
+    }
+    return "rejected";
+  }
+  return request.status;
 };
 
 interface RequestTableProps {
@@ -67,8 +146,11 @@ interface RequestTableProps {
   onView: (request: Request) => void;
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
+  onCancelOrder?: (id: string) => void;
   showActions?: boolean;
   showPlaceOrderButton?: boolean; // New prop to control place order button visibility
+  showCancelButton?: boolean; // New prop to control cancel order button visibility
+  showDeleteButton?: boolean; // New prop to control delete button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -79,8 +161,11 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onView,
   onDelete,
   onPlaceOrder,
+  onCancelOrder,
   showActions = true,
   showPlaceOrderButton = false, // Default to false for security
+  showCancelButton = false, // Default to false for security
+  showDeleteButton = true, // Default to true for backward compatibility
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -213,7 +298,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     `}
                   >
                     {getStatusStyles(request.status).icon}
-                    <span className="ml-1">{request.status}</span>
+                    <span className="ml-1">{getDescriptiveStatus(request)}</span>
                   </span>
                 </td>
                 {showActions && (
@@ -243,16 +328,33 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <ShoppingCart className="w-5 h-5" />
                         </button>
                       )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(request.id); // <-- Remove window.confirm, just call onDelete
-                      }}
-                      className="px-4 text-gray-500 hover:text-red-700"
-                      aria-label="Delete"
-                    >
-                      <Trash className="w-5 h-5" />
-                    </button>
+                    {showCancelButton &&
+                      request.status?.toLowerCase().trim() === "complete" &&
+                      onCancelOrder && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onCancelOrder(request.id);
+                          }}
+                          className="px-4 text-gray-500 hover:text-orange-700"
+                          aria-label="Cancel Order"
+                          title="Cancel Order"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    {showDeleteButton && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(request.id); // <-- Remove window.confirm, just call onDelete
+                        }}
+                        className="px-4 text-gray-500 hover:text-red-700"
+                        aria-label="Delete"
+                      >
+                        <Trash className="w-5 h-5" />
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>

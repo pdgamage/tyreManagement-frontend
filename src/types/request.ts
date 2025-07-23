@@ -26,10 +26,18 @@ export interface Request {
     | "engineer approved"
     | "complete"
     | "order placed"
-    | "rejected";
+    | "order cancelled"
+    | "rejected"
+    | "supervisor rejected"
+    | "technical-manager rejected"
+    | "engineer rejected"
+    | "customer-officer rejected";
   submittedAt: Date | string;
   images?: string[];
   supervisor_notes?: string;
+  // Department and Cost Center fields
+  userSection?: string;
+  costCenter?: string;
   // New delivery and pricing fields
   deliveryOfficeName?: string;
   deliveryStreetName?: string;
@@ -39,10 +47,12 @@ export interface Request {
   tireWearIndicatorAppeared?: boolean;
   technical_manager_note?: string;
   engineer_note?: string;
+  customer_officer_note?: string;
   supervisorId: string;
   technical_manager_id?: string;
   supervisor_decision_by?: string;
   engineer_decision_by?: string;
+  customer_officer_decision_by?: string;
   order_placed?: boolean;
   order_timestamp?: Date | string;
 }

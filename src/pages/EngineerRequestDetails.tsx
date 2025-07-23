@@ -98,7 +98,7 @@ const EngineerRequestDetails = () => {
         await updateRequestStatus(id!, "complete", notes, "engineer", user?.id);
       } else {
         // Just reject
-        await updateRequestStatus(id!, "rejected", notes, "engineer", user?.id);
+        await updateRequestStatus(id!, "engineer rejected", notes, "engineer", user?.id);
       }
       await fetchRequests();
       navigate("/engineer");
@@ -239,12 +239,6 @@ const EngineerRequestDetails = () => {
                 <div className="p-2 bg-white rounded">
                   {request.vehicleModel}
                 </div>
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
-                  Year
-                </label>
-                <div className="p-2 bg-white rounded">{request.year}</div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">

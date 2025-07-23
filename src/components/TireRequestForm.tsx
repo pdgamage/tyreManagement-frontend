@@ -4,8 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
-import { Vehicle } from "../types/api";
-import RequestTable from "./RequestTable";
+import { Vehicle, TireDetails } from "../types/api";
 import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
@@ -18,9 +17,6 @@ interface TireRequestFormProps {
 interface TireFormData {
   vehicleNumber: string;
   vehicleId: string;
-  vehicleType: string;
-  vehicleDepartment: string;
-  vehicleCostCentre: string;
   vehicleBrand: string;
   vehicleModel: string;
   tireSizeRequired: string;
@@ -31,8 +27,10 @@ interface TireFormData {
   requesterName: string;
   requesterEmail: string;
   requesterPhone: string;
+  userSection: string;
   lastReplacementDate: string;
   existingTireMake: string;
+  costCenter: string;
   presentKmReading: string;
   previousKmReading: string;
   tireWearPattern: string;
@@ -60,7 +58,12 @@ interface StepProps {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => void;
+  removeImage?: (index: number) => void;
   errors: Record<string, string>;
+}
+
+interface TireDetailsStepProps extends StepProps {
+  onTireSizeSelect: (tireSize: string) => void;
 }
 
 interface VehicleInformationStepProps extends StepProps {
@@ -202,137 +205,89 @@ const VehicleInformationStep: React.FC<VehicleInformationStepProps> = ({
         </div>
         <div>
           <label
-            htmlFor="vehicleType"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Vehicle Type *
-          </label>
-          <input
-            type="text"
-            id="vehicleType"
-            name="vehicleType"
-            value={formData.vehicleType}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-            readOnly
-          />
-          {errors.vehicleType && (
-            <p className="mt-1 text-sm text-red-600">{errors.vehicleType}</p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="vehicleDepartment"
+            htmlFor="userSection"
             className="block mb-1 font-medium text-gray-700"
           >
             Department *
           </label>
           <input
             type="text"
-            id="vehicleDepartment"
-            name="vehicleDepartment"
-            value={formData.vehicleDepartment}
-            className="w-full p-3 border border-gray-300 rounded"
+            id="userSection"
+            name="userSection"
+            value={formData.userSection}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Department (auto-filled when vehicle is selected)"
             required
             readOnly
           />
-          {errors.vehicleDepartment && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.vehicleDepartment}
-            </p>
+          {errors.userSection && (
+            <p className="mt-1 text-sm text-red-600">{errors.userSection}</p>
           )}
         </div>
         <div>
           <label
-            htmlFor="vehicleCostCentre"
+            htmlFor="costCenter"
             className="block mb-1 font-medium text-gray-700"
           >
-            Cost Centre *
+            Cost Center *
           </label>
           <input
             type="text"
-            id="vehicleCostCentre"
-            name="vehicleCostCentre"
-            value={formData.vehicleCostCentre}
-            className="w-full p-3 border border-gray-300 rounded"
+            id="costCenter"
+            name="costCenter"
+            value={formData.costCenter}
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Cost center (auto-filled when vehicle is selected)"
             required
             readOnly
           />
-          {errors.vehicleCostCentre && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.vehicleCostCentre}
-            </p>
+          {errors.costCenter && (
+            <p className="mt-1 text-sm text-red-600">{errors.costCenter}</p>
           )}
         </div>
-        <div>
-          <label
-            htmlFor="presentKmReading"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Current KM Reading *
-          </label>
-          <input
-            type="number"
-            id="presentKmReading"
-            name="presentKmReading"
-            value={formData.presentKmReading}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            min="0"
-            required
-          />
-          {errors.presentKmReading && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.presentKmReading}
-            </p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor="previousKmReading"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Previous KM Reading *
-          </label>
-          <input
-            type="number"
-            id="previousKmReading"
-            name="previousKmReading"
-            value={formData.previousKmReading}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            min="0"
-            required
-          />
-          {errors.previousKmReading && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.previousKmReading}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">
-            KM Difference
-          </label>
-          <div className="w-full p-3 text-gray-700 border border-gray-200 rounded bg-gray-50">
-            {(() => {
-              const current = parseInt(formData.presentKmReading) || 0;
-              const previous = parseInt(formData.previousKmReading) || 0;
-              const difference = current - previous;
-              return difference >= 0 ? difference.toLocaleString() : 0;
-            })()}
-          </div>
-        </div>
+
       </div>
     </div>
   );
 };
 
-const TireDetailsStep: React.FC<StepProps> = ({
+const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
   formData,
   handleChange,
   errors,
-}) => (
+  onTireSizeSelect,
+}) => {
+  const [tireSizes, setTireSizes] = useState<string[]>([]);
+  const [tireSizesLoading, setTireSizesLoading] = useState(true);
+
+  // Fetch tire sizes when component mounts
+  useEffect(() => {
+    const fetchTireSizes = async () => {
+      try {
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/tire-details/sizes"
+        );
+        const sizes = await response.json();
+        setTireSizes(sizes);
+      } catch (error) {
+        console.error("Error fetching tire sizes:", error);
+        setTireSizes([]);
+      } finally {
+        setTireSizesLoading(false);
+      }
+    };
+    fetchTireSizes();
+  }, []);
+
+  const handleTireSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSize = e.target.value;
+    handleChange(e); // Update the form data
+    if (selectedSize) {
+      onTireSizeSelect(selectedSize); // Trigger auto-fill
+    }
+  };
+
+  return (
   <div className="space-y-4">
     <h3 className="mb-4 text-xl font-semibold">Tire Details</h3>
     <div className="grid gap-4 md:grid-cols-2">
@@ -343,20 +298,26 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Tire Size Required *
         </label>
-        <input
-          type="text"
+        <select
           id="tireSizeRequired"
           name="tireSizeRequired"
           value={formData.tireSizeRequired}
-          onChange={handleChange}
+          onChange={handleTireSizeChange}
           className="w-full p-3 border border-gray-300 rounded"
           required
-        />
+          disabled={tireSizesLoading}
+        >
+          <option value="">Select tire size</option>
+          {tireSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
         {errors.tireSizeRequired && (
           <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
         )}
       </div>
-
       <div>
         <label
           htmlFor="existingTireMake"
@@ -364,47 +325,21 @@ const TireDetailsStep: React.FC<StepProps> = ({
         >
           Brand name *
         </label>
-        <select
+        <input
+          type="text"
           id="existingTireMake"
           name="existingTireMake"
           value={formData.existingTireMake}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+          placeholder="Brand name (auto-filled when tire size is selected)"
           required
-        >
-          <option value="">Select a tire brand</option>
-          <option value="Michelin">Michelin</option>
-          <option value="Bridgestone">Bridgestone</option>
-          <option value="Goodyear">Goodyear</option>
-          <option value="Continental">Continental</option>
-          <option value="Pirelli">Pirelli</option>
-          <option value="Dunlop">Dunlop</option>
-          <option value="Yokohama">Yokohama</option>
-          <option value="Hankook">Hankook</option>
-          <option value="Kumho">Kumho</option>
-          <option value="Toyo">Toyo</option>
-          <option value="Maxxis">Maxxis</option>
-          <option value="BFGoodrich">BFGoodrich</option>
-          <option value="Falken">Falken</option>
-          <option value="Nitto">Nitto</option>
-          <option value="Cooper">Cooper</option>
-          <option value="General">General</option>
-          <option value="Nexen">Nexen</option>
-          <option value="Firestone">Firestone</option>
-          <option value="Uniroyal">Uniroyal</option>
-          <option value="Nokian">Nokian</option>
-          <option value="Sumitomo">Sumitomo</option>
-          <option value="Hercules">Hercules</option>
-          <option value="Mastercraft">Mastercraft</option>
-          <option value="Dick Cepek">Dick Cepek</option>
-          <option value="Mickey Thompson">Mickey Thompson</option>
-          <option value="Other">Other</option>
-        </select>
+          readOnly
+        />
         {errors.existingTireMake && (
           <p className="mt-1 text-sm text-red-600">{errors.existingTireMake}</p>
         )}
       </div>
-
       <div>
         <label
           htmlFor="totalPrice"
@@ -418,10 +353,11 @@ const TireDetailsStep: React.FC<StepProps> = ({
           name="totalPrice"
           value={formData.totalPrice}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          placeholder="Enter total price"
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Total price (auto-filled when tire size is selected)"
           min="0"
           step="0.01"
+          readOnly
         />
       </div>
       <div>
@@ -437,9 +373,10 @@ const TireDetailsStep: React.FC<StepProps> = ({
           name="warrantyDistance"
           value={formData.warrantyDistance}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          placeholder="Enter warranty distance"
+          className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+          placeholder="Warranty distance (auto-filled when tire size is selected)"
           min="0"
+          readOnly
         />
       </div>
       <div>
@@ -482,6 +419,88 @@ const TireDetailsStep: React.FC<StepProps> = ({
       </div>
       <div>
         <label
+          htmlFor="lastReplacementDate"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Last Replacement Date *
+        </label>
+        <input
+          type="date"
+          id="lastReplacementDate"
+          name="lastReplacementDate"
+          value={formData.lastReplacementDate}
+          onChange={handleChange}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.preventDefault()} // Prevent typing
+          onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => e.preventDefault()} // Prevent pasting
+          className="w-full p-3 border border-gray-300 rounded cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
+          required
+          readOnly={false} // Keep as false to allow date picker interaction
+          style={{ caretColor: 'transparent' }} // Hide text cursor
+        />
+        {errors.lastReplacementDate && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.lastReplacementDate}
+          </p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="presentKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Current KM Reading *
+        </label>
+        <input
+          type="number"
+          id="presentKmReading"
+          name="presentKmReading"
+          value={formData.presentKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.presentKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.presentKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor="previousKmReading"
+          className="block mb-1 font-medium text-gray-700"
+        >
+          Previous KM Reading *
+        </label>
+        <input
+          type="number"
+          id="previousKmReading"
+          name="previousKmReading"
+          value={formData.previousKmReading}
+          onChange={handleChange}
+          className="w-full p-3 border border-gray-300 rounded"
+          min="0"
+          required
+        />
+        {errors.previousKmReading && (
+          <p className="mt-1 text-sm text-red-600">{errors.previousKmReading}</p>
+        )}
+      </div>
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">
+          KM Difference
+        </label>
+        <div className="w-full p-3 border border-gray-200 rounded bg-gray-50 text-gray-700">
+          {(() => {
+            const current = parseInt(formData.presentKmReading) || 0;
+            const previous = parseInt(formData.previousKmReading) || 0;
+            const difference = current - previous;
+            return difference >= 0 ? difference.toLocaleString() : 0;
+          })()}
+        </div>
+      </div>
+      <div>
+        <label
           htmlFor="tireWearPattern"
           className="block mb-1 font-medium text-gray-700"
         >
@@ -507,33 +526,10 @@ const TireDetailsStep: React.FC<StepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.tireWearPattern}</p>
         )}
       </div>
-
-      <div>
-        <label
-          htmlFor="lastReplacementDate"
-          className="block mb-1 font-medium text-gray-700"
-        >
-          Last Replacement Date *
-        </label>
-        <input
-          type="date"
-          id="lastReplacementDate"
-          name="lastReplacementDate"
-          value={formData.lastReplacementDate}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded"
-          max={new Date(Date.now() - 86400000).toISOString().split("T")[0]} // yesterday
-          required
-        />
-        {errors.lastReplacementDate && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.lastReplacementDate}
-          </p>
-        )}
-      </div>
     </div>
   </div>
-);
+  );
+};
 
 interface RequestInformationStepProps extends StepProps {
   supervisors: Supervisor[];
@@ -570,7 +566,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
         )}
       </div>
-
+      {/* Department and Cost Center fields moved to Vehicle Information section */}
       {/* Supervisor select field removed from here */}
     </div>
     <div className="grid gap-4 md:grid-cols-3">
@@ -630,6 +626,10 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           value={formData.requesterPhone}
           onChange={handleChange}
           className="w-full p-3 border border-gray-300 rounded"
+          placeholder="Enter phone number (max 10 digits, no leading zeros)"
+          maxLength={10}
+          pattern="[1-9][0-9]*"
+          inputMode="numeric"
           required
         />
         {errors.requesterPhone && (
@@ -640,9 +640,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
 
     {/* New Section 2: Delivery and Pricing Information */}
     <div className="mt-6 space-y-4">
-      <h4 className="text-lg font-semibold text-gray-800">
-        Delivery & Pricing Information
-      </h4>
+      <h4 className="text-lg font-semibold text-gray-800">Delivery & Pricing Information</h4>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -707,11 +705,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="true"
                 checked={formData.tireWearIndicatorAppeared === true}
-                onChange={() =>
-                  handleChange({
-                    target: { name: "tireWearIndicatorAppeared", value: true },
-                  } as any)
-                }
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: true }
+                } as any)}
                 className="mr-2"
               />
               Yes
@@ -722,11 +718,9 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
                 name="tireWearIndicatorAppeared"
                 value="false"
                 checked={formData.tireWearIndicatorAppeared === false}
-                onChange={() =>
-                  handleChange({
-                    target: { name: "tireWearIndicatorAppeared", value: false },
-                  } as any)
-                }
+                onChange={() => handleChange({
+                  target: { name: "tireWearIndicatorAppeared", value: false }
+                } as any)}
                 className="mr-2"
               />
               No
@@ -747,16 +741,11 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
   formData,
   handleChange,
   handleFileChange,
+  removeImage,
   errors,
   supervisors,
   supervisorsLoading,
 }) => {
-  const removeImage = (index: number) => {
-    const e = {
-      target: { files: null },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    handleFileChange(e, index);
-  };
 
   return (
     <div className="space-y-4">
@@ -789,13 +778,18 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, index)}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className={`w-full p-2 border rounded ${
+                    errors[`image_${index}`] ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors[`image_${index}`] && (
+                  <p className="mt-1 text-xs text-red-600">{errors[`image_${index}`]}</p>
+                )}
               </div>
             ))}
           </div>
           <p className="mt-1 mb-4 text-sm text-gray-500">
-            Upload images of tire wear, damage, or other relevant details
+            Upload images of tire wear, damage, or other relevant details (Max size: 5MB per image)
           </p>
 
           {/* Image Preview Grid */}
@@ -811,7 +805,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() => removeImage && removeImage(index)}
                       className="absolute p-1 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
                     >
                       <svg
@@ -884,6 +878,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
+  const [tireDetailsLoading, setTireDetailsLoading] = useState(false);
 
   // Fetch requests when component mounts
   useEffect(() => {
@@ -922,17 +917,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       requesterName: request.requesterName,
       requesterEmail: request.requesterEmail,
       requesterPhone: request.requesterPhone,
-      vehicleType: "", // These fields are not stored in requests, will be populated from vehicle data
-      vehicleDepartment: "",
-      vehicleCostCentre: "",
       vehicleBrand: request.vehicleBrand,
       vehicleModel: request.vehicleModel,
+      userSection: request.userSection,
       lastReplacementDate:
         typeof request.lastReplacementDate === "string"
           ? request.lastReplacementDate
           : request.lastReplacementDate.toISOString(),
       existingTireMake: request.existingTireMake,
       tireSizeRequired: request.tireSizeRequired,
+      costCenter: request.costCenter,
       presentKmReading: request.presentKmReading,
       previousKmReading: request.previousKmReading,
       tireWearPattern: request.tireWearPattern,
@@ -946,6 +940,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       supervisorNotes: request.supervisor_notes,
       technicalManagerNotes: request.technical_manager_note,
       engineerNotes: request.engineer_note,
+      customer_officer_note: request.customer_officer_note,
       // New delivery and pricing fields
       deliveryOfficeName: request.deliveryOfficeName,
       deliveryStreetName: request.deliveryStreetName,
@@ -967,12 +962,53 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     setSelectedRequest(null);
   };
 
+  // Function to handle tire size selection and auto-fill tire details
+  const handleTireSizeSelect = async (tireSize: string) => {
+    setTireDetailsLoading(true);
+    try {
+      const response = await fetch(
+        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(tireSize)}`
+      );
+
+      if (response.ok) {
+        const tireDetails: TireDetails = await response.json();
+
+        // Auto-fill the form fields
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: tireDetails.tire_brand,
+          totalPrice: tireDetails.total_price.toString(),
+          warrantyDistance: tireDetails.warranty_distance.toString(),
+        }));
+      } else {
+        console.error("Tire details not found for size:", tireSize);
+        // Clear the auto-filled fields if no details found
+        setFormData((prev) => ({
+          ...prev,
+          existingTireMake: "",
+          totalPrice: "",
+          warrantyDistance: "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching tire details:", error);
+      // Clear the auto-filled fields on error
+      setFormData((prev) => ({
+        ...prev,
+        existingTireMake: "",
+        totalPrice: "",
+        warrantyDistance: "",
+      }));
+    } finally {
+      setTireDetailsLoading(false);
+    }
+  };
+
+
+
   const initialFormData = {
     vehicleNumber: "",
     vehicleId: "",
-    vehicleType: "",
-    vehicleDepartment: "",
-    vehicleCostCentre: "",
     vehicleBrand: "",
     vehicleModel: "",
     tireSizeRequired: "",
@@ -982,8 +1018,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     requesterName: "",
     requesterEmail: "",
     requesterPhone: "",
+    userSection: "",
     lastReplacementDate: "",
     existingTireMake: "",
+    costCenter: "",
     presentKmReading: "",
     previousKmReading: "",
     tireWearPattern: "",
@@ -1002,12 +1040,54 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Helper function to format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
+
+    // Special handling for phone number to limit to 10 digits and remove leading zeros
+    if (name === 'requesterPhone') {
+      // Remove any non-digit characters
+      const digitsOnly = value.replace(/\D/g, '');
+      // Remove leading zeros
+      const withoutLeadingZeros = digitsOnly.replace(/^0+/, '');
+      // Limit to 10 digits maximum
+      const limitedValue = withoutLeadingZeros.slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: limitedValue,
+      }));
+      return;
+    }
+
+    // Special handling for date fields to ensure proper formatting
+    if (name === 'lastReplacementDate') {
+      // Ensure the date is in YYYY-MM-DD format and set time to start of day
+      if (value) {
+        const dateObj = new Date(value);
+        if (!isNaN(dateObj.getTime())) {
+          // Format as YYYY-MM-DD to ensure consistency
+          const formattedDate = dateObj.toISOString().split('T')[0];
+          setFormData((prev) => ({
+            ...prev,
+            [name]: formattedDate,
+          }));
+          return;
+        }
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -1018,14 +1098,67 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
+    const newImages = [...formData.images];
+
     if (e.target.files && e.target.files[0]) {
-      const newImages = [...formData.images];
-      newImages[index] = e.target.files[0];
-      setFormData((prev) => ({
-        ...prev,
-        images: newImages,
-      }));
+      const file = e.target.files[0];
+      const maxSizeInBytes = 5 * 1024 * 1024; // 5MB in bytes
+
+      // Check file size
+      if (file.size > maxSizeInBytes) {
+        // Show error message
+        setErrors((prev) => ({
+          ...prev,
+          [`image_${index}`]: `Image size must be less than 5MB. Current size: ${formatFileSize(file.size)}`
+        }));
+
+        // Clear the file input
+        e.target.value = '';
+        return;
+      }
+
+      // Clear any previous error for this image
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
+
+      // Adding a new image
+      newImages[index] = file;
+    } else {
+      // Removing an image (when files is null or empty)
+      newImages[index] = null;
+
+      // Clear any error for this image
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages[index] = null;
+
+    // Clear any error for this image
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[`image_${index}`];
+      return newErrors;
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
   };
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
@@ -1033,12 +1166,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       ...prev,
       vehicleId: vehicle.id.toString(),
       vehicleNumber: vehicle.vehicleNumber,
-      vehicleType: vehicle.type || "",
-      vehicleDepartment: vehicle.department || "",
-      vehicleCostCentre: vehicle.costCentre || "",
       vehicleBrand: vehicle.make || "",
       vehicleModel: vehicle.model || "",
-      tireSizeRequired: "", // Tire size is no longer stored in vehicle, user must enter manually
+      tireSizeRequired: vehicle.tireSize || "",
+      userSection: vehicle.department || "",
+      costCenter: vehicle.costCentre || "",
     }));
   };
 
@@ -1047,6 +1179,58 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       (v) =>
         v.vehicleNumber.trim().toLowerCase() === number.trim().toLowerCase()
     );
+
+  // Check for duplicate/recent requests for the same vehicle
+  const checkVehicleRequestRestrictions = (vehicleNumber: string) => {
+    if (!vehicleNumber || !requests) return null;
+
+    const vehicleRequests = requests.filter(
+      (req) => req.vehicleNumber.trim().toLowerCase() === vehicleNumber.trim().toLowerCase()
+    );
+
+    // Check for pending requests
+    const pendingRequests = vehicleRequests.filter(
+      (req) => !['rejected', 'complete', 'order placed'].includes(req.status)
+    );
+
+    if (pendingRequests.length > 0) {
+      const latestPending = pendingRequests[0];
+      return {
+        type: 'pending',
+        message: `Vehicle ${vehicleNumber} already has a pending tire request (Status: ${latestPending.status.replace(/_/g, ' ')}). Please wait for the current request to be processed.`,
+        requestId: latestPending.id,
+        status: latestPending.status
+      };
+    }
+
+    // Check for recent completed requests (within 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentCompletedRequests = vehicleRequests.filter(
+      (req) => {
+        const isCompleted = ['complete', 'order placed'].includes(req.status);
+        const requestDate = new Date(req.submittedAt);
+        return isCompleted && requestDate >= thirtyDaysAgo;
+      }
+    );
+
+    if (recentCompletedRequests.length > 0) {
+      const latestCompleted = recentCompletedRequests[0];
+      const requestDate = new Date(latestCompleted.submittedAt);
+      const daysSince = Math.ceil((new Date().getTime() - requestDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysRemaining = 30 - daysSince;
+
+      return {
+        type: 'recent',
+        message: `Vehicle ${vehicleNumber} had a tire request completed ${daysSince} days ago. Please wait ${daysRemaining} more days before submitting a new request.`,
+        lastRequestDate: latestCompleted.submittedAt,
+        daysRemaining: daysRemaining
+      };
+    }
+
+    return null;
+  };
 
   // Real-time validation for vehicle number
   useEffect(() => {
@@ -1057,45 +1241,48 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           vehicleNumber: "Vehicle not registered",
         }));
       } else {
-        setErrors((prev) => {
-          const { vehicleNumber, ...rest } = prev;
-          return rest;
-        });
+        // Check for duplicate/recent requests
+        const restriction = checkVehicleRequestRestrictions(formData.vehicleNumber);
+        if (restriction) {
+          setErrors((prev) => ({
+            ...prev,
+            vehicleNumber: restriction.message,
+          }));
+        } else {
+          setErrors((prev) => {
+            const { vehicleNumber, ...rest } = prev;
+            return rest;
+          });
+        }
       }
     }
     // eslint-disable-next-line
-  }, [formData.vehicleNumber, vehicles]);
+  }, [formData.vehicleNumber, vehicles, requests]);
 
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
 
     switch (step) {
       case 1:
-        if (!formData.vehicleNumber)
+        if (!formData.vehicleNumber) {
           newErrors.vehicleNumber = "Vehicle number is required";
-        else if (!vehicleNumberExists(formData.vehicleNumber))
+        } else if (!vehicleNumberExists(formData.vehicleNumber)) {
           newErrors.vehicleNumber = "Vehicle not registered";
+        } else {
+          // Check for duplicate/recent requests
+          const restriction = checkVehicleRequestRestrictions(formData.vehicleNumber);
+          if (restriction) {
+            newErrors.vehicleNumber = restriction.message;
+          }
+        }
         if (!formData.vehicleBrand)
           newErrors.vehicleBrand = "Vehicle brand is required";
         if (!formData.vehicleModel)
           newErrors.vehicleModel = "Vehicle model is required";
-        if (!formData.vehicleType)
-          newErrors.vehicleType = "Vehicle type is required";
-        if (!formData.vehicleDepartment)
-          newErrors.vehicleDepartment = "Department is required";
-        if (!formData.vehicleCostCentre)
-          newErrors.vehicleCostCentre = "Cost centre is required";
-        if (!formData.presentKmReading)
-          newErrors.presentKmReading = "Current KM reading is required";
-        if (!formData.previousKmReading)
-          newErrors.previousKmReading = "Previous KM reading is required";
-        if (formData.presentKmReading && formData.previousKmReading) {
-          const current = parseInt(formData.presentKmReading);
-          const previous = parseInt(formData.previousKmReading);
-          if (current < previous)
-            newErrors.presentKmReading =
-              "Current KM cannot be less than previous KM";
-        }
+        if (!formData.userSection)
+          newErrors.userSection = "Department is required";
+        if (!formData.costCenter)
+          newErrors.costCenter = "Cost center is required";
         break;
       case 2:
         if (!formData.tireSizeRequired)
@@ -1106,6 +1293,16 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.existingTireMake = "Existing tire make is required";
         if (!formData.lastReplacementDate)
           newErrors.lastReplacementDate = "Last replacement date is required";
+        if (!formData.presentKmReading)
+          newErrors.presentKmReading = "Current KM reading is required";
+        if (!formData.previousKmReading)
+          newErrors.previousKmReading = "Previous KM reading is required";
+        if (formData.presentKmReading && formData.previousKmReading) {
+          const current = parseInt(formData.presentKmReading);
+          const previous = parseInt(formData.previousKmReading);
+          if (current < previous)
+            newErrors.presentKmReading = "Current KM cannot be less than previous KM";
+        }
         if (!formData.tireWearPattern)
           newErrors.tireWearPattern = "Tire wear pattern is required";
         break;
@@ -1118,8 +1315,22 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           newErrors.requesterName = "Name is required";
         if (!formData.requesterEmail)
           newErrors.requesterEmail = "Email is required";
-        if (!formData.requesterPhone)
+        if (!formData.requesterPhone) {
           newErrors.requesterPhone = "Phone is required";
+        } else {
+          // Validate phone number format (digits only, max 10 digits, no leading zeros)
+          const phoneDigits = formData.requesterPhone.replace(/\D/g, '');
+          if (phoneDigits.length === 0) {
+            newErrors.requesterPhone = "Phone number is required";
+          } else if (phoneDigits.length > 10) {
+            newErrors.requesterPhone = "Phone number cannot exceed 10 digits";
+          } else if (phoneDigits.startsWith('0')) {
+            newErrors.requesterPhone = "Phone number cannot start with zero";
+          } else if (!/^\d+$/.test(phoneDigits)) {
+            newErrors.requesterPhone = "Phone number must contain only digits";
+          }
+          // Note: Leading zeros are automatically removed
+        }
         if (!formData.supervisorId)
           newErrors.supervisorId = "Supervisor is required";
         break;
@@ -1155,6 +1366,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       }
     }
 
+    // Check for image size errors
+    const imageErrors = Object.keys(errors).filter(key => key.startsWith('image_'));
+    if (imageErrors.length > 0) {
+      setError("Please fix image size errors before submitting.");
+      setCurrentStep(4); // Go to the step with image uploads
+      return;
+    }
+
     setFormLoading(true);
 
     try {
@@ -1169,19 +1388,12 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       // 2. Prepare data to send to backend
       const submitData = {
         ...formData,
-        userId: parseInt(user.id),
-        vehicleId: parseInt(formData.vehicleId),
-        quantity: parseInt(formData.quantity.toString()),
-        tubesQuantity: parseInt(formData.tubesQuantity.toString()),
-        presentKmReading: parseInt(formData.presentKmReading),
-        previousKmReading: parseInt(formData.previousKmReading),
+        userId: user.id,
         tireSize: formData.tireSizeRequired,
         submittedAt: new Date().toISOString(),
         images: imageUrls,
-        supervisorId: parseInt(formData.supervisorId),
+        supervisorId: formData.supervisorId, // <-- add this
       };
-
-      console.log("Submitting data:", submitData);
 
       // 3. Send to backend (as JSON)
       const response = await fetch(
@@ -1194,10 +1406,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `HTTP ${response.status}: Failed to submit request`
-        );
+        throw new Error("Failed to submit request");
       }
 
       // Refresh requests to show new request
@@ -1218,13 +1427,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         setCurrentStep(1);
       }, 2000);
     } catch (err) {
-      console.error("Request submission error:", err);
       setFormLoading(false);
-      setError(
-        err instanceof Error
-          ? `Error: ${err.message}`
-          : "An error occurred while submitting your request"
-      );
+      setError("An error occurred while submitting your request");
     }
   };
 
@@ -1349,6 +1553,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               handleChange={handleChange}
               handleFileChange={handleFileChange}
               errors={errors}
+              onTireSizeSelect={handleTireSizeSelect}
             />
           )}
           {currentStep === 3 && (
@@ -1367,6 +1572,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               formData={formData}
               handleChange={handleChange}
               handleFileChange={handleFileChange}
+              removeImage={removeImage}
               errors={errors}
               supervisors={supervisors}
               supervisorsLoading={supervisorsLoading}
@@ -1418,17 +1624,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
           </div>
         </div>
 
-        <RequestTable
-          requests={requests.filter((req) => req.userId === user?.id)}
-          title="Your Tire Requests"
-          onView={handleView}
-          onApprove={() => {}}
-          onReject={() => {}}
-          onDelete={handleDelete}
-          onPlaceOrder={() => {}} // Empty function - no place order for users
-          showActions={true}
-          showPlaceOrderButton={false} // Disable place order button for regular users
-        />
+
       </div>
 
       {showDeleteConfirm && (
@@ -1467,6 +1663,8 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         isOpen={showDetailsModal}
         onClose={handleCloseModal}
       />
+
+
     </div>
   );
 };

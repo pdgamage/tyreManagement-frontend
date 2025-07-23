@@ -82,7 +82,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   <p><span className="font-medium">Number:</span> {request.vehicleNumber}</p>
                   <p><span className="font-medium">Brand:</span> {request.vehicleBrand}</p>
                   <p><span className="font-medium">Model:</span> {request.vehicleModel}</p>
-                  <p><span className="font-medium">Year:</span> {request.year}</p>
                   <p><span className="font-medium">Department/Section:</span> {request.userSection}</p>
                   <p><span className="font-medium">Cost Center:</span> {request.costCenter}</p>
                 </div>
@@ -126,6 +125,17 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   <p><span className="font-medium">Tire Wear Indicator:</span> {request.tireWearIndicatorAppeared !== undefined ? (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}</p>
                 </div>
               </div>
+
+              {/* Cancellation Information - Only show for cancelled orders */}
+              {request.status === 'order cancelled' && request.customer_officer_note && (
+                <div className="col-span-full space-y-4">
+                  <h4 className="text-lg font-semibold text-orange-700 border-b border-orange-200 pb-2">Cancellation Information</h4>
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <p className="text-sm text-orange-600 font-medium mb-2">Reason for Cancellation:</p>
+                    <p className="text-gray-800">{request.customer_officer_note}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Images Section */}
               {request.images && request.images.length > 0 && (

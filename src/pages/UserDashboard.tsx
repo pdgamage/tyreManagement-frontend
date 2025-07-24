@@ -20,7 +20,7 @@ import {
   Activity,
   ShoppingCart,
   Package,
-  X
+  X,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -29,7 +29,9 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
+    null
+  );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -65,20 +67,30 @@ const UserDashboard = () => {
 
   // Filter user's own requests
   const userRequests = requests.filter((req: any) => req.userId === user?.id);
-  const pendingRequests = userRequests.filter((req: any) => req.status === "pending");
-  const approvedRequests = userRequests.filter((req: any) =>
-    req.status === "supervisor approved" ||
-    req.status === "technical-manager approved" ||
-    req.status === "engineer approved"
+  const pendingRequests = userRequests.filter(
+    (req: any) => req.status === "pending"
   );
-  const rejectedRequests = userRequests.filter((req: any) =>
-    req.status === "supervisor rejected" ||
-    req.status === "technical-manager rejected" ||
-    req.status === "engineer rejected"
+  const approvedRequests = userRequests.filter(
+    (req: any) =>
+      req.status === "supervisor approved" ||
+      req.status === "technical-manager approved" ||
+      req.status === "engineer approved"
   );
-  const placeOrderRequests = userRequests.filter((req: any) => req.status === "order placed");
-  const completeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
-  const cancelOrderRequests = userRequests.filter((req: any) => req.status === "order cancelled");
+  const rejectedRequests = userRequests.filter(
+    (req: any) =>
+      req.status === "supervisor rejected" ||
+      req.status === "technical-manager rejected" ||
+      req.status === "engineer rejected"
+  );
+  const placeOrderRequests = userRequests.filter(
+    (req: any) => req.status === "order placed"
+  );
+  const completeOrderRequests = userRequests.filter(
+    (req: any) => req.status === "complete"
+  );
+  const cancelOrderRequests = userRequests.filter(
+    (req: any) => req.status === "order cancelled"
+  );
 
   // Debug: Log the status values to see what we have (can be removed in production)
   // console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
@@ -128,7 +140,7 @@ const UserDashboard = () => {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
       // Only show department if it actually exists, otherwise show "Unknown Department"
-      userSection: tireRequest.userSection || 'Unknown Department'
+      userSection: tireRequest.userSection || "Unknown Department",
     };
   };
 
@@ -146,7 +158,9 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+      const API_BASE_URL =
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://tyremanagement-backend-production-8fed.up.railway.app";
       const response = await fetch(`${API_BASE_URL}/api/requests/${deleteId}`, {
         method: "DELETE",
       });
@@ -154,10 +168,10 @@ const UserDashboard = () => {
       if (response.ok) {
         await fetchRequests(); // Refresh the list
       } else {
-        console.error('Failed to delete request');
+        console.error("Failed to delete request");
       }
     } catch (error) {
-      console.error('Error deleting request:', error);
+      console.error("Error deleting request:", error);
     }
 
     setShowDeleteConfirm(false);
@@ -170,15 +184,15 @@ const UserDashboard = () => {
   };
 
   const handleApprove = (id: string) => {
-    console.log('Approve request:', id);
+    console.log("Approve request:", id);
   };
 
   const handleReject = (id: string) => {
-    console.log('Reject request:', id);
+    console.log("Reject request:", id);
   };
 
   const handlePlaceOrder = (request: any) => {
-    console.log('Place order for request:', request);
+    console.log("Place order for request:", request);
   };
 
   const handleLogout = async () => {
@@ -206,9 +220,13 @@ const UserDashboard = () => {
                 </p>
                 <div className="flex items-center mt-2 space-x-2">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-slate-400 font-medium">User Level Access</span>
+                  <span className="text-sm text-slate-400 font-medium">
+                    User Level Access
+                  </span>
                   <span className="text-slate-500">•</span>
-                  <span className="text-sm text-slate-400">Welcome back, {user?.name || 'User'}</span>
+                  <span className="text-sm text-slate-400">
+                    Welcome back, {user?.name || "User"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -216,18 +234,28 @@ const UserDashboard = () => {
               {/* Quick Actions */}
               <div className="hidden lg:flex items-center space-x-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
-                  <div className="text-sm font-semibold text-white">{currentTime.toLocaleTimeString()}</div>
+                  <div className="text-xs text-slate-300 font-medium">
+                    Current Time
+                  </div>
+                  <div className="text-sm font-semibold text-white">
+                    {currentTime.toLocaleTimeString()}
+                  </div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
-                  <div className="text-sm font-semibold text-white">{currentTime.toLocaleDateString()}</div>
+                  <div className="text-xs text-slate-300 font-medium">
+                    Today's Date
+                  </div>
+                  <div className="text-sm font-semibold text-white">
+                    {currentTime.toLocaleDateString()}
+                  </div>
                 </div>
               </div>
               {/* Enhanced User Profile */}
               <div className="flex items-center space-x-3">
                 <div className="text-right hidden sm:block">
-                  <div className="text-sm font-medium text-white">{user?.name || 'User'}</div>
+                  <div className="text-sm font-medium text-white">
+                    {user?.name || "User"}
+                  </div>
                   <div className="text-xs text-slate-300">User</div>
                 </div>
                 <div className="relative" ref={dropdownRef}>
@@ -261,7 +289,9 @@ const UserDashboard = () => {
               className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
-              <span>{showRequestForm ? 'Hide Request Form' : 'New Tire Request'}</span>
+              <span>
+                {showRequestForm ? "Hide Request Form" : "New Tire Request"}
+              </span>
             </button>
           </div>
         </div>
@@ -273,15 +303,23 @@ const UserDashboard = () => {
           {/* Professional Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             <div
-              onClick={() => setActiveFilter(activeFilter === "pending" ? "all" : "pending")}
+              onClick={() =>
+                setActiveFilter(activeFilter === "pending" ? "all" : "pending")
+              }
               className={`bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-8 text-white shadow-xl border border-yellow-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "pending" ? "ring-4 ring-yellow-300 ring-opacity-50" : ""
+                activeFilter === "pending"
+                  ? "ring-4 ring-yellow-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-yellow-100 text-sm font-medium mb-2">Pending Requests</p>
-                  <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
+                  <p className="text-yellow-100 text-sm font-medium mb-2">
+                    Pending Requests
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {pendingRequests.length}
+                  </p>
                   <p className="text-yellow-200 text-xs">Awaiting review</p>
                 </div>
                 <div className="w-16 h-16 bg-yellow-400/30 rounded-xl flex items-center justify-center">
@@ -291,16 +329,28 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "approved" ? "all" : "approved")}
+              onClick={() =>
+                setActiveFilter(
+                  activeFilter === "approved" ? "all" : "approved"
+                )
+              }
               className={`bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "approved" ? "ring-4 ring-emerald-300 ring-opacity-50" : ""
+                activeFilter === "approved"
+                  ? "ring-4 ring-emerald-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-emerald-100 text-sm font-medium mb-2">Approved</p>
-                  <p className="text-4xl font-bold mb-1">{approvedRequests.length}</p>
-                  <p className="text-emerald-200 text-xs">Successfully approved</p>
+                  <p className="text-emerald-100 text-sm font-medium mb-2">
+                    Approved
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {approvedRequests.length}
+                  </p>
+                  <p className="text-emerald-200 text-xs">
+                    Successfully approved
+                  </p>
                 </div>
                 <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-8 h-8" />
@@ -309,15 +359,25 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "rejected" ? "all" : "rejected")}
+              onClick={() =>
+                setActiveFilter(
+                  activeFilter === "rejected" ? "all" : "rejected"
+                )
+              }
               className={`bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-8 text-white shadow-xl border border-rose-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "rejected" ? "ring-4 ring-rose-300 ring-opacity-50" : ""
+                activeFilter === "rejected"
+                  ? "ring-4 ring-rose-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-rose-100 text-sm font-medium mb-2">Rejected</p>
-                  <p className="text-4xl font-bold mb-1">{rejectedRequests.length}</p>
+                  <p className="text-rose-100 text-sm font-medium mb-2">
+                    Rejected
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {rejectedRequests.length}
+                  </p>
                   <p className="text-rose-200 text-xs">Needs revision</p>
                 </div>
                 <div className="w-16 h-16 bg-rose-400/30 rounded-xl flex items-center justify-center">
@@ -327,15 +387,25 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "place-orders" ? "all" : "place-orders")}
+              onClick={() =>
+                setActiveFilter(
+                  activeFilter === "place-orders" ? "all" : "place-orders"
+                )
+              }
               className={`bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "place-orders" ? "ring-4 ring-blue-300 ring-opacity-50" : ""
+                activeFilter === "place-orders"
+                  ? "ring-4 ring-blue-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium mb-2">Place Orders</p>
-                  <p className="text-4xl font-bold mb-1">{placeOrderRequests.length}</p>
+                  <p className="text-blue-100 text-sm font-medium mb-2">
+                    Place Orders
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {placeOrderRequests.length}
+                  </p>
                   <p className="text-blue-200 text-xs">Orders placed</p>
                 </div>
                 <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">
@@ -345,15 +415,25 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "complete-orders" ? "all" : "complete-orders")}
+              onClick={() =>
+                setActiveFilter(
+                  activeFilter === "complete-orders" ? "all" : "complete-orders"
+                )
+              }
               className={`bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "complete-orders" ? "ring-4 ring-purple-300 ring-opacity-50" : ""
+                activeFilter === "complete-orders"
+                  ? "ring-4 ring-purple-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-2">Complete Orders</p>
-                  <p className="text-4xl font-bold mb-1">{completeOrderRequests.length}</p>
+                  <p className="text-purple-100 text-sm font-medium mb-2">
+                    Complete Orders
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {completeOrderRequests.length}
+                  </p>
                   <p className="text-purple-200 text-xs">Orders completed</p>
                 </div>
                 <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
@@ -363,15 +443,25 @@ const UserDashboard = () => {
             </div>
 
             <div
-              onClick={() => setActiveFilter(activeFilter === "cancel-orders" ? "all" : "cancel-orders")}
+              onClick={() =>
+                setActiveFilter(
+                  activeFilter === "cancel-orders" ? "all" : "cancel-orders"
+                )
+              }
               className={`bg-gradient-to-br from-slate-500 to-gray-600 rounded-2xl p-8 text-white shadow-xl border border-slate-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "cancel-orders" ? "ring-4 ring-slate-300 ring-opacity-50" : ""
+                activeFilter === "cancel-orders"
+                  ? "ring-4 ring-slate-300 ring-opacity-50"
+                  : ""
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-100 text-sm font-medium mb-2">Cancel Orders</p>
-                  <p className="text-4xl font-bold mb-1">{cancelOrderRequests.length}</p>
+                  <p className="text-slate-100 text-sm font-medium mb-2">
+                    Cancel Orders
+                  </p>
+                  <p className="text-4xl font-bold mb-1">
+                    {cancelOrderRequests.length}
+                  </p>
                   <p className="text-slate-200 text-xs">Orders cancelled</p>
                 </div>
                 <div className="w-16 h-16 bg-slate-400/30 rounded-xl flex items-center justify-center">
@@ -390,16 +480,23 @@ const UserDashboard = () => {
                     <Plus className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-green-900">Submit New Tire Request</h2>
-                    <p className="text-green-700 text-sm">Fill out the form below to request new tires for your vehicle</p>
+                    <h2 className="text-xl font-bold text-green-900">
+                      Submit New Tire Request
+                    </h2>
+                    <p className="text-green-700 text-sm">
+                      Fill out the form below to request new tires for your
+                      vehicle
+                    </p>
                   </div>
                 </div>
               </div>
               <div className="p-8">
-                <TireRequestForm onSuccess={() => {
-                  setShowRequestForm(false);
-                  fetchRequests(); // Refresh the requests to update counts
-                }} />
+                <TireRequestForm
+                  onSuccess={() => {
+                    setShowRequestForm(false);
+                    fetchRequests(); // Refresh the requests to update counts
+                  }}
+                />
               </div>
             </div>
           )}
@@ -420,7 +517,8 @@ const UserDashboard = () => {
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}
-                        {activeFilter === "complete-orders" && "Completed Orders"}
+                        {activeFilter === "complete-orders" &&
+                          "Completed Orders"}
                         {activeFilter === "cancel-orders" && "Cancelled Orders"}
                       </span>
                     )}
@@ -428,8 +526,19 @@ const UserDashboard = () => {
                   <p className="text-blue-700 text-sm">
                     {activeFilter === "all"
                       ? "Track the status of your tire requests with color-coded indicators"
-                      : `Showing ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "orders that have been placed" : activeFilter === "complete-orders" ? "completed orders" : "cancelled orders"} requests`
-                    }
+                      : `Showing ${
+                          activeFilter === "pending"
+                            ? "pending"
+                            : activeFilter === "approved"
+                            ? "approved"
+                            : activeFilter === "rejected"
+                            ? "rejected"
+                            : activeFilter === "place-orders"
+                            ? "orders that have been placed"
+                            : activeFilter === "complete-orders"
+                            ? "completed orders"
+                            : "cancelled orders"
+                        } requests`}
                     {activeFilter !== "all" && (
                       <button
                         onClick={() => setActiveFilter("all")}
@@ -462,13 +571,38 @@ const UserDashboard = () => {
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
                   <div className="text-gray-500 text-lg mb-2 font-medium">
-                    {activeFilter === "all" ? "No requests found" : `No ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : activeFilter === "complete-orders" ? "completed orders" : "cancelled orders"} found`}
+                    {activeFilter === "all"
+                      ? "No requests found"
+                      : `No ${
+                          activeFilter === "pending"
+                            ? "pending"
+                            : activeFilter === "approved"
+                            ? "approved"
+                            : activeFilter === "rejected"
+                            ? "rejected"
+                            : activeFilter === "place-orders"
+                            ? "placed orders"
+                            : activeFilter === "complete-orders"
+                            ? "completed orders"
+                            : "cancelled orders"
+                        } found`}
                   </div>
                   <p className="text-gray-400 text-sm mb-6">
                     {activeFilter === "all"
                       ? "Submit your first tire request using the form above"
-                      : `You don't have any ${activeFilter === "pending" ? "pending" : activeFilter === "approved" ? "approved" : activeFilter === "rejected" ? "rejected" : activeFilter === "place-orders" ? "placed orders" : activeFilter === "complete-orders" ? "completed orders" : "cancelled orders"} at the moment.`
-                    }
+                      : `You don't have any ${
+                          activeFilter === "pending"
+                            ? "pending"
+                            : activeFilter === "approved"
+                            ? "approved"
+                            : activeFilter === "rejected"
+                            ? "rejected"
+                            : activeFilter === "place-orders"
+                            ? "placed orders"
+                            : activeFilter === "complete-orders"
+                            ? "completed orders"
+                            : "cancelled orders"
+                        } at the moment.`}
                   </p>
                   <button
                     onClick={() => setShowRequestForm(true)}
@@ -490,12 +624,16 @@ const UserDashboard = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-blue-900">Quick Tips</h3>
-                <p className="text-blue-700 text-sm">Important information for tire requests</p>
+                <p className="text-blue-700 text-sm">
+                  Important information for tire requests
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                <h4 className="font-semibold text-gray-900 mb-2">Before Submitting</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Before Submitting
+                </h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Ensure your vehicle is registered in the system</li>
                   <li>• Check current tire condition and wear patterns</li>
@@ -504,7 +642,9 @@ const UserDashboard = () => {
                 </ul>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                <h4 className="font-semibold text-gray-900 mb-2">Request Process</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Request Process
+                </h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Requests are reviewed by supervisors first</li>
                   <li>• Technical managers verify technical requirements</li>
@@ -550,7 +690,8 @@ const UserDashboard = () => {
             </div>
 
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete this tire request? All associated data will be permanently removed.
+              Are you sure you want to delete this tire request? All associated
+              data will be permanently removed.
             </p>
 
             <div className="flex justify-end gap-3">

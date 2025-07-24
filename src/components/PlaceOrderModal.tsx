@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import type { Request } from '../types/request';
-import type { TireRequest } from '../types/api';
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import type { Request } from "../types/request";
+import type { TireRequest } from "../types/api";
 
 interface Supplier {
   id: number;
@@ -25,8 +25,10 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   onOrderPlaced,
 }) => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
-  const [orderNotes, setOrderNotes] = useState('');
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
+    null
+  );
+  const [orderNotes, setOrderNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -42,25 +44,28 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const fetchSuppliers = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/suppliers`
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production-8fed.up.railway.app"
+        }/api/suppliers`
       );
       if (response.ok) {
         const data = await response.json();
         setSuppliers(data);
       } else {
-        setError('Failed to fetch suppliers');
+        setError("Failed to fetch suppliers");
       }
     } catch (err) {
-      setError('Error fetching suppliers');
-      console.error('Error fetching suppliers:', err);
+      setError("Error fetching suppliers");
+      console.error("Error fetching suppliers:", err);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedSupplierId) {
-      setError('Please select a supplier');
+      setError("Please select a supplier");
       return;
     }
 
@@ -69,11 +74,14 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app"}/api/requests/${request?.id}/place-order`,
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production-8fed.up.railway.app"
+        }/api/requests/${request?.id}/place-order`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             supplierId: selectedSupplierId,
@@ -84,10 +92,12 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Order placed successfully:', result);
+        console.log("Order placed successfully:", result);
 
         // Show success message
-        setSuccess(`Order placed successfully! Email sent to ${result.supplier.name} (${result.supplier.email})`);
+        setSuccess(
+          `Order placed successfully! Email sent to ${result.supplier.name} (${result.supplier.email})`
+        );
         setError(null);
 
         // Wait 2 seconds to show success message, then close
@@ -96,19 +106,22 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           onClose();
           // Reset form
           setSelectedSupplierId(null);
-          setOrderNotes('');
+          setOrderNotes("");
           setSuccess(null);
         }, 2000);
-
       } else {
         const errorData = await response.json();
         // Check if the error is just a database issue but email was sent
-        if (errorData.error && errorData.error.includes('Data truncated') && errorData.emailResult) {
+        if (
+          errorData.error &&
+          errorData.error.includes("Data truncated") &&
+          errorData.emailResult
+        ) {
           // Email was sent successfully, treat as success
-          console.log('Order email sent successfully despite database error');
+          console.log("Order email sent successfully despite database error");
 
           // Show success message
-          setSuccess('Order placed successfully! Email sent to supplier.');
+          setSuccess("Order placed successfully! Email sent to supplier.");
           setError(null);
 
           // Wait 2 seconds to show success message, then close
@@ -117,17 +130,16 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             onClose();
             // Reset form
             setSelectedSupplierId(null);
-            setOrderNotes('');
+            setOrderNotes("");
             setSuccess(null);
           }, 2000);
-
         } else {
-          setError(errorData.error || 'Failed to place order');
+          setError(errorData.error || "Failed to place order");
         }
       }
     } catch (err) {
-      setError('Error placing order');
-      console.error('Error placing order:', err);
+      setError("Error placing order");
+      console.error("Error placing order:", err);
     } finally {
       setLoading(false);
     }
@@ -135,7 +147,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
   const handleClose = () => {
     setSelectedSupplierId(null);
-    setOrderNotes('');
+    setOrderNotes("");
     setError(null);
     onClose();
   };
@@ -162,16 +174,19 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           <h3 className="font-semibold text-gray-800 mb-2">Order Summary</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="font-medium">Vehicle:</span> {request.vehicleNumber}
+              <span className="font-medium">Vehicle:</span>{" "}
+              {request.vehicleNumber}
             </div>
             <div>
-              <span className="font-medium">Tire Size:</span> {request.tireSizeRequired}
+              <span className="font-medium">Tire Size:</span>{" "}
+              {request.tireSizeRequired}
             </div>
             <div>
               <span className="font-medium">Quantity:</span> {request.quantity}
             </div>
             <div>
-              <span className="font-medium">Tubes:</span> {request.tubesQuantity}
+              <span className="font-medium">Tubes:</span>{" "}
+              {request.tubesQuantity}
             </div>
           </div>
         </div>
@@ -179,7 +194,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         <form onSubmit={handleSubmit}>
           {/* Supplier Selection */}
           <div className="mb-6">
-            <h3 className="font-semibold text-gray-800 mb-3">Select Supplier</h3>
+            <h3 className="font-semibold text-gray-800 mb-3">
+              Select Supplier
+            </h3>
             {suppliers.length === 0 ? (
               <p className="text-gray-500">Loading suppliers...</p>
             ) : (
@@ -189,8 +206,8 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                     key={supplier.id}
                     className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                       selectedSupplierId === supplier.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => setSelectedSupplierId(supplier.id)}
                   >
@@ -203,7 +220,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                         onChange={() => setSelectedSupplierId(supplier.id)}
                         className="mr-3"
                       />
-                      <h4 className="font-medium text-gray-800">{supplier.name}</h4>
+                      <h4 className="font-medium text-gray-800">
+                        {supplier.name}
+                      </h4>
                     </div>
                     <div className="ml-6 text-sm text-gray-600">
                       <p>Email: {supplier.email}</p>
@@ -240,8 +259,16 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           {success && (
             <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
               <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {success}
               </div>
@@ -263,7 +290,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
               disabled={loading || !selectedSupplierId}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Placing Order...' : 'Place Order'}
+              {loading ? "Placing Order..." : "Place Order"}
             </button>
           </div>
         </form>

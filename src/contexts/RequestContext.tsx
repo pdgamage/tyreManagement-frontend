@@ -3,7 +3,7 @@ import { usePolling } from "../hooks/usePolling";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://tyremanagement-backend-production.up.railway.app";
+  "https://tyremanagement-backend-production-8fed.up.railway.app";
 
 import type { Request as RequestType } from "../types/request";
 

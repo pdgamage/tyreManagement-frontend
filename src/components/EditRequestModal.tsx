@@ -429,6 +429,12 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         return;
       }
 
+      // Validate that we have the essential data
+      if (!submitData.vehicleNumber || !submitData.requestReason || !submitData.requesterName) {
+        alert("Error: Missing essential form data");
+        return;
+      }
+
 
 
       const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
@@ -440,17 +446,23 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
       });
 
       console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
+      console.log("Response ok:", response.ok);
 
       let responseData;
       try {
         const responseText = await response.text();
-        console.log("Raw response:", responseText);
+        console.log("Raw response:", responseText.substring(0, 200) + "...");
 
         if (responseText.trim().startsWith('<')) {
           // Server returned HTML instead of JSON (likely an error page)
           console.error("Server returned HTML instead of JSON");
           alert("Server error: The server returned an error page instead of data. Please check if the backend is running properly.");
+          return;
+        }
+
+        if (!responseText.trim()) {
+          console.error("Empty response from server");
+          alert("Server returned empty response. Please try again.");
           return;
         }
 
@@ -461,16 +473,17 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         return;
       }
 
-      console.log("Response status:", response.status);
-      console.log("Response data:", responseData);
+      console.log("Parsed response data:", responseData);
 
-      if (response.ok) {
+      if (response.ok && responseData.success) {
+        console.log("Update successful!");
+        alert("Request updated successfully!");
         await fetchRequests(); // Refresh the requests list
         onSuccess?.();
         onClose();
       } else {
         console.error("Failed to update request:", responseData);
-        const errorMessage = responseData.error || responseData.details || 'Unknown error';
+        const errorMessage = responseData.error || responseData.details || responseData.message || 'Unknown error';
         alert(`Failed to update request: ${errorMessage}`);
       }
     } catch (error) {

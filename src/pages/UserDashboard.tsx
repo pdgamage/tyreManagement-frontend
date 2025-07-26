@@ -32,6 +32,7 @@ const UserDashboard = () => {
   const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [editingRequest, setEditingRequest] = useState<TireRequest | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -175,6 +176,11 @@ const UserDashboard = () => {
 
   const handleReject = (id: string) => {
     console.log('Reject request:', id);
+  };
+
+  const handleEdit = (request: any) => {
+    setEditingRequest(request);
+    setShowRequestForm(true);
   };
 
   const handlePlaceOrder = (request: any) => {
@@ -390,16 +396,27 @@ const UserDashboard = () => {
                     <Plus className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-green-900">Submit New Tire Request</h2>
-                    <p className="text-green-700 text-sm">Fill out the form below to request new tires for your vehicle</p>
+                    <h2 className="text-xl font-bold text-green-900">
+                      {editingRequest ? "Edit Tire Request" : "Submit New Tire Request"}
+                    </h2>
+                    <p className="text-green-700 text-sm">
+                      {editingRequest
+                        ? "Update your tire request details below"
+                        : "Fill out the form below to request new tires for your vehicle"
+                      }
+                    </p>
                   </div>
                 </div>
               </div>
               <div className="p-8">
-                <TireRequestForm onSuccess={() => {
-                  setShowRequestForm(false);
-                  fetchRequests(); // Refresh the requests to update counts
-                }} />
+                <TireRequestForm
+                  editingRequest={editingRequest}
+                  onSuccess={() => {
+                    setShowRequestForm(false);
+                    setEditingRequest(null);
+                    fetchRequests(); // Refresh the requests to update counts
+                  }}
+                />
               </div>
             </div>
           )}
@@ -449,12 +466,14 @@ const UserDashboard = () => {
                   title=""
                   onView={handleView}
                   onDelete={handleDelete}
+                  onEdit={handleEdit}
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onPlaceOrder={handlePlaceOrder}
                   showActions={true}
                   showPlaceOrderButton={false}
                   showCancelButton={false}
+                  showEditButton={true}
                 />
               ) : (
                 <div className="text-center py-12">

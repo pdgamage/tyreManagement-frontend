@@ -12,6 +12,7 @@ import RequestDetailsModal from "./RequestDetailsModal";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
+  editingRequest?: TireRequest | null;
 }
 
 interface TireFormData {
@@ -860,10 +861,10 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 
 // Main component
 // Component implementations
-const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
+const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess, editingRequest }) => {
   const { vehicles, loading: vehiclesLoading } = useVehicles();
   const { user } = useAuth();
-  const { requests, fetchRequests, lastUpdate } = useRequests();
+  const { requests, fetchRequests, updateRequest, lastUpdate } = useRequests();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -1039,6 +1040,46 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Populate form data when editing
+  useEffect(() => {
+    if (editingRequest) {
+      setFormData({
+        vehicleNumber: editingRequest.vehicleNumber || "",
+        vehicleId: editingRequest.vehicleId?.toString() || "",
+        vehicleBrand: editingRequest.vehicleBrand || "",
+        vehicleModel: editingRequest.vehicleModel || "",
+        tireSizeRequired: editingRequest.tireSizeRequired || "",
+        tireSize: editingRequest.tireSize || "",
+        quantity: editingRequest.quantity || 1,
+        tubesQuantity: editingRequest.tubesQuantity || 0,
+        requestReason: editingRequest.requestReason || "",
+        requesterName: editingRequest.requesterName || "",
+        requesterEmail: editingRequest.requesterEmail || "",
+        requesterPhone: editingRequest.requesterPhone || "",
+        userSection: editingRequest.userSection || "",
+        lastReplacementDate: editingRequest.lastReplacementDate || "",
+        existingTireMake: editingRequest.existingTireMake || "",
+        costCenter: editingRequest.costCenter || "",
+        presentKmReading: editingRequest.presentKmReading?.toString() || "",
+        previousKmReading: editingRequest.previousKmReading?.toString() || "",
+        tireWearPattern: editingRequest.tireWearPattern || "",
+        comments: editingRequest.comments || "",
+        images: editingRequest.images || Array(7).fill(null),
+        supervisorId: (editingRequest as any).supervisorId || "",
+        userId: editingRequest.userId,
+        // New delivery and pricing fields
+        deliveryOfficeName: (editingRequest as any).deliveryOfficeName || "",
+        deliveryStreetName: (editingRequest as any).deliveryStreetName || "",
+        deliveryTown: (editingRequest as any).deliveryTown || "",
+        totalPrice: (editingRequest as any).totalPrice || "",
+        warrantyDistance: (editingRequest as any).warrantyDistance || "",
+        tireWearIndicatorAppeared: (editingRequest as any).tireWearIndicatorAppeared || false,
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [editingRequest]);
 
   // Helper function to format file size
   const formatFileSize = (bytes: number): string => {
@@ -1396,17 +1437,23 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       };
 
       // 3. Send to backend (as JSON)
-      const response = await fetch(
-        "https://tyremanagement-backend-production.up.railway.app/api/requests",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(submitData),
-        }
-      );
+      if (editingRequest) {
+        // Update existing request
+        await updateRequest(editingRequest.id.toString(), submitData);
+      } else {
+        // Create new request
+        const response = await fetch(
+          "https://tyremanagement-backend-production.up.railway.app/api/requests",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(submitData),
+          }
+        );
 
-      if (!response.ok) {
-        throw new Error("Failed to submit request");
+        if (!response.ok) {
+          throw new Error("Failed to submit request");
+        }
       }
 
       // Refresh requests to show new request

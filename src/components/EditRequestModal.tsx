@@ -314,7 +314,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     if (!formData.requesterPhone.trim()) newErrors.requesterPhone = "Phone is required";
     if (!formData.vehicleBrand.trim()) newErrors.vehicleBrand = "Vehicle brand is required";
     if (!formData.vehicleModel.trim()) newErrors.vehicleModel = "Vehicle model is required";
-    if (!formData.lastReplacementDate) newErrors.lastReplacementDate = "Last replacement date is required";
+    if (!formData.lastReplacementDate || formData.lastReplacementDate.trim() === '') newErrors.lastReplacementDate = "Last replacement date is required";
     if (!formData.existingTireMake.trim()) newErrors.existingTireMake = "Existing tire make is required";
     if (!formData.tireSizeRequired.trim()) newErrors.tireSizeRequired = "Tire size is required";
     if (!formData.tireWearPattern.trim()) newErrors.tireWearPattern = "Tire wear pattern is required";
@@ -398,7 +398,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         requesterPhone: formData.requesterPhone.trim(),
         vehicleBrand: formData.vehicleBrand.trim(),
         vehicleModel: formData.vehicleModel.trim(),
-        lastReplacementDate: formData.lastReplacementDate,
+        lastReplacementDate: formData.lastReplacementDate ? new Date(formData.lastReplacementDate).toISOString().split('T')[0] : null,
         existingTireMake: formData.existingTireMake.trim(),
         tireSizeRequired: formData.tireSizeRequired.trim(),
         presentKmReading: parseInt(formData.presentKmReading) || 0,
@@ -420,6 +420,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
       console.log("Submit data:", submitData);
 
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+      console.log("Using API URL:", API_BASE_URL);
 
       const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
         method: "PUT",
@@ -429,8 +430,17 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         body: JSON.stringify(submitData),
       });
 
-      const responseData = await response.json();
-      console.log("Response:", responseData);
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        console.error("Failed to parse response:", parseError);
+        alert("Failed to parse server response. Please try again.");
+        return;
+      }
+
+      console.log("Response status:", response.status);
+      console.log("Response data:", responseData);
 
       if (response.ok) {
         await fetchRequests(); // Refresh the requests list
@@ -438,7 +448,8 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         onClose();
       } else {
         console.error("Failed to update request:", responseData);
-        alert(`Failed to update request: ${responseData.error || 'Unknown error'}`);
+        const errorMessage = responseData.error || responseData.details || 'Unknown error';
+        alert(`Failed to update request: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Error updating request:", error);

@@ -10,7 +10,6 @@ import {
   Eye,
   ShoppingCart,
   X,
-  Edit,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -146,14 +145,12 @@ interface RequestTableProps {
   onReject: (id: string) => void;
   onView: (request: Request) => void;
   onDelete: (id: string) => void;
-  onEdit?: (request: Request) => void;
   onPlaceOrder: (request: Request) => void;
   onCancelOrder?: (id: string) => void;
   showActions?: boolean;
   showPlaceOrderButton?: boolean; // New prop to control place order button visibility
   showCancelButton?: boolean; // New prop to control cancel order button visibility
   showDeleteButton?: boolean; // New prop to control delete button visibility
-  showEditButton?: boolean; // New prop to control edit button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -163,14 +160,12 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onReject,
   onView,
   onDelete,
-  onEdit,
   onPlaceOrder,
   onCancelOrder,
   showActions = true,
   showPlaceOrderButton = false, // Default to false for security
   showCancelButton = false, // Default to false for security
   showDeleteButton = true, // Default to true for backward compatibility
-  showEditButton = false, // Default to false for security
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -318,19 +313,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {showEditButton && onEdit && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(request);
-                          }}
-                          className="px-4 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded"
-                          aria-label="Edit Request"
-                          title="Edit Request"
-                        >
-                          <Edit className="w-5 h-5" />
-                        </button>
-                      )}
                     {showPlaceOrderButton &&
                       request.status?.toLowerCase().trim() === "complete" &&
                       !(request as any).order_placed && (

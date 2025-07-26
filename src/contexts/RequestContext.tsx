@@ -3,7 +3,7 @@ import { usePolling } from "../hooks/usePolling";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://tyremanagement-backend-production-8fed.up.railway.app";
+  "https://tyremanagement-backend-production.up.railway.app";
 
 import type { Request as RequestType } from "../types/request";
 
@@ -19,7 +19,6 @@ interface RequestsContextType {
     role: string,
     userId?: string
   ) => Promise<void>;
-  updateRequest: (id: string, requestData: any) => Promise<void>;
   isRefreshing: boolean;
   lastUpdate: number;
   reconnectWebSocket: () => void;
@@ -105,50 +104,6 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     [fetchRequests]
   );
 
-  const updateRequest = useCallback(
-    async (id: string, requestData: any) => {
-      try {
-        const formData = new FormData();
-
-        // Add all request data to FormData
-        Object.keys(requestData).forEach(key => {
-          if (key === 'images') {
-            // Handle images separately
-            if (Array.isArray(requestData.images)) {
-              requestData.images.forEach((image: any, index: number) => {
-                if (image instanceof File) {
-                  formData.append('images', image);
-                } else if (typeof image === 'string' && image) {
-                  // For existing image URLs, we'll handle them in the backend
-                  formData.append(`existingImage_${index}`, image);
-                }
-              });
-            }
-          } else if (requestData[key] !== null && requestData[key] !== undefined) {
-            formData.append(key, requestData[key].toString());
-          }
-        });
-
-        const res = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
-          method: "PUT",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "Failed to update request");
-        }
-
-        // Refresh requests after update
-        await fetchRequests();
-      } catch (err) {
-        console.error("Error updating request:", err);
-        throw err;
-      }
-    },
-    [fetchRequests]
-  );
-
   // Manual reconnect function
   const reconnectWebSocket = useCallback(() => {
     // Force page reload to reset WebSocket connection
@@ -159,7 +114,6 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     requests,
     fetchRequests,
     updateRequestStatus,
-    updateRequest,
     isRefreshing,
     lastUpdate,
     reconnectWebSocket,

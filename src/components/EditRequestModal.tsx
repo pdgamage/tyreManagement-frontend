@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, Loader } from "lucide-react";
+import Autosuggest from "react-autosuggest";
 import { Request } from "../types/request";
+import { Vehicle, TireDetails } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
+import { useVehicles } from "../contexts/VehicleContext";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 interface EditRequestModalProps {
   request: Request | null;
@@ -12,9 +16,10 @@ interface EditRequestModalProps {
 }
 
 interface EditFormData {
+  vehicleId: string;
   vehicleNumber: string;
-  quantity: number;
-  tubesQuantity: number;
+  quantity: string;
+  tubesQuantity: string;
   tireSize: string;
   requestReason: string;
   requesterName: string;
@@ -25,8 +30,8 @@ interface EditFormData {
   lastReplacementDate: string;
   existingTireMake: string;
   tireSizeRequired: string;
-  presentKmReading: number;
-  previousKmReading: number;
+  presentKmReading: string;
+  previousKmReading: string;
   tireWearPattern: string;
   comments: string;
   userSection: string;
@@ -34,9 +39,17 @@ interface EditFormData {
   deliveryOfficeName: string;
   deliveryStreetName: string;
   deliveryTown: string;
-  totalPrice: number;
-  warrantyDistance: number;
+  totalPrice: string;
+  warrantyDistance: string;
   tireWearIndicatorAppeared: boolean;
+  images: (File | string | null)[];
+  supervisorId: string;
+}
+
+interface Supervisor {
+  id: number;
+  name: string;
+  email: string;
 }
 
 const EditRequestModal: React.FC<EditRequestModalProps> = ({
@@ -47,10 +60,13 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
 }) => {
   const { user } = useAuth();
   const { fetchRequests } = useRequests();
+  const { vehicles, loading: vehiclesLoading } = useVehicles();
+
   const [formData, setFormData] = useState<EditFormData>({
+    vehicleId: "",
     vehicleNumber: "",
-    quantity: 1,
-    tubesQuantity: 0,
+    quantity: "1",
+    tubesQuantity: "0",
     tireSize: "",
     requestReason: "",
     requesterName: "",
@@ -61,8 +77,8 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     lastReplacementDate: "",
     existingTireMake: "",
     tireSizeRequired: "",
-    presentKmReading: 0,
-    previousKmReading: 0,
+    presentKmReading: "0",
+    previousKmReading: "0",
     tireWearPattern: "",
     comments: "",
     userSection: "",
@@ -70,20 +86,82 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     deliveryOfficeName: "",
     deliveryStreetName: "",
     deliveryTown: "",
-    totalPrice: 0,
-    warrantyDistance: 0,
+    totalPrice: "0",
+    warrantyDistance: "0",
     tireWearIndicatorAppeared: false,
+    images: Array(7).fill(null),
+    supervisorId: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
+  const [supervisorsLoading, setSupervisorsLoading] = useState(false);
+  const [tireDetails, setTireDetails] = useState<TireDetails[]>([]);
+  const [tireDetailsLoading, setTireDetailsLoading] = useState(false);
+
+  // Vehicle autosuggest state
+  const [suggestions, setSuggestions] = useState<Vehicle[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+
+  // Fetch supervisors and tire details
+  useEffect(() => {
+    const fetchSupervisors = async () => {
+      setSupervisorsLoading(true);
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+        const response = await fetch(`${API_BASE_URL}/api/users/supervisors`);
+        if (response.ok) {
+          const data = await response.json();
+          setSupervisors(data);
+        }
+      } catch (error) {
+        console.error("Error fetching supervisors:", error);
+      } finally {
+        setSupervisorsLoading(false);
+      }
+    };
+
+    const fetchTireDetails = async () => {
+      setTireDetailsLoading(true);
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+        const response = await fetch(`${API_BASE_URL}/api/tire-details`);
+        if (response.ok) {
+          const data = await response.json();
+          setTireDetails(data);
+        }
+      } catch (error) {
+        console.error("Error fetching tire details:", error);
+      } finally {
+        setTireDetailsLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchSupervisors();
+      fetchTireDetails();
+    }
+  }, [isOpen]);
 
   // Populate form data when request changes
   useEffect(() => {
     if (request) {
+      // Handle existing images
+      const requestImages = request.images || [];
+      const imageArray = Array(7).fill(null);
+      requestImages.forEach((img, index) => {
+        if (index < 7 && img) {
+          imageArray[index] = img; // Store URL strings for existing images
+        }
+      });
+      setExistingImages(requestImages);
+
       setFormData({
+        vehicleId: request.vehicleId?.toString() || "",
         vehicleNumber: request.vehicleNumber || "",
-        quantity: request.quantity || 1,
-        tubesQuantity: request.tubesQuantity || 0,
+        quantity: request.quantity?.toString() || "1",
+        tubesQuantity: request.tubesQuantity?.toString() || "0",
         tireSize: request.tireSize || "",
         requestReason: request.requestReason || "",
         requesterName: request.requesterName || "",
@@ -91,13 +169,13 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         requesterPhone: request.requesterPhone || "",
         vehicleBrand: request.vehicleBrand || "",
         vehicleModel: request.vehicleModel || "",
-        lastReplacementDate: request.lastReplacementDate 
-          ? new Date(request.lastReplacementDate).toISOString().split('T')[0] 
+        lastReplacementDate: request.lastReplacementDate
+          ? new Date(request.lastReplacementDate).toISOString().split('T')[0]
           : "",
         existingTireMake: request.existingTireMake || "",
         tireSizeRequired: request.tireSizeRequired || "",
-        presentKmReading: request.presentKmReading || 0,
-        previousKmReading: request.previousKmReading || 0,
+        presentKmReading: request.presentKmReading?.toString() || "0",
+        previousKmReading: request.previousKmReading?.toString() || "0",
         tireWearPattern: request.tireWearPattern || "",
         comments: request.comments || "",
         userSection: request.userSection || "",
@@ -105,9 +183,11 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         deliveryOfficeName: request.deliveryOfficeName || "",
         deliveryStreetName: request.deliveryStreetName || "",
         deliveryTown: request.deliveryTown || "",
-        totalPrice: request.totalPrice || 0,
-        warrantyDistance: request.warrantyDistance || 0,
+        totalPrice: request.totalPrice?.toString() || "0",
+        warrantyDistance: request.warrantyDistance?.toString() || "0",
         tireWearIndicatorAppeared: request.tireWearIndicatorAppeared || false,
+        images: imageArray,
+        supervisorId: request.supervisorId?.toString() || "",
       });
     }
   }, [request]);
@@ -116,15 +196,111 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked 
-              : type === 'number' ? Number(value) 
-              : value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
+  };
+
+  // Vehicle autosuggest functions
+  const getSuggestionValue = (suggestion: Vehicle) => suggestion.vehicleNumber;
+
+  const renderSuggestion = (suggestion: Vehicle) => (
+    <div className="p-2 hover:bg-gray-100 cursor-pointer">
+      <div className="font-medium">{suggestion.vehicleNumber}</div>
+      <div className="text-sm text-gray-600">{suggestion.make} {suggestion.model}</div>
+    </div>
+  );
+
+  const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
+    const inputValue = value.trim().toLowerCase();
+    const filteredSuggestions = vehicles.filter(vehicle =>
+      vehicle.vehicleNumber.toLowerCase().includes(inputValue)
+    );
+    setSuggestions(filteredSuggestions);
+  };
+
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
+  const handleVehicleSelect = (vehicle: Vehicle) => {
+    setFormData(prev => ({
+      ...prev,
+      vehicleId: vehicle.id.toString(),
+      vehicleNumber: vehicle.vehicleNumber,
+      vehicleBrand: vehicle.make || "",
+      vehicleModel: vehicle.model || "",
+      tireSizeRequired: vehicle.tireSize || "",
+      userSection: vehicle.department || "",
+      costCenter: vehicle.costCentre || "",
+    }));
+  };
+
+  // File handling functions
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newImages = [...formData.images];
+
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+
+      if (file.size > maxSizeInBytes) {
+        setErrors(prev => ({
+          ...prev,
+          [`image_${index}`]: `Image size must be less than 5MB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
+        }));
+        e.target.value = '';
+        return;
+      }
+
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
+
+      newImages[index] = file;
+    } else {
+      newImages[index] = null;
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[`image_${index}`];
+        return newErrors;
+      });
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages[index] = null;
+
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[`image_${index}`];
+      return newErrors;
+    });
+
+    setFormData(prev => ({
+      ...prev,
+      images: newImages,
+    }));
+  };
+
+  const handleTireSizeSelect = (tireSize: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tireSizeRequired: tireSize,
+      tireSize: tireSize,
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -146,10 +322,15 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     if (!formData.costCenter.trim()) newErrors.costCenter = "Cost center is required";
 
     // Numeric validations
-    if (formData.quantity < 1) newErrors.quantity = "Quantity must be at least 1";
-    if (formData.tubesQuantity < 0) newErrors.tubesQuantity = "Tubes quantity cannot be negative";
-    if (formData.presentKmReading < 0) newErrors.presentKmReading = "Present KM reading cannot be negative";
-    if (formData.previousKmReading < 0) newErrors.previousKmReading = "Previous KM reading cannot be negative";
+    const quantity = parseInt(formData.quantity);
+    const tubesQuantity = parseInt(formData.tubesQuantity);
+    const presentKm = parseInt(formData.presentKmReading);
+    const previousKm = parseInt(formData.previousKmReading);
+
+    if (isNaN(quantity) || quantity < 1) newErrors.quantity = "Quantity must be at least 1";
+    if (isNaN(tubesQuantity) || tubesQuantity < 0) newErrors.tubesQuantity = "Tubes quantity cannot be negative";
+    if (isNaN(presentKm) || presentKm < 0) newErrors.presentKmReading = "Present KM reading cannot be negative";
+    if (isNaN(previousKm) || previousKm < 0) newErrors.previousKmReading = "Previous KM reading cannot be negative";
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -158,8 +339,8 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     }
 
     // KM reading logic validation
-    if (formData.presentKmReading > 0 && formData.previousKmReading > 0 &&
-        formData.presentKmReading <= formData.previousKmReading) {
+    if (!isNaN(presentKm) && !isNaN(previousKm) && presentKm > 0 && previousKm > 0 &&
+        presentKm <= previousKm) {
       newErrors.presentKmReading = "Present KM reading should be greater than previous KM reading";
     }
 
@@ -169,19 +350,74 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm() || !request) return;
 
     setLoading(true);
     try {
+      // Handle image uploads
+      const imageUrls: string[] = [];
+
+      for (let i = 0; i < formData.images.length; i++) {
+        const image = formData.images[i];
+        if (image) {
+          if (typeof image === 'string') {
+            // Existing image URL
+            imageUrls.push(image);
+          } else if (image instanceof File) {
+            // New file to upload
+            try {
+              const url = await uploadToCloudinary(image);
+              imageUrls.push(url);
+            } catch (uploadError) {
+              console.error("Error uploading image:", uploadError);
+              alert(`Failed to upload image ${i + 1}. Please try again.`);
+              setLoading(false);
+              return;
+            }
+          }
+        }
+      }
+
+      // Prepare data for submission
+      const submitData = {
+        vehicleId: parseInt(formData.vehicleId) || undefined,
+        vehicleNumber: formData.vehicleNumber,
+        quantity: parseInt(formData.quantity),
+        tubesQuantity: parseInt(formData.tubesQuantity),
+        tireSize: formData.tireSizeRequired,
+        requestReason: formData.requestReason,
+        requesterName: formData.requesterName,
+        requesterEmail: formData.requesterEmail,
+        requesterPhone: formData.requesterPhone,
+        vehicleBrand: formData.vehicleBrand,
+        vehicleModel: formData.vehicleModel,
+        lastReplacementDate: formData.lastReplacementDate,
+        existingTireMake: formData.existingTireMake,
+        tireSizeRequired: formData.tireSizeRequired,
+        presentKmReading: parseInt(formData.presentKmReading),
+        previousKmReading: parseInt(formData.previousKmReading),
+        tireWearPattern: formData.tireWearPattern,
+        comments: formData.comments,
+        userSection: formData.userSection,
+        costCenter: formData.costCenter,
+        deliveryOfficeName: formData.deliveryOfficeName,
+        deliveryStreetName: formData.deliveryStreetName,
+        deliveryTown: formData.deliveryTown,
+        totalPrice: parseFloat(formData.totalPrice) || 0,
+        warrantyDistance: parseInt(formData.warrantyDistance) || 0,
+        tireWearIndicatorAppeared: formData.tireWearIndicatorAppeared,
+        images: imageUrls,
+      };
+
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
-      
+
       const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -221,24 +457,43 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
           <div className="border-b pb-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Vehicle Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Vehicle Number *
-              </label>
-              <input
-                type="text"
-                name="vehicleNumber"
-                value={formData.vehicleNumber}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.vehicleNumber ? 'border-red-500' : 'border-gray-300'
-                }`}
-                required
-              />
-              {errors.vehicleNumber && (
-                <p className="text-red-500 text-sm mt-1">{errors.vehicleNumber}</p>
-              )}
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Vehicle Number *
+                </label>
+                <div className="relative">
+                  <Autosuggest
+                    suggestions={suggestions}
+                    onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+                    onSuggestionsClearRequested={onSuggestionsClearRequested}
+                    getSuggestionValue={getSuggestionValue}
+                    renderSuggestion={renderSuggestion}
+                    inputProps={{
+                      placeholder: "Enter vehicle number",
+                      value: formData.vehicleNumber,
+                      onChange: (e, { newValue }) => {
+                        setFormData(prev => ({ ...prev, vehicleNumber: newValue }));
+                      },
+                      className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors.vehicleNumber ? 'border-red-500' : 'border-gray-300'
+                      }`
+                    }}
+                    onSuggestionSelected={(e, { suggestion }) => {
+                      handleVehicleSelect(suggestion);
+                    }}
+                    theme={{
+                      container: 'relative',
+                      suggestionsContainer: 'absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto',
+                      suggestionsList: 'list-none p-0 m-0',
+                      suggestion: 'cursor-pointer',
+                      suggestionHighlighted: 'bg-blue-100'
+                    }}
+                  />
+                </div>
+                {errors.vehicleNumber && (
+                  <p className="text-red-500 text-sm mt-1">{errors.vehicleNumber}</p>
+                )}
+              </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -282,16 +537,25 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tire Size Required *
               </label>
-              <input
-                type="text"
+              <select
                 name="tireSizeRequired"
                 value={formData.tireSizeRequired}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  handleTireSizeSelect(e.target.value);
+                }}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.tireSizeRequired ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
-              />
+              >
+                <option value="">Select tire size</option>
+                {tireDetails.map((tire) => (
+                  <option key={tire.id} value={tire.tire_size}>
+                    {tire.tire_size} - {tire.tire_brand} (₹{tire.total_price})
+                  </option>
+                ))}
+              </select>
               {errors.tireSizeRequired && (
                 <p className="text-red-500 text-sm mt-1">{errors.tireSizeRequired}</p>
               )}
@@ -446,6 +710,32 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
             {errors.requestReason && (
               <p className="text-red-500 text-sm mt-1">{errors.requestReason}</p>
             )}
+            </div>
+
+            {/* Supervisor Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Supervisor *
+              </label>
+              <select
+                name="supervisorId"
+                value={formData.supervisorId}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.supervisorId ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              >
+                <option value="">Select a supervisor</option>
+                {supervisors.map((supervisor) => (
+                  <option key={supervisor.id} value={supervisor.id}>
+                    {supervisor.name} ({supervisor.email})
+                  </option>
+                ))}
+              </select>
+              {errors.supervisorId && (
+                <p className="text-red-500 text-sm mt-1">{errors.supervisorId}</p>
+              )}
             </div>
           </div>
 
@@ -680,6 +970,63 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
             <label className="ml-2 block text-sm text-gray-900">
               Tire wear indicator appeared
             </label>
+          </div>
+
+          {/* Image Upload Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Upload Images (Max 7)
+            </label>
+            <div className="grid gap-4 md:grid-cols-4">
+              {formData.images.map((image, index) => (
+                <div key={index} className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, index)}
+                    className={`w-full p-2 border rounded ${
+                      errors[`image_${index}`] ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors[`image_${index}`] && (
+                    <p className="mt-1 text-xs text-red-600">{errors[`image_${index}`]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Upload images of tire wear, damage, or other relevant details (Max size: 5MB per image)
+            </p>
+
+            {/* Image Preview Grid */}
+            <div className="grid gap-4 mt-4 md:grid-cols-4">
+              {formData.images.map((image, index) => {
+                if (!image) return null;
+
+                const isFile = image instanceof File;
+                const isUrl = typeof image === 'string';
+
+                return (
+                  <div key={`preview-${index}`} className="relative group">
+                    <img
+                      src={isFile ? URL.createObjectURL(image) : image}
+                      alt={`Preview ${index + 1}`}
+                      className="object-cover w-full h-40 border border-gray-300 rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute p-1 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                      {isFile ? 'New' : 'Existing'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Comments */}

@@ -123,13 +123,20 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!res.ok) {
           let errorMessage = "Failed to update request";
           try {
-            const errorData = await res.json();
+            // Clone the response to avoid "body stream already read" error
+            const responseClone = res.clone();
+            const errorData = await responseClone.json();
             errorMessage = errorData.error || errorMessage;
           } catch (parseError) {
             // If we can't parse as JSON, it might be an HTML error page
-            const textResponse = await res.text();
-            console.error("Non-JSON response:", textResponse);
-            errorMessage = `Server error (${res.status}): ${res.statusText}`;
+            try {
+              const textResponse = await res.text();
+              console.error("Non-JSON response:", textResponse);
+              errorMessage = `Server error (${res.status}): ${res.statusText}`;
+            } catch (textError) {
+              console.error("Could not read response as text:", textError);
+              errorMessage = `Server error (${res.status}): ${res.statusText}`;
+            }
           }
           throw new Error(errorMessage);
         }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestDetailsModal from "../components/RequestDetailsModal";
+import EditRequestModal from "../components/EditRequestModal";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -36,6 +37,8 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editRequest, setEditRequest] = useState<TireRequest | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -179,6 +182,23 @@ const UserDashboard = () => {
 
   const handlePlaceOrder = (request: any) => {
     console.log('Place order for request:', request);
+  };
+
+  const handleEdit = (request: any) => {
+    console.log('Edit request:', request);
+    setEditRequest(request);
+    setShowEditModal(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditModal(false);
+    setEditRequest(null);
+    fetchRequests(); // Refresh the requests list
+  };
+
+  const handleEditClose = () => {
+    setShowEditModal(false);
+    setEditRequest(null);
   };
 
   const handleLogout = async () => {
@@ -452,9 +472,11 @@ const UserDashboard = () => {
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onPlaceOrder={handlePlaceOrder}
+                  onEdit={handleEdit}
                   showActions={true}
                   showPlaceOrderButton={false}
                   showCancelButton={false}
+                  showEditButton={true}
                 />
               ) : (
                 <div className="text-center py-12">
@@ -524,6 +546,14 @@ const UserDashboard = () => {
           isOpen={!!selectedRequest}
         />
       )}
+
+      {/* Edit Request Modal */}
+      <EditRequestModal
+        request={editRequest}
+        isOpen={showEditModal}
+        onClose={handleEditClose}
+        onSuccess={handleEditSuccess}
+      />
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

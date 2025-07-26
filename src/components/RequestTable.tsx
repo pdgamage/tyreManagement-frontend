@@ -318,15 +318,13 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {showEditButton &&
-                      request.status?.toLowerCase().trim() === "pending" &&
-                      onEdit && (
+                    {showEditButton && onEdit && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onEdit(request);
                           }}
-                          className="px-4 text-gray-500 hover:text-blue-700"
+                          className="px-4 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded"
                           aria-label="Edit Request"
                           title="Edit Request"
                         >

@@ -109,7 +109,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     const fetchSupervisors = async () => {
       setSupervisorsLoading(true);
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production-8fed.up.railway.app";
         const response = await fetch(`${API_BASE_URL}/api/users/supervisors`);
         if (response.ok) {
           const data = await response.json();
@@ -125,7 +125,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     const fetchTireDetails = async () => {
       setTireDetailsLoading(true);
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production-8fed.up.railway.app";
         const response = await fetch(`${API_BASE_URL}/api/tire-details`);
         if (response.ok) {
           const data = await response.json();
@@ -419,8 +419,17 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
       console.log("Submit data:", submitData);
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production-8fed.up.railway.app";
       console.log("Using API URL:", API_BASE_URL);
+      console.log("Request ID:", request.id);
+      console.log("Request object:", request);
+
+      if (!request.id) {
+        alert("Error: Request ID is missing");
+        return;
+      }
+
+
 
       const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
         method: "PUT",
@@ -430,9 +439,22 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         body: JSON.stringify(submitData),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       let responseData;
       try {
-        responseData = await response.json();
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+
+        if (responseText.trim().startsWith('<')) {
+          // Server returned HTML instead of JSON (likely an error page)
+          console.error("Server returned HTML instead of JSON");
+          alert("Server error: The server returned an error page instead of data. Please check if the backend is running properly.");
+          return;
+        }
+
+        responseData = JSON.parse(responseText);
       } catch (parseError) {
         console.error("Failed to parse response:", parseError);
         alert("Failed to parse server response. Please try again.");

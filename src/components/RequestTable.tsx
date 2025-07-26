@@ -272,7 +272,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
               </th>
               {showActions && (
                 <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
-                  Actions
+                  Actions (Edit Test)
                 </th>
               )}
             </tr>
@@ -328,20 +328,9 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {showEditButton && onEdit && (() => {
-                      const status = request.status;
-                      const isPending = status === "pending" ||
-                                       (typeof status === "string" && status.toLowerCase().trim() === "pending");
-                      console.log("Edit button check:", {
-                        requestId: request.id,
-                        status,
-                        statusType: typeof status,
-                        isPending,
-                        showEditButton,
-                        hasOnEdit: !!onEdit
-                      });
-                      return isPending;
-                    })() && (
+                    {/* Always visible test button - Updated at 3:50 PM */}
+                    <span className="px-2 text-red-500 font-bold">EDIT TEST 3:50</span>
+                    {showEditButton && onEdit && request.status === "pending" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -352,9 +341,26 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           aria-label="Edit Request"
                           title="Edit Request"
                         >
-                          <Edit className="w-5 h-5" />
+                          ✏️
                         </button>
                       )}
+                    {/* Debug info */}
+                    {showEditButton && (
+                      <span className="text-xs text-gray-400">
+                        {request.status}
+                      </span>
+                    )}
+                    {/* Debug button - always show */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log("Debug - showEditButton:", showEditButton, "onEdit:", !!onEdit);
+                      }}
+                      className="px-4 text-gray-500 hover:text-blue-700"
+                      title="Debug"
+                    >
+                      🔍
+                    </button>
                     {showPlaceOrderButton &&
                       request.status?.toLowerCase().trim() === "complete" &&
                       !(request as any).order_placed && (

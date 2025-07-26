@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestDetailsModal from "../components/RequestDetailsModal";
-import EditTireRequestModal from "../components/EditTireRequestModal";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -31,10 +30,8 @@ const UserDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
-  const [editRequest, setEditRequest] = useState<TireRequest | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -138,11 +135,6 @@ const UserDashboard = () => {
   // Handler functions for RequestTable
   const handleView = (request: any) => {
     setSelectedRequest(request);
-  };
-
-  const handleEdit = (request: any) => {
-    setEditRequest(request);
-    setShowEditModal(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -456,7 +448,6 @@ const UserDashboard = () => {
                   requests={filteredRequests.map(convertTireRequestToRequest)}
                   title=""
                   onView={handleView}
-                  onEdit={handleEdit}
                   onDelete={handleDelete}
                   onApprove={handleApprove}
                   onReject={handleReject}
@@ -464,7 +455,6 @@ const UserDashboard = () => {
                   showActions={true}
                   showPlaceOrderButton={false}
                   showCancelButton={false}
-                  showEditButton={true}
                 />
               ) : (
                 <div className="text-center py-12">
@@ -581,16 +571,6 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Edit Request Modal */}
-      <EditTireRequestModal
-        request={editRequest}
-        isOpen={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setEditRequest(null);
-        }}
-      />
     </div>
   );
 };

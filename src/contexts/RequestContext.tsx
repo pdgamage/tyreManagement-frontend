@@ -19,7 +19,6 @@ interface RequestsContextType {
     role: string,
     userId?: string
   ) => Promise<void>;
-  updateRequest: (id: string, requestData: any) => Promise<void>;
   isRefreshing: boolean;
   lastUpdate: number;
   reconnectWebSocket: () => void;
@@ -105,52 +104,6 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     [fetchRequests]
   );
 
-  const updateRequest = useCallback(
-    async (id: string, requestData: any) => {
-      try {
-        console.log("Updating request:", id, requestData);
-        const res = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
-
-        console.log("Response status:", res.status);
-        console.log("Response headers:", res.headers);
-
-        if (!res.ok) {
-          let errorMessage = "Failed to update request";
-          try {
-            // Clone the response to avoid "body stream already read" error
-            const responseClone = res.clone();
-            const errorData = await responseClone.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (parseError) {
-            // If we can't parse as JSON, it might be an HTML error page
-            try {
-              const textResponse = await res.text();
-              console.error("Non-JSON response:", textResponse);
-              errorMessage = `Server error (${res.status}): ${res.statusText}`;
-            } catch (textError) {
-              console.error("Could not read response as text:", textError);
-              errorMessage = `Server error (${res.status}): ${res.statusText}`;
-            }
-          }
-          throw new Error(errorMessage);
-        }
-
-        // Refresh the requests list after update
-        await fetchRequests();
-      } catch (error) {
-        console.error("Error updating request:", error);
-        throw error; // Re-throw to allow component to handle the error
-      }
-    },
-    [fetchRequests]
-  );
-
   // Manual reconnect function
   const reconnectWebSocket = useCallback(() => {
     // Force page reload to reset WebSocket connection
@@ -161,7 +114,6 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     requests,
     fetchRequests,
     updateRequestStatus,
-    updateRequest,
     isRefreshing,
     lastUpdate,
     reconnectWebSocket,

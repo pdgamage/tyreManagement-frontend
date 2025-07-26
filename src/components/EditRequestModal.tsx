@@ -130,6 +130,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // Required field validations
     if (!formData.vehicleNumber.trim()) newErrors.vehicleNumber = "Vehicle number is required";
     if (!formData.requestReason.trim()) newErrors.requestReason = "Request reason is required";
     if (!formData.requesterName.trim()) newErrors.requesterName = "Requester name is required";
@@ -144,10 +145,23 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     if (!formData.userSection.trim()) newErrors.userSection = "Department is required";
     if (!formData.costCenter.trim()) newErrors.costCenter = "Cost center is required";
 
+    // Numeric validations
     if (formData.quantity < 1) newErrors.quantity = "Quantity must be at least 1";
     if (formData.tubesQuantity < 0) newErrors.tubesQuantity = "Tubes quantity cannot be negative";
     if (formData.presentKmReading < 0) newErrors.presentKmReading = "Present KM reading cannot be negative";
     if (formData.previousKmReading < 0) newErrors.previousKmReading = "Previous KM reading cannot be negative";
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.requesterEmail && !emailRegex.test(formData.requesterEmail)) {
+      newErrors.requesterEmail = "Please enter a valid email address";
+    }
+
+    // KM reading logic validation
+    if (formData.presentKmReading > 0 && formData.previousKmReading > 0 &&
+        formData.presentKmReading <= formData.previousKmReading) {
+      newErrors.presentKmReading = "Present KM reading should be greater than previous KM reading";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -191,7 +205,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Edit Tire Request</h2>
           <button
@@ -202,9 +216,11 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Vehicle Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+          {/* Vehicle Information Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Vehicle Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Vehicle Number *
@@ -280,10 +296,13 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 <p className="text-red-500 text-sm mt-1">{errors.tireSizeRequired}</p>
               )}
             </div>
+            </div>
           </div>
 
-          {/* Quantity Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Quantity Information Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Quantity & Tire Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Quantity *
@@ -322,10 +341,13 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 <p className="text-red-500 text-sm mt-1">{errors.tubesQuantity}</p>
               )}
             </div>
+            </div>
           </div>
 
-          {/* Requester Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Requester Information Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Requester Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Requester Name *
@@ -401,10 +423,13 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 <p className="text-red-500 text-sm mt-1">{errors.userSection}</p>
               )}
             </div>
+            </div>
           </div>
 
-          {/* Request Reason */}
-          <div>
+          {/* Request Details Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Request Details</h3>
+            <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Request Reason *
             </label>
@@ -421,6 +446,240 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
             {errors.requestReason && (
               <p className="text-red-500 text-sm mt-1">{errors.requestReason}</p>
             )}
+            </div>
+          </div>
+
+          {/* Tire Details Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Tire Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last Replacement Date *
+              </label>
+              <input
+                type="date"
+                name="lastReplacementDate"
+                value={formData.lastReplacementDate}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.lastReplacementDate ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+              {errors.lastReplacementDate && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastReplacementDate}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Existing Tire Make *
+              </label>
+              <input
+                type="text"
+                name="existingTireMake"
+                value={formData.existingTireMake}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.existingTireMake ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+              {errors.existingTireMake && (
+                <p className="text-red-500 text-sm mt-1">{errors.existingTireMake}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tire Wear Pattern *
+              </label>
+              <select
+                name="tireWearPattern"
+                value={formData.tireWearPattern}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.tireWearPattern ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              >
+                <option value="">Select wear pattern</option>
+                <option value="Even wear">Even wear</option>
+                <option value="Center wear">Center wear</option>
+                <option value="Edge wear">Edge wear</option>
+                <option value="Cupping">Cupping</option>
+                <option value="Patchy wear">Patchy wear</option>
+                <option value="Feathering">Feathering</option>
+              </select>
+              {errors.tireWearPattern && (
+                <p className="text-red-500 text-sm mt-1">{errors.tireWearPattern}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cost Center *
+              </label>
+              <input
+                type="text"
+                name="costCenter"
+                value={formData.costCenter}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.costCenter ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+              {errors.costCenter && (
+                <p className="text-red-500 text-sm mt-1">{errors.costCenter}</p>
+              )}
+            </div>
+            </div>
+          </div>
+
+          {/* KM Readings Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Vehicle Readings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Present KM Reading *
+              </label>
+              <input
+                type="number"
+                name="presentKmReading"
+                value={formData.presentKmReading}
+                onChange={handleChange}
+                min="0"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.presentKmReading ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+              {errors.presentKmReading && (
+                <p className="text-red-500 text-sm mt-1">{errors.presentKmReading}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Previous KM Reading *
+              </label>
+              <input
+                type="number"
+                name="previousKmReading"
+                value={formData.previousKmReading}
+                onChange={handleChange}
+                min="0"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.previousKmReading ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+              {errors.previousKmReading && (
+                <p className="text-red-500 text-sm mt-1">{errors.previousKmReading}</p>
+              )}
+            </div>
+            </div>
+          </div>
+
+          {/* Delivery Information Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Delivery Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Office Name
+                </label>
+                <input
+                  type="text"
+                  name="deliveryOfficeName"
+                  value={formData.deliveryOfficeName}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Street Name
+                </label>
+                <input
+                  type="text"
+                  name="deliveryStreetName"
+                  value={formData.deliveryStreetName}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Town
+                </label>
+                <input
+                  type="text"
+                  name="deliveryTown"
+                  value={formData.deliveryTown}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing and Warranty Section */}
+          <div className="border-b pb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Pricing & Warranty</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Total Price
+              </label>
+              <input
+                type="number"
+                name="totalPrice"
+                value={formData.totalPrice}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Warranty Distance (KM)
+              </label>
+              <input
+                type="number"
+                name="warrantyDistance"
+                value={formData.warrantyDistance}
+                onChange={handleChange}
+                min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            </div>
+          </div>
+
+          {/* Additional Information Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
+
+            {/* Tire Wear Indicator */}
+            <div className="flex items-center mb-4">
+            <input
+              type="checkbox"
+              name="tireWearIndicatorAppeared"
+              checked={formData.tireWearIndicatorAppeared}
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label className="ml-2 block text-sm text-gray-900">
+              Tire wear indicator appeared
+            </label>
           </div>
 
           {/* Comments */}
@@ -432,9 +691,11 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
               name="comments"
               value={formData.comments}
               onChange={handleChange}
-              rows={2}
+              rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Any additional information or special requirements..."
             />
+          </div>
           </div>
 
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">

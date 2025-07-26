@@ -435,12 +435,49 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         return;
       }
 
+      // Test backend connectivity first
+      try {
+        console.log("Testing backend connectivity...");
 
+        // Test the specific endpoint first
+        const testEndpoint = `${API_BASE_URL}/api/requests/test/${request.id}`;
+        console.log("Testing endpoint:", testEndpoint);
+
+        const testResponse = await fetch(testEndpoint, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+          },
+        });
+
+        console.log("Test response status:", testResponse.status);
+
+        if (!testResponse.ok) {
+          throw new Error(`Backend test failed: ${testResponse.status}`);
+        }
+
+        const testData = await testResponse.text();
+        console.log("Test response data:", testData);
+
+        if (testData.trim().startsWith('<')) {
+          throw new Error("Backend returned HTML instead of JSON");
+        }
+
+        console.log("Backend connectivity test passed");
+      } catch (testError) {
+        console.error("Backend connectivity test failed:", testError);
+        const errorMessage = testError instanceof Error ? testError.message : String(testError);
+        alert(`Cannot connect to the backend server: ${errorMessage}. Please check your internet connection and try again.`);
+        return;
+      }
+
+      console.log("Making update request to:", `${API_BASE_URL}/api/requests/${request.id}`);
 
       const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify(submitData),
       });

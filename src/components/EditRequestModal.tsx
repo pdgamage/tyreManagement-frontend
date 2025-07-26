@@ -435,52 +435,38 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         return;
       }
 
-      // Test backend connectivity first
-      try {
-        console.log("Testing backend connectivity...");
-
-        // Test the specific endpoint first
-        const testEndpoint = `${API_BASE_URL}/api/requests/test/${request.id}`;
-        console.log("Testing endpoint:", testEndpoint);
-
-        const testResponse = await fetch(testEndpoint, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json",
-          },
-        });
-
-        console.log("Test response status:", testResponse.status);
-
-        if (!testResponse.ok) {
-          throw new Error(`Backend test failed: ${testResponse.status}`);
-        }
-
-        const testData = await testResponse.text();
-        console.log("Test response data:", testData);
-
-        if (testData.trim().startsWith('<')) {
-          throw new Error("Backend returned HTML instead of JSON");
-        }
-
-        console.log("Backend connectivity test passed");
-      } catch (testError) {
-        console.error("Backend connectivity test failed:", testError);
-        const errorMessage = testError instanceof Error ? testError.message : String(testError);
-        alert(`Cannot connect to the backend server: ${errorMessage}. Please check your internet connection and try again.`);
-        return;
-      }
+      // Skip connectivity test and proceed directly to update
 
       console.log("Making update request to:", `${API_BASE_URL}/api/requests/${request.id}`);
+      console.log("Submit data being sent:", JSON.stringify(submitData, null, 2));
 
-      const response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      });
+      // Create a simplified data object for the update
+      const simplifiedData = {
+        vehicleNumber: submitData.vehicleNumber,
+        requestReason: submitData.requestReason,
+        requesterName: submitData.requesterName,
+        requesterEmail: submitData.requesterEmail,
+        requesterPhone: submitData.requesterPhone,
+        comments: submitData.comments || ""
+      };
+
+      console.log("Simplified data being sent:", JSON.stringify(simplifiedData, null, 2));
+
+      let response;
+      try {
+        response = await fetch(`${API_BASE_URL}/api/requests/${request.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify(simplifiedData),
+        });
+      } catch (fetchError) {
+        console.error("Network error during fetch:", fetchError);
+        alert("Network error: Unable to connect to the server. Please check your internet connection and try again.");
+        return;
+      }
 
       console.log("Response status:", response.status);
       console.log("Response ok:", response.ok);

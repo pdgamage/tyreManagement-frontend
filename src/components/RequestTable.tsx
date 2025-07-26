@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Trash,
   Clock,
@@ -10,7 +10,6 @@ import {
   Eye,
   ShoppingCart,
   X,
-  Edit,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -148,12 +147,10 @@ interface RequestTableProps {
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
   onCancelOrder?: (id: string) => void;
-  onEdit?: (request: Request) => void; // New prop for edit functionality
   showActions?: boolean;
   showPlaceOrderButton?: boolean; // New prop to control place order button visibility
   showCancelButton?: boolean; // New prop to control cancel order button visibility
   showDeleteButton?: boolean; // New prop to control delete button visibility
-  showEditButton?: boolean; // New prop to control edit button visibility
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -165,27 +162,15 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onDelete,
   onPlaceOrder,
   onCancelOrder,
-  onEdit,
   showActions = true,
   showPlaceOrderButton = false, // Default to false for security
   showCancelButton = false, // Default to false for security
   showDeleteButton = true, // Default to true for backward compatibility
-  showEditButton = false, // Default to false for security
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const requestsPerPage = 5;
-
-  // Debug logging
-  useEffect(() => {
-    console.log("RequestTable Debug:", {
-      showEditButton,
-      onEdit: !!onEdit,
-      requestsCount: requests.length,
-      requests: requests.map(r => ({ id: r.id, status: r.status }))
-    });
-  }, [requests, showEditButton, onEdit]);
 
   const handleSort = (field: keyof Request) => {
     if (sortField === field) {
@@ -272,7 +257,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
               </th>
               {showActions && (
                 <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
-                  Actions (Edit Test)
+                  Actions
                 </th>
               )}
             </tr>
@@ -327,39 +312,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       aria-label="View Details"
                     >
                       <Eye className="w-5 h-5" />
-                    </button>
-                    {/* Always visible test button - Updated at 3:50 PM */}
-                    <span className="px-2 text-red-500 font-bold">EDIT TEST 3:50</span>
-                    {showEditButton && onEdit && request.status === "pending" && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            console.log("Edit button clicked for request:", request.id, "Status:", request.status);
-                            onEdit(request);
-                          }}
-                          className="px-4 text-gray-500 hover:text-green-700"
-                          aria-label="Edit Request"
-                          title="Edit Request"
-                        >
-                          ✏️
-                        </button>
-                      )}
-                    {/* Debug info */}
-                    {showEditButton && (
-                      <span className="text-xs text-gray-400">
-                        {request.status}
-                      </span>
-                    )}
-                    {/* Debug button - always show */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log("Debug - showEditButton:", showEditButton, "onEdit:", !!onEdit);
-                      }}
-                      className="px-4 text-gray-500 hover:text-blue-700"
-                      title="Debug"
-                    >
-                      🔍
                     </button>
                     {showPlaceOrderButton &&
                       request.status?.toLowerCase().trim() === "complete" &&

@@ -574,7 +574,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 <option value="">Select tire size</option>
                 {tireDetails.map((tire) => (
                   <option key={tire.id} value={tire.tire_size}>
-                    {tire.tire_size} - {tire.tire_brand} (₹{tire.total_price})
+                    {tire.tire_size} - {tire.tire_brand} (LKR {tire.total_price})
                   </option>
                 ))}
               </select>

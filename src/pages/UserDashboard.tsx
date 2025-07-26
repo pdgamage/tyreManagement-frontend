@@ -127,6 +127,7 @@ const UserDashboard = () => {
 
   // Convert TireRequest to Request format for RequestTable
   const convertTireRequestToRequest = (tireRequest: any) => {
+    console.log("Converting request:", { id: tireRequest.id, status: tireRequest.status, statusType: typeof tireRequest.status });
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),

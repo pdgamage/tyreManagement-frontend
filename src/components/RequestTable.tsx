@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Trash,
   Clock,
@@ -177,6 +177,16 @@ const RequestTable: React.FC<RequestTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const requestsPerPage = 5;
 
+  // Debug logging
+  useEffect(() => {
+    console.log("RequestTable Debug:", {
+      showEditButton,
+      onEdit: !!onEdit,
+      requestsCount: requests.length,
+      requests: requests.map(r => ({ id: r.id, status: r.status }))
+    });
+  }, [requests, showEditButton, onEdit]);
+
   const handleSort = (field: keyof Request) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -308,15 +318,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
-                    {/* Debug logging */}
-                    {console.log("Request debug:", {
-                      id: request.id,
-                      status: request.status,
-                      statusType: typeof request.status,
-                      showEditButton,
-                      onEdit: !!onEdit,
-                      isPending: request.status?.toLowerCase().trim() === "pending"
-                    })}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -327,11 +328,20 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {showEditButton &&
-                      onEdit &&
-                      (request.status?.toLowerCase().trim() === "pending" ||
-                       request.status?.toLowerCase() === "pending" ||
-                       request.status === "pending") && (
+                    {showEditButton && onEdit && (() => {
+                      const status = request.status;
+                      const isPending = status === "pending" ||
+                                       (typeof status === "string" && status.toLowerCase().trim() === "pending");
+                      console.log("Edit button check:", {
+                        requestId: request.id,
+                        status,
+                        statusType: typeof status,
+                        isPending,
+                        showEditButton,
+                        hasOnEdit: !!onEdit
+                      });
+                      return isPending;
+                    })() && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

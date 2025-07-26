@@ -308,6 +308,15 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
+                    {/* Debug logging */}
+                    {console.log("Request debug:", {
+                      id: request.id,
+                      status: request.status,
+                      statusType: typeof request.status,
+                      showEditButton,
+                      onEdit: !!onEdit,
+                      isPending: request.status?.toLowerCase().trim() === "pending"
+                    })}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -320,14 +329,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     </button>
                     {showEditButton &&
                       onEdit &&
-                      request.status?.toLowerCase().trim() === "pending" && (
+                      (request.status?.toLowerCase().trim() === "pending" ||
+                       request.status?.toLowerCase() === "pending" ||
+                       request.status === "pending") && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            console.log("Edit button clicked for request:", request.id, "Status:", request.status);
                             onEdit(request);
                           }}
                           className="px-4 text-gray-500 hover:text-green-700"
                           aria-label="Edit Request"
+                          title="Edit Request"
                         >
                           <Edit className="w-5 h-5" />
                         </button>

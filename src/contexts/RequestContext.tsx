@@ -108,6 +108,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateRequest = useCallback(
     async (id: string, requestData: any) => {
       try {
+        console.log("Updating request:", id, requestData);
         const res = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
           method: "PUT",
           headers: {
@@ -116,9 +117,21 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
           body: JSON.stringify(requestData),
         });
 
+        console.log("Response status:", res.status);
+        console.log("Response headers:", res.headers);
+
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "Failed to update request");
+          let errorMessage = "Failed to update request";
+          try {
+            const errorData = await res.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (parseError) {
+            // If we can't parse as JSON, it might be an HTML error page
+            const textResponse = await res.text();
+            console.error("Non-JSON response:", textResponse);
+            errorMessage = `Server error (${res.status}): ${res.statusText}`;
+          }
+          throw new Error(errorMessage);
         }
 
         // Refresh the requests list after update

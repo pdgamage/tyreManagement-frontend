@@ -320,6 +320,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
     if (!formData.tireWearPattern.trim()) newErrors.tireWearPattern = "Tire wear pattern is required";
     if (!formData.userSection.trim()) newErrors.userSection = "Department is required";
     if (!formData.costCenter.trim()) newErrors.costCenter = "Cost center is required";
+    // Note: supervisorId is optional for edit, so we don't validate it as required
 
     // Numeric validations
     const quantity = parseInt(formData.quantity);
@@ -344,6 +345,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
       newErrors.presentKmReading = "Present KM reading should be greater than previous KM reading";
     }
 
+    console.log("Validation errors:", newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -351,7 +353,12 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm() || !request) return;
+    console.log("Form data before validation:", formData);
+
+    if (!validateForm() || !request) {
+      console.log("Validation failed or no request");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -379,36 +386,38 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         }
       }
 
-      // Prepare data for submission
+      // Prepare data for submission - ensure all required fields are present
       const submitData = {
-        vehicleId: parseInt(formData.vehicleId) || undefined,
-        vehicleNumber: formData.vehicleNumber,
-        quantity: parseInt(formData.quantity),
-        tubesQuantity: parseInt(formData.tubesQuantity),
-        tireSize: formData.tireSizeRequired,
-        requestReason: formData.requestReason,
-        requesterName: formData.requesterName,
-        requesterEmail: formData.requesterEmail,
-        requesterPhone: formData.requesterPhone,
-        vehicleBrand: formData.vehicleBrand,
-        vehicleModel: formData.vehicleModel,
+        vehicleId: formData.vehicleId ? parseInt(formData.vehicleId) : null,
+        vehicleNumber: formData.vehicleNumber.trim(),
+        quantity: parseInt(formData.quantity) || 1,
+        tubesQuantity: parseInt(formData.tubesQuantity) || 0,
+        requestReason: formData.requestReason.trim(),
+        requesterName: formData.requesterName.trim(),
+        requesterEmail: formData.requesterEmail.trim(),
+        requesterPhone: formData.requesterPhone.trim(),
+        vehicleBrand: formData.vehicleBrand.trim(),
+        vehicleModel: formData.vehicleModel.trim(),
         lastReplacementDate: formData.lastReplacementDate,
-        existingTireMake: formData.existingTireMake,
-        tireSizeRequired: formData.tireSizeRequired,
-        presentKmReading: parseInt(formData.presentKmReading),
-        previousKmReading: parseInt(formData.previousKmReading),
-        tireWearPattern: formData.tireWearPattern,
-        comments: formData.comments,
-        userSection: formData.userSection,
-        costCenter: formData.costCenter,
-        deliveryOfficeName: formData.deliveryOfficeName,
-        deliveryStreetName: formData.deliveryStreetName,
-        deliveryTown: formData.deliveryTown,
-        totalPrice: parseFloat(formData.totalPrice) || 0,
-        warrantyDistance: parseInt(formData.warrantyDistance) || 0,
-        tireWearIndicatorAppeared: formData.tireWearIndicatorAppeared,
+        existingTireMake: formData.existingTireMake.trim(),
+        tireSizeRequired: formData.tireSizeRequired.trim(),
+        presentKmReading: parseInt(formData.presentKmReading) || 0,
+        previousKmReading: parseInt(formData.previousKmReading) || 0,
+        tireWearPattern: formData.tireWearPattern.trim(),
+        comments: formData.comments.trim() || null,
+        userSection: formData.userSection.trim(),
+        costCenter: formData.costCenter.trim(),
+        deliveryOfficeName: formData.deliveryOfficeName.trim() || null,
+        deliveryStreetName: formData.deliveryStreetName.trim() || null,
+        deliveryTown: formData.deliveryTown.trim() || null,
+        totalPrice: parseFloat(formData.totalPrice) || null,
+        warrantyDistance: parseInt(formData.warrantyDistance) || null,
+        tireWearIndicatorAppeared: formData.tireWearIndicatorAppeared || false,
+        supervisorId: formData.supervisorId ? parseInt(formData.supervisorId) : null,
         images: imageUrls,
       };
+
+      console.log("Submit data:", submitData);
 
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
 
@@ -420,14 +429,16 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
         body: JSON.stringify(submitData),
       });
 
+      const responseData = await response.json();
+      console.log("Response:", responseData);
+
       if (response.ok) {
         await fetchRequests(); // Refresh the requests list
         onSuccess?.();
         onClose();
       } else {
-        const errorData = await response.json();
-        console.error("Failed to update request:", errorData);
-        alert("Failed to update request. Please try again.");
+        console.error("Failed to update request:", responseData);
+        alert(`Failed to update request: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error updating request:", error);
@@ -715,7 +726,7 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
             {/* Supervisor Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Supervisor *
+                Select Supervisor (Optional)
               </label>
               <select
                 name="supervisorId"
@@ -724,7 +735,6 @@ const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.supervisorId ? 'border-red-500' : 'border-gray-300'
                 }`}
-                required
               >
                 <option value="">Select a supervisor</option>
                 {supervisors.map((supervisor) => (

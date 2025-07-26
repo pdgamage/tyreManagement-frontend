@@ -19,6 +19,7 @@ interface RequestsContextType {
     role: string,
     userId?: string
   ) => Promise<void>;
+  updateRequest: (id: string, requestData: any) => Promise<void>;
   isRefreshing: boolean;
   lastUpdate: number;
   reconnectWebSocket: () => void;
@@ -104,6 +105,32 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     [fetchRequests]
   );
 
+  const updateRequest = useCallback(
+    async (id: string, requestData: any) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to update request");
+        }
+
+        // Refresh the requests list after update
+        await fetchRequests();
+      } catch (error) {
+        console.error("Error updating request:", error);
+        throw error; // Re-throw to let the component handle the error
+      }
+    },
+    [fetchRequests]
+  );
+
   // Manual reconnect function
   const reconnectWebSocket = useCallback(() => {
     // Force page reload to reset WebSocket connection
@@ -114,6 +141,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     requests,
     fetchRequests,
     updateRequestStatus,
+    updateRequest,
     isRefreshing,
     lastUpdate,
     reconnectWebSocket,

@@ -34,6 +34,7 @@ const EditTireRequestModal: React.FC<EditTireRequestModalProps> = ({
   // Auto-suggest states
   const [vehicleSuggestions, setVehicleSuggestions] = useState<Vehicle[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
+  const [tireSizesLoading, setTireSizesLoading] = useState(true);
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [supervisorsLoading, setSupervisorsLoading] = useState(true);
   const [tireDetailsLoading, setTireDetailsLoading] = useState(false);
@@ -60,14 +61,24 @@ const EditTireRequestModal: React.FC<EditTireRequestModalProps> = ({
   useEffect(() => {
     const fetchTireSizes = async () => {
       try {
+        console.log("Fetching tire sizes...");
         const response = await fetch(
           "https://tyremanagement-backend-production.up.railway.app/api/tire-details/sizes"
         );
+        console.log("Tire sizes response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const sizes = await response.json();
+        console.log("Fetched tire sizes:", sizes);
         setTireSizes(sizes);
       } catch (error) {
         console.error("Error fetching tire sizes:", error);
         setTireSizes([]);
+      } finally {
+        setTireSizesLoading(false);
       }
     };
     fetchTireSizes();
@@ -469,7 +480,7 @@ const EditTireRequestModal: React.FC<EditTireRequestModalProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tire Size Required *
+                    Tire Size Required * {tireSizesLoading && <span className="text-blue-500">(Loading...)</span>}
                   </label>
                   <select
                     name="tireSizeRequired"
@@ -481,9 +492,15 @@ const EditTireRequestModal: React.FC<EditTireRequestModalProps> = ({
                       }
                     }}
                     required
+                    disabled={tireSizesLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Select Tire Size</option>
+                    <option value="">
+                      {tireSizesLoading ? "Loading tire sizes..." : "Select Tire Size"}
+                    </option>
+                    {!tireSizesLoading && tireSizes.length === 0 && (
+                      <option value="" disabled>No tire sizes available</option>
+                    )}
                     {tireSizes.map((size) => (
                       <option key={size} value={size}>
                         {size}
@@ -492,6 +509,9 @@ const EditTireRequestModal: React.FC<EditTireRequestModalProps> = ({
                   </select>
                   {errors.tireSizeRequired && (
                     <p className="mt-1 text-sm text-red-600">{errors.tireSizeRequired}</p>
+                  )}
+                  {!tireSizesLoading && tireSizes.length === 0 && (
+                    <p className="mt-1 text-sm text-yellow-600">No tire sizes found. Please check if tire details are configured in the system.</p>
                   )}
                 </div>
 

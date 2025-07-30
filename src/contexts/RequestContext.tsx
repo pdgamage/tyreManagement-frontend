@@ -79,22 +79,33 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       status: string,
       notes: string,
       role: string,
-      userId?: string
+      userId?: string,
+      supplier?: { supplierName: string; supplierPhone: string; supplierEmail: string }
     ) => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/requests/${id}/status`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status, notes, role, userId }),
-        });
+        const body: any = { status, notes, role, userId };
+        if (supplier) {
+          body.supplierName = supplier.supplierName;
+          body.supplierPhone = supplier.supplierPhone;
+          body.supplierEmail = supplier.supplierEmail;
+        }
 
-        if (!res.ok) {
+        const response = await fetch(
+          `${API_BASE_URL}/api/requests/${id}/status`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        );
+
+        if (!response.ok) {
           throw new Error("Failed to update request status");
         }
 
-        // Refresh the requests list after update
+        // Refetch requests to update the list
         await fetchRequests();
       } catch (error) {
         console.error("Error updating request status:", error);

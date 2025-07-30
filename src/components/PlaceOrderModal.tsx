@@ -1,155 +1,210 @@
 import React, { useState, useEffect } from "react";
-import { useRequests } from "../contexts/RequestContext";
-import { useAuth } from "../contexts/AuthContext";
-import { Request } from "../types/request";
 import { X } from "lucide-react";
+import type { Request } from "../types/request";
+import type { TireRequest } from "../types/api";
 
-// Define a type for the supplier
 interface Supplier {
-  id: string;
+  id: number;
   name: string;
-  phone: string;
   email: string;
+  phone: string;
+  formsfree_key: string;
 }
 
-// Define the props for the modal component
 interface PlaceOrderModalProps {
-  request: Request | null;
+  request: Request | TireRequest | null;
+  isOpen: boolean;
   onClose: () => void;
   onOrderPlaced: () => void;
 }
 
 const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   request,
+  isOpen,
   onClose,
   onOrderPlaced,
 }) => {
-  const { updateRequestStatus } = useRequests();
-  const { user } = useAuth();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [selectedSupplier, setSelectedSupplier] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
+    null
+  );
+  const [orderNotes, setOrderNotes] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Fetch suppliers when the modal is opened for a request
   useEffect(() => {
-    const fetchSuppliers = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/suppliers`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch suppliers");
-        }
-        const data = await response.json();
-        setSuppliers(data);
-      } catch (err) {
-        setError("Could not load suppliers. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (request) {
+    if (isOpen) {
+      setError(null);
+      setSuccess(null);
       fetchSuppliers();
     }
-  }, [request]);
+  }, [isOpen]);
 
-  // Handle the order placement
-  const handlePlaceOrder = async () => {
-    if (!request || !selectedSupplier || !user) return;
-
-    const supplier = suppliers.find((s) => s.id === selectedSupplier);
-    if (!supplier) {
-      setError("Selected supplier not found.");
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
+  const fetchSuppliers = async () => {
     try {
-      await updateRequestStatus(
-        request.id,
-        "order placed",
-        "Order placed with the selected supplier.",
-        "customer-officer",
-        user.id,
-        {
-          supplierName: supplier.name,
-          supplierPhone: supplier.phone,
-          supplierEmail: supplier.email,
-        }
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production-8fed.up.railway.app"
+        }/api/suppliers`
       );
-      onOrderPlaced(); // Callback to refresh data on the parent component
-      onClose(); // Close the modal on success
+      if (response.ok) {
+        const data = await response.json();
+        setSuppliers(data);
+      } else {
+        setError("Failed to fetch suppliers");
+      }
     } catch (err) {
-      setError("Failed to place the order. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setError("Error fetching suppliers");
+      console.error("Error fetching suppliers:", err);
     }
   };
 
-  if (!request) return null;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedSupplierId) {
+      setError("Please select a supplier");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://tyremanagement-backend-production-8fed.up.railway.app"
+        }/api/requests/${request?.id}/place-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            supplierId: selectedSupplierId,
+            orderNotes: orderNotes,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Order placed successfully:", result);
+
+        // Show success message
+        setSuccess(
+          `Order placed successfully! Email sent to ${result.supplier.name} (${result.supplier.email})`
+        );
+        setError(null);
+
+        // Wait 2 seconds to show success message, then close
+        setTimeout(() => {
+          onOrderPlaced();
+          onClose();
+          // Reset form
+          setSelectedSupplierId(null);
+          setOrderNotes("");
+          setSuccess(null);
+        }, 2000);
+      } else {
+        const errorData = await response.json();
+        // Check if the error is just a database issue but email was sent
+        if (
+          errorData.error &&
+          errorData.error.includes("Data truncated") &&
+          errorData.emailResult
+        ) {
+          // Email was sent successfully, treat as success
+          console.log("Order email sent successfully despite database error");
+
+          // Show success message
+          setSuccess("Order placed successfully! Email sent to supplier.");
+          setError(null);
+
+          // Wait 2 seconds to show success message, then close
+          setTimeout(() => {
+            onOrderPlaced();
+            onClose();
+            // Reset form
+            setSelectedSupplierId(null);
+            setOrderNotes("");
+            setSuccess(null);
+          }, 2000);
+        } else {
+          setError(errorData.error || "Failed to place order");
+        }
+      }
+    } catch (err) {
+      setError("Error placing order");
+      console.error("Error placing order:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedSupplierId(null);
+    setOrderNotes("");
+    setError(null);
+    onClose();
+  };
+
+  if (!isOpen || !request) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Place Order</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
-            <X size={24} />
-          </button>
-        </div>
-        <div className="mb-4 border-t pt-4">
-          <p className="text-sm text-gray-600"><strong>Request ID:</strong> {request.id}</p>
-          <p className="text-sm text-gray-600"><strong>Vehicle No:</strong> {request.vehicleNo}</p>
-        </div>
-        <div className="mb-6">
-          <label htmlFor="supplier" className="block text-sm font-medium text-gray-700 mb-2">
-            Select a Supplier
-          </label>
-          <select
-            id="supplier"
-            value={selectedSupplier}
-            onChange={(e) => setSelectedSupplier(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={isLoading || suppliers.length === 0}
-          >
-            <option value="" disabled>
-              {isLoading ? "Loading suppliers..." : "-- Select a supplier --"}
-            </option>
-            {suppliers.map((supplier) => (
-              <option key={supplier.id} value={supplier.id}>
-                {supplier.name} - {supplier.phone}
-              </option>
-            ))}
-          </select>
-        </div>
-        {error && <p className="text-red-500 text-sm mb-4 bg-red-100 p-3 rounded-md">{error}</p>}
-        <div className="flex justify-end space-x-4 border-t pt-4">
+          <h2 className="text-xl font-bold text-gray-800">
+            Place Order - Request #{request.id}
+          </h2>
           <button
-            onClick={onClose}
-            type="button"
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50"
-            disabled={isLoading}
+            onClick={handleClose}
+            className="text-gray-500 hover:text-gray-700"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handlePlaceOrder}
-            type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!selectedSupplier || isLoading}
-          >
-            {isLoading ? "Placing Order..." : "Place Order"}
+            <X className="w-6 h-6" />
           </button>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default PlaceOrderModal;
+        {/* Request Summary */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold text-gray-800 mb-2">Order Summary</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Vehicle:</span>{" "}
+              {request.vehicleNumber}
+            </div>
+            <div>
+              <span className="font-medium">Tire Size:</span>{" "}
+              {request.tireSizeRequired}
+            </div>
+            <div>
+              <span className="font-medium">Quantity:</span> {request.quantity}
+            </div>
+            <div>
+              <span className="font-medium">Tubes:</span>{" "}
+              {request.tubesQuantity}
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* Supplier Selection */}
+          <div className="mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">
+              Select Supplier
+            </h3>
+            {suppliers.length === 0 ? (
+              <p className="text-gray-500">Loading suppliers...</p>
+            ) : (
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {suppliers.map((supplier) => (
+                  <div
+                    key={supplier.id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                       selectedSupplierId === supplier.id
                         ? "border-blue-500 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"

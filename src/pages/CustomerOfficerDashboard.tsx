@@ -64,27 +64,14 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
-  // Filter requests to show completed requests
+  // Filter requests to show both "complete" and "order placed" status
   const completeRequests = requests.filter((req) =>
-    req.status === "complete"
-  );
-
-  // Filter placed orders
-  const placedOrders = requests.filter((req) => 
-    req.status === "order placed"
+    req.status === "complete" || req.status === "order placed"
   );
 
   // Filter cancelled orders
   const cancelledRequests = requests.filter((req) =>
     req.status === "order cancelled"
-  );
-
-  // Filter pending orders
-  const pendingRequests = requests.filter((req) => 
-    req.status === "pending" || 
-    req.status === "supervisor approved" ||
-    req.status === "technical-manager approved" ||
-    req.status === "engineer approved"
   );
 
   const handleView = (request: Request) => {
@@ -284,16 +271,28 @@ const CustomerOfficerDashboard = () => {
           <div className="space-y-8">
             {/* Professional Overview Cards with Enhanced Spacing */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              {/* Placed Orders Count Card */}
-              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl border border-green-200 hover:shadow-2xl transition-all duration-300">
+              <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white shadow-xl border border-emerald-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-100 text-sm font-medium mb-2">Placed Orders</p>
-                    <p className="text-4xl font-bold mb-1">{placedOrders.length}</p>
-                    <p className="text-green-200 text-xs">Orders currently placed</p>
+                    <p className="text-emerald-100 text-sm font-medium mb-2">Active Orders</p>
+                    <p className="text-4xl font-bold mb-1">{completeRequests.length}</p>
+                    <p className="text-emerald-200 text-xs">Ready for fulfillment</p>
                   </div>
-                  <div className="w-16 h-16 bg-green-400/30 rounded-xl flex items-center justify-center">
-                    <ShoppingCart className="w-8 h-8" />
+                  <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-100 text-sm font-medium mb-2">Cancelled Orders</p>
+                    <p className="text-4xl font-bold mb-1">{cancelledRequests.length}</p>
+                    <p className="text-red-200 text-xs">Customer cancellations</p>
+                  </div>
+                  <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                    <XCircle className="w-8 h-8" />
                   </div>
                 </div>
               </div>
@@ -324,19 +323,6 @@ const CustomerOfficerDashboard = () => {
                   </div>
                   <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
                     <BarChart3 className="w-8 h-8" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-red-100 text-sm font-medium mb-2">Cancelled Orders</p>
-                    <p className="text-4xl font-bold mb-1">{cancelledRequests.length}</p>
-                    <p className="text-red-200 text-xs">Customer cancellations</p>
-                  </div>
-                  <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
-                    <XCircle className="w-8 h-8" />
                   </div>
                 </div>
               </div>

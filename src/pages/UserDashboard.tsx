@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  TrendingUp,
+  Calendar,
   Activity,
   ShoppingCart,
   Package,
@@ -32,10 +34,6 @@ const UserDashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  // Vehicle filter state
-  const [selectedVehicle, setSelectedVehicle] = useState<string>("all");
-  const [showVehicleModal, setShowVehicleModal] = useState(false);
-  const [vehicleQuery, setVehicleQuery] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -82,12 +80,6 @@ const UserDashboard = () => {
   const completeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
   const cancelOrderRequests = userRequests.filter((req: any) => req.status === "order cancelled");
 
-  // Unique vehicle numbers for dropdown
-  const vehicleOptions = Array.from(new Set(userRequests.map((req: any) => req.vehicleNumber))) as string[];
-  const filteredVehicleOptions = vehicleOptions.filter(v =>
-    v.toLowerCase().includes(vehicleQuery.toLowerCase())
-  );
-
   // Debug: Log the status values to see what we have (can be removed in production)
   // console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
   // console.log("Place order requests (complete):", placeOrderRequests.length);
@@ -120,10 +112,7 @@ const UserDashboard = () => {
       default:
         result = userRequests;
     }
-    // Further filter by vehicle if selected
-    if (selectedVehicle !== "all") {
-      result = result.filter((req: any) => req.vehicleNumber === selectedVehicle);
-    }
+    // console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
     return result;
   };
 
@@ -199,34 +188,6 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Primary Navigation for User Inquiries */}
-      <nav className="bg-white shadow sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ul className="flex items-center space-x-8 h-14 text-sm font-semibold text-gray-600">
-            <li
-              className={`cursor-pointer flex items-center transition-colors duration-150 ${!showRequestForm ? "text-indigo-600 border-b-2 border-indigo-600" : "hover:text-indigo-600"}`}
-              onClick={() => setShowRequestForm(false)}
-            >
-              My Inquiries
-            </li>
-            <li
-              className={`cursor-pointer flex items-center transition-colors duration-150 ${showRequestForm ? "text-indigo-600 border-b-2 border-indigo-600" : "hover:text-indigo-600"}`}
-              onClick={() => setShowRequestForm(true)}
-            >
-              Submit New Request
-            </li>
-            <li className="ml-auto">
-              <button
-                onClick={() => setShowVehicleModal(true)}
-                className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors shadow-sm border border-indigo-100"
-              >
-                <FileText className="w-4 h-4" />
-                {selectedVehicle === "all" ? "Filter by Vehicle" : `Vehicle: ${selectedVehicle}`}
-              </button>
-            </li>
-          </ul>
-        </div>
-      </nav>
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -419,81 +380,6 @@ const UserDashboard = () => {
               </div>
             </div>
           </div>
-
-          {/* Vehicle Filter Button */}
-          <div className="mb-8 flex justify-end">
-            <button
-              onClick={() => setShowVehicleModal(true)}
-              className="bg-white border border-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50"
-            >
-              {selectedVehicle === "all" ? "Filter Orders by Vehicle" : `Vehicle: ${selectedVehicle}`}
-            </button>
-          </div>
-
-          {/* Vehicle Filter Modal */}
-          {showVehicleModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-              <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
-                <button
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowVehicleModal(false)}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Search Vehicle Number</h2>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Type vehicle number"
-                  value={vehicleQuery}
-                  onChange={(e) => setVehicleQuery(e.target.value)}
-                />
-                <div className="max-h-40 overflow-y-auto mb-4 border border-gray-200 rounded-lg">
-                  {filteredVehicleOptions.length === 0 && (
-                    <p className="p-3 text-sm text-gray-500">No matches</p>
-                  )}
-                  {filteredVehicleOptions.map((v) => (
-                    <div
-                      key={v}
-                      onClick={() => {
-                        setSelectedVehicle(v);
-                        setVehicleQuery(v);
-                        setShowVehicleModal(false);
-                      }}
-                      className="px-4 py-2 cursor-pointer hover:bg-indigo-50"
-                    >
-                      {v}
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-between">
-                  <button
-                    onClick={() => {
-                      setSelectedVehicle("all");
-                      setVehicleQuery("");
-                      setShowVehicleModal(false);
-                    }}
-                    className="text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    Clear Filter
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (vehicleQuery.trim() !== "") {
-                        setSelectedVehicle(vehicleQuery.trim());
-                      } else {
-                        setSelectedVehicle("all");
-                      }
-                      setShowVehicleModal(false);
-                    }}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Tire Request Form Section */}
           {showRequestForm && (

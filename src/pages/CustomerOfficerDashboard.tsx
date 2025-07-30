@@ -302,8 +302,8 @@ const CustomerOfficerDashboard = () => {
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100 text-sm font-medium mb-2">Total Requests</p>
-                    <p className="text-4xl font-bold mb-1">{requests.length}</p>
+                    <p className="text-blue-100 text-sm font-medium mb-2">Total Orders</p>
+                    <p className="text-4xl font-bold mb-1">{completeRequests.length + cancelledRequests.length}</p>
                     <p className="text-blue-200 text-xs">All order activities</p>
                   </div>
                   <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">

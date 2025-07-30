@@ -34,6 +34,8 @@ const UserDashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  // Vehicle filter state
+  const [selectedVehicle, setSelectedVehicle] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -80,6 +82,9 @@ const UserDashboard = () => {
   const completeOrderRequests = userRequests.filter((req: any) => req.status === "complete");
   const cancelOrderRequests = userRequests.filter((req: any) => req.status === "order cancelled");
 
+  // Unique vehicle numbers for dropdown
+  const vehicleOptions = Array.from(new Set(userRequests.map((req: any) => req.vehicleNumber))) as string[];
+
   // Debug: Log the status values to see what we have (can be removed in production)
   // console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
   // console.log("Place order requests (complete):", placeOrderRequests.length);
@@ -112,7 +117,10 @@ const UserDashboard = () => {
       default:
         result = userRequests;
     }
-    // console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
+    // Further filter by vehicle if selected
+    if (selectedVehicle !== "all") {
+      result = result.filter((req: any) => req.vehicleNumber === selectedVehicle);
+    }
     return result;
   };
 
@@ -379,6 +387,25 @@ const UserDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Vehicle Inquiry Filter */}
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Vehicle
+            </label>
+            <select
+              value={selectedVehicle}
+              onChange={(e) => setSelectedVehicle(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg"
+            >
+              <option value="all">All Vehicles</option>
+              {vehicleOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Tire Request Form Section */}

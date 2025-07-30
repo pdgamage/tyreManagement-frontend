@@ -255,6 +255,9 @@ const RequestTable: React.FC<RequestTableProps> = ({
               <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Status
               </th>
+              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Supplier
+              </th>
               {showActions && (
                 <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
                   Actions
@@ -300,6 +303,19 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     {getStatusStyles(request.status).icon}
                     <span className="ml-1">{getDescriptiveStatus(request)}</span>
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {request.supplierName ? (
+                    <div>
+                      <div className="text-sm text-gray-900 font-medium">{request.supplierName}</div>
+                      <div className="text-xs text-gray-500">
+                        {request.supplierEmail || ""}
+                        {request.supplierPhone ? ` • ${request.supplierPhone}` : ""}
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-400">—</span>
+                  )}
                 </td>
                 {showActions && (
                   <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">

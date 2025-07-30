@@ -413,6 +413,15 @@ const UserDashboard = () => {
             </div>
           )}
 
+          {/* DEBUG: Show request counts and vehicle numbers */}
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-xs">
+            <div><b>Debug Info:</b></div>
+            <div>Total requests: {requests.length}</div>
+            <div>User requests: {userRequests.length}</div>
+            <div>Filtered requests: {filteredRequests.length}</div>
+            <div>Vehicle numbers: {vehicleNumbers.join(', ') || 'None'}</div>
+          </div>
+
           {/* Filter Section */}
           <div className="mb-8 flex flex-col md:flex-row md:items-end md:space-x-6 space-y-4 md:space-y-0">
             {/* Vehicle Number Filter */}

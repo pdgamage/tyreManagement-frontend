@@ -34,11 +34,6 @@ const UserDashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [vehicleFilter, setVehicleFilter] = useState<string>("");
-  
-  // Extract unique vehicle numbers for dropdown
-  const vehicleNumbers = Array.from(new Set(userRequests.map((req: any) => req.vehicleNumber).filter(Boolean)));
-
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -121,11 +116,7 @@ const UserDashboard = () => {
     return result;
   };
 
-  // Apply both request status and vehicle number filters
-  const filteredRequests = getFilteredRequests().filter((req: any) => {
-    if (vehicleFilter && req.vehicleNumber !== vehicleFilter) return false;
-    return true;
-  });
+  const filteredRequests = getFilteredRequests();
 
   const closeDetailsModal = () => {
     setSelectedRequest(null);
@@ -412,59 +403,6 @@ const UserDashboard = () => {
               </div>
             </div>
           )}
-
-          {/* DEBUG: Show request counts and vehicle numbers */}
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-xs">
-            <div><b>Debug Info:</b></div>
-            <div>Total requests: {requests.length}</div>
-            <div>User requests: {userRequests.length}</div>
-            <div>Filtered requests: {filteredRequests.length}</div>
-            <div>Vehicle numbers: {vehicleNumbers.join(', ') || 'None'}</div>
-          </div>
-
-          {/* Filter Section */}
-          <div className="mb-8 flex flex-col md:flex-row md:items-end md:space-x-6 space-y-4 md:space-y-0">
-            {/* Vehicle Number Filter */}
-            <div className="flex flex-col">
-              <label className="text-sm font-semibold text-slate-700 mb-1">Filter by Vehicle Number</label>
-              <select
-                className="px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-400 outline-none shadow-sm bg-white text-slate-800 min-w-[200px]"
-                value={vehicleFilter}
-                onChange={e => setVehicleFilter(e.target.value)}
-              >
-                <option value="">All Vehicles</option>
-                {vehicleNumbers.map(vn => (
-                  <option key={vn} value={vn}>{vn}</option>
-                ))}
-              </select>
-            </div>
-            {/* Request Status Filter */}
-            <div className="flex flex-col">
-              <label className="text-sm font-semibold text-slate-700 mb-1">Filter by Request Status</label>
-              <select
-                className="px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-400 outline-none shadow-sm bg-white text-slate-800 min-w-[200px]"
-                value={activeFilter}
-                onChange={e => setActiveFilter(e.target.value)}
-              >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="place-orders">Orders Placed</option>
-                <option value="complete-orders">Completed Orders</option>
-                <option value="cancel-orders">Cancelled Orders</option>
-              </select>
-            </div>
-            {/* Reset Filters Button */}
-            {(vehicleFilter || activeFilter !== "all") && (
-              <button
-                className="mt-4 md:mt-0 px-4 py-2 bg-gradient-to-r from-slate-500 to-slate-700 text-white rounded-lg shadow hover:from-slate-600 hover:to-slate-800 transition-all"
-                onClick={() => { setVehicleFilter(""); setActiveFilter("all"); }}
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
 
           {/* Your Tire Requests Section with Color-Coded Statuses */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">

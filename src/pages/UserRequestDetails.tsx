@@ -19,6 +19,9 @@ const UserRequestDetails = () => {
   const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [editedRequest, setEditedRequest] = useState<Request | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +41,7 @@ const UserRequestDetails = () => {
         }
         const data = await res.json();
         setRequest(data);
+        setEditedRequest(data);
       } catch (err: any) {
         setError(err.message || "Failed to load request");
       }
@@ -46,23 +50,47 @@ const UserRequestDetails = () => {
     fetchRequest();
   }, [id]);
 
-  const handleEditRequest = () => {
-    if (!request) return;
+  const canEdit = () => {
+    return (
+      request?.status?.toLowerCase() === "pending" &&
+      request?.requesterEmail === user?.email
+    );
+  };
 
-    // Check if user can edit this request
-    if (request.requesterEmail !== user?.email) {
-      alert("You can only edit your own requests.");
-      return;
+  const handleFieldChange = (field: string, value: any) => {
+    if (!canEdit() || !editedRequest) return;
+
+    setEditedRequest((prev) => ({
+      ...prev!,
+      [field]: value,
+    }));
+    setHasChanges(true);
+  };
+
+  const handleUpdateRequest = async () => {
+    if (!editedRequest || !hasChanges) return;
+
+    setIsUpdating(true);
+    try {
+      const response = await fetch(apiUrls.requestById(editedRequest.id), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editedRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update request");
+      }
+
+      await fetchRequests();
+      setRequest(editedRequest);
+      setHasChanges(false);
+      alert("Request updated successfully!");
+    } catch (error) {
+      alert("Failed to update request. Please try again.");
+    } finally {
+      setIsUpdating(false);
     }
-
-    if (request.status?.toLowerCase() !== "pending") {
-      alert(
-        "This request cannot be edited. Only pending requests can be modified."
-      );
-      return;
-    }
-
-    navigate(`/user/edit-request/${id}`);
   };
 
   // Image modal functions
@@ -127,25 +155,6 @@ const UserRequestDetails = () => {
     }
   };
 
-  const formatDate = (dateString: string | Date) => {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const canEditRequest = () => {
-    return (
-      request?.status?.toLowerCase() === "pending" &&
-      request?.requesterEmail === user?.email
-    );
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -173,7 +182,7 @@ const UserRequestDetails = () => {
     );
   }
 
-  if (!request) {
+  if (!request || !editedRequest) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -205,7 +214,8 @@ const UserRequestDetails = () => {
                 Request #{request.id}
               </h1>
               <p className="text-gray-600 mt-1">
-                Submitted on {formatDate(request.submittedAt)}
+                Submitted on{" "}
+                {new Date(request.submittedAt).toLocaleDateString()}
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -216,232 +226,434 @@ const UserRequestDetails = () => {
               >
                 {request.status || "Unknown"}
               </div>
-              {canEditRequest() && (
+              {canEdit() && hasChanges && (
                 <button
-                  onClick={handleEditRequest}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={handleUpdateRequest}
+                  disabled={isUpdating}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                 >
-                  Edit Request
+                  {isUpdating ? "Updating..." : "Update Request"}
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Request Details
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Request Information
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">ID:</span> #{request.id}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Reason:</span>{" "}
-                      {request.requestReason}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Status:</span>{" "}
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadgeClass(
-                          request.status || ""
-                        )}`}
-                      >
-                        {request.status || "Unknown"}
-                      </span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Submitted:</span>{" "}
-                      {formatDate(request.submittedAt)}
-                    </p>
+        <div className="space-y-8">
+          {/* Vehicle & Requester Info */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Vehicle & Requester Info
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Number
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.vehicleNumber}
+                    onChange={(e) =>
+                      handleFieldChange("vehicleNumber", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.vehicleNumber}
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Vehicle Information
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Vehicle Number:</span>{" "}
-                      {request.vehicleNumber}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Brand:</span>{" "}
-                      {request.vehicleBrand}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Model:</span>{" "}
-                      {request.vehicleModel}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Current Mileage:</span>{" "}
-                      {request.presentKmReading?.toLocaleString()} km
-                    </p>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Brand
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.vehicleBrand}
+                    onChange={(e) =>
+                      handleFieldChange("vehicleBrand", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.vehicleBrand}
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Tire Information
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Size Required:</span>{" "}
-                      {request.tireSizeRequired}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Quantity:</span>{" "}
-                      {request.quantity}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Existing Make:</span>{" "}
-                      {request.existingTireMake || "N/A"}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Total Price:</span> Rs.{" "}
-                      {request.totalPrice?.toLocaleString()}
-                    </p>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Vehicle Model
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.vehicleModel}
+                    onChange={(e) =>
+                      handleFieldChange("vehicleModel", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.vehicleModel}
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Submitted By
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Name:</span>{" "}
-                      {request.requesterName}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Email:</span>{" "}
-                      {request.requesterEmail}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Phone:</span>{" "}
-                      {request.requesterPhone}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Department:</span>{" "}
-                      {request.userSection}
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {request.comments && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Comments
-                  </h3>
-                  <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded">
-                    {request.comments}
-                  </p>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Department/Section
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.userSection || ""}
+                    onChange={(e) =>
+                      handleFieldChange("userSection", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.userSection}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Cost Center
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.costCenter || ""}
+                    onChange={(e) =>
+                      handleFieldChange("costCenter", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.costCenter}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Name
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.requesterName}
+                    onChange={(e) =>
+                      handleFieldChange("requesterName", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.requesterName}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Email
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="email"
+                    value={editedRequest.requesterEmail}
+                    onChange={(e) =>
+                      handleFieldChange("requesterEmail", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.requesterEmail}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Requester Phone
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.requesterPhone}
+                    onChange={(e) =>
+                      handleFieldChange("requesterPhone", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.requesterPhone}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Submitted At
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {new Date(request.submittedAt).toLocaleString()}
                 </div>
-              )}
+              </div>
             </div>
+          </div>
+          <hr />
+          {/* Tire & Request Details */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Tire & Request Details
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Size Required
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.tireSizeRequired}
+                    onChange={(e) =>
+                      handleFieldChange("tireSizeRequired", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.tireSizeRequired}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Quantity
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="number"
+                    value={editedRequest.quantity}
+                    onChange={(e) =>
+                      handleFieldChange("quantity", parseInt(e.target.value))
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">{request.quantity}</div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tubes Quantity
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="number"
+                    value={editedRequest.tubesQuantity}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "tubesQuantity",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.tubesQuantity}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Existing Tire Make
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.existingTireMake}
+                    onChange={(e) =>
+                      handleFieldChange("existingTireMake", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.existingTireMake}
+                  </div>
+                )}
+              </div>
 
-            {/* Images Section */}
-            {request.images && request.images.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Attached Images
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {request.images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={image}
-                        alt={`Request image ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
-                        onClick={() => openImageModal(index)}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-black bg-opacity-50 text-white p-2 rounded">
-                          Click to view
-                        </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Last Replacement Date
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="date"
+                    value={
+                      editedRequest.lastReplacementDate
+                        ? typeof editedRequest.lastReplacementDate === "string"
+                          ? editedRequest.lastReplacementDate.split("T")[0]
+                          : new Date(editedRequest.lastReplacementDate)
+                              .toISOString()
+                              .split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      handleFieldChange("lastReplacementDate", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.lastReplacementDate
+                      ? new Date(
+                          request.lastReplacementDate
+                        ).toLocaleDateString()
+                      : "-"}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Present KM Reading
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="number"
+                    value={editedRequest.presentKmReading}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "presentKmReading",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.presentKmReading}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Previous KM Reading
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="number"
+                    value={editedRequest.previousKmReading}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "previousKmReading",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.previousKmReading}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tire Wear Pattern
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.tireWearPattern}
+                    onChange={(e) =>
+                      handleFieldChange("tireWearPattern", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.tireWearPattern}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Request Reason
+                </label>
+                {canEdit() ? (
+                  <input
+                    type="text"
+                    value={editedRequest.requestReason}
+                    onChange={(e) =>
+                      handleFieldChange("requestReason", e.target.value)
+                    }
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.requestReason}
+                  </div>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Comments
+                </label>
+                {canEdit() ? (
+                  <textarea
+                    value={editedRequest.comments || ""}
+                    onChange={(e) =>
+                      handleFieldChange("comments", e.target.value)
+                    }
+                    rows={3}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                ) : (
+                  <div className="p-2 bg-white rounded">
+                    {request.comments || "No comments"}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Images */}
+          {request.images && request.images.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                Attached Images
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg">
+                {request.images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image}
+                      alt={`Request image ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                      onClick={() => openImageModal(index)}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-black bg-opacity-50 text-white p-2 rounded text-sm">
+                        Click to view
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Status Notes */}
-            {(request.supervisor_notes ||
-              request.engineer_note ||
-              request.technical_manager_notes) && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Status Notes
-                </h2>
-                <div className="space-y-4">
-                  {request.supervisor_notes && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700">
-                        Supervisor Notes
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
-                        {request.supervisor_notes}
-                      </p>
-                    </div>
-                  )}
-                  {request.engineer_note && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700">
-                        Engineer Notes
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
-                        {request.engineer_note}
-                      </p>
-                    </div>
-                  )}
-                  {request.technical_manager_notes && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700">
-                        Technical Manager Notes
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
-                        {request.technical_manager_notes}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Edit Notice */}
-            {!canEditRequest() && request.requesterEmail === user?.email && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
-                      Request Cannot Be Edited
-                    </h3>
-                    <div className="mt-2 text-sm text-yellow-700">
-                      <p>
-                        This request can only be edited when the status is
-                        "Pending". Current status: {request.status}
-                      </p>
-                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -451,7 +663,7 @@ const UserRequestDetails = () => {
           <div className="relative max-w-4xl max-h-full p-4">
             <button
               onClick={closeImageModal}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 text-2xl"
             >
               ✕
             </button>

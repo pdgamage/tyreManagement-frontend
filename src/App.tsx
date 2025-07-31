@@ -22,7 +22,6 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
-import UserEditRequest from "./pages/UserEditRequest";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -148,18 +147,6 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <UserRequestDetails />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/user/edit-request/:id"
-                element={
-                  <RequireAuth role="user">
-                    <Layout>
-                      <PageTransition>
-                        <UserEditRequest />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

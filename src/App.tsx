@@ -11,7 +11,7 @@ import TechnicalManagerDashboard from "./pages/TechnicalManagerDashboard";
 import EngineerDashboard from "./pages/EngineerDashboard";
 import CustomerOfficerDashboard from "./pages/CustomerOfficerDashboard";
 import VehicleRegistration from "./pages/VehicleRegistration";
-import VehicleSearchPage from "./pages/VehicleSearchPage";
+
 import Layout from "./components/Layout";
 import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
@@ -64,16 +64,7 @@ export function App() {
                   </Layout>
                 }
               />
-              <Route
-                path="/vehicle-search"
-                element={
-                  <Layout>
-                    <PageTransition>
-                      <VehicleSearchPage />
-                    </PageTransition>
-                  </Layout>
-                }
-              />
+
               {/* Single login route */}
               <Route
                 path="/login"

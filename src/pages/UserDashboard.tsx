@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestDetailsModal from "../components/RequestDetailsModal";
 import RequestTable from "../components/RequestTable";
-import VehicleFilter from "../components/VehicleFilter";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
@@ -21,8 +20,7 @@ import {
   Activity,
   ShoppingCart,
   Package,
-  X,
-  Search
+  X
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -38,7 +36,7 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [showVehicleFilter, setShowVehicleFilter] = useState(false);
+
 
   useEffect(() => {
     fetchRequests();
@@ -266,13 +264,7 @@ const UserDashboard = () => {
               <Plus className="w-5 h-5" />
               <span>{showRequestForm ? 'Hide Request Form' : 'New Tire Request'}</span>
             </button>
-            <button
-              onClick={() => setShowVehicleFilter(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <Search className="w-5 h-5" />
-              <span>Search by Vehicle</span>
-            </button>
+
           </div>
         </div>
       </header>
@@ -535,10 +527,7 @@ const UserDashboard = () => {
         />
       )}
 
-      {/* Vehicle Filter Modal */}
-      {showVehicleFilter && (
-        <VehicleFilter onClose={() => setShowVehicleFilter(false)} />
-      )}
+
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

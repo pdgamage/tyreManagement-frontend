@@ -340,10 +340,10 @@ const VehicleRegistrationForm = () => {
               <input
                 id="costCentre"
                 type="text"
-                className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:shadow-md"
-                placeholder="e.g., CC-001, DEPT-LOGISTICS"
+                className="w-full ..."
+                placeholder="Auto-filled from user"
                 value={costCentre}
-                onChange={(e) => setCostCentre(e.target.value)}
+                readOnly
                 required
               />
             </div>
@@ -377,43 +377,15 @@ const VehicleRegistrationForm = () => {
             >
               Department *
             </label>
-            <select
+            <input
               id="department"
-              name="department"
+              type="text"
+              className="w-full ..."
+              placeholder="Auto-filled from user"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:shadow-md"
+              readOnly
               required
-            >
-              <option value="" disabled>
-                Select a department
-              </option>
-              <option value="HR department">🏢 HR Department</option>
-              <option value="IT department">💻 IT Department</option>
-              <option value="Marketing department">
-                📈 Marketing Department
-              </option>
-              <option value="Security">🔒 Security</option>
-              <option value="User department">👥 User Department</option>
-              <option value="Finance department">💰 Finance Department</option>
-              <option value="Procurement department">
-                🛒 Procurement Department
-              </option>
-              <option value="Legal department">⚖️ Legal Department</option>
-              <option value="Customer support">📞 Customer Support</option>
-              <option value="Operations department">
-                ⚙️ Operations Department
-              </option>
-              <option value="Logistics department">
-                🚚 Logistics Department
-              </option>
-              <option value="Engineering department">
-                🔧 Engineering Department
-              </option>
-              <option value="Administration department">
-                📋 Administration Department
-              </option>
-            </select>
+            />
           </div>
         </div>
 

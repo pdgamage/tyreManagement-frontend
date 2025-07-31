@@ -2,6 +2,7 @@ import React, { useState, createContext, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { AccountInfo } from "@azure/msal-browser";
+import { apiUrls } from "../config/api";
 
 type Role =
   | "user"
@@ -75,7 +76,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const idToken = response.idToken;
 
           const res = await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/azure-protected`,
+            `${apiUrls
+              .health()
+              .replace("/api/health", "/api/azure-protected")}`,
             {
               method: "GET",
               headers: {

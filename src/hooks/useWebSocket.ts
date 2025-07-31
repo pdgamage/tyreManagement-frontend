@@ -1,9 +1,9 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
+import { API_CONFIG } from "../config/api";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 interface WebSocketHookProps {
   onRequestUpdate?: (data: any) => void;

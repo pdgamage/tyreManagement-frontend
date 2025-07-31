@@ -9,6 +9,7 @@ import { Request } from "../types/request";
 import { TireRequest } from "../types/api";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 import RequestDetailsModal from "./RequestDetailsModal";
+import { apiUrls } from "../config/api";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
@@ -258,18 +259,30 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
 }) => {
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [tireSizesLoading, setTireSizesLoading] = useState(true);
+  const [tireSizesError, setTireSizesError] = useState<string | null>(null);
 
   // Fetch tire sizes when component mounts
   useEffect(() => {
     const fetchTireSizes = async () => {
       try {
-        const response = await fetch(
-          "https://tyremanagement-backend-production.up.railway.app/api/tire-details/sizes"
-        );
+        setTireSizesError(null);
+        const response = await fetch(apiUrls.tireSizes());
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch tire sizes: ${response.status} ${response.statusText}`
+          );
+        }
         const sizes = await response.json();
-        setTireSizes(sizes);
+        if (Array.isArray(sizes)) {
+          setTireSizes(sizes);
+        } else {
+          throw new Error("Invalid response format for tire sizes");
+        }
       } catch (error) {
         console.error("Error fetching tire sizes:", error);
+        setTireSizesError(
+          error instanceof Error ? error.message : "Failed to load tire sizes"
+        );
         setTireSizes([]);
       } finally {
         setTireSizesLoading(false);
@@ -306,7 +319,14 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
             required
             disabled={tireSizesLoading}
           >
-            <option value="">Select tire size</option>
+            <option value="">
+              {tireSizesLoading ? "Loading tire sizes..." : "Select tire size"}
+            </option>
+            {tireSizes.length === 0 && !tireSizesLoading && (
+              <option value="" disabled>
+                No tire sizes available
+              </option>
+            )}
             {tireSizes.map((size) => (
               <option key={size} value={size}>
                 {size}
@@ -317,6 +337,12 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
             <p className="mt-1 text-sm text-red-600">
               {errors.tireSizeRequired}
             </p>
+          )}
+          {tireSizesError && (
+            <p className="mt-1 text-sm text-red-600">{tireSizesError}</p>
+          )}
+          {tireSizesLoading && (
+            <p className="mt-1 text-sm text-blue-600">Loading tire sizes...</p>
           )}
         </div>
         <div>
@@ -913,12 +939,14 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   useEffect(() => {
     const fetchSupervisors = async () => {
       try {
-        const res = await fetch(
-          "https://tyremanagement-backend-production.up.railway.app/api/users/supervisors"
-        );
+        const res = await fetch(apiUrls.supervisors());
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const data = await res.json();
         setSupervisors(data);
-      } catch {
+      } catch (error) {
+        console.error("Error fetching supervisors:", error);
         setSupervisors([]);
       } finally {
         setSupervisorsLoading(false);
@@ -989,11 +1017,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const handleTireSizeSelect = async (tireSize: string) => {
     setTireDetailsLoading(true);
     try {
-      const response = await fetch(
-        `https://tyremanagement-backend-production.up.railway.app/api/tire-details/size/${encodeURIComponent(
-          tireSize
-        )}`
-      );
+      const response = await fetch(apiUrls.tireDetailsBySize(tireSize));
 
       if (response.ok) {
         const tireDetails: TireDetails = await response.json();
@@ -1431,14 +1455,11 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       };
 
       // 3. Send to backend (as JSON)
-      const response = await fetch(
-        "https://tyremanagement-backend-production.up.railway.app/api/requests",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(submitData),
-        }
-      );
+      const response = await fetch(apiUrls.requests(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submitData),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to submit request");
@@ -1510,12 +1531,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${deleteId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await fetch(apiUrls.requestById(deleteId), {
+        method: "DELETE",
+      });
       fetchRequests(); // Refresh requests after deletion
     } catch {
       // Optionally show an error in your modal, but do NOT use alert()

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Request } from "../types/request";
+import { apiUrls } from "../config/api";
 
 const SupervisorRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,9 +34,7 @@ const SupervisorRequestDetails = () => {
         if (isNaN(numericId)) {
           throw new Error("Invalid request ID.");
         }
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/requests/${numericId}`
-        );
+        const res = await fetch(apiUrls.requestById(numericId));
         if (!res.ok) {
           if (res.status === 404) {
             throw new Error("Request not found.");

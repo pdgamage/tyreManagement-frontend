@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
-import RequestDetailsModal from "../components/RequestDetailsModal";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -30,9 +29,7 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
-    null
-  );
+  // Removed selectedRequest state - using navigation instead of modal
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -131,9 +128,7 @@ const UserDashboard = () => {
 
   const filteredRequests = getFilteredRequests();
 
-  const closeDetailsModal = () => {
-    setSelectedRequest(null);
-  };
+  // Removed closeDetailsModal - no longer using modal
 
   // Convert TireRequest to Request format for RequestTable
   const convertTireRequestToRequest = (tireRequest: any) => {
@@ -147,7 +142,7 @@ const UserDashboard = () => {
 
   // Handler functions for RequestTable
   const handleView = (request: any) => {
-    setSelectedRequest(request);
+    navigate(`/user/request/${request.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -655,13 +650,7 @@ const UserDashboard = () => {
         </div>
       </main>
 
-      {selectedRequest && (
-        <RequestDetailsModal
-          request={selectedRequest}
-          onClose={closeDetailsModal}
-          isOpen={!!selectedRequest}
-        />
-      )}
+      {/* Removed RequestDetailsModal - using navigation to dedicated page instead */}
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

@@ -13,6 +13,10 @@ import { apiUrls } from "../config/api";
 
 interface TireRequestFormProps {
   onSuccess?: () => void;
+  editMode?: boolean;
+  existingRequest?: Request;
+  onRequestUpdated?: () => void;
+  onCancel?: () => void;
 }
 
 interface TireFormData {
@@ -909,7 +913,13 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
 
 // Main component
 // Component implementations
-const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
+const TireRequestForm: React.FC<TireRequestFormProps> = ({
+  onSuccess,
+  editMode = false,
+  existingRequest,
+  onRequestUpdated,
+  onCancel,
+}) => {
   const { vehicles, loading: vehiclesLoading } = useVehicles();
   const { user } = useAuth();
   const { requests, fetchRequests, lastUpdate } = useRequests();
@@ -1086,6 +1096,47 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
 
   const [formData, setFormData] = useState<TireFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Populate form data when in edit mode
+  useEffect(() => {
+    if (editMode && existingRequest) {
+      setFormData({
+        vehicleNumber: existingRequest.vehicleNumber || "",
+        vehicleId: existingRequest.vehicleId?.toString() || "",
+        vehicleBrand: existingRequest.vehicleBrand || "",
+        vehicleModel: existingRequest.vehicleModel || "",
+        tireSizeRequired: existingRequest.tireSizeRequired || "",
+        quantity: existingRequest.quantity || 1,
+        tubesQuantity: existingRequest.tubesQuantity || 0,
+        requestReason: existingRequest.requestReason || "",
+        requesterName: existingRequest.requesterName || "",
+        requesterEmail: existingRequest.requesterEmail || "",
+        requesterPhone: existingRequest.requesterPhone || "",
+        userSection: existingRequest.userSection || "",
+        lastReplacementDate:
+          typeof existingRequest.lastReplacementDate === "string"
+            ? existingRequest.lastReplacementDate
+            : existingRequest.lastReplacementDate
+                ?.toISOString()
+                .split("T")[0] || "",
+        existingTireMake: existingRequest.existingTireMake || "",
+        costCenter: existingRequest.costCenter || "",
+        presentKmReading: existingRequest.presentKmReading?.toString() || "",
+        previousKmReading: existingRequest.previousKmReading?.toString() || "",
+        tireWearPattern: existingRequest.tireWearPattern || "",
+        comments: existingRequest.comments || "",
+        images: Array(7).fill(null), // Reset images for edit mode
+        supervisorId: existingRequest.supervisorId?.toString() || "",
+        deliveryOfficeName: existingRequest.deliveryOfficeName || "",
+        deliveryStreetName: existingRequest.deliveryStreetName || "",
+        deliveryTown: existingRequest.deliveryTown || "",
+        totalPrice: existingRequest.totalPrice?.toString() || "",
+        warrantyDistance: existingRequest.warrantyDistance?.toString() || "",
+        tireWearIndicatorAppeared:
+          existingRequest.tireWearIndicatorAppeared || false,
+      });
+    }
+  }, [editMode, existingRequest]);
 
   // Helper function to format file size
   const formatFileSize = (bytes: number): string => {
@@ -1455,33 +1506,48 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
       };
 
       // 3. Send to backend (as JSON)
-      const response = await fetch(apiUrls.requests(), {
-        method: "POST",
+      const url =
+        editMode && existingRequest
+          ? apiUrls.requestById(existingRequest.id)
+          : apiUrls.requests();
+
+      const method = editMode ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submitData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit request");
+        throw new Error(
+          editMode ? "Failed to update request" : "Failed to submit request"
+        );
       }
 
-      // Refresh requests to show new request
+      // Refresh requests to show updated/new request
       fetchRequests();
 
-      if (onSuccess) onSuccess();
+      if (editMode && onRequestUpdated) {
+        onRequestUpdated();
+      } else if (onSuccess) {
+        onSuccess();
+      }
 
       setFormLoading(false);
       setSuccess(true);
 
-      setTimeout(() => {
-        setSuccess(false);
-        setFormData({
-          ...initialFormData,
-          requesterName: user.name || "",
-          requesterEmail: user.email || "",
-        });
-        setCurrentStep(1);
-      }, 2000);
+      if (!editMode) {
+        setTimeout(() => {
+          setSuccess(false);
+          setFormData({
+            ...initialFormData,
+            requesterName: user.name || "",
+            requesterEmail: user.email || "",
+          });
+          setCurrentStep(1);
+        }, 2000);
+      }
     } catch (err) {
       setFormLoading(false);
       setError("An error occurred while submitting your request");
@@ -1636,14 +1702,25 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
         </div>
 
         <div className="flex justify-between mt-8">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className={`px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200
-              ${currentStep === 1 ? "invisible" : ""}`}
-          >
-            Previous
-          </button>
+          <div className="flex space-x-3">
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className={`px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200
+                ${currentStep === 1 ? "invisible" : ""}`}
+            >
+              Previous
+            </button>
+            {editMode && onCancel && currentStep === 1 && (
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
           {currentStep < 4 ? (
             <button
               type="button"
@@ -1656,14 +1733,31 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({ onSuccess }) => {
               Next
             </button>
           ) : (
-            <button
-              type="submit"
-              disabled={formLoading}
-              className={`px-6 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700
-                ${formLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              {formLoading ? "Submitting..." : "Submit Request"}
-            </button>
+            <div className="flex space-x-3">
+              {editMode && onCancel && (
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={formLoading}
+                className={`px-6 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700
+                  ${formLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {formLoading
+                  ? editMode
+                    ? "Updating..."
+                    : "Submitting..."
+                  : editMode
+                  ? "Update Request"
+                  : "Submit Request"}
+              </button>
+            </div>
           )}
         </div>
       </form>

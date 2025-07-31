@@ -1,134 +1,199 @@
-import React, { useState, useEffect } from 'react';
-import { useVehicles } from '../contexts/VehicleContext';
-import { Vehicle } from '../types/api'; // Import the Vehicle type
+import React, { useState } from "react";
+import { Eye } from "lucide-react";
+import { useVehicles } from "../contexts/VehicleContext";
 
-// Cascade to USER: The lint errors regarding 'react' and 'JSX' suggest that the type definitions for React might be missing.
-// Please run 'npm install @types/react' in your terminal to fix them.
+interface Vehicle {
+  id: number;
+  vehicleNumber: string;
+  make: string;
+  model: string;
+  type: string;
+  costCentre: string;
+  department: string;
+  status: string;
+}
 
-const RegisteredVehiclesTable: React.FC = () => {
-  const { vehicles, loading, error } = useVehicles();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+const RegisteredVehiclesTable = () => {
+  const { vehicles, loading } = useVehicles();
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // Use the same API base URL as the context
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  // Display all vehicles by default
+  const displayedVehicles = vehicles;
 
-  useEffect(() => {
-    if (searchTerm.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    const fetchSuggestions = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/vehicles/search?term=${searchTerm}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setSuggestions(data);
-      } catch (err) {
-        console.error('Error fetching suggestions:', err);
-      }
-    };
-
-    const debounceTimeout = setTimeout(() => {
-      fetchSuggestions();
-    }, 300);
-
-    return () => clearTimeout(debounceTimeout);
-  }, [searchTerm, API_BASE_URL]);
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchTerm(suggestion);
-    setSuggestions([]);
+  const handleViewDetails = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setShowModal(true);
   };
 
-  const filteredVehicles = vehicles.filter((vehicle: Vehicle) =>
-    vehicle.vehicleNo.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   if (loading) {
-    return <div className="text-center p-4">Loading vehicles...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center p-4 text-red-500">Error: {error}</div>;
+    return (
+      <div className="flex items-center justify-center h-32">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-8">
-      <div className="py-8">
-        <div>
-          <h2 className="text-2xl font-semibold leading-tight">Registered Vehicles</h2>
-        </div>
-        <div className="my-2 flex sm:flex-row flex-col">
-          <div className="relative w-full sm:w-1/2 md:w-1/3">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              placeholder="Search by vehicle number..."
-              className="h-full rounded-lg border block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              autoComplete="off"
-            />
-            {suggestions.length > 0 && (
-              <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto">
-                {suggestions.map((suggestion: string) => (
-                  <li
-                    key={suggestion}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-        <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-          <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
-            <table className="min-w-full leading-normal">
-              <thead>
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="p-6">
+        <h2 className="text-xl font-semibold mb-4">
+          Registered Vehicles ({vehicles.length})
+        </h2>
+
+        {/* Scrollable container with max height */}
+        <div className="overflow-x-auto">
+          <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Vehicle No
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vehicle Number
                   </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Make
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Make/Model
                   </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Model
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
                   </th>
-                   <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Cost Centre
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Department
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredVehicles.map((vehicle: Vehicle) => (
-                  <tr key={vehicle.id}>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{vehicle.vehicleNo}</p>
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{vehicle.make}</p>
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{vehicle.model}</p>
-                    </td>
-                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <p className="text-gray-900 whitespace-no-wrap">{vehicle.department}</p>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {displayedVehicles.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      <div className="flex flex-col items-center">
+                        <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <p className="text-lg font-medium text-gray-900 mb-1">No vehicles registered</p>
+                        <p className="text-sm text-gray-500">Register your first vehicle to get started</p>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  displayedVehicles.map((vehicle) => (
+                <tr key={vehicle.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {vehicle.vehicleNumber}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{vehicle.make}</div>
+                    <div className="text-sm text-gray-500">{vehicle.model}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {vehicle.type}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {vehicle.costCentre}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {vehicle.department}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={() => handleViewDetails(vehicle)}
+                      className="inline-flex items-center p-1 text-blue-600 hover:text-blue-900"
+                      title="View Details"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </td>
+                </tr>
+                  ))
+                )}
               </tbody>
-            </table>
+          </table>
           </div>
         </div>
       </div>
+
+      {/* Vehicle Details Modal */}
+      {showModal && selectedVehicle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Vehicle Details
+              </h3>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Vehicle Number
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.vehicleNumber}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Make</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.make}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Model</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.model}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Type</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.type}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Cost Centre
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.costCentre}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Department
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.department}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Status</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedVehicle.status}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedVehicle(null);
+                }}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

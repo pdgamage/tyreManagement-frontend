@@ -13,6 +13,21 @@ const VehicleSearchPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Sample vehicle numbers for suggestions
+  const vehicleSuggestions = [
+    "ABC123",
+    "XYZ789",
+    "DEF456",
+    "GHI789",
+    "JKL012",
+    "MNO345",
+    "PQR678",
+    "STU901",
+    "VWX234",
+    "YZA567"
+  ];
 
   const handleSearch = async () => {
     if (!vehicleNumber.trim()) {
@@ -25,7 +40,7 @@ const VehicleSearchPage: React.FC = () => {
     setHasSearched(true);
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tyremanagement-backend-production.up.railway.app";
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
       const response = await fetch(`${API_BASE_URL}/api/requests/vehicle/${vehicleNumber.trim()}/requests`);
       
       if (response.ok) {
@@ -89,8 +104,15 @@ const VehicleSearchPage: React.FC = () => {
     console.log('Place order for request:', request);
   };
 
+  // Close suggestions when clicking outside
+  const handleClickOutside = (e: React.MouseEvent) => {
+    if (!(e.target as Element).closest('.vehicle-input-container')) {
+      setShowSuggestions(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50" onClick={handleClickOutside}>
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-2xl border-b border-blue-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -147,17 +169,39 @@ const VehicleSearchPage: React.FC = () => {
                     <label htmlFor="vehicleNumber" className="block text-sm font-medium text-gray-700 mb-2">
                       Vehicle Number
                     </label>
-                    <div className="relative">
+                    <div className="relative vehicle-input-container">
                       <input
                         type="text"
                         id="vehicleNumber"
                         value={vehicleNumber}
                         onChange={(e) => setVehicleNumber(e.target.value)}
                         onKeyPress={handleKeyPress}
+                        onFocus={() => setShowSuggestions(true)}
                         placeholder="Enter vehicle number (e.g., ABC123)"
                         className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       />
                       <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      
+                      {/* Vehicle Suggestions Dropdown */}
+                      {showSuggestions && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                          <div className="p-2">
+                            <div className="text-xs font-medium text-gray-500 px-3 py-1">Suggestions:</div>
+                            {vehicleSuggestions.map((suggestion, index) => (
+                              <button
+                                key={index}
+                                onClick={() => {
+                                  setVehicleNumber(suggestion);
+                                  setShowSuggestions(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <button

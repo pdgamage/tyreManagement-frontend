@@ -1,13 +1,17 @@
 export interface Vehicle {
   id: number;
-  vehicleNumber: string;
-  make?: string;
-  model?: string;
+  vehicleNo: string;
+  make: string;
+  model: string;
+  department: string;
   type?: string;
   costCentre?: string;
-  department?: string;
+  chassisNo?: string;
+  engineNo?: string;
+  registeredDate?: string;
+  tyreSize?: string;
+  initialOdometer?: number;
   status?: string;
-  registeredBy?: number;
 }
 
 export interface TireDetails {

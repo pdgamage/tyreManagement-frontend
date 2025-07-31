@@ -340,7 +340,7 @@ const VehicleRegistrationForm = () => {
               <input
                 id="costCentre"
                 type="text"
-                className="w-full ..."
+                className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
                 placeholder="Auto-filled from user"
                 value={costCentre}
                 readOnly
@@ -380,7 +380,7 @@ const VehicleRegistrationForm = () => {
             <input
               id="department"
               type="text"
-              className="w-full ..."
+              className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
               placeholder="Auto-filled from user"
               value={department}
               readOnly

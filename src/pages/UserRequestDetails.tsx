@@ -85,9 +85,8 @@ const UserRequestDetails = () => {
       await fetchRequests();
       setRequest(editedRequest);
       setHasChanges(false);
-      alert("Request updated successfully!");
     } catch (error) {
-      alert("Failed to update request. Please try again.");
+      console.error("Failed to update request:", error);
     } finally {
       setIsUpdating(false);
     }
@@ -226,15 +225,6 @@ const UserRequestDetails = () => {
               >
                 {request.status || "Unknown"}
               </div>
-              {canEdit() && hasChanges && (
-                <button
-                  onClick={handleUpdateRequest}
-                  disabled={isUpdating}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                >
-                  {isUpdating ? "Updating..." : "Update Request"}
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -250,135 +240,58 @@ const UserRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Number
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.vehicleNumber}
-                    onChange={(e) =>
-                      handleFieldChange("vehicleNumber", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.vehicleNumber}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.vehicleNumber}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Brand
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.vehicleBrand}
-                    onChange={(e) =>
-                      handleFieldChange("vehicleBrand", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.vehicleBrand}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.vehicleBrand}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Vehicle Model
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.vehicleModel}
-                    onChange={(e) =>
-                      handleFieldChange("vehicleModel", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.vehicleModel}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.vehicleModel}
+                </div>
               </div>
 
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Department/Section
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.userSection || ""}
-                    onChange={(e) =>
-                      handleFieldChange("userSection", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.userSection}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.userSection}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Cost Center
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.costCenter || ""}
-                    onChange={(e) =>
-                      handleFieldChange("costCenter", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.costCenter}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.costCenter}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Requester Name
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.requesterName}
-                    onChange={(e) =>
-                      handleFieldChange("requesterName", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.requesterName}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.requesterName}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   Requester Email
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="email"
-                    value={editedRequest.requesterEmail}
-                    onChange={(e) =>
-                      handleFieldChange("requesterEmail", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.requesterEmail}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.requesterEmail}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
@@ -403,7 +316,7 @@ const UserRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Submitted At
                 </label>
-                <div className="p-2 bg-white rounded">
+                <div className="p-2 bg-gray-100 rounded">
                   {new Date(request.submittedAt).toLocaleString()}
                 </div>
               </div>
@@ -420,20 +333,9 @@ const UserRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Tire Size Required
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.tireSizeRequired}
-                    onChange={(e) =>
-                      handleFieldChange("tireSizeRequired", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.tireSizeRequired}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.tireSizeRequired}
+                </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
@@ -478,20 +380,9 @@ const UserRequestDetails = () => {
                 <label className="block mb-1 font-semibold text-gray-700">
                   Existing Tire Make
                 </label>
-                {canEdit() ? (
-                  <input
-                    type="text"
-                    value={editedRequest.existingTireMake}
-                    onChange={(e) =>
-                      handleFieldChange("existingTireMake", e.target.value)
-                    }
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <div className="p-2 bg-white rounded">
-                    {request.existingTireMake}
-                  </div>
-                )}
+                <div className="p-2 bg-gray-100 rounded">
+                  {request.existingTireMake}
+                </div>
               </div>
 
               <div>
@@ -652,6 +543,19 @@ const UserRequestDetails = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Update Button */}
+          {canEdit() && hasChanges && (
+            <div className="flex justify-end mt-8">
+              <button
+                onClick={handleUpdateRequest}
+                disabled={isUpdating}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 font-medium"
+              >
+                {isUpdating ? "Updating..." : "Update Request"}
+              </button>
             </div>
           )}
         </div>

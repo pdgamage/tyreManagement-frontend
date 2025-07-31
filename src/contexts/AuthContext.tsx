@@ -15,6 +15,7 @@ interface User {
   name: string;
   role: Role;
   email?: string;
+  costCentre?: string;
   department?: string;
 }
 

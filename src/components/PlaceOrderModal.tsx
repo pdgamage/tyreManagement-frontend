@@ -57,6 +57,13 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     }
   };
 
+  // Function to generate unique order number
+  const generateOrderNumber = () => {
+    const timestamp = new Date().getTime().toString().slice(-6); // Last 6 digits of timestamp
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0'); // 4-digit random number
+    return `ORD-${timestamp}-${random}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -76,6 +83,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
+      // Generate unique order number
+      const orderNumber = generateOrderNumber();
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -88,6 +98,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
             supplierPhone: selectedSupplier.phone,
+            orderNumber: orderNumber,
             orderNotes: orderNotes,
           }),
         }

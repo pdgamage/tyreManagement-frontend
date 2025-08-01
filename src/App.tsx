@@ -18,6 +18,7 @@ import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
 import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
+import VehicleSearch from "./components/VehicleSearch";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
@@ -72,6 +73,19 @@ export function App() {
                   <PageTransition>
                     <Login />
                   </PageTransition>
+                }
+              />
+              
+              <Route
+                path="/vehicle-search"
+                element={
+                  <RequireAuth role="supervisor">
+                    <Layout>
+                      <PageTransition>
+                        <VehicleSearch />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
                 }
               />
               {/* Protected routes */}

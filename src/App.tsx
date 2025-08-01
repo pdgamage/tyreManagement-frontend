@@ -13,6 +13,7 @@ import CustomerOfficerDashboard from "./pages/CustomerOfficerDashboard";
 import VehicleRegistration from "./pages/VehicleRegistration";
 
 import Layout from "./components/Layout";
+import VehicleRequestFilterWindow from "./components/VehicleRequestFilterWindow";
 import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
@@ -49,6 +50,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <UserDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/vehicle-request-filter"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <VehicleRequestFilterWindow />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

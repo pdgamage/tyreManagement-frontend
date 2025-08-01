@@ -108,14 +108,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierEmail: selectedSupplier.email,
             supplierPhone: selectedSupplier.phone,
             orderNumber: orderNumber.trim(), // Ensure orderNumber is not empty
-            orderNotes: orderNotes.trim(), // Trim orderNotes as well
-          }),
-          // Log the request for debugging
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+          body: JSON.stringify(orderData),
 
       if (response.ok) {
         const result = await response.json();

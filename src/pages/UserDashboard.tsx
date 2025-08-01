@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestTable from "../components/RequestTable";
-import VehicleRequestSearch from "../components/VehicleRequestSearch";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
@@ -25,7 +24,6 @@ import {
 } from "lucide-react";
 
 const UserDashboard = () => {
-  const [showVehicleRequestSearch, setShowVehicleRequestSearch] = useState(false);
   const { user, logout } = useAuth();
   const { requests, fetchRequests } = useRequests();
   const navigate = useNavigate();
@@ -288,16 +286,6 @@ const UserDashboard = () => {
                 {showRequestForm ? "Hide Request Form" : "New Tire Request"}
               </span>
             </button>
-            <button
-              onClick={() => {
-                setShowRequestForm(false);
-                setShowVehicleRequestSearch((prev) => !prev);
-              }}
-              className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <FileText className="w-5 h-5" />
-              <span>Search Vehicle Requests</span>
-            </button>
           </div>
         </div>
       </header>
@@ -305,9 +293,6 @@ const UserDashboard = () => {
       {/* Enhanced Main Content */}
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         <div className="space-y-8">
-          {showVehicleRequestSearch && (
-            <VehicleRequestSearch />
-          )}
           {/* Professional Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             <div

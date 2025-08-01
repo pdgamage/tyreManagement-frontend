@@ -92,15 +92,17 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
+      // Prepare order data with all required fields
       const orderData = {
         supplierId: selectedSupplierId,
         supplierName: selectedSupplier.name,
         supplierEmail: selectedSupplier.email,
         supplierPhone: selectedSupplier.phone,
-        orderNumber: orderNumber,
+        orderNumber: orderNumber.trim(),  // Ensure orderNumber is trimmed
         orderNotes: orderNotes,
       };
 
+      // Log the data being sent for debugging
       console.log("Sending order data:", orderData);
 
       const response = await fetch(

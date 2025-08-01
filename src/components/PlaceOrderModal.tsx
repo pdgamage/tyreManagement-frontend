@@ -30,7 +30,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     null
   );
   const [orderNotes, setOrderNotes] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -90,7 +89,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierEmail: selectedSupplier.email,
             supplierPhone: selectedSupplier.phone,
             orderNotes: orderNotes,
-            orderNumber: orderNumber,
           }),
         }
       );
@@ -153,7 +151,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleClose = () => {
     setSelectedSupplierId(null);
     setOrderNotes("");
-    setOrderNumber("");
     setError(null);
     onClose();
   };
@@ -238,21 +235,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Order Number */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Order Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter order number"
-              required
-            />
           </div>
 
           {/* Order Notes */}

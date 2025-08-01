@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { usePolling } from "../hooks/usePolling";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://tyremanagement-backend-production.up.railway.app";
+import { apiUrls } from "../config/api";
 
 import type { Request as RequestType } from "../types/request";
 
@@ -40,7 +37,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchRequests = useCallback(async () => {
     try {
       setIsRefreshing(true);
-      const res = await fetch(`${API_BASE_URL}/api/requests`);
+      const res = await fetch(apiUrls.requests());
       const data = await res.json();
       setRequests(data);
       setLastUpdate(Date.now());
@@ -82,7 +79,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       userId?: string
     ) => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/requests/${id}/status`, {
+        const res = await fetch(`${apiUrls.requestById(id)}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

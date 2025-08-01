@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { Vehicle, ApiResponse } from "../types/api";
+import { apiUrls } from "../config/api";
 
 interface VehicleContextType {
   vehicles: Vehicle[];
@@ -24,14 +25,10 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://tyremanagement-backend-production-8fed.up.railway.app";
-
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/vehicles`);
+      const response = await fetch(apiUrls.vehicles());
       const result = await response.json();
 
       // If result is an array, use it directly
@@ -51,7 +48,7 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({
     vehicleData: Omit<Vehicle, "id">
   ): Promise<Vehicle> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/vehicles`, {
+      const response = await fetch(apiUrls.vehicles(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(vehicleData),

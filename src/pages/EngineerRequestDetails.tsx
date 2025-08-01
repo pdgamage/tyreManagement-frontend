@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Request } from "../types/request";
+import { apiUrls } from "../config/api";
 
 const EngineerRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,12 +34,7 @@ const EngineerRequestDetails = () => {
         if (isNaN(numericId)) {
           throw new Error("Invalid request ID.");
         }
-        const res = await fetch(
-          `${
-            import.meta.env.VITE_API_BASE_URL ||
-            "https://tyremanagement-backend-production.up.railway.app"
-          }/api/requests/${numericId}`
-        );
+        const res = await fetch(apiUrls.requestById(numericId));
         if (!res.ok) {
           if (res.status === 404) {
             throw new Error("Request not found.");
@@ -98,7 +94,13 @@ const EngineerRequestDetails = () => {
         await updateRequestStatus(id!, "complete", notes, "engineer", user?.id);
       } else {
         // Just reject
-        await updateRequestStatus(id!, "engineer rejected", notes, "engineer", user?.id);
+        await updateRequestStatus(
+          id!,
+          "engineer rejected",
+          notes,
+          "engineer",
+          user?.id
+        );
       }
       await fetchRequests();
       navigate("/engineer");
@@ -415,7 +417,9 @@ const EngineerRequestDetails = () => {
                   Total Price (LKR)
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.totalPrice ? `LKR ${Number(request.totalPrice).toLocaleString()}` : "N/A"}
+                  {request.totalPrice
+                    ? `LKR ${Number(request.totalPrice).toLocaleString()}`
+                    : "N/A"}
                 </div>
               </div>
               <div>
@@ -423,7 +427,9 @@ const EngineerRequestDetails = () => {
                   Warranty Distance (KM)
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.warrantyDistance ? `${Number(request.warrantyDistance).toLocaleString()} KM` : "N/A"}
+                  {request.warrantyDistance
+                    ? `${Number(request.warrantyDistance).toLocaleString()} KM`
+                    : "N/A"}
                 </div>
               </div>
               <div>
@@ -431,8 +437,11 @@ const EngineerRequestDetails = () => {
                   Tire Wear Indicator Appeared
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.tireWearIndicatorAppeared !== undefined ?
-                    (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}
+                  {request.tireWearIndicatorAppeared !== undefined
+                    ? request.tireWearIndicatorAppeared
+                      ? "Yes"
+                      : "No"
+                    : "N/A"}
                 </div>
               </div>
             </div>

@@ -5,7 +5,17 @@ import RequestReports from "../components/RequestReports";
 import PlaceOrderModal from "../components/PlaceOrderModal";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { UserCircle, ChevronDown, LogOut, ShoppingCart, BarChart3, Package, XCircle, CheckCircle2 } from "lucide-react";
+import { apiUrls } from "../config/api";
+import {
+  UserCircle,
+  ChevronDown,
+  LogOut,
+  ShoppingCart,
+  BarChart3,
+  Package,
+  XCircle,
+  CheckCircle2,
+} from "lucide-react";
 
 import { Request } from "../types/request";
 
@@ -22,7 +32,8 @@ interface RequestsContextType {
 }
 
 const CustomerOfficerDashboard = () => {
-  const { requests, fetchRequests, updateRequestStatus } = useRequests() as RequestsContextType;
+  const { requests, fetchRequests, updateRequestStatus } =
+    useRequests() as RequestsContextType;
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -65,15 +76,15 @@ const CustomerOfficerDashboard = () => {
   }, [fetchRequests]);
 
   // Filter requests to show both "complete" and "order placed" status
-  const completeRequests = requests.filter((req) =>
-    req.status === "complete" || req.status === "order placed"
+  const completeRequests = requests.filter(
+    (req) => req.status === "complete" || req.status === "order placed"
   );
 
   const placedOrders = requests.filter((req) => req.status === "order placed");
 
   // Filter cancelled orders
-  const cancelledRequests = requests.filter((req) =>
-    req.status === "order cancelled"
+  const cancelledRequests = requests.filter(
+    (req) => req.status === "order cancelled"
   );
 
   const handleView = (request: Request) => {
@@ -99,12 +110,9 @@ const CustomerOfficerDashboard = () => {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/requests/${deleteId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(apiUrls.requestById(deleteId), {
+        method: "DELETE",
+      });
 
       if (response.ok) {
         // Refresh the requests list after deletion
@@ -179,13 +187,18 @@ const CustomerOfficerDashboard = () => {
                   Customer Officer Dashboard
                 </h1>
                 <p className="text-slate-300 text-lg font-medium mt-1">
-                  Manage orders, track deliveries, and oversee customer fulfillment
+                  Manage orders, track deliveries, and oversee customer
+                  fulfillment
                 </p>
                 <div className="flex items-center mt-2 space-x-2">
                   <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-slate-400 font-medium">Customer Service Level Access</span>
+                  <span className="text-sm text-slate-400 font-medium">
+                    Customer Service Level Access
+                  </span>
                   <span className="text-slate-500">•</span>
-                  <span className="text-sm text-slate-400">Welcome back, {user?.name || 'Customer Officer'}</span>
+                  <span className="text-sm text-slate-400">
+                    Welcome back, {user?.name || "Customer Officer"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -193,18 +206,28 @@ const CustomerOfficerDashboard = () => {
               {/* Quick Actions */}
               <div className="hidden lg:flex items-center space-x-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">Current Time</div>
-                  <div className="text-sm font-semibold text-white">{new Date().toLocaleTimeString()}</div>
+                  <div className="text-xs text-slate-300 font-medium">
+                    Current Time
+                  </div>
+                  <div className="text-sm font-semibold text-white">
+                    {new Date().toLocaleTimeString()}
+                  </div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">Today's Date</div>
-                  <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString()}</div>
+                  <div className="text-xs text-slate-300 font-medium">
+                    Today's Date
+                  </div>
+                  <div className="text-sm font-semibold text-white">
+                    {new Date().toLocaleDateString()}
+                  </div>
                 </div>
               </div>
               {/* Enhanced User Profile */}
               <div className="flex items-center space-x-3">
                 <div className="text-right hidden sm:block">
-                  <div className="text-sm font-medium text-white">{user?.name || 'Customer Officer'}</div>
+                  <div className="text-sm font-medium text-white">
+                    {user?.name || "Customer Officer"}
+                  </div>
                   <div className="text-xs text-slate-300">Customer Officer</div>
                 </div>
                 <div className="relative" ref={dropdownRef}>
@@ -276,9 +299,15 @@ const CustomerOfficerDashboard = () => {
               <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-8 text-white shadow-xl border border-cyan-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-cyan-100 text-sm font-medium mb-2">Placed Orders</p>
-                    <p className="text-4xl font-bold mb-1">{placedOrders.length}</p>
-                    <p className="text-cyan-200 text-xs">Orders recently placed</p>
+                    <p className="text-cyan-100 text-sm font-medium mb-2">
+                      Placed Orders
+                    </p>
+                    <p className="text-4xl font-bold mb-1">
+                      {placedOrders.length}
+                    </p>
+                    <p className="text-cyan-200 text-xs">
+                      Orders recently placed
+                    </p>
                   </div>
                   <div className="w-16 h-16 bg-cyan-400/30 rounded-xl flex items-center justify-center">
                     <Package className="w-8 h-8" />
@@ -289,9 +318,15 @@ const CustomerOfficerDashboard = () => {
               <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl border border-red-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-red-100 text-sm font-medium mb-2">Cancelled Orders</p>
-                    <p className="text-4xl font-bold mb-1">{cancelledRequests.length}</p>
-                    <p className="text-red-200 text-xs">Customer cancellations</p>
+                    <p className="text-red-100 text-sm font-medium mb-2">
+                      Cancelled Orders
+                    </p>
+                    <p className="text-4xl font-bold mb-1">
+                      {cancelledRequests.length}
+                    </p>
+                    <p className="text-red-200 text-xs">
+                      Customer cancellations
+                    </p>
                   </div>
                   <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
                     <XCircle className="w-8 h-8" />
@@ -302,9 +337,15 @@ const CustomerOfficerDashboard = () => {
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100 text-sm font-medium mb-2">Total Orders</p>
-                    <p className="text-4xl font-bold mb-1">{completeRequests.length + cancelledRequests.length}</p>
-                    <p className="text-blue-200 text-xs">All order activities</p>
+                    <p className="text-blue-100 text-sm font-medium mb-2">
+                      Total Orders
+                    </p>
+                    <p className="text-4xl font-bold mb-1">
+                      {completeRequests.length + cancelledRequests.length}
+                    </p>
+                    <p className="text-blue-200 text-xs">
+                      All order activities
+                    </p>
                   </div>
                   <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">
                     <Package className="w-8 h-8" />
@@ -315,13 +356,23 @@ const CustomerOfficerDashboard = () => {
               <div className="bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-8 text-white shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-purple-100 text-sm font-medium mb-2">Success Rate</p>
+                    <p className="text-purple-100 text-sm font-medium mb-2">
+                      Success Rate
+                    </p>
                     <p className="text-4xl font-bold mb-1">
                       {completeRequests.length + cancelledRequests.length > 0
-                        ? Math.round((completeRequests.length / (completeRequests.length + cancelledRequests.length)) * 100)
-                        : 0}%
+                        ? Math.round(
+                            (completeRequests.length /
+                              (completeRequests.length +
+                                cancelledRequests.length)) *
+                              100
+                          )
+                        : 0}
+                      %
                     </p>
-                    <p className="text-purple-200 text-xs">Order completion rate</p>
+                    <p className="text-purple-200 text-xs">
+                      Order completion rate
+                    </p>
                   </div>
                   <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
                     <BarChart3 className="w-8 h-8" />
@@ -339,8 +390,12 @@ const CustomerOfficerDashboard = () => {
                       <CheckCircle2 className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-emerald-900">Active Orders & Completed Requests</h2>
-                      <p className="text-emerald-700 text-sm">Orders ready for fulfillment and delivery</p>
+                      <h2 className="text-xl font-bold text-emerald-900">
+                        Active Orders & Completed Requests
+                      </h2>
+                      <p className="text-emerald-700 text-sm">
+                        Orders ready for fulfillment and delivery
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -370,8 +425,12 @@ const CustomerOfficerDashboard = () => {
                         <XCircle className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-red-900">Cancelled Orders</h2>
-                        <p className="text-red-700 text-sm">Orders cancelled by customer or system</p>
+                        <h2 className="text-xl font-bold text-red-900">
+                          Cancelled Orders
+                        </h2>
+                        <p className="text-red-700 text-sm">
+                          Orders cancelled by customer or system
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -401,13 +460,20 @@ const CustomerOfficerDashboard = () => {
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-blue-900">Customer Analytics & Reports</h2>
-                  <p className="text-blue-700 text-sm">Comprehensive order fulfillment insights</p>
+                  <h2 className="text-xl font-bold text-blue-900">
+                    Customer Analytics & Reports
+                  </h2>
+                  <p className="text-blue-700 text-sm">
+                    Comprehensive order fulfillment insights
+                  </p>
                 </div>
               </div>
             </div>
             <div className="p-8">
-              <RequestReports requests={[...completeRequests, ...cancelledRequests]} role="customer-officer" />
+              <RequestReports
+                requests={[...completeRequests, ...cancelledRequests]}
+                role="customer-officer"
+              />
             </div>
           </div>
         )}
@@ -429,7 +495,8 @@ const CustomerOfficerDashboard = () => {
               Confirm Deletion
             </h3>
             <p className="mb-6 text-gray-600">
-              Are you sure you want to delete this request? This action cannot be undone.
+              Are you sure you want to delete this request? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end gap-4">
               <button
@@ -457,11 +524,23 @@ const CustomerOfficerDashboard = () => {
             <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-white">Cancel Order</h3>
+                <h3 className="text-xl font-semibold text-white">
+                  Cancel Order
+                </h3>
               </div>
             </div>
 
@@ -480,10 +559,21 @@ const CustomerOfficerDashboard = () => {
               />
               <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <p className="text-sm text-orange-700 flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
-                  The customer will be notified about the cancellation and the reason provided.
+                  The customer will be notified about the cancellation and the
+                  reason provided.
                 </p>
               </div>
             </div>

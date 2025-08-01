@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useVehicles } from "../contexts/VehicleContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Navigate, useLocation } from "react-router-dom";
@@ -23,6 +23,14 @@ const VehicleRegistrationForm = () => {
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  // Auto-fill costCentre and department from user
+  useEffect(() => {
+    if (user) {
+      setCostCentre(user.costCentre || "");
+      setDepartment(user.department || "");
+    }
+  }, [user]);
 
   // Instant validation for vehicle number
   const handleVehicleNumberChange = (
@@ -180,11 +188,21 @@ const VehicleRegistrationForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Vehicle Identification Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
-            <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div className="p-6 border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+          <h3 className="flex items-center mb-4 text-lg font-semibold text-blue-900">
+            <div className="flex items-center justify-center w-6 h-6 mr-3 bg-blue-500 rounded-lg">
+              <svg
+                className="w-3 h-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
             Vehicle Identification
@@ -201,23 +219,33 @@ const VehicleRegistrationForm = () => {
               <input
                 id="vehicleNumber"
                 type="text"
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
                 placeholder="e.g., TRK-2023-001"
                 value={vehicleNumber}
                 onChange={handleVehicleNumberChange}
                 required
               />
               {vehicleNumberError && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <p className="flex items-center mt-2 text-sm text-red-600">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   {vehicleNumberError}
                 </p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
                 <label
                   className="block mb-3 text-sm font-semibold text-gray-800"
@@ -228,7 +256,7 @@ const VehicleRegistrationForm = () => {
                 <input
                   id="make"
                   type="text"
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                  className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
                   placeholder="e.g., Volvo, Mercedes, Toyota"
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
@@ -245,7 +273,7 @@ const VehicleRegistrationForm = () => {
                 <input
                   id="model"
                   type="text"
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                  className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
                   placeholder="e.g., FH16, Actros, Camry"
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
@@ -256,17 +284,27 @@ const VehicleRegistrationForm = () => {
           </div>
         </div>
         {/* Vehicle Classification Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-100">
-          <h3 className="text-lg font-semibold text-purple-900 mb-4 flex items-center">
-            <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a1.994 1.994 0 01-1.414.586H7a4 4 0 01-4-4V7a4 4 0 014-4z" />
+        <div className="p-6 border border-purple-100 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl">
+          <h3 className="flex items-center mb-4 text-lg font-semibold text-purple-900">
+            <div className="flex items-center justify-center w-6 h-6 mr-3 bg-purple-500 rounded-lg">
+              <svg
+                className="w-3 h-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a1.994 1.994 0 01-1.414.586H7a4 4 0 01-4-4V7a4 4 0 014-4z"
+                />
               </svg>
             </div>
             Vehicle Classification
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label
                 className="block mb-3 text-sm font-semibold text-gray-800"
@@ -278,7 +316,7 @@ const VehicleRegistrationForm = () => {
                 id="type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:shadow-md"
                 required
               >
                 <option value="" disabled>
@@ -302,21 +340,31 @@ const VehicleRegistrationForm = () => {
               <input
                 id="costCentre"
                 type="text"
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                placeholder="e.g., CC-001, DEPT-LOGISTICS"
+                className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
+                placeholder="Auto-filled from user"
                 value={costCentre}
-                onChange={(e) => setCostCentre(e.target.value)}
+                readOnly
                 required
               />
             </div>
           </div>
         </div>
         {/* Department Assignment Section */}
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
-          <h3 className="text-lg font-semibold text-emerald-900 mb-4 flex items-center">
-            <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        <div className="p-6 border bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border-emerald-100">
+          <h3 className="flex items-center mb-4 text-lg font-semibold text-emerald-900">
+            <div className="flex items-center justify-center w-6 h-6 mr-3 rounded-lg bg-emerald-500">
+              <svg
+                className="w-3 h-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
               </svg>
             </div>
             Department Assignment
@@ -329,31 +377,15 @@ const VehicleRegistrationForm = () => {
             >
               Department *
             </label>
-            <select
+            <input
               id="department"
-              name="department"
+              type="text"
+              className="w-full p-4 transition-all duration-200 bg-white border-2 border-gray-200 shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
+              placeholder="Auto-filled from user"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+              readOnly
               required
-            >
-              <option value="" disabled>
-                Select a department
-              </option>
-              <option value="HR department">🏢 HR Department</option>
-              <option value="IT department">💻 IT Department</option>
-              <option value="Marketing department">📈 Marketing Department</option>
-              <option value="Security">🔒 Security</option>
-              <option value="User department">👥 User Department</option>
-              <option value="Finance department">💰 Finance Department</option>
-              <option value="Procurement department">🛒 Procurement Department</option>
-              <option value="Legal department">⚖️ Legal Department</option>
-              <option value="Customer support">📞 Customer Support</option>
-              <option value="Operations department">⚙️ Operations Department</option>
-              <option value="Logistics department">🚚 Logistics Department</option>
-              <option value="Engineering department">🔧 Engineering Department</option>
-              <option value="Administration department">📋 Administration Department</option>
-            </select>
+            />
           </div>
         </div>
 
@@ -364,19 +396,29 @@ const VehicleRegistrationForm = () => {
             disabled={formLoading}
             className={`w-full max-w-md px-8 py-4 font-bold text-white rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg ${
               formLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 hover:shadow-xl'
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 hover:shadow-xl"
             }`}
           >
             {formLoading ? (
               <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                <div className="w-5 h-5 mr-3 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
                 Processing...
               </div>
             ) : (
               <div className="flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
                 </svg>
                 Register Vehicle
               </div>

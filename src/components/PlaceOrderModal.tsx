@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import type { Request } from "../types/request";
 import type { TireRequest } from "../types/api";
+import { apiUrls } from "../config/api";
 
 interface Supplier {
   id: number;
@@ -43,12 +44,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL ||
-          "https://tyremanagement-backend-production-8fed.up.railway.app"
-        }/api/suppliers`
-      );
+      const response = await fetch(apiUrls.suppliers());
       if (response.ok) {
         const data = await response.json();
         setSuppliers(data);
@@ -74,10 +70,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL ||
-          "https://tyremanagement-backend-production-8fed.up.railway.app"
-        }/api/requests/${request?.id}/place-order`,
+        `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
           method: "POST",
           headers: {

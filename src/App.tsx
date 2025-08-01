@@ -22,6 +22,7 @@ import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
+import UserRequestDetails from "./pages/UserRequestDetails";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -151,6 +152,18 @@ export function App() {
               <Route
                 path="/customer-officer/request/:id"
                 element={<CustomerOfficerRequestDetails />}
+              />
+              <Route
+                path="/user/request/:id"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserRequestDetails />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
               />
             </Routes>
           </RequestProvider>

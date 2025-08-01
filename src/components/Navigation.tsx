@@ -129,11 +129,6 @@ const Navigation = () => {
           </NavLink>
           {renderRoleSpecificLinks()}
           {user && (
-            <NavLink to="/vehicle-request-filter" icon={<TruckIcon size={20} />}>
-              Vehicle Request Filter
-            </NavLink>
-          )}
-          {user && (
             <div className="flex items-center ml-auto space-x-4">
               <span className="flex items-center space-x-2 text-gray-600">
                 <UserIcon size={20} />

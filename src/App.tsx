@@ -13,7 +13,6 @@ import CustomerOfficerDashboard from "./pages/CustomerOfficerDashboard";
 import VehicleRegistration from "./pages/VehicleRegistration";
 
 import Layout from "./components/Layout";
-import VehicleRequestFilterWindow from "./components/VehicleRequestFilterWindow";
 import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
@@ -22,7 +21,6 @@ import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
-import UserRequestDetails from "./pages/UserRequestDetails";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -51,18 +49,6 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <UserDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/vehicle-request-filter"
-                element={
-                  <RequireAuth role="user">
-                    <Layout>
-                      <PageTransition>
-                        <VehicleRequestFilterWindow />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>
@@ -152,18 +138,6 @@ export function App() {
               <Route
                 path="/customer-officer/request/:id"
                 element={<CustomerOfficerRequestDetails />}
-              />
-              <Route
-                path="/user/request/:id"
-                element={
-                  <RequireAuth role="user">
-                    <Layout>
-                      <PageTransition>
-                        <UserRequestDetails />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
               />
             </Routes>
           </RequestProvider>

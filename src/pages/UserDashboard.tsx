@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
-import VehicleRequestFilterSection from "../components/VehicleRequestFilterSection";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -196,7 +195,6 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <VehicleRequestFilterSection />
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">

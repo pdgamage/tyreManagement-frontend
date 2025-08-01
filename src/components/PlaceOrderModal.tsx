@@ -30,7 +30,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     null
   );
   const [orderNotes, setOrderNotes] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -58,15 +57,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      setError(null);
-      setSuccess(null);
-      setOrderNumber("");
-      fetchSuppliers();
-    }
-  }, [isOpen]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -86,25 +76,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
-      // Validate order number
-      if (!orderNumber.trim()) {
-        setError("Please enter an order number");
-        return;
-      }
-
-      // Prepare order data with all required fields
-      const orderData = {
-        supplierId: selectedSupplierId,
-        supplierName: selectedSupplier.name,
-        supplierEmail: selectedSupplier.email,
-        supplierPhone: selectedSupplier.phone,
-        orderNumber: orderNumber.trim(),  // Ensure orderNumber is trimmed
-        orderNotes: orderNotes,
-      };
-
-      // Log the data being sent for debugging
-      console.log("Sending order data:", orderData);
-
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -112,7 +83,13 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(orderData),
+          body: JSON.stringify({
+            supplierId: selectedSupplierId,
+            supplierName: selectedSupplier.name,
+            supplierEmail: selectedSupplier.email,
+            supplierPhone: selectedSupplier.phone,
+            orderNotes: orderNotes,
+          }),
         }
       );
 
@@ -174,7 +151,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleClose = () => {
     setSelectedSupplierId(null);
     setOrderNotes("");
-    setOrderNumber("");
     setError(null);
     onClose();
   };
@@ -259,21 +235,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Order Number Input */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Order Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter order number (e.g., PO-2025-001)"
-              required
-            />
           </div>
 
           {/* Order Notes */}

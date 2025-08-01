@@ -83,6 +83,18 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
+      // Prepare the order data
+      const orderData = {
+        supplierId: selectedSupplierId,
+        supplierName: selectedSupplier.name,
+        supplierEmail: selectedSupplier.email,
+        supplierPhone: selectedSupplier.phone,
+        orderNumber: orderNumber.trim(),
+        orderNotes: orderNotes.trim(),
+      };
+
+      console.log('Sending order data:', orderData);
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -95,9 +107,13 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
             supplierPhone: selectedSupplier.phone,
-            orderNumber: orderNumber.trim(),
-            orderNotes: orderNotes,
+            orderNumber: orderNumber.trim(), // Ensure orderNumber is not empty
+            orderNotes: orderNotes.trim(), // Trim orderNotes as well
           }),
+          // Log the request for debugging
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 

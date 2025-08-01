@@ -86,6 +86,18 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
       // Generate unique order number
       const orderNumber = generateOrderNumber();
 
+      // Log the order data being sent
+      const orderData = {
+        supplierId: selectedSupplierId,
+        supplierName: selectedSupplier.name,
+        supplierEmail: selectedSupplier.email,
+        supplierPhone: selectedSupplier.phone,
+        orderNumber: orderNumber,
+        orderNotes: orderNotes,
+      };
+
+      console.log("Sending order data:", orderData);
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -93,14 +105,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            supplierId: selectedSupplierId,
-            supplierName: selectedSupplier.name,
-            supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.phone,
-            orderNumber: orderNumber,
-            orderNotes: orderNotes,
-          }),
+          body: JSON.stringify(orderData),
         }
       );
 

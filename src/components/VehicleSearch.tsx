@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 import Autosuggest from 'react-autosuggest';
 import LoadingSpinner from './LoadingSpinner';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Vehicle {
   vehicleNumber: string;
@@ -30,6 +31,7 @@ interface SearchResult {
 }
 
 const VehicleSearch: React.FC = () => {
+  const { user } = useAuth();
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState<Vehicle[]>([]);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
@@ -156,7 +158,8 @@ const VehicleSearch: React.FC = () => {
                         <p className="font-medium">{new Date(request.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
-                    {request.Supplier && (
+                    {/* Only show supplier details for authenticated users */}
+                    {user?.role === 'supervisor' && request.Supplier && (
                       <div className="mt-2">
                         <p className="font-medium text-gray-700 mb-2">Supplier Details:</p>
                         <div className="bg-gray-50 p-3 rounded">

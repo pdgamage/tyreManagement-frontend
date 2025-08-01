@@ -79,13 +79,11 @@ export function App() {
               <Route
                 path="/vehicle-search"
                 element={
-                  <RequireAuth role="supervisor">
-                    <Layout>
-                      <PageTransition>
-                        <VehicleSearch />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
+                  <Layout>
+                    <PageTransition>
+                      <VehicleSearch />
+                    </PageTransition>
+                  </Layout>
                 }
               />
               {/* Protected routes */}

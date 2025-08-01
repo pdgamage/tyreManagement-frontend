@@ -50,9 +50,13 @@ const Navigation = () => {
           >
             Submit Request
           </NavLink>
-          {/* <NavLink to="/vehicle-registration" icon={<TruckIcon size={20} />} requiresAuth={false}>
-            Register Vehicle
-          </NavLink> */}
+          <NavLink
+            to="/vehicle-search"
+            icon={<SearchIcon size={20} />}
+            requiresAuth={false}
+          >
+            Vehicle Search
+          </NavLink>
         </>
       );
     }

@@ -100,15 +100,11 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            supplierId: selectedSupplierId,
-            supplierName: selectedSupplier.name,
-            supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.phone,
-            orderNumber: orderNumber.trim(), // Ensure orderNumber is not empty
-          body: JSON.stringify(orderData),
+          body: JSON.stringify(orderData)
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -126,6 +122,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           onClose();
           // Reset form
           setSelectedSupplierId(null);
+          setOrderNumber("");
           setOrderNotes("");
           setSuccess(null);
         }, 2000);

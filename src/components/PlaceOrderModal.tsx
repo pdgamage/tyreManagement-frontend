@@ -30,6 +30,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     null
   );
   const [orderNotes, setOrderNotes] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -57,16 +58,14 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     }
   };
 
-  // Function to generate unique order number
-  const generateOrderNumber = () => {
-    const date = new Date();
-    const year = date.getFullYear().toString().slice(-2);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const timestamp = date.getTime().toString().slice(-4);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `ORD${year}${month}${day}-${timestamp}-${random}`;
-  };
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+      setSuccess(null);
+      setOrderNumber("");
+      fetchSuppliers();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,9 +86,11 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
-      // Generate unique order number and log it
-      const orderNumber = generateOrderNumber();
-      console.log("Generated order number:", orderNumber);
+      // Validate order number
+      if (!orderNumber.trim()) {
+        setError("Please enter an order number");
+        return;
+      }
 
       const orderData = {
         supplierId: selectedSupplierId,
@@ -171,6 +172,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleClose = () => {
     setSelectedSupplierId(null);
     setOrderNotes("");
+    setOrderNumber("");
     setError(null);
     onClose();
   };
@@ -255,6 +257,21 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Order Number Input */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Order Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={orderNumber}
+              onChange={(e) => setOrderNumber(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter order number (e.g., PO-2025-001)"
+              required
+            />
           </div>
 
           {/* Order Notes */}

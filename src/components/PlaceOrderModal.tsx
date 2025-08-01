@@ -69,6 +69,13 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setError(null);
 
     try {
+      // Get the selected supplier details
+      const selectedSupplier = suppliers.find((s) => s.id === selectedSupplierId);
+      if (!selectedSupplier) {
+        setError("Selected supplier not found");
+        return;
+      }
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -78,6 +85,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           },
           body: JSON.stringify({
             supplierId: selectedSupplierId,
+            supplierName: selectedSupplier.name,
+            supplierEmail: selectedSupplier.email,
+            supplierPhone: selectedSupplier.phone,
             orderNotes: orderNotes,
           }),
         }

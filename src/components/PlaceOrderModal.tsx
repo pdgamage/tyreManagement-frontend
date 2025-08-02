@@ -95,7 +95,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierId: selectedSupplierId,
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.contact_number || selectedSupplier.phone || '', // Try both fields, ensure never undefined
+            supplierPhone: selectedSupplier.contact_number || '', // Use only contact_number as it's the correct field
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
           }),
@@ -238,7 +238,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                     </div>
                     <div className="ml-6 text-sm text-gray-600">
                       <p>Email: {supplier.email}</p>
-                      {supplier.phone && <p>Phone: {supplier.phone}</p>}
+                      <p>Phone: {supplier.contact_number || supplier.phone || 'N/A'}</p>
                     </div>
                   </div>
                 ))}

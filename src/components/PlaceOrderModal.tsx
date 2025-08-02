@@ -8,7 +8,7 @@ interface Supplier {
   id: number;
   name: string;
   email: string;
-  phone_number: string; // Changed to match database column name
+  phone: string;
   formsfree_key: string;
 }
 
@@ -94,9 +94,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierId: selectedSupplierId,
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.phone_number || '', // Using correct field name
-            orderNumber: orderNumber.trim(),
-            orderNotes: orderNotes.trim(),
+            supplierPhone: selectedSupplier.phone,
+            orderNumber: orderNumber,
+            orderNotes: orderNotes,
           }),
         }
       );
@@ -237,7 +237,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                     </div>
                     <div className="ml-6 text-sm text-gray-600">
                       <p>Email: {supplier.email}</p>
-                      <p>Phone: {supplier.phone_number || 'N/A'}</p>
+                      {supplier.phone && <p>Phone: {supplier.phone}</p>}
                     </div>
                   </div>
                 ))}

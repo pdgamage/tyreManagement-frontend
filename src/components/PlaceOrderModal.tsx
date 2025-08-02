@@ -9,6 +9,7 @@ interface Supplier {
   name: string;
   email: string;
   phone: string;
+  contact_number: string;
   formsfree_key: string;
 }
 
@@ -94,9 +95,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierId: selectedSupplierId,
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.phone,
-            orderNumber: orderNumber,
-            orderNotes: orderNotes,
+            supplierPhone: selectedSupplier.contact_number || selectedSupplier.phone || '', // Try both fields, ensure never undefined
+            orderNumber: orderNumber.trim(),
+            orderNotes: orderNotes.trim(),
           }),
         }
       );

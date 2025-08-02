@@ -29,6 +29,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
     null
   );
+  const [orderNumber, setOrderNumber] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,8 +61,14 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
     if (!selectedSupplierId) {
       setError("Please select a supplier");
+      return;
+    }
+
+    if (!orderNumber || orderNumber.trim() === '') {
+      setError("Please enter an order number");
       return;
     }
 
@@ -88,6 +95,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
             supplierPhone: selectedSupplier.phone,
+            orderNumber: orderNumber,
             orderNotes: orderNotes,
           }),
         }
@@ -235,6 +243,21 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Order Number */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Order Number *
+            </label>
+            <input
+              type="text"
+              value={orderNumber}
+              onChange={(e) => setOrderNumber(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter order number"
+              required
+            />
           </div>
 
           {/* Order Notes */}

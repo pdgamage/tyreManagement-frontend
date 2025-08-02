@@ -83,6 +83,14 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         return;
       }
 
+      // Debug log for supplier details
+      console.log("Selected supplier details:", {
+        id: selectedSupplier.id,
+        name: selectedSupplier.name,
+        email: selectedSupplier.email,
+        phone: selectedSupplier.phone
+      });
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -94,15 +102,18 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierId: selectedSupplierId,
             supplierName: selectedSupplier.name,
             supplierEmail: selectedSupplier.email,
-            supplierPhone: selectedSupplier.phone,
-            orderNumber: orderNumber,
-            orderNotes: orderNotes,
+            supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
+            orderNumber: orderNumber.trim(),
+            orderNotes: orderNotes.trim(),
           }),
         }
       );
 
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+      
       if (response.ok) {
-        const result = await response.json();
+        const result = JSON.parse(responseText);
         console.log("Order placed successfully:", result);
 
         // Show success message
@@ -237,7 +248,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
                     </div>
                     <div className="ml-6 text-sm text-gray-600">
                       <p>Email: {supplier.email}</p>
-                      {supplier.phone && <p>Phone: {supplier.phone}</p>}
+                      <p>Phone: {supplier.phone || 'N/A'}</p>
                     </div>
                   </div>
                 ))}

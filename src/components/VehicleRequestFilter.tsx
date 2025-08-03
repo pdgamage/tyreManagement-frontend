@@ -22,9 +22,14 @@ import LoadingSpinner from './LoadingSpinner';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  borderRadius: theme.spacing(1),
+  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+  borderRadius: theme.spacing(2),
   backgroundColor: '#ffffff',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
+  '&:hover': {
+    boxShadow: '0 12px 20px rgba(0, 0, 0, 0.15)',
+  },
+  transition: 'box-shadow 0.3s ease-in-out',
 }));
 
 const SearchContainer = styled(Box)(({ theme }) => ({

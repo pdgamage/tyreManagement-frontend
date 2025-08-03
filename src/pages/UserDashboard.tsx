@@ -198,31 +198,64 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Top Actions Row */}
-      <div className="flex gap-4 mb-6 px-6 pt-6">
-        <button
-          onClick={() => setShowRequestForm(true)}
-          className="flex-1 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
-        >
-          <Plus size={20} />
-          New Tire Request
-        </button>
-        <button
-          onClick={() => setShowRequestFilter(true)}
-          className="flex-1 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
-        >
-          <Search size={20} />
-          Search Vehicle Requests
-        </button>
-      </div>
-
-      {/* Vehicle Request Filter Panel */}
-      {showRequestFilter && (
-        <div className="px-6 mb-6">
-          <VehicleRequestFilter />
-        </div>
-      )}
       {/* Professional Header with Enhanced Design */}
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          {/* Enhanced Header Title Section */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
+                <FileText className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white tracking-tight">
+                  User Dashboard
+                </h1>
+                <p className="text-slate-300 text-lg font-medium mt-1">
+                  Submit tire requests and track your applications
+                </p>
+                <div className="flex items-center mt-2 space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-slate-400 font-medium">
+                    User Level Access
+                  </span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-sm text-slate-400">
+                    Welcome back, {user?.name || "User"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowRequestForm(!showRequestForm)}
+              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Plus size={20} className="mr-2" />
+              {showRequestForm ? "Hide Request Form" : "New Tire Request"}
+            </button>
+            <button
+              onClick={() => setShowRequestFilter(!showRequestFilter)}
+              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Search size={20} className="mr-2" />
+              {showRequestFilter ? "Hide Search" : "Search Vehicle Requests"}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {/* Vehicle Request Filter Panel */}
+        {showRequestFilter && (
+          <div className="mb-6">
+            <VehicleRequestFilter />
+          </div>
+        )}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Enhanced Header Title Section */}

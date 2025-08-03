@@ -22,7 +22,6 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
-import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import VehicleInquiry from "./components/VehicleInquiry";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -130,7 +129,8 @@ export function App() {
                   <RequireAuth role="customer-officer">
                     <Layout>
                       <PageTransition>
-                        <CustomerOfficerDashboard /</PageTransition>
+                        <CustomerOfficerDashboard />
+                      </PageTransition>
                     </Layout>
                   </RequireAuth>
                 }
@@ -159,18 +159,6 @@ export function App() {
                       <UserRequestDetails />
                     </PageTransition>
                   </Layout>
-                }
-              />
-              <Route
-                path="/user/inquiry-dashboard"
-                element={
-                  <RequireAuth role="user">
-                    <Layout>
-                      <PageTransition>
-                        <TireInquiryDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
                 }
               />
             </Routes>

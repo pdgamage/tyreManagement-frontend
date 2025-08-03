@@ -21,8 +21,6 @@ import {
   ShoppingCart,
   Package,
   X,
-  SearchCheck,
-  Home,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -226,17 +224,8 @@ const UserDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-6">
-              {/* Quick Actions - Visible on all screen sizes */}
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => navigate('/vehicle-inquiry')}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
-                >
-                  <SearchCheck className="w-5 h-5" />
-                  <span className="hidden sm:inline">Vehicle Inquiry</span>
-                  <span className="sm:hidden">Inquiry</span>
-                </button>
-                <div className="h-8 w-px bg-white/20"></div>
+              {/* Quick Actions */}
+              <div className="hidden lg:flex items-center space-x-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
                   <div className="text-xs text-slate-300 font-medium">
                     Current Time
@@ -296,20 +285,6 @@ const UserDashboard = () => {
               <span>
                 {showRequestForm ? "Hide Request Form" : "New Tire Request"}
               </span>
-            </button>
-            <button
-              onClick={() => navigate('/user-inquiry')}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <UserCircle className="w-5 h-5" />
-              <span>User Inquiry</span>
-            </button>
-            <button
-              onClick={() => navigate('/vehicle-inquiry')}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <SearchCheck className="w-5 h-5" />
-              <span>Vehicle Inquiry</span>
             </button>
           </div>
         </div>
@@ -676,39 +651,6 @@ const UserDashboard = () => {
       </main>
 
       {/* Removed RequestDetailsModal - using navigation to dedicated page instead */}
-
-      {/* Bottom Navigation Bar - Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 lg:hidden">
-        <div className="flex justify-around items-center p-2">
-          <button
-            onClick={() => setShowRequestForm(true)}
-            className="flex flex-col items-center justify-center p-2 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex-1"
-          >
-            <Plus className="w-6 h-6" />
-            <span className="text-xs mt-1">New Request</span>
-          </button>
-          
-          <div className="h-10 w-px bg-gray-200 mx-1"></div>
-          
-          <button
-            onClick={() => navigate('/vehicle-inquiry')}
-            className="flex flex-col items-center justify-center p-2 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex-1"
-          >
-            <SearchCheck className="w-6 h-6" />
-            <span className="text-xs mt-1">Vehicle Inquiry</span>
-          </button>
-          
-          <div className="h-10 w-px bg-gray-200 mx-1"></div>
-          
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex flex-col items-center justify-center p-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors flex-1"
-          >
-            <Home className="w-6 h-6" />
-            <span className="text-xs mt-1">Home</span>
-          </button>
-        </div>
-      </div>
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

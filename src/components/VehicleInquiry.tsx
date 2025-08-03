@@ -83,40 +83,47 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
+      console.log('Fetching requests for vehicle:', selectedVehicle);
+      
       // Fetch requests by vehicle number from the backend
       const response = await axios.get(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(selectedVehicle)}`
+        `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`
       );
+      
+      console.log('API Response:', response.data);
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
         // Format the response data to match the frontend's expected structure
-        const formattedRequests = response.data.map((request: any) => ({
-          id: request.id,
-          orderNumber: request.order_number || `REQ-${request.id}`,
-          status: request.status,
-          requestDate: request.created_at ? dayjs(request.created_at).format('YYYY-MM-DD') : null,
-          vehicleNumber: request.vehicle_number,
-          vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',
-          requestType: request.request_type || 'Tyre Replacement',
-          urgencyLevel: request.urgency_level || 'Normal',
-          supplier: request.supplier_name ? {
-            name: request.supplier_name,
-            phoneNumber: request.supplier_phone || 'N/A',
-            email: request.supplier_email || 'N/A'
-          } : undefined,
-          tireDetails: {
-            brand: request.tire_brand || 'N/A',
-            size: request.tire_size || 'N/A',
-            quantity: request.quantity || 1,
-            pattern: request.tire_pattern || 'N/A',
-            position: request.tire_position || 'N/A',
-            currentReading: request.present_km_reading || 0,
-            lastReplacementDate: request.last_replacement_date || null,
-            replacementReason: request.replacement_reason || 'N/A'
-          },
-          // Include any additional fields from the backend
-          ...(request.images && { images: request.images })
-        }));
+        const formattedRequests = response.data.map((request: any) => {
+          console.log('Processing request:', request);
+          return {
+            id: request.id,
+            orderNumber: request.order_number || `REQ-${request.id}`,
+            status: request.status,
+            requestDate: request.created_at ? dayjs(request.created_at).format('YYYY-MM-DD') : null,
+            vehicleNumber: request.vehicle_number || selectedVehicle,
+            vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',
+            requestType: request.request_type || 'Tyre Replacement',
+            urgencyLevel: request.urgency_level || 'Normal',
+            supplier: request.supplier_name ? {
+              name: request.supplier_name,
+              phoneNumber: request.supplier_phone || 'N/A',
+              email: request.supplier_email || 'N/A'
+            } : undefined,
+            tireDetails: {
+              brand: request.tire_brand || 'N/A',
+              size: request.tire_size || 'N/A',
+              quantity: request.quantity || 1,
+              pattern: request.tire_pattern || 'N/A',
+              position: request.tire_position || 'N/A',
+              currentReading: request.present_km_reading || 0,
+              lastReplacementDate: request.last_replacement_date || null,
+              replacementReason: request.replacement_reason || 'N/A'
+            },
+            // Include any additional fields from the backend
+            ...(request.images && { images: request.images })
+          };
+        });
         
         setRequests(formattedRequests);
         setRequestDetails(formattedRequests[0]);

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Select, Input, Card, Table } from 'antd';
 import axios from 'axios';
 import { API_CONFIG } from '../config/api';
+import { useNavigate } from 'react-router-dom';
+import DashboardHeader from './DashboardHeader';
 
 interface UserInquiryDashboardProps {
   userId: number;
@@ -20,8 +22,15 @@ interface Request {
 }
 
 const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) => {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<string[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
+  const [userName] = useState('User');
+  const [currentTime, setCurrentTime] = useState('');
+  const [currentDate, setCurrentDate] = useState('');
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [rejectedCount, setRejectedCount] = useState(0);
   const [filters, setFilters] = useState({
     vehicleNumber: '',
     status: '',
@@ -30,13 +39,33 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
   });
 
   useEffect(() => {
+    // Update time and date
+    const updateDateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString());
+      setCurrentDate(now.toLocaleDateString());
+    };
+
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     // Fetch vehicles associated with user's requests
     const fetchVehicles = async () => {
       try {
         const response = await axios.get(`${API_CONFIG.BASE_URL}/api/requests/user/${userId}`);
-        const uniqueVehicles = [...new Set(response.data.map((req: Request) => req.vehicleNumber))];
+        const data = response.data as Request[];
+        const uniqueVehicles = [...new Set(data.map(req => req.vehicleNumber))];
         setVehicles(uniqueVehicles);
-        setRequests(response.data);
+        setRequests(data);
+        
+        // Update counts
+        setPendingCount(data.filter(req => req.status.toLowerCase() === 'pending').length);
+        setApprovedCount(data.filter(req => req.status.toLowerCase() === 'approved').length);
+        setRejectedCount(data.filter(req => req.status.toLowerCase() === 'rejected').length);
       } catch (error) {
         console.error('Error fetching user requests:', error);
       }
@@ -113,8 +142,102 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
   });
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6">User Inquiry Dashboard</h2>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Menu */}
+      <div className="flex items-center gap-4 px-6 py-4 bg-white border-b">
+        <button 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+        >
+          Home
+        </button>
+        <button 
+          onClick={() => navigate('/my-requests')}
+          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg"
+        >
+          My Requests
+        </button>
+        <button 
+          onClick={() => navigate('/register-vehicle')}
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+        >
+          Register Vehicle
+        </button>
+      </div>
+
+      {/* Dashboard Header */}
+      <div className="bg-[#1e2a3b] text-white p-8">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="bg-emerald-500 p-4 rounded-lg">
+              <i className="fas fa-file-alt text-2xl" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">User Dashboard</h1>
+              <p className="text-gray-300">Submit tire requests and track your applications</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="text-sm">User Level Access</span>
+                <span className="mx-2">•</span>
+                <span className="text-sm">Welcome back, {userName}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-700 px-4 py-2 rounded">
+              <div className="text-sm">Current Time</div>
+              <div className="font-semibold">{currentTime}</div>
+            </div>
+            <div className="bg-gray-700 px-4 py-2 rounded">
+              <div className="text-sm">Today's Date</div>
+              <div className="font-semibold">{currentDate}</div>
+            </div>
+            <div className="flex items-center gap-2 bg-gray-700 px-4 py-2 rounded">
+              <span>{userName}</span>
+              <span className="text-sm bg-emerald-500 px-2 py-0.5 rounded">User</span>
+            </div>
+            <button className="bg-emerald-500 p-2 rounded">
+              <i className="fas fa-user text-xl" />
+            </button>
+          </div>
+        </div>
+
+        <button className="mt-6 bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-lg flex items-center gap-2">
+          <i className="fas fa-plus" />
+          New Tire Request
+        </button>
+      </div>
+
+      <div className="p-6">
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="bg-amber-500 text-white p-6 rounded-lg">
+            <h3 className="text-4xl font-bold mb-2">{pendingCount || 0}</h3>
+            <p className="mb-4">Pending Requests</p>
+            <p className="text-sm">Awaiting review</p>
+            <div className="flex justify-end">
+              <i className="fas fa-clock text-4xl opacity-50" />
+            </div>
+          </div>
+          
+          <div className="bg-emerald-500 text-white p-6 rounded-lg">
+            <h3 className="text-4xl font-bold mb-2">{approvedCount || 0}</h3>
+            <p className="mb-4">Approved</p>
+            <p className="text-sm">Successfully approved</p>
+            <div className="flex justify-end">
+              <i className="fas fa-check-circle text-4xl opacity-50" />
+            </div>
+          </div>
+          
+          <div className="bg-red-500 text-white p-6 rounded-lg">
+            <h3 className="text-4xl font-bold mb-2">{rejectedCount || 0}</h3>
+            <p className="mb-4">Rejected</p>
+            <p className="text-sm">Needs revision</p>
+            <div className="flex justify-end">
+              <i className="fas fa-times-circle text-4xl opacity-50" />
+            </div>
+          </div>
+        </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card className="shadow-sm">
@@ -196,6 +319,9 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
       </Card>
     </div>
   );
+};
+
+export default UserInquiryDashboard;
 };
 
 export default UserInquiryDashboard;

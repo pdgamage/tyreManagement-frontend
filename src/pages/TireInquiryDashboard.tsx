@@ -78,47 +78,19 @@ const TireInquiryDashboard: React.FC = () => {
     setError(null);
     try {
       const url = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
-      console.log("Fetching requests from URL:", url);
-      
       const res = await fetch(url);
-      console.log("Response status:", res.status);
-      
       if (!res.ok) {
         if (res.status === 404) {
-          console.log("No requests found for vehicle:", selectedVehicle);
           setRequests([]);
-          setError(null);
           return;
         }
-        const errorText = await res.text();
-        console.error("API Error:", errorText);
-        throw new Error(`Failed to fetch requests: ${res.status} ${res.statusText}`);
+        throw new Error('Failed to fetch requests');
       }
-      
       const data = await res.json();
-      console.log("Received data:", data);
-      
-      // Transform the data to match our interface
-      const transformedData = Array.isArray(data) ? data.map(req => ({
-        ...req,
-        vehicleNumber: req.vehicle_number || req.vehicleNumber,
-        supplierName: req.supplier_name || req.supplierName,
-        supplierPhone: req.supplier_phone || req.supplierPhone,
-        supplierEmail: req.supplier_email || req.supplierEmail,
-        requesterName: req.requester_name || req.requesterName,
-        requesterEmail: req.requester_email || req.requesterEmail,
-        requesterPhone: req.requester_phone || req.requesterPhone,
-        vehicleBrand: req.vehicle_brand || req.vehicleBrand,
-        vehicleModel: req.vehicle_model || req.vehicleModel,
-        created_at: req.created_at || req.submittedAt,
-        submittedAt: req.submittedAt || req.created_at
-      })) : [];
-      
-      setRequests(transformedData);
-      console.log("Set requests:", transformedData);
+      setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
+      setError("Failed to fetch requests");
       console.error("Error fetching requests:", err);
-      setError(`Failed to fetch requests: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -131,12 +103,9 @@ const TireInquiryDashboard: React.FC = () => {
     setError(null);
     try {
       const url = `${apiUrls.requests()}?startDate=${dateFrom}&endDate=${dateTo}`;
-      console.log("Fetching report from URL:", url);
-      
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch report data');
       const data = await res.json();
-      
       // Filter by date range on frontend as well
       const filteredData = data.filter((req: RequestDetail) => {
         const requestDate = new Date(req.created_at || req.submittedAt);
@@ -144,7 +113,6 @@ const TireInquiryDashboard: React.FC = () => {
         const toDate = new Date(dateTo);
         return requestDate >= fromDate && requestDate <= toDate;
       });
-      
       setReportResults(Array.isArray(filteredData) ? filteredData : []);
     } catch (err) {
       setError("Failed to fetch report data");
@@ -264,7 +232,7 @@ const TireInquiryDashboard: React.FC = () => {
           {requests.length > 0 && (
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Request Details for Vehicle: {selectedVehicle} ({requests.length} requests found)
+                Request Details for Vehicle: {selectedVehicle}
               </h3>
               <div className="space-y-6">
                 {requests.map(req => (
@@ -418,7 +386,7 @@ const TireInquiryDashboard: React.FC = () => {
             </div>
           )}
 
-          {selectedVehicle && requests.length === 0 && !loading && !error && (
+          {selectedVehicle && requests.length === 0 && !loading && (
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-gray-400" />

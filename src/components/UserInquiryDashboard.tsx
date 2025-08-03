@@ -25,9 +25,6 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<string[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
-  const [userName] = useState('User');
-  const [currentTime, setCurrentTime] = useState('');
-  const [currentDate, setCurrentDate] = useState('');
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
   const [rejectedCount, setRejectedCount] = useState(0);
@@ -37,20 +34,6 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
     orderNumber: '',
     supplierName: '',
   });
-
-  useEffect(() => {
-    // Update time and date
-    const updateDateTime = () => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString());
-      setCurrentDate(now.toLocaleDateString());
-    };
-
-    updateDateTime();
-    const interval = setInterval(updateDateTime, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     // Fetch vehicles associated with user's requests
@@ -143,32 +126,52 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Top Bar */}
+      <div className="bg-[#1e3a8a] text-white py-2 px-6 flex items-center">
+        <div className="flex items-center gap-4">
+          <span>📞 1717 (24x7)</span>
+          <span>✉️ support@mobitel.lk</span>
+        </div>
+      </div>
+
+      {/* Logo and Logout */}
+      <div className="flex justify-between items-center px-6 py-4">
+        <img src="/slt-mobitel-logo.png" alt="SLT Mobitel" className="h-8" />
+        <button 
+          onClick={() => navigate('/logout')}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2"
+        >
+          <span>Logout</span>
+        </button>
+      </div>
+
       {/* Navigation Menu */}
-      <div className="flex items-center gap-4 px-6 py-4 bg-white border-b">
+      <div className="flex items-center gap-4 px-6 pb-4">
         <button 
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
+          <i className="fas fa-home" />
           Home
         </button>
         <button 
           onClick={() => navigate('/my-requests')}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg"
         >
+          <i className="fas fa-list" />
           My Requests
         </button>
         <button 
           onClick={() => navigate('/register-vehicle')}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
+          <i className="fas fa-car" />
           Register Vehicle
         </button>
-        <button 
-          onClick={() => navigate('/user-inquiry')}
-          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg"
-        >
-          User Inquiry
-        </button>
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-gray-600">suresh user</span>
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">User</span>
+        </div>
       </div>
 
       {/* Dashboard Header */}
@@ -176,42 +179,45 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="bg-emerald-500 p-4 rounded-lg">
-              <i className="fas fa-file-alt text-2xl" />
+              <i className="fas fa-clipboard-list text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">User Inquiry Dashboard</h1>
-              <p className="text-gray-300">Search and track your tire requests</p>
+              <h1 className="text-3xl font-bold mb-2">User Dashboard</h1>
+              <p className="text-gray-300">Submit tire requests and track your applications</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
                 <span className="text-sm">User Level Access</span>
                 <span className="mx-2">•</span>
-                <span className="text-sm">Welcome back, {userName}</span>
+                <span className="text-sm">Welcome back, suresh user</span>
               </div>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="bg-gray-700 px-4 py-2 rounded">
-              <div className="text-sm">Current Time</div>
-              <div className="font-semibold">{currentTime}</div>
+            <div className="bg-gray-800 px-4 py-2 rounded">
+              <div className="text-sm text-gray-400">Current Time</div>
+              <div className="font-semibold">1:22:19 PM</div>
             </div>
-            <div className="bg-gray-700 px-4 py-2 rounded">
-              <div className="text-sm">Today's Date</div>
-              <div className="font-semibold">{currentDate}</div>
+            <div className="bg-gray-800 px-4 py-2 rounded">
+              <div className="text-sm text-gray-400">Today's Date</div>
+              <div className="font-semibold">8/3/2025</div>
             </div>
-            <div className="flex items-center gap-2 bg-gray-700 px-4 py-2 rounded">
-              <span>{userName}</span>
+            <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded">
+              <span>suresh user</span>
               <span className="text-sm bg-emerald-500 px-2 py-0.5 rounded">User</span>
             </div>
-            <button className="bg-emerald-500 p-2 rounded">
+            <button className="bg-emerald-500 p-2 rounded-lg hover:bg-emerald-600">
               <i className="fas fa-user text-xl" />
             </button>
           </div>
         </div>
 
-        <button className="mt-6 bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-lg flex items-center gap-2">
+        <button 
+          onClick={() => navigate('/new-request')}
+          className="mt-6 bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+        >
           <i className="fas fa-plus" />
-          New Tire Request
+          <span className="font-medium">New Tire Request</span>
         </button>
       </div>
 
@@ -323,6 +329,7 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
           }}
         />
       </Card>
+      </div>
     </div>
   );
 };

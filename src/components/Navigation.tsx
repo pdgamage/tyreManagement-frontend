@@ -7,7 +7,6 @@ import {
   TruckIcon,
   UserIcon,
   Settings2Icon,
-  SearchIcon,
 } from "lucide-react";
 const Navigation = () => {
   const { user } = useAuth();
@@ -49,13 +48,6 @@ const Navigation = () => {
             requiresAuth={false}
           >
             Submit Request
-          </NavLink>
-          <NavLink
-            to="/vehicle-search"
-            icon={<SearchIcon size={20} />}
-            requiresAuth={false}
-          >
-            Search Requests
           </NavLink>
           {/* <NavLink to="/vehicle-registration" icon={<TruckIcon size={20} />} requiresAuth={false}>
             Register Vehicle

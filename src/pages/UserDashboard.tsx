@@ -21,9 +21,7 @@ import {
   ShoppingCart,
   Package,
   X,
-  Search,
 } from "lucide-react";
-import VehicleRequestFilter from "../components/VehicleRequestFilter";
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -38,7 +36,6 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [showRequestFilter, setShowRequestFilter] = useState(false);
 
   useEffect(() => {
     fetchRequests();
@@ -200,112 +197,6 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
-        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
-                <FileText className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold text-white tracking-tight">
-                  User Dashboard
-                </h1>
-                <p className="text-slate-300 text-lg font-medium mt-1">
-                  Submit tire requests and track your applications
-                </p>
-                <div className="flex items-center mt-2 space-x-2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-slate-400 font-medium">
-                    User Level Access
-                  </span>
-                  <span className="text-slate-500">•</span>
-                  <span className="text-sm text-slate-400">
-                    Welcome back, {user?.name || "User"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              {/* Quick Actions */}
-              <div className="hidden lg:flex items-center space-x-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">
-                    Current Time
-                  </div>
-                  <div className="text-sm font-semibold text-white">
-                    {currentTime.toLocaleTimeString()}
-                  </div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">
-                    Today's Date
-                  </div>
-                  <div className="text-sm font-semibold text-white">
-                    {currentTime.toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-              
-              {/* User Profile */}
-              <div className="flex items-center space-x-3">
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-medium text-white">
-                    {user?.name || "User"}
-                  </div>
-                  <div className="text-xs text-slate-300">User</div>
-                </div>
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg border-2 border-white/20 hover:shadow-xl transition-all duration-200"
-                  >
-                    <UserCircle className="w-6 h-6 text-white" />
-                  </button>
-                  {isProfileOpen && (
-                    <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                      >
-                        <LogOut className="w-4 h-4 mr-3" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-8">
-            <button
-              onClick={() => setShowRequestForm(!showRequestForm)}
-              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Plus size={20} className="mr-2" />
-              {showRequestForm ? "Hide Request Form" : "New Tire Request"}
-            </button>
-            <button
-              onClick={() => setShowRequestFilter(!showRequestFilter)}
-              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Search size={20} className="mr-2" />
-              {showRequestFilter ? "Hide Search" : "Search Vehicle Requests"}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Vehicle Request Filter Panel */}
-        {showRequestFilter && (
-          <div className="mb-8">
-            <VehicleRequestFilter />
-          </div>
-        )}
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Enhanced Header Title Section */}
           <div className="flex items-center justify-between mb-8">

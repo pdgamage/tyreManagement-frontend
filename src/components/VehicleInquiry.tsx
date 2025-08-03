@@ -1,11 +1,19 @@
 import { FC, useState, useEffect } from 'react';
-import { Select, DatePicker, Button, Card, Table } from 'antd';
+import { Select, DatePicker, Button, Card, Table, Input, AutoComplete, message, Spin } from 'antd';
 import axios from 'axios';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, FileSearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { API_CONFIG } from '../config/api';
 
 const { RangePicker } = DatePicker;
-const { Option } = Select;
+
+interface Vehicle {
+  id: string;
+  vehicleNumber: string;
+  registrationDate: string;
+  vehicleType: string;
+  division?: string;
+}
 
 interface VehicleRequest {
   id: string;
@@ -13,34 +21,53 @@ interface VehicleRequest {
   requestDate: string;
   orderNumber: string;
   status: string;
+  rejectionReason?: string;
+  approvedDate?: string;
+  expectedDeliveryDate?: string;
+  orderDate?: string;
+  requestType: string;
+  urgencyLevel: string;
   supplier?: {
     name: string;
     phoneNumber: string;
+    email?: string;
+    address?: string;
   };
   tireDetails?: {
     brand: string;
     size: string;
     quantity: number;
+    pattern?: string;
+    position?: string;
+    currentReading?: number;
+    lastReplacementDate?: string;
+    replacementReason?: string;
   };
 }
 
 const VehicleInquiry: FC = () => {
-  const [vehicles, setVehicles] = useState<string[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>('');
   const [requests, setRequests] = useState<VehicleRequest[]>([]);
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([null, null]);
   const [loading, setLoading] = useState(false);
   const [requestDetails, setRequestDetails] = useState<VehicleRequest | null>(null);
 
-  // Fetch all vehicle numbers
+  // Fetch all vehicles
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const response = await axios.get('/api/vehicles');
-        const vehicleNumbers = response.data.map((vehicle: any) => vehicle.vehicleNumber);
-        setVehicles(vehicleNumbers);
+        setLoading(true);
+        const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`);
+        setVehicles(response.data);
+        setFilteredVehicles(response.data);
       } catch (error) {
         console.error('Error fetching vehicles:', error);
+        message.error('Failed to fetch vehicles');
+      } finally {
+        setLoading(false);
       }
     };
     fetchVehicles();
@@ -48,15 +75,26 @@ const VehicleInquiry: FC = () => {
 
   // Handle vehicle search
   const handleSearch = async () => {
-    if (!selectedVehicle) return;
+    if (!selectedVehicle) {
+      message.warning('Please select a vehicle number');
+      return;
+    }
     
     setLoading(true);
     try {
-      const response = await axios.get(`/api/requests/vehicle/${selectedVehicle}`);
-      setRequests(response.data);
-      setRequestDetails(response.data[0] || null);
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${selectedVehicle}`);
+      if (response.data && response.data.length > 0) {
+        setRequests(response.data);
+        setRequestDetails(response.data[0]);
+        message.success(`Found ${response.data.length} requests for vehicle ${selectedVehicle}`);
+      } else {
+        setRequests([]);
+        setRequestDetails(null);
+        message.info(`No requests found for vehicle ${selectedVehicle}`);
+      }
     } catch (error) {
       console.error('Error fetching requests:', error);
+      message.error('Failed to fetch request details');
     } finally {
       setLoading(false);
     }
@@ -64,19 +102,31 @@ const VehicleInquiry: FC = () => {
 
   // Handle date range search
   const handleDateRangeSearch = async () => {
-    if (!dateRange[0] || !dateRange[1]) return;
+    if (!dateRange[0] || !dateRange[1]) {
+      message.warning('Please select a date range');
+      return;
+    }
     
     setLoading(true);
     try {
-      const response = await axios.get('/api/requests/report', {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/report`, {
         params: {
           startDate: dateRange[0].format('YYYY-MM-DD'),
           endDate: dateRange[1].format('YYYY-MM-DD'),
         },
       });
-      setRequests(response.data);
+      
+      if (response.data && response.data.length > 0) {
+        setRequests(response.data);
+        message.success(`Found ${response.data.length} requests in the selected date range`);
+      } else {
+        setRequests([]);
+        message.info('No requests found in the selected date range');
+      }
+      setRequestDetails(null); // Clear detailed view when showing report
     } catch (error) {
       console.error('Error fetching report:', error);
+      message.error('Failed to generate report');
     } finally {
       setLoading(false);
     }
@@ -87,30 +137,85 @@ const VehicleInquiry: FC = () => {
       title: 'Order Number',
       dataIndex: 'orderNumber',
       key: 'orderNumber',
+      sorter: (a: VehicleRequest, b: VehicleRequest) => a.orderNumber.localeCompare(b.orderNumber),
     },
     {
       title: 'Vehicle Number',
       dataIndex: 'vehicleNumber',
       key: 'vehicleNumber',
+      sorter: (a: VehicleRequest, b: VehicleRequest) => a.vehicleNumber.localeCompare(b.vehicleNumber),
+    },
+    {
+      title: 'Request Type',
+      dataIndex: 'requestType',
+      key: 'requestType',
+      filters: [
+        { text: 'New', value: 'NEW' },
+        { text: 'Replacement', value: 'REPLACEMENT' },
+      ],
+      onFilter: (value: string, record: VehicleRequest) => record.requestType === value,
+    },
+    {
+      title: 'Urgency',
+      dataIndex: 'urgencyLevel',
+      key: 'urgencyLevel',
+      filters: [
+        { text: 'High', value: 'HIGH' },
+        { text: 'Medium', value: 'MEDIUM' },
+        { text: 'Low', value: 'LOW' },
+      ],
+      onFilter: (value: string, record: VehicleRequest) => record.urgencyLevel === value,
+      render: (urgencyLevel: string) => (
+        <span className={`px-2 py-1 rounded-full text-sm ${
+          urgencyLevel === 'HIGH' ? 'bg-red-100 text-red-800' :
+          urgencyLevel === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-green-100 text-green-800'
+        }`}>
+          {urgencyLevel}
+        </span>
+      ),
     },
     {
       title: 'Request Date',
       dataIndex: 'requestDate',
       key: 'requestDate',
+      sorter: (a: VehicleRequest, b: VehicleRequest) => 
+        dayjs(a.requestDate).unix() - dayjs(b.requestDate).unix(),
       render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      filters: [
+        { text: 'Pending', value: 'PENDING' },
+        { text: 'Approved', value: 'APPROVED' },
+        { text: 'Completed', value: 'COMPLETED' },
+        { text: 'Rejected', value: 'REJECTED' },
+      ],
+      onFilter: (value: string, record: VehicleRequest) => record.status === value,
       render: (status: string) => (
         <span className={`px-2 py-1 rounded-full text-sm ${
           status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
           status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+          status === 'APPROVED' ? 'bg-blue-100 text-blue-800' :
+          status === 'REJECTED' ? 'bg-red-100 text-red-800' :
           'bg-gray-100 text-gray-800'
         }`}>
           {status}
         </span>
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record: VehicleRequest) => (
+        <Button
+          type="link"
+          onClick={() => setRequestDetails(record)}
+        >
+          View Details
+        </Button>
       ),
     },
   ];
@@ -127,18 +232,37 @@ const VehicleInquiry: FC = () => {
           <div>
             <h2 className="text-lg font-semibold mb-4">Search by Vehicle</h2>
             <div className="flex gap-4">
-              <Select
-                showSearch
+              <AutoComplete
                 style={{ width: '100%' }}
-                placeholder="Select Vehicle Number"
-                value={selectedVehicle}
-                onChange={setSelectedVehicle}
-                optionFilterProp="children"
-              >
-                {vehicles.map(vehicle => (
-                  <Option key={vehicle} value={vehicle}>{vehicle}</Option>
-                ))}
-              </Select>
+                placeholder="Type to search vehicle number"
+                options={filteredVehicles.map(vehicle => ({
+                  value: vehicle.vehicleNumber,
+                  label: (
+                    <div>
+                      <div className="font-medium">{vehicle.vehicleNumber}</div>
+                      <div className="text-xs text-gray-500">
+                        {vehicle.vehicleType} - {vehicle.division || 'No Division'}
+                      </div>
+                    </div>
+                  )
+                }))}
+                value={searchText}
+                onChange={(value) => {
+                  setSearchText(value);
+                  setSelectedVehicle(value);
+                  const filtered = vehicles.filter(v => 
+                    v.vehicleNumber.toLowerCase().includes(value.toLowerCase()) ||
+                    v.vehicleType.toLowerCase().includes(value.toLowerCase()) ||
+                    (v.division && v.division.toLowerCase().includes(value.toLowerCase()))
+                  );
+                  setFilteredVehicles(filtered);
+                }}
+                onSelect={(value) => {
+                  setSelectedVehicle(value);
+                  setSearchText(value);
+                }}
+                notFoundContent={loading ? <Spin size="small" /> : "No vehicles found"}
+              />
               <Button 
                 type="primary"
                 icon={<SearchOutlined />}
@@ -179,8 +303,31 @@ const VehicleInquiry: FC = () => {
               <h3 className="font-medium text-gray-600">Order Information</h3>
               <div className="space-y-2 mt-2">
                 <p><span className="font-medium">Order Number:</span> {requestDetails.orderNumber}</p>
-                <p><span className="font-medium">Status:</span> {requestDetails.status}</p>
+                <p><span className="font-medium">Status:</span> 
+                  <span className={`ml-2 px-2 py-1 rounded-full text-sm ${
+                    requestDetails.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                    requestDetails.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                    requestDetails.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {requestDetails.status}
+                  </span>
+                </p>
+                <p><span className="font-medium">Request Type:</span> {requestDetails.requestType}</p>
+                <p><span className="font-medium">Urgency Level:</span> {requestDetails.urgencyLevel}</p>
                 <p><span className="font-medium">Request Date:</span> {dayjs(requestDetails.requestDate).format('YYYY-MM-DD')}</p>
+                {requestDetails.approvedDate && (
+                  <p><span className="font-medium">Approved Date:</span> {dayjs(requestDetails.approvedDate).format('YYYY-MM-DD')}</p>
+                )}
+                {requestDetails.orderDate && (
+                  <p><span className="font-medium">Order Date:</span> {dayjs(requestDetails.orderDate).format('YYYY-MM-DD')}</p>
+                )}
+                {requestDetails.expectedDeliveryDate && (
+                  <p><span className="font-medium">Expected Delivery:</span> {dayjs(requestDetails.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
+                )}
+                {requestDetails.rejectionReason && (
+                  <p><span className="font-medium">Rejection Reason:</span> {requestDetails.rejectionReason}</p>
+                )}
               </div>
             </div>
 
@@ -190,6 +337,12 @@ const VehicleInquiry: FC = () => {
                 <div className="space-y-2 mt-2">
                   <p><span className="font-medium">Name:</span> {requestDetails.supplier.name}</p>
                   <p><span className="font-medium">Contact:</span> {requestDetails.supplier.phoneNumber}</p>
+                  {requestDetails.supplier.email && (
+                    <p><span className="font-medium">Email:</span> {requestDetails.supplier.email}</p>
+                  )}
+                  {requestDetails.supplier.address && (
+                    <p><span className="font-medium">Address:</span> {requestDetails.supplier.address}</p>
+                  )}
                 </div>
               </div>
             )}
@@ -201,6 +354,21 @@ const VehicleInquiry: FC = () => {
                   <p><span className="font-medium">Brand:</span> {requestDetails.tireDetails.brand}</p>
                   <p><span className="font-medium">Size:</span> {requestDetails.tireDetails.size}</p>
                   <p><span className="font-medium">Quantity:</span> {requestDetails.tireDetails.quantity}</p>
+                  {requestDetails.tireDetails.pattern && (
+                    <p><span className="font-medium">Pattern:</span> {requestDetails.tireDetails.pattern}</p>
+                  )}
+                  {requestDetails.tireDetails.position && (
+                    <p><span className="font-medium">Position:</span> {requestDetails.tireDetails.position}</p>
+                  )}
+                  {requestDetails.tireDetails.currentReading && (
+                    <p><span className="font-medium">Current Reading:</span> {requestDetails.tireDetails.currentReading}</p>
+                  )}
+                  {requestDetails.tireDetails.lastReplacementDate && (
+                    <p><span className="font-medium">Last Replacement:</span> {dayjs(requestDetails.tireDetails.lastReplacementDate).format('YYYY-MM-DD')}</p>
+                  )}
+                  {requestDetails.tireDetails.replacementReason && (
+                    <p><span className="font-medium">Replacement Reason:</span> {requestDetails.tireDetails.replacementReason}</p>
+                  )}
                 </div>
               </div>
             )}

@@ -84,24 +84,14 @@ const VehicleInquiry: FC = () => {
     setLoading(true);
     try {
       // Fetch requests using vehicle number
-      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/search`, {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
         params: { vehicleNumber: selectedVehicle }
       });
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        const formattedRequests = response.data.map((req: any) => ({
-          ...req,
-          id: req.id || req._id,
-          orderNumber: req.order_number || req.orderNumber,
-          vehicleNumber: selectedVehicle,
-          requestDate: req.created_at || req.requestDate,
-          status: req.status?.toUpperCase() || 'PENDING',
-          supplier: req.supplier || {
-            name: req.supplier_name,
-            phoneNumber: req.supplier_phone,
-            email: req.supplier_email,
-            address: req.supplier_address
-          }
+        setRequests(response.data);
+        setRequestDetails(response.data[0]);
+        message.success(`Found ${response.data.length} requests for vehicle ${selectedVehicle}`);
         }));
 
         setRequests(formattedRequests);

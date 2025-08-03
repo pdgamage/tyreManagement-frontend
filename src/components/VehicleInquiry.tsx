@@ -115,23 +115,31 @@ const VehicleInquiry: FC = () => {
             vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',
             requestType: request.request_type || 'Tyre Replacement',
             urgencyLevel: request.urgency_level || 'Normal',
+            // Map supplier details if available
             supplier: request.supplier_name ? {
               name: request.supplier_name,
               phoneNumber: request.supplier_phone || 'N/A',
-              email: request.supplier_email || 'N/A'
+              email: request.supplier_email || 'N/A',
+              contactPerson: request.supplier_contact || 'N/A'
             } : undefined,
+            // Map requester details if available
+            requester: {
+              name: request.requester_name || 'N/A',
+              email: request.requester_email || 'N/A',
+              phone: request.requester_phone || 'N/A'
+            },
+            // Map tire details if available
             tireDetails: {
               brand: request.tire_brand || 'N/A',
               size: request.tire_size || 'N/A',
               quantity: request.quantity || 1,
               pattern: request.tire_pattern || 'N/A',
-              position: request.tire_position || 'N/A',
+              position: request.position || request.tire_position || 'N/A',
               currentReading: request.present_km_reading || 0,
               lastReplacementDate: request.last_replacement_date || null,
-              replacementReason: request.replacement_reason || 'N/A'
-            },
-            // Include any additional fields from the backend
-            ...(request.images && { images: request.images })
+              replacementReason: request.replacement_reason || 'N/A',
+              // Include any other tire-related fields from the request
+              ...(request.images && { images: request.images })
           };
         });
         

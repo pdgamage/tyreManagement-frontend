@@ -83,66 +83,17 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
-      console.log('Fetching requests for vehicle:', selectedVehicle);
-      
-      // Construct the API URL
-      const apiUrl = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
-      console.log('API URL:', apiUrl);
-      
-      // Fetch requests by vehicle number from the backend
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        validateStatus: (status: number) => {
-          return status >= 200 && status < 500; // Resolve only if the status code is less than 500
-        }
+      // Fetch requests using vehicle number
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
+        params: { vehicleNumber: selectedVehicle }
       });
       
-      console.log('API Response Status:', response.status);
-      console.log('API Response Data:', response.data);
-      
-      if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
-        // Format the response data to match the frontend's expected structure
-        const formattedRequests = response.data.map((request: any) => {
-          console.log('Processing request:', request);
-          return {
-            id: request.id,
-            orderNumber: request.order_number || `REQ-${request.id}`,
-            status: request.status || 'Pending',
-            requestDate: request.created_at ? dayjs(request.created_at).format('YYYY-MM-DD') : null,
-            vehicleNumber: request.vehicle_number || selectedVehicle,
-            vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',
-            requestType: request.request_type || 'Tyre Replacement',
-            urgencyLevel: request.urgency_level || 'Normal',
-            // Map supplier details if available
-            supplier: request.supplier_name ? {
-              name: request.supplier_name,
-              phoneNumber: request.supplier_phone || 'N/A',
-              email: request.supplier_email || 'N/A',
-              contactPerson: request.supplier_contact || 'N/A'
-            } : undefined,
-            // Map requester details if available
-            requester: {
-              name: request.requester_name || 'N/A',
-              email: request.requester_email || 'N/A',
-              phone: request.requester_phone || 'N/A'
-            },
-            // Map tire details if available
-            tireDetails: {
-              brand: request.tire_brand || 'N/A',
-              size: request.tire_size || 'N/A',
-              quantity: request.quantity || 1,
-              pattern: request.tire_pattern || 'N/A',
-              position: request.position || request.tire_position || 'N/A',
-              currentReading: request.present_km_reading || 0,
-              lastReplacementDate: request.last_replacement_date || null,
-              replacementReason: request.replacement_reason || 'N/A',
-              // Include any other tire-related fields from the request
-              ...(request.images && { images: request.images })
-          };
-        });
-        
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        setRequests(response.data);
+        setRequestDetails(response.data[0]);
+        message.success(`Found ${response.data.length} requests for vehicle ${selectedVehicle}`);
+        }));
+
         setRequests(formattedRequests);
         setRequestDetails(formattedRequests[0]);
         message.success(`Found ${formattedRequests.length} requests for vehicle ${selectedVehicle}`);
@@ -153,10 +104,7 @@ const VehicleInquiry: FC = () => {
       }
     } catch (error: any) {
       console.error('Error fetching requests:', error);
-      const errorMessage = error.response?.data?.message || 
-                         error.response?.data?.error || 
-                         'Failed to fetch request details. Please try again later.';
-      message.error(errorMessage);
+      message.error(error.response?.data?.message || 'Failed to fetch request details');
       setRequests([]);
       setRequestDetails(null);
     } finally {
@@ -175,36 +123,22 @@ const VehicleInquiry: FC = () => {
     try {
       const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/report`, {
         params: {
-          startDate: dateRange[0]?.format('YYYY-MM-DD'),
-          endDate: dateRange[1]?.format('YYYY-MM-DD'),
-          includeTireDetails: true,
-          includeSupplier: true
+          startDate: dateRange[0].format('YYYY-MM-DD'),
+          endDate: dateRange[1].format('YYYY-MM-DD'),
         },
       });
       
-      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        const formattedRequests = response.data.map((request: any) => ({
-          ...request,
-          requestDate: dayjs(request.requestDate).format('YYYY-MM-DD'),
-          orderDate: request.orderDate ? dayjs(request.orderDate).format('YYYY-MM-DD') : null,
-          approvedDate: request.approvedDate ? dayjs(request.approvedDate).format('YYYY-MM-DD') : null,
-          expectedDeliveryDate: request.expectedDeliveryDate ? dayjs(request.expectedDeliveryDate).format('YYYY-MM-DD') : null
-        }));
-        
-        setRequests(formattedRequests);
-        message.success(`Found ${formattedRequests.length} requests in the selected date range`);
+      if (response.data && response.data.length > 0) {
+        setRequests(response.data);
+        message.success(`Found ${response.data.length} requests in the selected date range`);
       } else {
         setRequests([]);
         message.info('No requests found in the selected date range');
       }
       setRequestDetails(null); // Clear detailed view when showing report
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching report:', error);
-      const errorMessage = error.response?.data?.message || 
-                         error.response?.data?.error || 
-                         'Failed to fetch report. Please try again later.';
-      message.error(errorMessage);
-      setRequests([]);
+      message.error('Failed to generate report');
     } finally {
       setLoading(false);
     }

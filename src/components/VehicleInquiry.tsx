@@ -83,22 +83,39 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
-      // Fetch requests using vehicle number
-      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
-        params: { 
-          vehicleNumber: selectedVehicle,
-          includeTireDetails: true,
-          includeSupplier: true
-        }
-      });
+      // Fetch requests by vehicle number from the backend
+      const response = await axios.get(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(selectedVehicle)}`
+      );
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        // Format the response data to match the frontend's expected structure
         const formattedRequests = response.data.map((request: any) => ({
-          ...request,
-          requestDate: dayjs(request.requestDate).format('YYYY-MM-DD'),
-          orderDate: request.orderDate ? dayjs(request.orderDate).format('YYYY-MM-DD') : null,
-          approvedDate: request.approvedDate ? dayjs(request.approvedDate).format('YYYY-MM-DD') : null,
-          expectedDeliveryDate: request.expectedDeliveryDate ? dayjs(request.expectedDeliveryDate).format('YYYY-MM-DD') : null
+          id: request.id,
+          orderNumber: request.order_number || `REQ-${request.id}`,
+          status: request.status,
+          requestDate: request.created_at ? dayjs(request.created_at).format('YYYY-MM-DD') : null,
+          vehicleNumber: request.vehicle_number,
+          vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',
+          requestType: request.request_type || 'Tyre Replacement',
+          urgencyLevel: request.urgency_level || 'Normal',
+          supplier: request.supplier_name ? {
+            name: request.supplier_name,
+            phoneNumber: request.supplier_phone || 'N/A',
+            email: request.supplier_email || 'N/A'
+          } : undefined,
+          tireDetails: {
+            brand: request.tire_brand || 'N/A',
+            size: request.tire_size || 'N/A',
+            quantity: request.quantity || 1,
+            pattern: request.tire_pattern || 'N/A',
+            position: request.tire_position || 'N/A',
+            currentReading: request.present_km_reading || 0,
+            lastReplacementDate: request.last_replacement_date || null,
+            replacementReason: request.replacement_reason || 'N/A'
+          },
+          // Include any additional fields from the backend
+          ...(request.images && { images: request.images })
         }));
         
         setRequests(formattedRequests);

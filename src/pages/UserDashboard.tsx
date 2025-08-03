@@ -311,8 +311,29 @@ const UserDashboard = () => {
         </div>
       </header>
 
-      {/* Enhanced Main Content */}
-      <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
+      {/* Main Content */}
+      <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {/* Quick Actions Card */}
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              to="/user-inquiry"
+              className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+            >
+              <FileText className="w-5 h-5 mr-2" />
+              Check Request Status
+            </Link>
+            <button
+              onClick={() => setShowRequestForm(true)}
+              className="flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Create New Request
+            </button>
+          </div>
+        </div>
+
         <div className="space-y-8">
           {/* Professional Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">

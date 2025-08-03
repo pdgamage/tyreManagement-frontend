@@ -90,13 +90,6 @@ const UserDashboard = () => {
     (req: any) => req.status === "order cancelled"
   );
 
-  // Debug: Log the status values to see what we have (can be removed in production)
-  // console.log("All user requests statuses:", userRequests.map((req: any) => req.status));
-  // console.log("Place order requests (complete):", placeOrderRequests.length);
-  // console.log("Complete order requests (order placed):", completeOrderRequests.length);
-  // console.log("Cancel order requests (order cancelled):", cancelOrderRequests.length);
-  // console.log("Active filter:", activeFilter);
-
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     let result;
@@ -111,31 +104,27 @@ const UserDashboard = () => {
         result = rejectedRequests;
         break;
       case "place-orders":
-        result = placeOrderRequests; // When clicking "Place Orders" card, show "order placed" requests
+        result = placeOrderRequests;
         break;
       case "complete-orders":
-        result = completeOrderRequests; // When clicking "Complete Orders" card, show "complete" requests
+        result = completeOrderRequests;
         break;
       case "cancel-orders":
-        result = cancelOrderRequests; // When clicking "Cancel Orders" card, show "order cancelled" requests
+        result = cancelOrderRequests;
         break;
       default:
         result = userRequests;
     }
-    // console.log(`Filter: ${activeFilter}, Result count: ${result.length}`);
     return result;
   };
 
   const filteredRequests = getFilteredRequests();
-
-  // Removed closeDetailsModal - no longer using modal
 
   // Convert TireRequest to Request format for RequestTable
   const convertTireRequestToRequest = (tireRequest: any) => {
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
-      // Only show department if it actually exists, otherwise show "Unknown Department"
       userSection: tireRequest.userSection || "Unknown Department",
     };
   };
@@ -159,7 +148,7 @@ const UserDashboard = () => {
       });
 
       if (response.ok) {
-        await fetchRequests(); // Refresh the list
+        await fetchRequests();
       } else {
         console.error("Failed to delete request");
       }
@@ -285,6 +274,13 @@ const UserDashboard = () => {
               <span>
                 {showRequestForm ? "Hide Request Form" : "New Tire Request"}
               </span>
+            </button>
+            <button
+              onClick={() => navigate('/user/inquiry-dashboard')}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+            >
+              <FileText className="w-5 h-5" />
+              <span>User Inquiry</span>
             </button>
           </div>
         </div>
@@ -487,7 +483,7 @@ const UserDashboard = () => {
                 <TireRequestForm
                   onSuccess={() => {
                     setShowRequestForm(false);
-                    fetchRequests(); // Refresh the requests to update counts
+                    fetchRequests();
                   }}
                 />
               </div>
@@ -649,8 +645,6 @@ const UserDashboard = () => {
           </div>
         </div>
       </main>
-
-      {/* Removed RequestDetailsModal - using navigation to dedicated page instead */}
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

@@ -48,6 +48,8 @@ export const apiUrls = {
   requests: () => buildApiUrl(API_CONFIG.ENDPOINTS.REQUESTS),
   requestById: (id: string | number) =>
     buildApiUrl(API_CONFIG.ENDPOINTS.REQUESTS, id.toString()),
+  requestsByVehicleNumber: (vehicleNumber: string) =>
+    buildApiUrl(`${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`),
   requestsByUser: (userId: string | number) =>
     buildApiUrl(`${API_CONFIG.ENDPOINTS.REQUESTS}/user`, userId.toString()),
 

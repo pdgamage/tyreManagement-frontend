@@ -1,6 +1,6 @@
-import { useState, useMemo, FC } from 'react';
-import { useRequests } from '../contexts/RequestContext';
+import { useState, useEffect, useMemo, FC } from 'react';
 import { TireRequest } from '../types/api';
+import { apiUrls } from '../config/api';
 
 // Type guard to check if an object has the required properties
 const isTireRequestLike = (obj: any): obj is Partial<TireRequest> => {
@@ -78,23 +78,34 @@ const safeToTireRequest = (obj: any): TireRequest | null => {
 };
 
 const VehicleInquiry: FC = () => {
-  const { requests: allRequests } = useRequests();
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<TireRequest[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  const tireRequests = useMemo(() => {
-    if (!Array.isArray(allRequests)) {
-      console.error('Expected requests to be an array, got:', allRequests);
-      return [];
+  // Load recent searches from localStorage on component mount
+  useEffect(() => {
+    const savedSearches = localStorage.getItem('recentVehicleSearches');
+    if (savedSearches) {
+      try {
+        setRecentSearches(JSON.parse(savedSearches));
+      } catch (e) {
+        console.error('Error parsing recent searches:', e);
+      }
     }
-    
-    return allRequests
-      .map(safeToTireRequest)
-      .filter((req): req is TireRequest => req !== null);
-  }, [allRequests]);
+  }, []);
+
+  // Save to recent searches when a search is performed
+  const addToRecentSearches = (vehicleNumber: string) => {
+    const updatedSearches = [
+      vehicleNumber,
+      ...recentSearches.filter(search => search !== vehicleNumber).slice(0, 4) // Keep only the 5 most recent
+    ];
+    setRecentSearches(updatedSearches);
+    localStorage.setItem('recentVehicleSearches', JSON.stringify(updatedSearches));
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -107,19 +118,10 @@ const VehicleInquiry: FC = () => {
     }
   };
 
-  const uniqueVehicleNumbers = useMemo(() => {
-    const numbers = new Set<string>();
-    tireRequests.forEach(req => {
-      if (req.vehicleNumber) {
-        numbers.add(req.vehicleNumber);
-      }
-    });
-    return Array.from(numbers).sort();
-  }, [tireRequests]);
-
   const handleVehicleSelect = (vehicleNumber: string) => {
     setSearchTerm(vehicleNumber);
     setSelectedVehicle(vehicleNumber);
+    handleSearch(vehicleNumber);
   };
 
   const formatDate = (dateString?: string | Date) => {
@@ -132,29 +134,45 @@ const VehicleInquiry: FC = () => {
     }
   };
 
-  const handleSearch = () => {
-    if (!searchTerm.trim()) {
+  const handleSearch = async (vehicleNumber?: string) => {
+    const searchValue = vehicleNumber || searchTerm.trim();
+    
+    if (!searchValue) {
       setError('Please enter a vehicle number');
       return;
     }
     
     setIsLoading(true);
+    setError(null);
     
     try {
-      const results = tireRequests.filter((req: TireRequest) => 
-        req.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const response = await fetch(apiUrls.requestsByVehicleNumber(searchValue));
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('No requests found for this vehicle number');
+        } else {
+          throw new Error(`Error: ${response.status} - ${response.statusText}`);
+        }
+      }
+      
+      const data = await response.json();
+      
+      // Convert the API response to TireRequest objects
+      const results = data
+        .map(safeToTireRequest)
+        .filter((req: TireRequest | null): req is TireRequest => req !== null);
       
       setSearchResults(results);
+      setSelectedVehicle(searchValue);
+      addToRecentSearches(searchValue);
       
       if (results.length === 0) {
         setError('No requests found for this vehicle number');
-      } else {
-        setError(null);
       }
     } catch (err) {
-      console.error('Error searching requests:', err);
-      setError('An error occurred while searching. Please try again.');
+      console.error('Error fetching requests:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching requests');
       setSearchResults([]);
     } finally {
       setIsLoading(false);
@@ -171,40 +189,46 @@ const VehicleInquiry: FC = () => {
             Search by Vehicle Number
           </label>
           <div className="relative">
-            <input
-              type="text"
-              id="vehicleSearch"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter vehicle number"
-              className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex">
+              <input
+                type="text"
+                id="vehicleSearch"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter vehicle number"
+                className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={() => handleSearch()}
+                disabled={isLoading}
+                className="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+              >
+                {isLoading ? 'Searching...' : 'Search'}
+              </button>
+            </div>
             {isLoading && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+              <div className="absolute inset-y-0 right-16 flex items-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
               </div>
             )}
           </div>
           
-          {/* Quick vehicle number suggestions */}
-          {uniqueVehicleNumbers.length > 0 && searchTerm && (
-            <div className="mt-2 space-y-1">
-              {uniqueVehicleNumbers
-                .filter(num => 
-                  num.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                  num !== searchTerm
-                )
-                .slice(0, 5)
-                .map((number) => (
-                  <div 
+          {/* Recent searches */}
+          {recentSearches.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-1">Recent searches:</p>
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((number) => (
+                  <button
                     key={number}
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
                     onClick={() => handleVehicleSelect(number)}
+                    className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full text-gray-700"
                   >
                     {number}
-                  </div>
+                  </button>
                 ))}
+              </div>
             </div>
           )}
         </div>

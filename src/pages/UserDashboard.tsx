@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
@@ -198,27 +197,7 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
-        <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          {/* Top Bar with Buttons */}
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-            <div className="flex space-x-3">
-              <Link
-                to="/user-inquiry"
-                className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Request Inquiry
-              </Link>
-              <button
-                onClick={() => setShowRequestForm(true)}
-                className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Request
-              </button>
-            </div>
-          </div>
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Enhanced Header Title Section */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
@@ -311,29 +290,8 @@ const UserDashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        {/* Quick Actions Card */}
-        <div className="mb-8 p-6 bg-white rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              to="/user-inquiry"
-              className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
-            >
-              <FileText className="w-5 h-5 mr-2" />
-              Check Request Status
-            </Link>
-            <button
-              onClick={() => setShowRequestForm(true)}
-              className="flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Create New Request
-            </button>
-          </div>
-        </div>
-
+      {/* Enhanced Main Content */}
+      <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         <div className="space-y-8">
           {/* Professional Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">

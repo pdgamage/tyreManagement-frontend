@@ -22,6 +22,7 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
+import VehicleInquiry from "./components/VehicleInquiry";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -53,6 +54,16 @@ export function App() {
                       </PageTransition>
                     </Layout>
                   </RequireAuth>
+                }
+              />
+              <Route
+                path="/vehicle-inquiry"
+                element={
+                  <Layout>
+                    <PageTransition>
+                      <VehicleInquiry />
+                    </PageTransition>
+                  </Layout>
                 }
               />
               <Route

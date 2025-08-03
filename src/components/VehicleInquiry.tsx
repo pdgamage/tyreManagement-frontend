@@ -83,13 +83,10 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
-      // Directly fetch requests using vehicle number
-      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
+      // Fetch requests using vehicle number
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/search`, {
         params: { vehicleNumber: selectedVehicle }
       });
-
-      // Then get the requests for this vehicle
-      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${vehicleId}`);
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
         const formattedRequests = response.data.map((req: any) => ({

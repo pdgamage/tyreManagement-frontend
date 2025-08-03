@@ -21,6 +21,12 @@ import {
   ShoppingCart,
   Package,
   X,
+  Search,
+  Filter,
+  Car,
+  Phone,
+  Building,
+  Hash,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -36,6 +42,13 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  // User Inquiry Filter States
+  const [showUserInquiry, setShowUserInquiry] = useState(false);
+  const [selectedVehicleNumber, setSelectedVehicleNumber] = useState<string>("");
+  const [vehicleNumbers, setVehicleNumbers] = useState<string[]>([]);
+  const [filteredVehicleRequests, setFilteredVehicleRequests] = useState<any[]>([]);
+  const [inquiryLoading, setInquiryLoading] = useState(false);
 
   useEffect(() => {
     fetchRequests();

@@ -53,6 +53,7 @@ const VehicleInquiry: FC = () => {
   const [requests, setRequests] = useState<VehicleRequest[]>([]);
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([null, null]);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [requestDetails, setRequestDetails] = useState<VehicleRequest | null>(null);
 
   // Fetch all vehicles
@@ -138,55 +139,13 @@ const VehicleInquiry: FC = () => {
       dataIndex: 'orderNumber',
       key: 'orderNumber',
       sorter: (a: VehicleRequest, b: VehicleRequest) => a.orderNumber.localeCompare(b.orderNumber),
-    },
-    {
-      title: 'Vehicle Number',
-      dataIndex: 'vehicleNumber',
-      key: 'vehicleNumber',
-      sorter: (a: VehicleRequest, b: VehicleRequest) => a.vehicleNumber.localeCompare(b.vehicleNumber),
-    },
-    {
-      title: 'Request Type',
-      dataIndex: 'requestType',
-      key: 'requestType',
-      filters: [
-        { text: 'New', value: 'NEW' },
-        { text: 'Replacement', value: 'REPLACEMENT' },
-      ],
-      onFilter: (value: string, record: VehicleRequest) => record.requestType === value,
-    },
-    {
-      title: 'Urgency',
-      dataIndex: 'urgencyLevel',
-      key: 'urgencyLevel',
-      filters: [
-        { text: 'High', value: 'HIGH' },
-        { text: 'Medium', value: 'MEDIUM' },
-        { text: 'Low', value: 'LOW' },
-      ],
-      onFilter: (value: string, record: VehicleRequest) => record.urgencyLevel === value,
-      render: (urgencyLevel: string) => (
-        <span className={`px-2 py-1 rounded-full text-sm ${
-          urgencyLevel === 'HIGH' ? 'bg-red-100 text-red-800' :
-          urgencyLevel === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-green-100 text-green-800'
-        }`}>
-          {urgencyLevel}
-        </span>
-      ),
-    },
-    {
-      title: 'Request Date',
-      dataIndex: 'requestDate',
-      key: 'requestDate',
-      sorter: (a: VehicleRequest, b: VehicleRequest) => 
-        dayjs(a.requestDate).unix() - dayjs(b.requestDate).unix(),
-      render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
+      width: '15%',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: '15%',
       filters: [
         { text: 'Pending', value: 'PENDING' },
         { text: 'Approved', value: 'APPROVED' },
@@ -207,8 +166,40 @@ const VehicleInquiry: FC = () => {
       ),
     },
     {
+      title: 'Supplier',
+      dataIndex: ['supplier', 'name'],
+      key: 'supplierName',
+      width: '20%',
+      render: (text: string, record: VehicleRequest) => record.supplier?.name || 'Not assigned',
+    },
+    {
+      title: 'Contact Number',
+      dataIndex: ['supplier', 'phoneNumber'],
+      key: 'supplierPhone',
+      width: '15%',
+      render: (text: string, record: VehicleRequest) => record.supplier?.phoneNumber || 'N/A',
+    },
+    {
+      title: 'Request Date',
+      dataIndex: 'requestDate',
+      key: 'requestDate',
+      width: '15%',
+      sorter: (a: VehicleRequest, b: VehicleRequest) => 
+        dayjs(a.requestDate).unix() - dayjs(b.requestDate).unix(),
+      render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
+    },
+    {
+      title: 'Expected Delivery',
+      dataIndex: 'expectedDeliveryDate',
+      key: 'expectedDeliveryDate',
+      width: '15%',
+      render: (date: string) => date ? dayjs(date).format('YYYY-MM-DD') : 'Not set',
+    },
+    {
       title: 'Actions',
       key: 'actions',
+      width: '10%',
+      fixed: 'right',
       render: (_, record: VehicleRequest) => (
         <Button
           type="link"
@@ -233,15 +224,23 @@ const VehicleInquiry: FC = () => {
             <h2 className="text-lg font-semibold mb-4">Search by Vehicle</h2>
             <div className="flex gap-4">
               <AutoComplete
+                dropdownMatchSelectWidth={false}
                 style={{ width: '100%' }}
-                placeholder="Type to search vehicle number"
+                placeholder="Type vehicle number to search"
                 options={filteredVehicles.map(vehicle => ({
                   value: vehicle.vehicleNumber,
                   label: (
-                    <div>
-                      <div className="font-medium">{vehicle.vehicleNumber}</div>
-                      <div className="text-xs text-gray-500">
-                        {vehicle.vehicleType} - {vehicle.division || 'No Division'}
+                    <div className="flex flex-col py-1">
+                      <div className="font-medium text-base">{vehicle.vehicleNumber}</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                          {vehicle.vehicleType}
+                        </span>
+                        {vehicle.division && (
+                          <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded">
+                            {vehicle.division}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )
@@ -250,18 +249,24 @@ const VehicleInquiry: FC = () => {
                 onChange={(value) => {
                   setSearchText(value);
                   setSelectedVehicle(value);
+                  setSearchLoading(true);
                   const filtered = vehicles.filter(v => 
                     v.vehicleNumber.toLowerCase().includes(value.toLowerCase()) ||
                     v.vehicleType.toLowerCase().includes(value.toLowerCase()) ||
                     (v.division && v.division.toLowerCase().includes(value.toLowerCase()))
                   );
                   setFilteredVehicles(filtered);
+                  setSearchLoading(false);
                 }}
                 onSelect={(value) => {
                   setSelectedVehicle(value);
                   setSearchText(value);
+                  handleSearch(); // Automatically search when a vehicle is selected
                 }}
-                notFoundContent={loading ? <Spin size="small" /> : "No vehicles found"}
+                notFoundContent={searchLoading ? <Spin size="small" /> : "No vehicles found"}
+                filterOption={(inputValue, option) =>
+                  option?.value.toString().toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+                }
               />
               <Button 
                 type="primary"

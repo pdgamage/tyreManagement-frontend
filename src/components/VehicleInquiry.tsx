@@ -85,21 +85,31 @@ const VehicleInquiry: FC = () => {
     try {
       console.log('Fetching requests for vehicle:', selectedVehicle);
       
+      // Construct the API URL
+      const apiUrl = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
+      console.log('API URL:', apiUrl);
+      
       // Fetch requests by vehicle number from the backend
-      const response = await axios.get(
-        `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`
-      );
+      const response = await axios.get(apiUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        validateStatus: (status: number) => {
+          return status >= 200 && status < 500; // Resolve only if the status code is less than 500
+        }
+      });
       
-      console.log('API Response:', response.data);
+      console.log('API Response Status:', response.status);
+      console.log('API Response Data:', response.data);
       
-      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
         // Format the response data to match the frontend's expected structure
         const formattedRequests = response.data.map((request: any) => {
           console.log('Processing request:', request);
           return {
             id: request.id,
             orderNumber: request.order_number || `REQ-${request.id}`,
-            status: request.status,
+            status: request.status || 'Pending',
             requestDate: request.created_at ? dayjs(request.created_at).format('YYYY-MM-DD') : null,
             vehicleNumber: request.vehicle_number || selectedVehicle,
             vehicleType: request.vehicle_brand ? `${request.vehicle_brand} ${request.vehicle_model || ''}`.trim() : 'N/A',

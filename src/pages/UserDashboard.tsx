@@ -272,6 +272,13 @@ const UserDashboard = () => {
                   )}
                 </div>
               </div>
+              <button
+                onClick={() => navigate('/user/inquiry')}
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <FileText className="w-5 h-5" />
+                <span>User Inquiry</span>
+              </button>
             </div>
           </div>
 

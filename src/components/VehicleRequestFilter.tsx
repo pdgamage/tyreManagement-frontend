@@ -11,10 +11,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Paper,
-  Grid,
+  Stack,
   Chip,
-  Divider
+  Divider,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,14 +21,15 @@ import LoadingSpinner from './LoadingSpinner';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
-  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-  borderRadius: theme.spacing(2),
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+  borderRadius: theme.spacing(3),
   backgroundColor: '#ffffff',
-  border: '1px solid rgba(0, 0, 0, 0.1)',
+  border: '1px solid rgba(59, 130, 246, 0.2)',
   '&:hover': {
-    boxShadow: '0 12px 20px rgba(0, 0, 0, 0.15)',
+    boxShadow: '0 12px 28px rgba(0, 0, 0, 0.15)',
+    border: '1px solid rgba(59, 130, 246, 0.4)',
   },
-  transition: 'box-shadow 0.3s ease-in-out',
+  transition: 'all 0.3s ease-in-out',
 }));
 
 const SearchContainer = styled(Box)(({ theme }) => ({
@@ -39,12 +39,24 @@ const SearchContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const ResultCard = styled(Card)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  backgroundColor: theme.palette.background.paper,
-}));
+// Types
+interface Vehicle {
+  id: number;
+  vehicleNumber: string;
+}
 
-const StatusChip = styled(Chip)(({ theme, status }: { theme: any, status: string }) => ({
+interface Request {
+  id: number;
+  vehicleNumber: string;
+  status: string;
+  submittedAt: string;
+  orderNumber?: string;
+  supplierName?: string;
+  supplierEmail?: string;
+  supplierPhone?: string;
+}
+
+const StatusChip = styled(Chip)<{ status: string }>(({ theme, status }) => ({
   margin: theme.spacing(0.5),
   backgroundColor: 
     status === 'complete' ? theme.palette.success.light :
@@ -77,6 +89,17 @@ const VehicleRequestFilter: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+
+  const inputProps = {
+    placeholder: 'Enter vehicle number...',
+    value,
+    onChange: (_: React.FormEvent<HTMLElement>, { newValue }: { newValue: string }) => setValue(newValue),
+    onKeyPress: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        searchVehicle();
+      }
+    },
+  };
 
   useEffect(() => {
     // Fetch registered vehicles on component mount
@@ -204,53 +227,60 @@ const VehicleRequestFilter: React.FC = () => {
           </DialogTitle>
           <DialogContent>
             {request && (
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6">
+              <Stack spacing={3}>
+                <Box>
+                  <Typography variant="h6" gutterBottom>
                     Vehicle Number: {request.vehicleNumber}
                   </Typography>
                   <StatusChip
                     label={request.status}
                     status={request.status}
                   />
-                </Grid>
+                </Box>
                 
-                <Grid item xs={12}>
+                <Box>
                   <Typography variant="body1">
                     Submitted: {formatDate(request.submittedAt)}
                   </Typography>
-                </Grid>
+                </Box>
 
                 {request.status === 'order placed' && (
                   <>
-                    <Grid item xs={12}>
-                      <Divider />
-                      <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+                    <Box>
+                      <Divider sx={{ mb: 2 }} />
+                      <Typography variant="h6" gutterBottom>
                         Order Information
                       </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
                       <Typography variant="body1">
                         Order Number: {request.orderNumber}
                       </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+                    </Box>
+                    
+                    <Box>
+                      <Typography variant="h6" gutterBottom>
                         Supplier Details
                       </Typography>
-                      <Typography variant="body1">
-                        Name: {request.supplierName}
-                      </Typography>
-                      <Typography variant="body1">
-                        Email: {request.supplierEmail}
-                      </Typography>
-                      <Typography variant="body1">
-                        Phone: {request.supplierPhone}
-                      </Typography>
-                    </Grid>
+                      <Stack spacing={1}>
+                        {request.supplierName && (
+                          <Typography variant="body1">
+                            Name: {request.supplierName}
+                          </Typography>
+                        )}
+                        {request.supplierEmail && (
+                          <Typography variant="body1">
+                            Email: {request.supplierEmail}
+                          </Typography>
+                        )}
+                        {request.supplierPhone && (
+                          <Typography variant="body1">
+                            Phone: {request.supplierPhone}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
                   </>
                 )}
-              </Grid>
+              </Stack>
             )}
           </DialogContent>
         </Dialog>

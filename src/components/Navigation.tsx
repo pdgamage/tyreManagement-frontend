@@ -6,7 +6,6 @@ import {
   ClipboardListIcon,
   TruckIcon,
   UserIcon,
-  Settings2Icon,
   SearchCheckIcon,
 } from "lucide-react";
 const Navigation = () => {
@@ -38,30 +37,30 @@ const Navigation = () => {
       <span>{children}</span>
     </Link>
   );
+  const renderCommonLinks = () => (
+    <>
+      {!user && (
+        <NavLink
+          to="/user"
+          icon={<ClipboardListIcon size={20} />}
+          requiresAuth={false}
+        >
+          Submit Request
+        </NavLink>
+      )}
+      <NavLink
+        to="/vehicle-inquiry"
+        icon={<SearchCheckIcon size={20} />}
+        requiresAuth={false}
+      >
+        Vehicle Inquiry
+      </NavLink>
+    </>
+  );
+
   const renderRoleSpecificLinks = () => {
-    // For regular users (no login required)
     if (!user) {
-      return (
-        <>
-          <NavLink
-            to="/user"
-            icon={<ClipboardListIcon size={20} />}
-            requiresAuth={false}
-          >
-            Submit Request
-          </NavLink>
-          <NavLink
-            to="/vehicle-inquiry"
-            icon={<SearchCheckIcon size={20} />}
-            requiresAuth={false}
-          >
-            Vehicle Inquiry
-          </NavLink>
-          {/* <NavLink to="/vehicle-registration" icon={<TruckIcon size={20} />} requiresAuth={false}>
-            Register Vehicle
-          </NavLink> */}
-        </>
-      );
+      return renderCommonLinks();
     }
     // For authenticated roles
     switch (user.role) {
@@ -128,6 +127,7 @@ const Navigation = () => {
         );
     }
   };
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="px-4 mx-auto max-w-7xl">
@@ -135,6 +135,24 @@ const Navigation = () => {
           <NavLink to="/" icon={<HomeIcon size={20} />} requiresAuth={false}>
             Home
           </NavLink>
+          {/* Common links for all users */}
+          {!user && (
+            <NavLink
+              to="/user"
+              icon={<ClipboardListIcon size={20} />}
+              requiresAuth={false}
+            >
+              Submit Request
+            </NavLink>
+          )}
+          <NavLink
+            to="/vehicle-inquiry"
+            icon={<SearchCheckIcon size={20} />}
+            requiresAuth={false}
+          >
+            Vehicle Inquiry
+          </NavLink>
+          {/* Role-specific links */}
           {renderRoleSpecificLinks()}
           {user && (
             <div className="flex items-center ml-auto space-x-4">

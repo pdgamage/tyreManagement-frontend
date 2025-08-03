@@ -83,17 +83,10 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
-      // First, get the vehicle ID
-      const vehicleResponse = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`, {
+      // Directly fetch requests using vehicle number
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
         params: { vehicleNumber: selectedVehicle }
       });
-
-      if (!vehicleResponse.data || vehicleResponse.data.length === 0) {
-        message.error('Vehicle not found');
-        return;
-      }
-
-      const vehicleId = vehicleResponse.data[0].id;
 
       // Then get the requests for this vehicle
       const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${vehicleId}`);

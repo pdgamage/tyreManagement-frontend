@@ -83,19 +83,50 @@ const VehicleInquiry: FC = () => {
     
     setLoading(true);
     try {
-      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${selectedVehicle}`);
-      if (response.data && response.data.length > 0) {
-        setRequests(response.data);
-        setRequestDetails(response.data[0]);
-        message.success(`Found ${response.data.length} requests for vehicle ${selectedVehicle}`);
+      // First, get the vehicle ID
+      const vehicleResponse = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`, {
+        params: { vehicleNumber: selectedVehicle }
+      });
+
+      if (!vehicleResponse.data || vehicleResponse.data.length === 0) {
+        message.error('Vehicle not found');
+        return;
+      }
+
+      const vehicleId = vehicleResponse.data[0].id;
+
+      // Then get the requests for this vehicle
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${vehicleId}`);
+      
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const formattedRequests = response.data.map((req: any) => ({
+          ...req,
+          id: req.id || req._id,
+          orderNumber: req.order_number || req.orderNumber,
+          vehicleNumber: selectedVehicle,
+          requestDate: req.created_at || req.requestDate,
+          status: req.status?.toUpperCase() || 'PENDING',
+          supplier: req.supplier || {
+            name: req.supplier_name,
+            phoneNumber: req.supplier_phone,
+            email: req.supplier_email,
+            address: req.supplier_address
+          }
+        }));
+
+        setRequests(formattedRequests);
+        setRequestDetails(formattedRequests[0]);
+        message.success(`Found ${formattedRequests.length} requests for vehicle ${selectedVehicle}`);
       } else {
         setRequests([]);
         setRequestDetails(null);
         message.info(`No requests found for vehicle ${selectedVehicle}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching requests:', error);
-      message.error('Failed to fetch request details');
+      message.error(error.response?.data?.message || 'Failed to fetch request details');
+      setRequests([]);
+      setRequestDetails(null);
     } finally {
       setLoading(false);
     }

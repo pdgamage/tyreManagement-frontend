@@ -14,7 +14,7 @@ const UserInquiryDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { requests = [], fetchRequests, isRefreshing } = useRequests();
-  const { vehicles = [] } = useVehicles();
+  const { vehicles = [], fetchVehicles } = useVehicles();
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>(undefined);
   const [vehicleDetails, setVehicleDetails] = useState<{
@@ -110,8 +110,11 @@ const UserInquiryDashboard: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      // Fetch requests
-      await fetchRequests();
+      // Fetch both requests and vehicles in parallel
+      await Promise.all([
+        fetchRequests(),
+        fetchVehicles(),
+      ]);
       
     } catch (err) {
       console.error('Error loading data:', err);
@@ -119,7 +122,7 @@ const UserInquiryDashboard: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [fetchRequests]);
+  }, [fetchRequests, fetchVehicles]);
 
   // Initial data load
   useEffect(() => {

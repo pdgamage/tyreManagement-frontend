@@ -44,32 +44,30 @@ export function App() {
                 }
               />
               {/* Public routes (no login required) */}
-              <Route path="/user">
-                <Route
-                  index
-                  element={
-                    <RequireAuth role="user">
-                      <Layout>
-                        <PageTransition>
-                          <UserDashboard />
-                        </PageTransition>
-                      </Layout>
-                    </RequireAuth>
-                  }
-                />
-                <Route
-                  path="inquiry"
-                  element={
-                    <RequireAuth role="user">
-                      <Layout>
-                        <PageTransition>
-                          <UserInquiryDashboard />
-                        </PageTransition>
-                      </Layout>
-                    </RequireAuth>
-                  }
-                />
-              </Route>
+              <Route
+                path="/user"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/user/inquiry"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
               <Route
                 path="/vehicle-registration"
                 element={

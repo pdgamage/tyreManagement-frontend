@@ -29,7 +29,10 @@ const VehicleInquiry: FC = () => {
 
   // Fetch requests by vehicle number
   const fetchRequestsByVehicle = async () => {
-    if (!vehicleNumber.trim()) return;
+    if (!vehicleNumber.trim()) {
+      setSearchResults([]);
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -39,10 +42,13 @@ const VehicleInquiry: FC = () => {
       
       if (response.ok) {
         const data = await response.json();
-        setSearchResults(data);
+        setSearchResults(data || []);
+      } else {
+        setSearchResults([]);
       }
     } catch (error) {
       console.error('Error fetching requests:', error);
+      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -285,7 +291,7 @@ const VehicleInquiry: FC = () => {
       )}
 
       {/* Empty State */}
-      {searchResults.length === 0 && !isLoading && vehicleNumber && (
+      {searchResults.length === 0 && !isLoading && vehicleNumber ? (
         <div className="text-center py-12">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No requests found</h3>
@@ -293,14 +299,12 @@ const VehicleInquiry: FC = () => {
             No request history found for vehicle {vehicleNumber}.
           </p>
         </div>
-      )}
-      
-      {searchResults.length === 0 && !isLoading && !vehicleNumber && (
+      ) : (
         <div className="text-center py-12">
           <Truck className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">Search for a vehicle</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Enter a vehicle number to view request history.
+            Enter a vehicle number and click search to view request history.
           </p>
         </div>
       )}

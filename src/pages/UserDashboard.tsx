@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   Package,
   X,
+  SearchCheck,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -226,6 +227,14 @@ const UserDashboard = () => {
             <div className="flex items-center space-x-6">
               {/* Quick Actions */}
               <div className="hidden lg:flex items-center space-x-4">
+                <button
+                  onClick={() => navigate('/vehicle-inquiry')}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
+                >
+                  <SearchCheck className="w-5 h-5" />
+                  <span>Vehicle Inquiry</span>
+                </button>
+                <div className="h-8 w-px bg-white/20"></div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
                   <div className="text-xs text-slate-300 font-medium">
                     Current Time

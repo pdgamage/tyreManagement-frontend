@@ -295,6 +295,13 @@ const UserDashboard = () => {
                 {showRequestForm ? "Hide Request Form" : "New Tire Request"}
               </span>
             </button>
+            <button
+              onClick={() => navigate('/vehicle-inquiry')}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+            >
+              <SearchCheck className="w-5 h-5" />
+              <span>Vehicle Inquiry</span>
+            </button>
           </div>
         </div>
       </header>

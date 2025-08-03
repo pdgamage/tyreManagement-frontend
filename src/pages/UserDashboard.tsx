@@ -21,7 +21,9 @@ import {
   ShoppingCart,
   Package,
   X,
+  Search,
 } from "lucide-react";
+import VehicleRequestFilter from "../components/VehicleRequestFilter";
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -36,6 +38,7 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showRequestFilter, setShowRequestFilter] = useState(false);
 
   useEffect(() => {
     fetchRequests();
@@ -195,6 +198,30 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Top Actions Row */}
+      <div className="flex gap-4 mb-6 px-6 pt-6">
+        <button
+          onClick={() => setShowRequestForm(true)}
+          className="flex-1 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
+        >
+          <Plus size={20} />
+          New Tire Request
+        </button>
+        <button
+          onClick={() => setShowRequestFilter(true)}
+          className="flex-1 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
+        >
+          <Search size={20} />
+          Search Vehicle Requests
+        </button>
+      </div>
+
+      {/* Vehicle Request Filter Panel */}
+      {showRequestFilter && (
+        <div className="px-6 mb-6">
+          <VehicleRequestFilter />
+        </div>
+      )}
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">

@@ -22,9 +22,9 @@ import LoadingSpinner from './LoadingSpinner';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
-  margin: theme.spacing(2),
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   borderRadius: theme.spacing(1),
+  backgroundColor: '#ffffff',
 }));
 
 const SearchContainer = styled(Box)(({ theme }) => ({
@@ -137,8 +137,8 @@ const VehicleRequestFilter: React.FC = () => {
   return (
     <StyledCard>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Vehicle Request Filter
+        <Typography variant="h6" gutterBottom sx={{ color: '#1e40af', fontWeight: 'bold' }}>
+          Search Vehicle Requests
         </Typography>
         
         <SearchContainer>

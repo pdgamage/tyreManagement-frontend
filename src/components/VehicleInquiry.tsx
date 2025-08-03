@@ -85,15 +85,22 @@ const VehicleInquiry: FC = () => {
     try {
       // Fetch requests using vehicle number
       const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
-        params: { vehicleNumber: selectedVehicle }
+        params: { 
+          vehicleNumber: selectedVehicle,
+          includeTireDetails: true,
+          includeSupplier: true
+        }
       });
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        setRequests(response.data);
-        setRequestDetails(response.data[0]);
-        message.success(`Found ${response.data.length} requests for vehicle ${selectedVehicle}`);
+        const formattedRequests = response.data.map((request: any) => ({
+          ...request,
+          requestDate: dayjs(request.requestDate).format('YYYY-MM-DD'),
+          orderDate: request.orderDate ? dayjs(request.orderDate).format('YYYY-MM-DD') : null,
+          approvedDate: request.approvedDate ? dayjs(request.approvedDate).format('YYYY-MM-DD') : null,
+          expectedDeliveryDate: request.expectedDeliveryDate ? dayjs(request.expectedDeliveryDate).format('YYYY-MM-DD') : null
         }));
-
+        
         setRequests(formattedRequests);
         setRequestDetails(formattedRequests[0]);
         message.success(`Found ${formattedRequests.length} requests for vehicle ${selectedVehicle}`);
@@ -104,7 +111,10 @@ const VehicleInquiry: FC = () => {
       }
     } catch (error: any) {
       console.error('Error fetching requests:', error);
-      message.error(error.response?.data?.message || 'Failed to fetch request details');
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         'Failed to fetch request details. Please try again later.';
+      message.error(errorMessage);
       setRequests([]);
       setRequestDetails(null);
     } finally {
@@ -123,22 +133,36 @@ const VehicleInquiry: FC = () => {
     try {
       const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/report`, {
         params: {
-          startDate: dateRange[0].format('YYYY-MM-DD'),
-          endDate: dateRange[1].format('YYYY-MM-DD'),
+          startDate: dateRange[0]?.format('YYYY-MM-DD'),
+          endDate: dateRange[1]?.format('YYYY-MM-DD'),
+          includeTireDetails: true,
+          includeSupplier: true
         },
       });
       
-      if (response.data && response.data.length > 0) {
-        setRequests(response.data);
-        message.success(`Found ${response.data.length} requests in the selected date range`);
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const formattedRequests = response.data.map((request: any) => ({
+          ...request,
+          requestDate: dayjs(request.requestDate).format('YYYY-MM-DD'),
+          orderDate: request.orderDate ? dayjs(request.orderDate).format('YYYY-MM-DD') : null,
+          approvedDate: request.approvedDate ? dayjs(request.approvedDate).format('YYYY-MM-DD') : null,
+          expectedDeliveryDate: request.expectedDeliveryDate ? dayjs(request.expectedDeliveryDate).format('YYYY-MM-DD') : null
+        }));
+        
+        setRequests(formattedRequests);
+        message.success(`Found ${formattedRequests.length} requests in the selected date range`);
       } else {
         setRequests([]);
         message.info('No requests found in the selected date range');
       }
       setRequestDetails(null); // Clear detailed view when showing report
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching report:', error);
-      message.error('Failed to generate report');
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         'Failed to fetch report. Please try again later.';
+      message.error(errorMessage);
+      setRequests([]);
     } finally {
       setLoading(false);
     }

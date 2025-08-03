@@ -1,81 +1,9 @@
-import { useState, useEffect, useMemo, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { TireRequest } from '../types/api';
 import { apiUrls } from '../config/api';
 
-// Type guard to check if an object has the required properties
-const isTireRequestLike = (obj: any): obj is Partial<TireRequest> => {
-  return (
-    obj &&
-    (typeof obj.id === 'number' || typeof obj.id === 'string') &&
-    typeof obj.vehicleNumber === 'string'
-  );
-};
-
-// Helper to safely convert any object to TireRequest
-const safeToTireRequest = (obj: any): TireRequest | null => {
-  if (!isTireRequestLike(obj)) return null;
-  
-  try {
-    // Create base request with all required fields and default values
-    const baseRequest: Omit<TireRequest, 'id' | 'vehicleId'> = {
-      vehicleNumber: String(obj.vehicleNumber || 'Unknown'),
-      quantity: Number(obj.quantity || 0),
-      tubesQuantity: Number(obj.tubesQuantity || 0),
-      requestReason: String(obj.requestReason || ''),
-      requesterName: String(obj.requesterName || ''),
-      requesterEmail: String(obj.requesterEmail || ''),
-      requesterPhone: String(obj.requesterPhone || ''),
-      vehicleBrand: String(obj.vehicleBrand || ''),
-      vehicleModel: String(obj.vehicleModel || ''),
-      vehicleType: String(obj.vehicleType || ''),
-      vehicleDepartment: String(obj.vehicleDepartment || ''),
-      vehicleCostCentre: String(obj.vehicleCostCentre || ''),
-      lastReplacementDate: obj.lastReplacementDate ? new Date(obj.lastReplacementDate).toISOString() : new Date().toISOString(),
-      existingTireMake: String(obj.existingTireMake || ''),
-      tireSize: String(obj.tireSize || ''),
-      tireSizeRequired: String(obj.tireSizeRequired || 'N/A'),
-      presentKmReading: Number(obj.presentKmReading || 0),
-      previousKmReading: Number(obj.previousKmReading || 0),
-      tireWearPattern: String(obj.tireWearPattern || ''),
-      tireWearIndicatorAppeared: Boolean(obj.tireWearIndicatorAppeared || false),
-      comments: String(obj.comments || ''),
-      images: Array.isArray(obj.images) ? obj.images : [],
-      status: String(obj.status || 'pending'),
-      submittedAt: obj.submittedAt ? new Date(obj.submittedAt).toISOString() : new Date().toISOString(),
-      deliveryOfficeName: String(obj.deliveryOfficeName || ''),
-      deliveryStreetName: String(obj.deliveryStreetName || ''),
-      deliveryTown: String(obj.deliveryTown || ''),
-      totalPrice: Number(obj.totalPrice || 0),
-      warrantyDistance: Number(obj.warrantyDistance || 0),
-      customer_officer_note: String(obj.customer_officer_note || '')
-    };
-
-    // Add optional fields with proper type checking
-    const optionalFields: Partial<TireRequest> = {
-      ...(obj.supervisorApproved !== undefined && { supervisorApproved: Boolean(obj.supervisorApproved) }),
-      ...(obj.supervisorNotes && { supervisorNotes: String(obj.supervisorNotes) }),
-      ...(obj.supervisorTimestamp && { supervisorTimestamp: new Date(obj.supervisorTimestamp).toISOString() }),
-      ...(obj.technicalManagerApproved !== undefined && { technicalManagerApproved: Boolean(obj.technicalManagerApproved) }),
-      ...(obj.technicalManagerNotes && { technicalManagerNotes: String(obj.technicalManagerNotes) }),
-      ...(obj.technicalManagerTimestamp && { technicalManagerTimestamp: new Date(obj.technicalManagerTimestamp).toISOString() }),
-      ...(obj.engineerApproved !== undefined && { engineerApproved: Boolean(obj.engineerApproved) }),
-      ...(obj.engineerNotes && { engineerNotes: String(obj.engineerNotes) }),
-      ...(obj.engineerTimestamp && { engineerTimestamp: new Date(obj.engineerTimestamp).toISOString() }),
-      ...(obj.orderPlaced !== undefined && { orderPlaced: Boolean(obj.orderPlaced) }),
-      ...(obj.orderTimestamp && { orderTimestamp: new Date(obj.orderTimestamp).toISOString() })
-    };
-
-    return {
-      id: typeof obj.id === 'string' ? parseInt(obj.id, 10) : obj.id || 0,
-      vehicleId: obj.vehicleId ? (typeof obj.vehicleId === 'string' ? parseInt(obj.vehicleId, 10) : obj.vehicleId) : 0,
-      ...baseRequest,
-      ...optionalFields
-    };
-  } catch (error) {
-    console.error('Error converting to TireRequest:', error);
-    return null;
-  }
-};
+// The backend now returns properly formatted TireRequest objects
+// so we don't need the conversion functions anymore
 
 const VehicleInquiry: FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -135,7 +63,7 @@ const VehicleInquiry: FC = () => {
   };
 
   const handleSearch = async (vehicleNumber?: string) => {
-    const searchValue = vehicleNumber || searchTerm.trim();
+    const searchValue = vehicleNumber?.trim() || searchTerm.trim();
     
     if (!searchValue) {
       setError('Please enter a vehicle number');
@@ -146,28 +74,31 @@ const VehicleInquiry: FC = () => {
     setError(null);
     
     try {
+      console.log('Fetching requests for vehicle:', searchValue);
       const response = await fetch(apiUrls.requestsByVehicleNumber(searchValue));
       
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('No requests found for this vehicle number');
         } else {
-          throw new Error(`Error: ${response.status} - ${response.statusText}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `Error: ${response.status} - ${response.statusText}`);
         }
       }
       
       const data = await response.json();
+      console.log('Received response:', data);
       
-      // Convert the API response to TireRequest objects
-      const results = data
-        .map(safeToTireRequest)
-        .filter((req: TireRequest | null): req is TireRequest => req !== null);
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format: expected an array of requests');
+      }
       
-      setSearchResults(results);
+      // The backend now returns properly formatted data, so we can use it directly
+      setSearchResults(data);
       setSelectedVehicle(searchValue);
       addToRecentSearches(searchValue);
       
-      if (results.length === 0) {
+      if (data.length === 0) {
         setError('No requests found for this vehicle number');
       }
     } catch (err) {

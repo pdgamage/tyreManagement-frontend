@@ -6,11 +6,17 @@ interface VehicleContextType {
   vehicles: Vehicle[];
   loading: boolean;
   error: string | null;
-  fetchVehicles: () => Promise<void>;
   addVehicle: (vehicle: Omit<Vehicle, "id">) => Promise<Vehicle>;
 }
 
-const VehicleContext = createContext<VehicleContextType | undefined>(undefined);
+const VehicleContext = createContext<VehicleContextType>({
+  vehicles: [],
+  loading: false,
+  error: null,
+  addVehicle: async () => {
+    throw new Error("Not implemented");
+  },
+});
 
 export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -71,19 +77,10 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <VehicleContext.Provider
-      value={{ vehicles, loading, error, fetchVehicles, addVehicle }}
-    >
+    <VehicleContext.Provider value={{ vehicles, loading, error, addVehicle }}>
       {children}
     </VehicleContext.Provider>
   );
-
 };
 
-export const useVehicles = () => {
-  const context = useContext(VehicleContext);
-  if (context === undefined) {
-    throw new Error("useVehicles must be used within a VehicleProvider");
-  }
-  return context;
-};
+export const useVehicles = () => useContext(VehicleContext);

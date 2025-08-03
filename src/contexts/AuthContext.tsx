@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated();
@@ -64,16 +64,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Fetch user info from backend when authenticated
   useEffect(() => {
-    const checkAuth = async () => {
-      // If user is in localStorage, we can probably assume they are logged in.
-      // MSAL will handle the rest. We just need to stop showing the main loader.
-      if (user) {
-        setIsLoading(false);
-        return;
-      }
-
-      // If no user in LS, but MSAL says we are authenticated, try to fetch user.
-      if (isAuthenticated && accounts.length > 0) {
+    const fetchUser = async () => {
+      if (isAuthenticated && accounts.length > 0 && !user) {
+        setIsLoading(true);
         try {
           const request = {
             account: accounts[0] as AccountInfo,
@@ -93,25 +86,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               },
             }
           );
-
           if (res.ok) {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
+            // Do NOT navigate here
           } else {
-            // Not a critical error, just means they need to login fully.
-            console.warn("User is not authorized for azure-protected route.");
+            setError("Access denied: You are not authorized.");
           }
         } catch (err) {
-          console.error("Failed to acquire token silently:", err);
+          setError("Failed to fetch user info");
+          console.error("AuthProvider fetchUser error:", err);
+        } finally {
+          setIsLoading(false);
         }
       }
-      // We are done checking auth status
-      setIsLoading(false);
     };
-
-    checkAuth();
-  }, [isAuthenticated, accounts, instance]);
+    fetchUser();
+    // eslint-disable-next-line
+  }, [isAuthenticated, accounts, instance, user, navigate]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);

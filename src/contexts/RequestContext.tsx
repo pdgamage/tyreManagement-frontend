@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-
+import { usePolling } from "../hooks/usePolling";
 import { apiUrls } from "../config/api";
 
 import type { Request as RequestType } from "../types/request";
@@ -64,11 +64,11 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   // });
 
   // Aggressive polling for real-time updates (WebSocket disabled)
-  // usePolling({
-  //   onPoll: fetchRequests,
-  //   interval: 1500, // Poll every 1.5 seconds for near real-time updates
-  //   enabled: true,
-  // });
+  usePolling({
+    onPoll: fetchRequests,
+    interval: 1500, // Poll every 1.5 seconds for near real-time updates
+    enabled: true,
+  });
 
   const updateRequestStatus = useCallback(
     async (

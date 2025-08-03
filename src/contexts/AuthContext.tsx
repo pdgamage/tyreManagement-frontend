@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated();
@@ -64,9 +64,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Fetch user info from backend when authenticated
   useEffect(() => {
-    const fetchUser = async () => {
-      if (isAuthenticated && accounts.length > 0 && !user) {
-        setIsLoading(true);
+    const checkAuth = async () => {
+      // If user is in localStorage, we can probably assume they are logged in.
+      // MSAL will handle the rest. We just need to stop showing the main loader.
+      if (user) {
+        setIsLoading(false);
+        return;
+      }
+
+      // If no user in LS, but MSAL says we are authenticated, try to fetch user.
+      if (isAuthenticated && accounts.length > 0) {
         try {
           const request = {
             account: accounts[0] as AccountInfo,
@@ -86,25 +93,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               },
             }
           );
+
           if (res.ok) {
             const data = await res.json();
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
-            // Do NOT navigate here
           } else {
-            setError("Access denied: You are not authorized.");
+            // Not a critical error, just means they need to login fully.
+            console.warn("User is not authorized for azure-protected route.");
           }
         } catch (err) {
-          setError("Failed to fetch user info");
-          console.error("AuthProvider fetchUser error:", err);
-        } finally {
-          setIsLoading(false);
+          console.error("Failed to acquire token silently:", err);
         }
       }
+      // We are done checking auth status
+      setIsLoading(false);
     };
-    fetchUser();
-    // eslint-disable-next-line
-  }, [isAuthenticated, accounts, instance, user, navigate]);
+
+    checkAuth();
+  }, [isAuthenticated, accounts, instance]);
 
   const login = async (role: Role, username: string, password: string) => {
     setIsLoading(true);

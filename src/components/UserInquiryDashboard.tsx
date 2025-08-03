@@ -129,11 +129,7 @@ const UserInquiryDashboard: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Auto-refresh data periodically
-  useEffect(() => {
-    const refreshInterval = setInterval(loadData, 30000); // Refresh every 30 seconds
-    return () => clearInterval(refreshInterval);
-  }, [loadData]);
+
 
   useEffect(() => {
     let result = [...requests];
@@ -278,6 +274,8 @@ const UserInquiryDashboard: React.FC = () => {
   const handleStatusChange = (value: string | null) => {
     setFilters(prev => ({ ...prev, status: value || '' }));
   };
+
+  console.log('Rendering with state:', { isLoading, error, requestsCount: requests.length, vehiclesCount: vehicles.length });
 
   if (error) {
     return (

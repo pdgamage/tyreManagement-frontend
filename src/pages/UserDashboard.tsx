@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestTable from "../components/RequestTable";
-
+import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { apiUrls } from "../config/api";
@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-
+  TrendingUp,
+  Calendar,
   Activity,
   ShoppingCart,
   Package,
@@ -284,13 +285,6 @@ const UserDashboard = () => {
               <span>
                 {showRequestForm ? "Hide Request Form" : "New Tire Request"}
               </span>
-            </button>
-            <button
-              onClick={() => navigate('/user-inquiry')}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <FileText className="w-5 h-5" />
-              <span>Request Inquiry</span>
             </button>
           </div>
         </div>

@@ -1,7 +1,4 @@
 // Centralized API configuration
-
-
-
 export const API_CONFIG = {
   BASE_URL:
     import.meta.env.VITE_API_BASE_URL ||
@@ -68,6 +65,4 @@ export const apiUrls = {
 
   // Health check
   health: () => buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH),
-  vehiclesByUserId: (userId: string) => buildApiUrl(`${API_CONFIG.ENDPOINTS.VEHICLES}/user`, userId),
-  requestsByVehicleNumber: (vehicleNumber: string) => buildApiUrl(`${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle`, vehicleNumber),
 };

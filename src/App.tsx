@@ -26,6 +26,8 @@ import VehicleInquiry from "./components/VehicleInquiry";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import UserInquiryDashboard from "./pages/UserInquiryDashboard";
+
 export function App() {
   return (
     <VehicleProvider>
@@ -51,6 +53,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <UserDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/user-inquiry"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserInquiryDashboard />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

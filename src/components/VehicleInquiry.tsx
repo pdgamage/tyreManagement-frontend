@@ -1,8 +1,7 @@
-import { FC, useState, useEffect, useRef } from 'react';
-import { Search, Calendar, FileText, Truck, Clock, CheckCircle, XCircle, AlertCircle, Filter, ChevronDown, X } from 'lucide-react';
-import { useRequests } from '../contexts/RequestContext';
+import { FC, useState, useEffect } from 'react';
+import { Search, Calendar, FileText, Truck, Clock, CheckCircle, XCircle, AlertCircle, Filter } from 'lucide-react';
 import { apiUrls } from '../config/api';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 
 interface RequestDetails {
   id: string;
@@ -19,80 +18,18 @@ interface RequestDetails {
 }
 
 const VehicleInquiry: FC = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedVehicle, setSelectedVehicle] = useState<string>('');
-  const [vehicleList, setVehicleList] = useState<string[]>([]);
-  const [filteredVehicles, setFilteredVehicles] = useState<string[]>([]);
+  const [vehicleNumber, setVehicleNumber] = useState<string>('');
   const [searchResults, setSearchResults] = useState<RequestDetails[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState({
     startDate: format(new Date(new Date().setDate(1)), 'yyyy-MM-dd'), // 1st of current month
     endDate: format(new Date(), 'yyyy-MM-dd') // Today
   });
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { requests } = useRequests();
 
-  // Fetch unique vehicle numbers
-  useEffect(() => {
-    const fetchVehicleNumbers = async () => {
-      try {
-        const response = await fetch(apiUrls.vehicles);
-        if (response.ok) {
-          const data = await response.json();
-          const numbers = data
-            .map((vehicle: any) => vehicle.vehicleNumber)
-            .filter((v: string | null) => v && v.trim() !== '')
-            .sort();
-          setVehicleList(Array.from(new Set(numbers)));
-          setFilteredVehicles(Array.from(new Set(numbers)));
-        }
-      } catch (error) {
-        console.error('Error fetching vehicle numbers:', error);
-      }
-    };
-
-    fetchVehicleNumbers();
-  }, []);
-
-  // Filter vehicles based on search query
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredVehicles(vehicleList);
-    } else {
-      const filtered = vehicleList.filter(vehicle =>
-        vehicle.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredVehicles(filtered);
-    }
-  }, [searchQuery, vehicleList]);
-
-  // Handle click outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Focus input when dropdown opens
-  useEffect(() => {
-    if (isDropdownOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isDropdownOpen]);
-
-  // Search for requests by vehicle number
-  const handleSearch = async (vehicleNumber: string) => {
-    if (!vehicleNumber) return;
+  // Fetch requests by vehicle number
+  const fetchRequestsByVehicle = async () => {
+    if (!vehicleNumber.trim()) return;
     
     setIsLoading(true);
     try {
@@ -103,57 +40,56 @@ const VehicleInquiry: FC = () => {
       if (response.ok) {
         const data = await response.json();
         setSearchResults(data);
-        setSelectedVehicle(vehicleNumber);
-        setIsDropdownOpen(false);
       }
     } catch (error) {
-      console.error('Error searching requests:', error);
+      console.error('Error fetching requests:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle vehicle selection from dropdown
-  const handleVehicleSelect = (vehicle: string) => {
-    setSearchQuery(vehicle);
-    handleSearch(vehicle);
+  // Handle search form submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchRequestsByVehicle();
   };
 
   // Clear search
   const clearSearch = () => {
-    setSearchQuery('');
-    setSelectedVehicle('');
+    setVehicleNumber('');
     setSearchResults([]);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
   // Filter requests by date range
   const filteredRequests = searchResults.filter(request => {
-    const requestDate = new Date(request.requestDate);
-    const start = new Date(dateRange.startDate);
-    const end = new Date(dateRange.endDate);
-    end.setHours(23, 59, 59, 999); // Include the entire end day
+    if (!request.requestDate) return false;
     
-    return requestDate >= start && requestDate <= end;
+    const requestDate = new Date(request.requestDate);
+    const startDate = new Date(dateRange.startDate);
+    const endDate = new Date(dateRange.endDate);
+    endDate.setHours(23, 59, 59, 999); // Include the entire end date
+    
+    return requestDate >= startDate && requestDate <= endDate;
   });
 
   // Get status badge style
   const getStatusBadge = (status: string) => {
-    const baseStyle = 'px-2 py-1 text-xs font-medium rounded-full';
+    if (!status) return 'bg-gray-100 text-gray-800';
     
     switch (status.toLowerCase()) {
       case 'approved':
-      case 'complete':
-        return `${baseStyle} bg-green-100 text-green-800`;
+      case 'approve':
+        return 'bg-green-100 text-green-800';
       case 'pending':
-        return `${baseStyle} bg-yellow-100 text-yellow-800`;
+        return 'bg-yellow-100 text-yellow-800';
       case 'rejected':
-      case 'cancelled':
-        return `${baseStyle} bg-red-100 text-red-800`;
+      case 'reject':
+        return 'bg-red-100 text-red-800';
+      case 'completed':
+      case 'complete':
+        return 'bg-blue-100 text-blue-800';
       default:
-        return `${baseStyle} bg-gray-100 text-gray-800`;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -174,68 +110,53 @@ const VehicleInquiry: FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Vehicle Inquiry</h1>
-        <p className="text-gray-600">Search and track tire requests by vehicle number</p>
-      </div>
-
-      {/* Search Section */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <div className="flex-1">
-            <label htmlFor="vehicleNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Vehicle Number
-            </label>
-            <div className="relative" ref={dropdownRef}>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Vehicle Inquiry</h1>
+        
+        <form onSubmit={handleSearch} className="mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label htmlFor="vehicleNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                Vehicle Number
+              </label>
               <div className="relative">
                 <input
                   type="text"
                   id="vehicleNumber"
-                  ref={inputRef}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsDropdownOpen(true)}
-                  placeholder="Type to search vehicle number"
+                  value={vehicleNumber}
+                  onChange={(e) => setVehicleNumber(e.target.value)}
+                  placeholder="Enter vehicle number"
                   className="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  {searchQuery ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        clearSearch();
-                      }}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  )}
-                </div>
+                {vehicleNumber && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
               </div>
-              
-              {isDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                  {filteredVehicles.length === 0 ? (
-                    <div className="px-4 py-2 text-sm text-gray-500">No vehicles found</div>
-                  ) : (
-                    filteredVehicles.map((vehicle) => (
-                      <div
-                        key={vehicle}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleVehicleSelect(vehicle)}
-                      >
-                        {vehicle}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
+            </div>
+            <div className="flex items-end">
+              <button
+                type="submit"
+                disabled={!vehicleNumber.trim() || isLoading}
+                className={`flex items-center justify-center px-6 py-2.5 rounded-lg text-white font-medium ${
+                  !vehicleNumber.trim() || isLoading
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                {isLoading ? 'Searching...' : 'Search'}
+              </button>
             </div>
           </div>
-        </div>
+        </form>
 
         {/* Date Range Filter */}
         <div className="mt-4">
@@ -364,22 +285,22 @@ const VehicleInquiry: FC = () => {
       )}
 
       {/* Empty State */}
-      {searchResults.length === 0 && !isLoading && selectedVehicle && (
+      {searchResults.length === 0 && !isLoading && vehicleNumber && (
         <div className="text-center py-12">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No requests found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            No request history found for vehicle {selectedVehicle}.
+            No request history found for vehicle {vehicleNumber}.
           </p>
         </div>
       )}
       
-      {searchResults.length === 0 && !isLoading && !selectedVehicle && (
+      {searchResults.length === 0 && !isLoading && !vehicleNumber && (
         <div className="text-center py-12">
           <Truck className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">Search for a vehicle</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Type a vehicle number to view request history.
+            Enter a vehicle number to view request history.
           </p>
         </div>
       )}

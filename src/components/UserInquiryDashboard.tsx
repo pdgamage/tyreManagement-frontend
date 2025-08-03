@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Input, Select, Table, Button, Space, DatePicker, Tag, Form, Row, Col } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, Input, Select, Table, Button, Space, DatePicker, Tag, Form, Row, Col, Alert, Spin } from 'antd';
 import { SearchOutlined, FilterOutlined, ReloadOutlined, CarOutlined, FileTextOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Request } from '../types/request';
@@ -11,10 +11,10 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const UserInquiryDashboard: React.FC = () => {
-  console.log('Rendering UserInquiryDashboard');
-  const { requests, fetchRequests } = useRequests();
-  const { vehicles } = useVehicles();
-  console.log('Requests context:', { requests: requests?.length, vehicles: vehicles?.length });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { requests = [], fetchRequests, isRefreshing } = useRequests();
+  const { vehicles = [] } = useVehicles();
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>(undefined);
   const [vehicleDetails, setVehicleDetails] = useState<{
@@ -104,14 +104,33 @@ const UserInquiryDashboard: React.FC = () => {
     setFilteredRequests(result);
   }, [filters, requests]);
 
-  useEffect(() => {
-    console.log('Fetching requests...');
-    fetchRequests().then(() => {
-      console.log('Requests fetched successfully');
-    }).catch(error => {
-      console.error('Error fetching requests:', error);
-    });
+  // Initialize data
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Fetch requests
+      await fetchRequests();
+      
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError('Failed to load data. Please refresh the page or try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   }, [fetchRequests]);
+
+  // Initial data load
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Auto-refresh data periodically
+  useEffect(() => {
+    const refreshInterval = setInterval(loadData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(refreshInterval);
+  }, [loadData]);
 
   useEffect(() => {
     let result = [...requests];
@@ -257,8 +276,54 @@ const UserInquiryDashboard: React.FC = () => {
     setFilters(prev => ({ ...prev, status: value || '' }));
   };
 
+  if (error) {
+    return (
+      <div className="p-6">
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          action={
+            <Button 
+              type="primary" 
+              danger 
+              onClick={loadData}
+              loading={isLoading}
+              className="mt-2"
+            >
+              Retry
+            </Button>
+          }
+          className="mb-4"
+        />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Spin size="large" tip="Loading dashboard..." />
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Tire Request Inquiry</h1>
+        <p className="text-gray-600">View and manage tire replacement requests</p>
+      </div>
+      
+      {isRefreshing && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center">
+            <Spin size="small" className="mr-2" />
+            <span>Updating data...</span>
+          </div>
+        </div>
+      )}
       <div className="space-y-6">
         <Card 
           title={

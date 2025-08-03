@@ -11,8 +11,10 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const UserInquiryDashboard: React.FC = () => {
+  console.log('Rendering UserInquiryDashboard');
   const { requests, fetchRequests } = useRequests();
   const { vehicles } = useVehicles();
+  console.log('Requests context:', { requests: requests?.length, vehicles: vehicles?.length });
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>(undefined);
   const [vehicleDetails, setVehicleDetails] = useState<{
@@ -103,7 +105,12 @@ const UserInquiryDashboard: React.FC = () => {
   }, [filters, requests]);
 
   useEffect(() => {
-    fetchRequests();
+    console.log('Fetching requests...');
+    fetchRequests().then(() => {
+      console.log('Requests fetched successfully');
+    }).catch(error => {
+      console.error('Error fetching requests:', error);
+    });
   }, [fetchRequests]);
 
   useEffect(() => {

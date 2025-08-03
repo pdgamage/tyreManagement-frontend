@@ -153,7 +153,7 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
         </button>
         <button 
           onClick={() => navigate('/my-requests')}
-          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg"
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
         >
           My Requests
         </button>
@@ -162,6 +162,12 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
           className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
         >
           Register Vehicle
+        </button>
+        <button 
+          onClick={() => navigate('/user-inquiry')}
+          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg"
+        >
+          User Inquiry
         </button>
       </div>
 
@@ -173,8 +179,8 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
               <i className="fas fa-file-alt text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">User Dashboard</h1>
-              <p className="text-gray-300">Submit tire requests and track your applications</p>
+              <h1 className="text-3xl font-bold mb-2">User Inquiry Dashboard</h1>
+              <p className="text-gray-300">Search and track your tire requests</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
                 <span className="text-sm">User Level Access</span>
@@ -319,9 +325,6 @@ const UserInquiryDashboard: React.FC<UserInquiryDashboardProps> = ({ userId }) =
       </Card>
     </div>
   );
-};
-
-export default UserInquiryDashboard;
 };
 
 export default UserInquiryDashboard;

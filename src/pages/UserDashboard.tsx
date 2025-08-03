@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import TireRequestForm from "../components/TireRequestForm";
 import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
@@ -198,6 +199,25 @@ const UserDashboard = () => {
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+            <div className="flex space-x-4">
+              <Link
+                to="/user-inquiry"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Request Inquiry
+              </Link>
+              <button
+                onClick={() => setShowRequestForm(true)}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Request
+              </button>
+            </div>
+          </div>
           {/* Enhanced Header Title Section */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">

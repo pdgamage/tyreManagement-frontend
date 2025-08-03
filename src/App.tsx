@@ -23,6 +23,7 @@ import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
 import VehicleInquiry from "./components/VehicleInquiry";
+import UserInquiry from "./components/UserInquiry";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -64,6 +65,18 @@ export function App() {
                       <VehicleInquiry />
                     </PageTransition>
                   </Layout>
+                }
+              />
+              <Route
+                path="/user-inquiry"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserInquiry />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
                 }
               />
               <Route

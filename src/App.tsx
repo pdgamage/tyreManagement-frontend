@@ -22,7 +22,7 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
-import UserInquiryDashboard from "./pages/UserInquiryDashboard";
+import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -63,7 +63,7 @@ export function App() {
                   <RequireAuth role="user">
                     <Layout>
                       <PageTransition>
-                        <UserInquiryDashboard />
+                        <TireInquiryDashboard />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

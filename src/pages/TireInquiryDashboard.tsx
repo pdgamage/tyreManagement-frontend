@@ -303,6 +303,51 @@ const UserInquiryDashboard: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-6">
+        {/* Date Range Filter - Always Visible */}
+        <div className="mb-6 bg-white rounded-xl shadow-md p-5">
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Filter className="w-5 h-5 mr-2 text-blue-600" />
+            Date Range Filter
+          </h3>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="date"
+                className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setIsDateFilterActive(true);
+                }}
+                max={endDate || undefined}
+              />
+              <span className="text-gray-500">to</span>
+              <input
+                type="date"
+                className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setIsDateFilterActive(true);
+                }}
+                min={startDate || undefined}
+              />
+            </div>
+            {isDateFilterActive && (
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setIsDateFilterActive(false);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Clear Date Filter
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Dashboard Stats (only shown when vehicle is selected) */}
         {selectedVehicle && requests.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
@@ -384,8 +429,8 @@ const UserInquiryDashboard: React.FC = () => {
               Filter Requests
             </h3>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex flex-col md:flex-row gap-4 flex-1">
-                <div className="relative flex-1 max-w-md">
+              <div className="flex-1">
+                <div className="relative max-w-md">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-5 w-5 text-gray-400" />
                   </div>
@@ -395,29 +440,6 @@ const UserInquiryDashboard: React.FC = () => {
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <input
-                    type="date"
-                    className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    value={startDate}
-                    onChange={(e) => {
-                      setStartDate(e.target.value);
-                      setIsDateFilterActive(true);
-                    }}
-                    max={endDate || undefined}
-                  />
-                  <span className="text-gray-500">to</span>
-                  <input
-                    type="date"
-                    className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    value={endDate}
-                    onChange={(e) => {
-                      setEndDate(e.target.value);
-                      setIsDateFilterActive(true);
-                    }}
-                    min={startDate || undefined}
                   />
                 </div>
               </div>
@@ -465,18 +487,15 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {(searchTerm || statusFilter !== "all" || isDateFilterActive) && (
+                {(searchTerm || statusFilter !== "all") && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
-                      setStartDate("");
-                      setEndDate("");
-                      setIsDateFilterActive(false);
                     }}
                     className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    Reset All Filters
+                    Reset Search & Status
                   </button>
                 )}
               </div>

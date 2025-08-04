@@ -568,7 +568,7 @@ const UserInquiryDashboard: React.FC = () => {
                             {request.status.toLowerCase() === 'complete' && (
                               <p className="text-sm text-gray-600 italic flex items-center">
                                 <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />
-                                Engineer has approved your request
+                                The order has been sent to the customer officer 
                               </p>
                             )}
                           </div>

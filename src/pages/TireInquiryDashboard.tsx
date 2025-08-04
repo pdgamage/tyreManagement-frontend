@@ -563,12 +563,12 @@ const UserInquiryDashboard: React.FC = () => {
                           <div className="flex items-center gap-3 flex-wrap">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
                               {getStatusIcon(request.status)}
-                              {request.status.toLowerCase() === 'complete' ? 'Complete - Sent to Customer Officer' : request.status}
+                              {request.status.toLowerCase() === 'complete' ? 'Complete - Engineer Approved' : request.status}
                             </span>
                             {request.status.toLowerCase() === 'complete' && (
                               <p className="text-sm text-gray-600 italic flex items-center">
                                 <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />
-                                Sent to customer officer for processing
+                                Engineer has approved your request
                               </p>
                             )}
                           </div>

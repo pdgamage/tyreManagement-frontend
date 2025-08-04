@@ -74,6 +74,53 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, []);
 
+  const fetchAllRequests = useCallback(async () => {
+    setIsLoading(prev => ({ ...prev, requests: true }));
+    setError(prev => ({ ...prev, requests: '' }));
+    
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
+      }
+      
+      const result = await response.json();
+      const requestsData = Array.isArray(result.data) ? result.data : [];
+      
+      const formattedRequests = requestsData.map((req: any) => ({
+        id: req.id?.toString() || '',
+        vehicleNumber: req.vehicleNumber || '',
+        status: req.status || 'unknown',
+        orderNumber: req.orderNumber || '',
+        requestDate: req.requestDate || req.submittedAt || new Date().toISOString(),
+        submittedAt: req.submittedAt,
+        supplierName: req.supplierName || 'N/A',
+        tireCount: req.tireCount || 0,
+      }));
+      
+      setRequests(formattedRequests);
+      setFilteredRequests(formattedRequests);
+      
+    } catch (err: any) {
+      console.error('Error in fetchAllRequests:', err);
+      setError(prev => ({ 
+        ...prev, 
+        requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
+      }));
+      setRequests([]);
+      setFilteredRequests([]);
+    } finally {
+      setIsLoading(prev => ({ ...prev, requests: false }));
+    }
+  }, []);
+
   const fetchRequests = useCallback(async (vehicleNumber: string) => {
     if (!vehicleNumber) {
       setRequests([]);
@@ -144,8 +191,34 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
+  // Effect to fetch all requests when date filter is active
+  useEffect(() => {
+    if (isDateFilterActive) {
+      fetchAllRequests();
+    } else if (selectedVehicle) {
+      fetchRequests(selectedVehicle);
+    }
+  }, [isDateFilterActive, selectedVehicle, fetchAllRequests, fetchRequests]);
+
+  // Effect to filter requests based on all criteria
   useEffect(() => {
     let results = requests;
+    
+    // Apply date range filter first
+    if (isDateFilterActive && startDate && endDate) {
+      const start = new Date(startDate + "T00:00:00"); // Start of day
+      const end = new Date(endDate + "T23:59:59");     // End of day
+
+      results = results.filter(request => {
+        const requestDate = new Date(request.requestDate);
+        return requestDate >= start && requestDate <= end;
+      });
+    }
+
+    // If vehicle is selected and date filter is not active, filter by vehicle
+    if (selectedVehicle && !isDateFilterActive) {
+      results = results.filter(request => request.vehicleNumber === selectedVehicle);
+    }
     
     // Apply status filter
     if (statusFilter !== "all") {
@@ -163,21 +236,9 @@ const UserInquiryDashboard: React.FC = () => {
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
     }
-
-    // Apply date range filter
-    if (isDateFilterActive && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // Include the entire end date
-
-      results = results.filter(request => {
-        const requestDate = new Date(request.requestDate);
-        return requestDate >= start && requestDate <= end;
-      });
-    }
     
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, startDate, endDate, isDateFilterActive]);
+  }, [searchTerm, statusFilter, requests, startDate, endDate, isDateFilterActive, selectedVehicle]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -343,7 +404,7 @@ const UserInquiryDashboard: React.FC = () => {
                 disabled={!startDate || !endDate}
                 className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Apply Filter
+                View All Requests in Date Range
               </button>
               {isDateFilterActive && (
                 <button
@@ -351,10 +412,13 @@ const UserInquiryDashboard: React.FC = () => {
                     setStartDate("");
                     setEndDate("");
                     setIsDateFilterActive(false);
+                    if (selectedVehicle) {
+                      fetchRequests(selectedVehicle);
+                    }
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  Clear Filter
+                  Clear Date Filter
                 </button>
               )}
             </div>

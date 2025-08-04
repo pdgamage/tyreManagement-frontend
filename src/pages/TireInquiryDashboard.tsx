@@ -78,18 +78,34 @@ const TireInquiryDashboard: React.FC = () => {
     setError(null);
     try {
       const url = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
       if (!res.ok) {
         if (res.status === 404) {
           setRequests([]);
           return;
         }
-        throw new Error('Failed to fetch requests');
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || 'Failed to fetch requests');
       }
+      
       const data = await res.json();
-      setRequests(Array.isArray(data) ? data : []);
+      const formattedRequests = Array.isArray(data) ? data.map(request => ({
+        ...request,
+        status: request.status || 'Pending',
+        orderNumber: request.orderNumber || 'Not Assigned',
+        supplierName: request.supplierName || 'Not Assigned',
+        supplierPhone: request.supplierPhone || 'Not Available'
+      })) : [];
+      
+      setRequests(formattedRequests);
     } catch (err) {
-      setError("Failed to fetch requests");
+      setError(err instanceof Error ? err.message : "Failed to fetch requests");
       console.error("Error fetching requests:", err);
     } finally {
       setLoading(false);
@@ -234,7 +250,51 @@ const TireInquiryDashboard: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Request Details for Vehicle: {selectedVehicle}
               </h3>
-              <div className="space-y-6">
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order Number</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Supplier Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Supplier Phone</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {requests.map(req => (
+                      <tr key={req.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {req.orderNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(req.status)}`}>
+                            {req.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {req.supplierName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {req.supplierPhone}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => {
+                              // Handle viewing full details
+                              console.log('View full details:', req);
+                            }}
+                            className="text-blue-600 hover:text-blue-900 mr-4"
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-6 space-y-6">
                 {requests.map(req => (
                   <div key={req.id} className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

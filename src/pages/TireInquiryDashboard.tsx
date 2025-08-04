@@ -162,74 +162,80 @@ const TireInquiryDashboard: React.FC = () => {
     return 'bg-gray-100 text-gray-800';
   };
 
+  // --- Redesigned Dashboard Layout ---
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
-        <div className="flex items-center space-x-4 mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center space-x-4">
           <button 
             onClick={() => navigate(-1)} 
-            className="p-2 hover:bg-blue-700 rounded-full"
+            className="p-2 hover:bg-blue-800 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Go back"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tire Inquiry Dashboard</h1>
         </div>
-        
-        <div className="max-w-3xl">
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-white">
-                Select Vehicle
-              </label>
-              {isLoading.vehicles && (
-                <div className="flex items-center text-sm text-gray-300">
-                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                  Loading vehicles...
-                </div>
-              )}
-            </div>
-            
-            {error.vehicles && (
-              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-                {error.vehicles}
-              </div>
+      </div>
+
+      {/* Vehicle Selection Card */}
+      <div className="max-w-3xl mx-auto -mt-10 z-10 relative">
+        <div className="bg-white shadow-xl rounded-xl p-6 border border-blue-100">
+          <h2 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+            <span className="mr-2">Select Vehicle</span>
+            {isLoading.vehicles && (
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
             )}
-            
-            <div className="flex space-x-2">
-              <select
-                value={selectedVehicle}
-                onChange={handleVehicleChange}
-                className="flex-1 p-2 rounded-lg text-gray-900"
-                disabled={isLoading.vehicles}
-              >
-                <option value="">Select a vehicle</option>
-                {vehicles.map(v => (
-                  <option key={v.id} value={v.vehicleNumber}>
-                    {v.vehicleNumber} - {v.brand} {v.model}
-                  </option>
-                ))}
-              </select>
-              
-              {selectedVehicle && (
-                <button
-                  onClick={() => {
-                    setSelectedVehicle('');
-                    navigate('/user/inquiry-dashboard');
-                  }}
-                  className="p-2 hover:text-red-200"
-                  title="Clear selection"
-                  aria-label="Clear vehicle selection"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
+          </h2>
+          {error.vehicles && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+              {error.vehicles}
             </div>
+          )}
+          <div className="flex space-x-2">
+            <select
+              value={selectedVehicle}
+              onChange={handleVehicleChange}
+              className="flex-1 p-3 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+              disabled={isLoading.vehicles}
+            >
+              <option value="">Select a vehicle</option>
+              {vehicles.map(v => (
+                <option key={v.id} value={v.vehicleNumber}>
+                  {v.vehicleNumber} - {v.brand} {v.model}
+                </option>
+              ))}
+            </select>
+            {selectedVehicle && (
+              <button
+                onClick={() => {
+                  setSelectedVehicle('');
+                  navigate('/user/inquiry-dashboard');
+                }}
+                className="p-2 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-lg border border-gray-200 transition"
+                title="Clear selection"
+                aria-label="Clear vehicle selection"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8">
+      {/* Filters Card */}
+      {selectedVehicle && (
+        <div className="max-w-7xl mx-auto mt-8">
+          <div className="bg-white shadow-lg rounded-xl p-6 border border-blue-100">
+            <h2 className="text-lg font-semibold text-blue-900 mb-4">Filter Requests</h2>
+            {/* You can add date and status filters here if needed */}
+            {/* ... */}
+          </div>
+        </div>
+      )}
+
+      <main className="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8 mt-8">
         {/* Loading State */}
         {isLoading.requests && (
           <div className="flex flex-col items-center justify-center p-12 space-y-4">

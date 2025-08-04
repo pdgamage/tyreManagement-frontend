@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Calendar, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Calendar, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -19,17 +19,18 @@ interface TireRequest {
   created_at?: string;
   submittedAt?: string;
   supplierName?: string;
+  tireCount?: number;
 }
 
 const statusOptions = [
-  { value: "all", label: "All Statuses" },
-  { value: "pending", label: "Pending" },
-  { value: "approved", label: "Approved" },
-  { value: "rejected", label: "Rejected" },
-  { value: "complete", label: "Complete" },
+  { value: "all", label: "All Statuses", icon: null },
+  { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
+  { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
+  { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
+  { value: "complete", label: "Complete", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
 ];
 
-const TireInquiryDashboard: React.FC = () => {
+const UserInquiryDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const vehicleFromUrl = searchParams.get('vehicle') || '';
@@ -73,6 +74,7 @@ const TireInquiryDashboard: React.FC = () => {
   const fetchRequests = useCallback(async (vehicleNumber: string) => {
     if (!vehicleNumber) {
       setRequests([]);
+      setFilteredRequests([]);
       return;
     }
     
@@ -103,6 +105,7 @@ const TireInquiryDashboard: React.FC = () => {
         requestDate: req.requestDate || req.submittedAt || new Date().toISOString(),
         submittedAt: req.submittedAt,
         supplierName: req.supplierName || 'N/A',
+        tireCount: req.tireCount || 0,
       }));
       
       setRequests(formattedRequests);
@@ -154,7 +157,7 @@ const TireInquiryDashboard: React.FC = () => {
       results = results.filter(request => 
         request.orderNumber.toLowerCase().includes(term) || 
         request.id.toLowerCase().includes(term) ||
-        request.supplierName?.toLowerCase().includes(term)
+        (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
     }
     
@@ -176,10 +179,19 @@ const TireInquiryDashboard: React.FC = () => {
 
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower.includes('pending')) return 'bg-yellow-100 text-yellow-800';
-    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-100 text-green-800';
-    if (statusLower.includes('rejected')) return 'bg-red-100 text-red-800';
-    return 'bg-gray-100 text-gray-800';
+    if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-100';
+    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-50 text-green-800 border-green-100';
+    if (statusLower.includes('rejected')) return 'bg-red-50 text-red-800 border-red-100';
+    return 'bg-gray-50 text-gray-800 border-gray-100';
+  };
+
+  const getStatusIcon = (status: string) => {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('pending')) return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
+    if (statusLower.includes('approved')) return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
+    if (statusLower.includes('complete')) return <Smile className="w-4 h-4 mr-1.5 text-blue-500" />;
+    if (statusLower.includes('rejected')) return <XCircle className="w-4 h-4 mr-1.5 text-red-500" />;
+    return <FileText className="w-4 h-4 mr-1.5 text-gray-500" />;
   };
 
   const formatDate = (dateString: string) => {
@@ -196,30 +208,30 @@ const TireInquiryDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <header className="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button 
                 onClick={() => navigate(-1)} 
-                className="p-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
+                className="p-2 rounded-full hover:bg-blue-600 transition-colors duration-200"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold">Tire Request Dashboard</h1>
-                <p className="text-blue-100">Track and manage your tire requests</p>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry Dashboard</h1>
+                <p className="text-blue-100 opacity-90">Track and manage your tire requests and inquiries</p>
               </div>
             </div>
           </div>
           
           {/* Vehicle Selection Card */}
-          <div className="mt-6 bg-white bg-opacity-10 backdrop-filter backdrop-blur-sm rounded-xl p-4 shadow">
-            <div className="max-w-3xl mx-auto">
+          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+            <div className="max-w-4xl mx-auto">
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium text-blue-100">
-                  Select Vehicle
+                  Select Vehicle to View Requests
                 </label>
                 {isLoading.vehicles && (
                   <div className="flex items-center text-sm text-blue-200">
@@ -230,11 +242,9 @@ const TireInquiryDashboard: React.FC = () => {
               </div>
               
               {error.vehicles && (
-                <div className="mb-3 p-3 bg-red-500 bg-opacity-20 rounded-lg text-red-100 text-sm">
-                  <div className="flex items-center">
-                    <AlertCircle className="w-5 h-5 mr-2" />
-                    {error.vehicles}
-                  </div>
+                <div className="mb-4 p-3 bg-red-500/20 rounded-lg text-red-100 text-sm flex items-start">
+                  <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{error.vehicles}</span>
                 </div>
               )}
               
@@ -246,10 +256,10 @@ const TireInquiryDashboard: React.FC = () => {
                   <select
                     value={selectedVehicle}
                     onChange={handleVehicleChange}
-                    className="block w-full pl-10 pr-12 py-3 border border-blue-300 rounded-lg bg-white bg-opacity-90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full pl-10 pr-12 py-3 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium"
                     disabled={isLoading.vehicles}
                   >
-                    <option value="">Select a vehicle</option>
+                    <option value="">Select a vehicle...</option>
                     {vehicles.map(v => (
                       <option key={v.id} value={v.vehicleNumber}>
                         {v.vehicleNumber} - {v.brand} {v.model}
@@ -277,10 +287,73 @@ const TireInquiryDashboard: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-6">
+        {/* Dashboard Stats (only shown when vehicle is selected) */}
+        {selectedVehicle && requests.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Requests</p>
+                  <p className="text-2xl font-semibold text-gray-900">{requests.length}</p>
+                </div>
+                <div className="p-3 rounded-full bg-blue-50 text-blue-600">
+                  <FileText className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Pending</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {requests.filter(r => r.status.toLowerCase().includes('pending')).length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-yellow-50 text-yellow-600">
+                  <Clock className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Approved</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {requests.filter(r => r.status.toLowerCase().includes('approved')).length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-green-50 text-green-600">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Rejected</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {requests.filter(r => r.status.toLowerCase().includes('rejected')).length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-red-50 text-red-600">
+                  <XCircle className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filters Section (only shown when vehicle is selected) */}
         {selectedVehicle && (
-          <div className="mb-6 bg-white rounded-lg shadow p-4">
+          <div className="mb-6 bg-white rounded-xl shadow-md p-5">
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <Filter className="w-5 h-5 mr-2 text-blue-600" />
+              Filter Requests
+            </h3>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="relative flex-1 max-w-md">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -288,48 +361,66 @@ const TireInquiryDashboard: React.FC = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search requests..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Search by order #, request ID, or supplier..."
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               
-              <div className="relative">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-between w-full md:w-48 px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                >
-                  {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
-                  {isStatusDropdownOpen ? (
-                    <ChevronUp className="ml-2 h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                
-                {isStatusDropdownOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                    <div className="py-1">
-                      {statusOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          className={`block w-full text-left px-4 py-2 text-sm ${
-                            statusFilter === option.value
-                              ? "bg-blue-100 text-blue-800"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                          onClick={() => {
-                            setStatusFilter(option.value);
-                            setIsStatusDropdownOpen(false);
-                          }}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
+              <div className="flex space-x-3">
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-between w-full md:w-56 px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                  >
+                    <div className="flex items-center">
+                      <Filter className="w-4 h-4 mr-2 text-gray-500" />
+                      {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
                     </div>
-                  </div>
+                    {isStatusDropdownOpen ? (
+                      <ChevronUp className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    )}
+                  </button>
+                  
+                  {isStatusDropdownOpen && (
+                    <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                      <div className="py-1">
+                        {statusOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                              statusFilter === option.value
+                                ? "bg-blue-50 text-blue-800"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                            onClick={() => {
+                              setStatusFilter(option.value);
+                              setIsStatusDropdownOpen(false);
+                            }}
+                          >
+                            {option.icon}
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {(searchTerm || statusFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStatusFilter("all");
+                    }}
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Reset
+                  </button>
                 )}
               </div>
             </div>
@@ -340,23 +431,30 @@ const TireInquiryDashboard: React.FC = () => {
         <div className="space-y-6">
           {/* Loading State */}
           {isLoading.requests && (
-            <div className="flex flex-col items-center justify-center p-12 space-y-4 bg-white rounded-lg shadow">
+            <div className="flex flex-col items-center justify-center p-12 space-y-4 bg-white rounded-xl shadow">
               <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
               <p className="text-gray-600">Loading requests for {selectedVehicle}...</p>
+              <p className="text-sm text-gray-500">Please wait while we fetch your data</p>
             </div>
           )}
 
           {/* Error State */}
           {!isLoading.requests && error.requests && (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-red-50">
-                <div className="flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+                <div className="flex items-start">
+                  <AlertCircle className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
                   <div>
                     <h3 className="text-lg font-medium text-red-800">Error loading requests</h3>
                     <div className="mt-1 text-sm text-red-700">
                       <p>{error.requests}</p>
                     </div>
+                    <button
+                      onClick={() => fetchRequests(selectedVehicle)}
+                      className="mt-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Retry
+                    </button>
                   </div>
                 </div>
               </div>
@@ -365,88 +463,119 @@ const TireInquiryDashboard: React.FC = () => {
 
           {/* Empty State */}
           {!isLoading.requests && !error.requests && filteredRequests.length === 0 && selectedVehicle && (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="text-center py-12 px-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                  <FileText className="w-8 h-8 text-gray-400" />
+                  <Frown className="w-8 h-8 text-gray-400" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 max-w-md mx-auto">
                   {searchTerm || statusFilter !== "all" 
-                    ? "Try adjusting your search or filter criteria."
+                    ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
                     : `No tire requests were found for vehicle ${selectedVehicle}.`}
                 </p>
+                {(searchTerm || statusFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStatusFilter("all");
+                    }}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Clear Filters
+                  </button>
+                )}
               </div>
             </div>
           )}
 
           {/* Initial State - No vehicle selected */}
           {!isLoading.requests && !selectedVehicle && (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="text-center py-12 px-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
                   <Car className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No vehicle selected</h3>
-                <p className="text-gray-500">Please select a vehicle from the dropdown above to view its tire requests.</p>
+                <p className="text-gray-500">Select a vehicle from the dropdown above to view its tire requests and inquiries.</p>
               </div>
             </div>
           )}
 
           {/* Requests List */}
           {!isLoading.requests && !error.requests && filteredRequests.length > 0 && (
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div className="bg-white shadow-xl rounded-xl overflow-hidden">
               <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    <span className="hidden sm:inline">Tire Requests for </span>
-                    <span className="font-semibold text-blue-600">{selectedVehicle}</span>
-                  </h3>
-                  <p className="mt-1 sm:mt-0 text-sm text-gray-500">
-                    Showing {filteredRequests.length} of {requests.length} request{requests.length !== 1 ? 's' : ''}
-                  </p>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Requests for <span className="font-semibold text-blue-600">{selectedVehicle}</span>
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Showing {filteredRequests.length} of {requests.length} request{requests.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <div className="mt-2 sm:mt-0 flex items-center text-sm text-gray-500">
+                    <span className="hidden sm:inline mr-2">Sorted by:</span>
+                    <span className="font-medium">Most Recent</span>
+                  </div>
                 </div>
               </div>
               <ul className="divide-y divide-gray-200">
                 {filteredRequests.map((request) => (
-                  <li key={request.id} className="px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <li 
+                    key={request.id} 
+                    className="px-6 py-5 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                    onClick={() => handleViewDetails(request.id)}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center">
                           <p className="text-base font-semibold text-gray-900 truncate">
                             Request #{request.id}
                           </p>
-                          <span className={`ml-3 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)}`}>
+                          <span className={`ml-3 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)} border flex items-center`}>
+                            {getStatusIcon(request.status)}
                             {request.status}
                           </span>
                         </div>
                         
-                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
+                        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
                           <div className="flex items-center">
-                            <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                            <Calendar className="flex-shrink-0 mr-2 h-4 w-4 text-gray-400" />
                             {formatDate(request.requestDate)}
                           </div>
                           {request.orderNumber && (
                             <div className="flex items-center">
-                              <FileText className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                              <FileText className="flex-shrink-0 mr-2 h-4 w-4 text-gray-400" />
                               Order #{request.orderNumber}
                             </div>
                           )}
-                          {request.supplierName && (
+                          {request.supplierName && request.supplierName !== 'N/A' && (
                             <div className="flex items-center">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                {request.supplierName}
+                                Supplier: {request.supplierName}
+                              </span>
+                            </div>
+                          )}
+                          {request.tireCount && request.tireCount > 0 && (
+                            <div className="flex items-center">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                {request.tireCount} tire{request.tireCount !== 1 ? 's' : ''}
                               </span>
                             </div>
                           )}
                         </div>
                       </div>
                       
-                      <div className="mt-3 sm:mt-0 sm:ml-4 sm:flex-shrink-0">
+                      <div className="mt-4 md:mt-0 md:ml-4 md:flex-shrink-0">
                         <button
                           type="button"
                           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                          onClick={() => handleViewDetails(request.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewDetails(request.id);
+                          }}
                         >
                           View Details
                         </button>
@@ -463,4 +592,4 @@ const TireInquiryDashboard: React.FC = () => {
   );
 };
 
-export default TireInquiryDashboard;
+export default UserInquiryDashboard;

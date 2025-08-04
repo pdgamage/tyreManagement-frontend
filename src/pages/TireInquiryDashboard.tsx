@@ -1,17 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Calendar as CalendarIcon } from "lucide-react";
-import { format, subDays } from "date-fns";
-import { DateRange } from "react-day-picker";
-import { cn } from "../lib/utils";
-import { Button } from "../components/ui/button";
-import { Calendar } from "../components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../components/ui/popover";
+import { ArrowLeft, AlertCircle, Loader2, X } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -39,13 +29,8 @@ const TireInquiryDashboard: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl);
   const [requests, setRequests] = useState<TireRequest[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date(),
-  });
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -124,7 +109,6 @@ const TireInquiryDashboard: React.FC = () => {
       }));
       
       setRequests(formattedRequests);
-      setFilteredRequests(formattedRequests);
       
       if (formattedRequests.length === 0) {
         console.log('No requests found for the selected vehicle');
@@ -170,24 +154,6 @@ const TireInquiryDashboard: React.FC = () => {
     });
   };
 
-  // Apply date range filter to requests
-  useEffect(() => {
-    if (!dateRange?.from || !dateRange?.to) {
-      setFilteredRequests(requests);
-      return;
-    }
-
-    const filtered = requests.filter((request) => {
-      const requestDate = new Date(request.submittedAt || request.requestDate);
-      return (
-        requestDate >= new Date(dateRange.from!.setHours(0, 0, 0, 0)) &&
-        requestDate <= new Date(dateRange.to!.setHours(23, 59, 59, 999))
-      );
-    });
-
-    setFilteredRequests(filtered);
-  }, [dateRange, requests]);
-
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
     if (statusLower.includes('pending')) return 'bg-yellow-100 text-yellow-800';
@@ -207,14 +173,7 @@ const TireInquiryDashboard: React.FC = () => {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
-            {selectedVehicle && (
-              <p className="text-sm text-blue-100 mt-1">
-                Showing requests for vehicle: {selectedVehicle}
-              </p>
-            )}
-          </div>
+          <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
         </div>
         
         <div className="max-w-3xl">
@@ -237,71 +196,34 @@ const TireInquiryDashboard: React.FC = () => {
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              {/* Date Range Picker */}
-              <div className="bg-white/10 p-3 rounded-lg">
-                <label className="block text-sm font-medium text-white mb-1">
-                  Filter by Date Range
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal bg-white/90 hover:bg-white",
-                        !dateRange && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange?.from ? (
-                        dateRange.to ? (
-                          <>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>
-                        ) : (
-                          format(dateRange.from, "LLL dd, y")
-                        )
-                      ) : (
-                        <span>Pick a date range</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={dateRange?.from}
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      numberOfMonths={2}
-                    />
-                    <div className="p-3 border-t flex justify-end">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setDateRange(undefined)}
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
+            <div className="flex space-x-2">
+              <select
+                value={selectedVehicle}
+                onChange={handleVehicleChange}
+                className="flex-1 p-2 rounded-lg text-gray-900"
+                disabled={isLoading.vehicles}
+              >
+                <option value="">Select a vehicle</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.vehicleNumber}>
+                    {v.vehicleNumber} - {v.brand} {v.model}
+                  </option>
+                ))}
+              </select>
               
-              <div>
-                <select
-                  value={selectedVehicle}
-                  onChange={handleVehicleChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white/90"
-                  disabled={isLoading.vehicles}
+              {selectedVehicle && (
+                <button
+                  onClick={() => {
+                    setSelectedVehicle('');
+                    navigate('/user/inquiry-dashboard');
+                  }}
+                  className="p-2 hover:text-red-200"
+                  title="Clear selection"
+                  aria-label="Clear vehicle selection"
                 >
-                  <option value="">Select a vehicle</option>
-                  {vehicles.map(v => (
-                    <option key={v.id} value={v.vehicleNumber}>
-                      {v.vehicleNumber} - {v.brand} {v.model}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -358,7 +280,7 @@ const TireInquiryDashboard: React.FC = () => {
         {/* Requests List */}
         {!isLoading.requests && !error.requests && requests.length > 0 && (
           <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
                 Tire Requests for {selectedVehicle}
               </h3>
@@ -366,26 +288,8 @@ const TireInquiryDashboard: React.FC = () => {
                 Showing {requests.length} request{requests.length !== 1 ? 's' : ''}
               </p>
             </div>
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-              <p className="text-sm text-gray-600">
-                Showing <span className="font-medium">{filteredRequests.length}</span> requests
-                {dateRange?.from && dateRange?.to && (
-                  <span className="ml-2">
-                    from {format(dateRange.from, "MMM d, yyyy")} to {format(dateRange.to, "MMM d, yyyy")}
-                  </span>
-                )}
-              </p>
-              {dateRange?.from && dateRange?.to && (
-                <button
-                  onClick={() => setDateRange(undefined)}
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                >
-                  <X className="w-4 h-4 mr-1" /> Clear date filter
-                </button>
-              )}
-            </div>
             <ul className="divide-y divide-gray-200">
-              {filteredRequests.map((request) => (
+              {requests.map((request) => (
                 <li key={request.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">

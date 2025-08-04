@@ -156,25 +156,26 @@ const TireInquiryDashboard: React.FC = () => {
 
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower.includes('pending')) return 'bg-yellow-100 text-yellow-800';
-    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-100 text-green-800';
-    if (statusLower.includes('rejected')) return 'bg-red-100 text-red-800';
-    return 'bg-gray-100 text-gray-800';
+    if (statusLower.includes('pending')) return 'bg-amber-100 text-amber-700 ring-1 ring-amber-600/20';
+    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-600/20';
+    if (statusLower.includes('rejected')) return 'bg-rose-100 text-rose-700 ring-1 ring-rose-600/20';
+    return 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
-        <div className="flex items-center space-x-4 mb-6">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-2 hover:bg-blue-700 rounded-full"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
-        </div>
+    <div className="min-h-screen bg-gray-100">
+      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-8 shadow-lg">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center space-x-4 mb-6">
+            <button 
+              onClick={() => navigate(-1)} 
+              className="p-2 hover:bg-blue-600 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-blue-800"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-3xl font-bold tracking-tight">Tire Inquiry Dashboard</h1>
+          </div>
         
         <div className="max-w-3xl">
           <div className="mt-4">
@@ -200,7 +201,7 @@ const TireInquiryDashboard: React.FC = () => {
               <select
                 value={selectedVehicle}
                 onChange={handleVehicleChange}
-                className="flex-1 p-2 rounded-lg text-gray-900"
+                className="flex-1 p-3 rounded-xl text-gray-900 bg-white border border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 disabled={isLoading.vehicles}
               >
                 <option value="">Select a vehicle</option>
@@ -279,25 +280,25 @@ const TireInquiryDashboard: React.FC = () => {
 
         {/* Requests List */}
         {!isLoading.requests && !error.requests && requests.length > 0 && (
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
+            <div className="px-6 py-5 sm:px-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+              <h3 className="text-xl leading-6 font-semibold text-gray-900">
                 Tire Requests for {selectedVehicle}
               </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+              <p className="mt-2 max-w-2xl text-sm text-gray-600">
                 Showing {requests.length} request{requests.length !== 1 ? 's' : ''}
               </p>
             </div>
             <ul className="divide-y divide-gray-200">
               {requests.map((request) => (
-                <li key={request.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                <li key={request.id} className="group px-6 py-5 sm:px-8 hover:bg-blue-50/50 transition-colors duration-200">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center">
-                        <p className="text-sm font-medium text-blue-600 truncate">
+                        <p className="text-base font-medium text-blue-700 truncate group-hover:text-blue-800">
                           Request #{request.id}
                         </p>
-                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)}`}>
+                        <span className={`ml-3 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(request.status)}`}>
                           {request.status}
                         </span>
                       </div>
@@ -321,7 +322,7 @@ const TireInquiryDashboard: React.FC = () => {
                     <div className="ml-4 flex-shrink-0">
                       <button
                         type="button"
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-semibold rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105"
                         onClick={() => handleViewDetails(request.id)}
                         aria-label={`View details for request ${request.orderNumber || request.id}`}
                       >

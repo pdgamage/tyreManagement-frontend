@@ -132,8 +132,8 @@ const TireInquiryDashboard: React.FC = () => {
   
   // Handle view details click
   const handleViewDetails = useCallback((requestId: string) => {
-    navigate(`/request/${requestId}`);
-  }, [navigate]);
+    window.location.href = `/request/${requestId}`;
+  }, []);
 
   // Fetch vehicles function
   const fetchVehicles = useCallback(async () => {

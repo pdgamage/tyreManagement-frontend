@@ -101,10 +101,10 @@ const UserInquiryDashboard: React.FC = () => {
         id: req.id?.toString() || '',
         vehicleNumber: req.vehicleNumber || '',
         status: req.status || 'unknown',
-        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
+        orderNumber: req.orderNumber || '',
         requestDate: req.requestDate || req.submittedAt || new Date().toISOString(),
         submittedAt: req.submittedAt,
-        supplierName: req.supplierName || 'The order has not yet been placed with a supplier',
+        supplierName: req.supplierName || 'N/A',
         tireCount: req.tireCount || 0,
       }));
       
@@ -584,33 +584,29 @@ const UserInquiryDashboard: React.FC = () => {
                         </div>
                         
                         <div className="mt-4 flex flex-wrap gap-4">
-                          <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                              <FileText className="w-4 h-4 text-blue-600" />
+                          {request.orderNumber && (
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <FileText className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Order Number</p>
+                                <p className="text-sm font-medium text-gray-900">#{request.orderNumber}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xs text-gray-500">Order Number</p>
-                              <p className="text-sm font-medium text-gray-900">
-                                {!request.orderNumber || request.orderNumber === 'The order has not yet been placed with a supplier'
-                                  ? <span className="text-gray-500 italic">The order has not yet been placed with a supplier</span>
-                                  : `#${request.orderNumber}`}
-                              </p>
-                            </div>
-                          </div>
+                          )}
                           
-                          <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                              <Building className="w-4 h-4 text-purple-600" />
+                          {request.supplierName && request.supplierName !== 'N/A' && (
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                <Building className="w-4 h-4 text-purple-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Supplier</p>
+                                <p className="text-sm font-medium text-gray-900">{request.supplierName}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xs text-gray-500">Supplier</p>
-                              <p className="text-sm font-medium text-gray-900">
-                                {!request.supplierName || request.supplierName === 'The order has not yet been placed with a supplier'
-                                  ? <span className="text-gray-500 italic">The order has not yet been placed with a supplier</span>
-                                  : request.supplierName}
-                              </p>
-                            </div>
-                          </div>
+                          )}
                           
                           {(request.tireCount ?? 0) > 0 && (
                             <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">

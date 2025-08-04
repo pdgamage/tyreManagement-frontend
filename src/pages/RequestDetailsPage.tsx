@@ -11,6 +11,8 @@ interface RequestDetails {
   submittedAt: string;
   requestDate: string;
   supplierName: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
   // Add other fields from your request model as needed
 }
 
@@ -194,7 +196,27 @@ const RequestDetailsPage: React.FC = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Supplier</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {request.supplierName || 'N/A'}
+                  <div className="font-medium">{request.supplierName || 'N/A'}</div>
+                  {request.supplierPhone && (
+                    <div className="mt-1 flex items-center">
+                      <svg className="h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <a href={`tel:${request.supplierPhone}`} className="text-blue-600 hover:text-blue-800">
+                        {request.supplierPhone}
+                      </a>
+                    </div>
+                  )}
+                  {request.supplierEmail && (
+                    <div className="mt-1 flex items-center">
+                      <svg className="h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <a href={`mailto:${request.supplierEmail}`} className="text-blue-600 hover:text-blue-800">
+                        {request.supplierEmail}
+                      </a>
+                    </div>
+                  )}
                 </dd>
               </div>
               

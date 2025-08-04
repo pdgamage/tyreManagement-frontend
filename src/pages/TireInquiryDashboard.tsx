@@ -317,7 +317,7 @@ const UserInquiryDashboard: React.FC = () => {
                 value={startDate}
                 onChange={(e) => {
                   setStartDate(e.target.value);
-                  setIsDateFilterActive(true);
+                  setIsDateFilterActive(false);
                 }}
                 max={endDate || undefined}
               />
@@ -328,23 +328,36 @@ const UserInquiryDashboard: React.FC = () => {
                 value={endDate}
                 onChange={(e) => {
                   setEndDate(e.target.value);
-                  setIsDateFilterActive(true);
+                  setIsDateFilterActive(false);
                 }}
                 min={startDate || undefined}
               />
             </div>
-            {isDateFilterActive && (
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => {
-                  setStartDate("");
-                  setEndDate("");
-                  setIsDateFilterActive(false);
+                  if (startDate && endDate) {
+                    setIsDateFilterActive(true);
+                  }
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!startDate || !endDate}
+                className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Clear Date Filter
+                Apply Filter
               </button>
-            )}
+              {isDateFilterActive && (
+                <button
+                  onClick={() => {
+                    setStartDate("");
+                    setEndDate("");
+                    setIsDateFilterActive(false);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Clear Filter
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -546,11 +559,11 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {searchTerm || statusFilter !== "all" 
+                  {(searchTerm || statusFilter !== "all" || isDateFilterActive)
                     ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
                     : `No tire requests were found for vehicle ${selectedVehicle}.`}
                 </p>
-                {(searchTerm || statusFilter !== "all") && (
+                {(searchTerm || statusFilter !== "all" || isDateFilterActive) && (
                   <button
                     onClick={() => {
                       setSearchTerm("");

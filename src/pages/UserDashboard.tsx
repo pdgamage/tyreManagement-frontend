@@ -34,6 +34,7 @@ const UserDashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [vehicleFilter, setVehicleFilter] = useState<string>("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -90,7 +91,12 @@ const UserDashboard = () => {
     (req: any) => req.status === "order cancelled"
   );
 
-  // Filter requests based on active filter
+  // Get unique vehicle numbers for the dropdown
+  const uniqueVehicleNumbers = Array.from(
+    new Set(userRequests.map((req: any) => req.vehicleNumber).filter(Boolean))
+  ).sort();
+
+  // Filter requests based on active filter and vehicle number
   const getFilteredRequests = () => {
     let result;
     switch (activeFilter) {
@@ -115,6 +121,14 @@ const UserDashboard = () => {
       default:
         result = userRequests;
     }
+    
+    // Apply vehicle number filter if set
+    if (vehicleFilter) {
+      result = result.filter((req: any) => 
+        req.vehicleNumber.toLowerCase().includes(vehicleFilter.toLowerCase())
+      );
+    }
+    
     return result;
   };
 
@@ -264,24 +278,75 @@ const UserDashboard = () => {
             </div>
           </div>
 
-          {/* Professional Action Buttons */}
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setShowRequestForm(!showRequestForm)}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <Plus className="w-5 h-5" />
-              <span>
-                {showRequestForm ? "Hide Request Form" : "New Tire Request"}
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/user/inquiry-dashboard')}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-            >
-              <FileText className="w-5 h-5" />
-              <span>User Inquiry</span>
-            </button>
+          <div className="flex flex-col space-y-4">
+            {/* Professional Action Buttons */}
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setShowRequestForm(!showRequestForm)}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>
+                  {showRequestForm ? "Hide Request Form" : "New Tire Request"}
+                </span>
+              </button>
+              <button
+                onClick={() => navigate('/user/inquiry-dashboard')}
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <FileText className="w-5 h-5" />
+                <span>User Inquiry</span>
+              </button>
+            </div>
+
+            {/* Vehicle Number Filter */}
+            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Filter by vehicle number..."
+                  value={vehicleFilter}
+                  onChange={(e) => setVehicleFilter(e.target.value)}
+                  className="w-full px-4 py-2 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                />
+                {vehicleFilter && (
+                  <button
+                    onClick={() => setVehicleFilter("")}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+              
+              {uniqueVehicleNumbers.length > 0 && (
+                <div className="relative">
+                  <select
+                    value={vehicleFilter}
+                    onChange={(e) => setVehicleFilter(e.target.value)}
+                    className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Vehicle</option>
+                    {uniqueVehicleNumbers.map((vehicleNumber) => (
+                      <option key={vehicleNumber} value={vehicleNumber}>
+                        {vehicleNumber}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+              
+              {vehicleFilter && (
+                <span className="text-sm text-white">
+                  {getFilteredRequests().length} requests found
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </header>

@@ -612,6 +612,18 @@ const UserInquiryDashboard: React.FC = () => {
                               </div>
                             </div>
                           )}
+
+                          {request.status.toLowerCase() === 'complete' && (
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Order Status</p>
+                                <p className="text-sm font-medium text-gray-900">Ready to Place Order</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       

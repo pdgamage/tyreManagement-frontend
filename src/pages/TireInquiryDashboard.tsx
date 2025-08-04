@@ -118,6 +118,7 @@ const TireInquiryDashboard: React.FC = () => {
   const [dateTo, setDateTo] = useState<string>("");
   const [reportResults, setReportResults] = useState<RequestDetail[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   // Fetch vehicles function
   const fetchVehicles = useCallback(async () => {
@@ -170,6 +171,7 @@ const TireInquiryDashboard: React.FC = () => {
     setRequests([]);
 
     try {
+      console.log('Fetching requests for vehicle:', vehicleNumber);
       const response = await fetch(
         `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(vehicleNumber)}`,
         {
@@ -177,7 +179,8 @@ const TireInquiryDashboard: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          }
+          },
+          credentials: 'include'
         }
       );
 
@@ -454,15 +457,15 @@ const TireInquiryDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm border-b border-gray-200">
         <div className="px-4 py-8 mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
+            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
               <FileText className="w-7 h-7 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white tracking-tight">Tire Inquiry Dashboard</h1>
-              <p className="text-slate-300 text-base font-medium mt-1">Search and report on tire requests by vehicle</p>
+              <p className="text-slate-200 text-base font-medium mt-1">Search and report on tire requests by vehicle</p>
             </div>
           </div>
           <button
@@ -530,16 +533,6 @@ const TireInquiryDashboard: React.FC = () => {
               <div>
                 {error.vehicles && <p className="text-red-700">{error.vehicles}</p>}
                 {error.requests && <p className="text-red-700">{error.requests}</p>}
-              </div>
-            </div>
-          )}
-
-          {(error.vehicles || error.requests) && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center space-x-2">
-              <AlertCircle className="w-5 h-5 text-red-500" />
-              <div className="text-red-700">
-                {error.vehicles && <p>{error.vehicles}</p>}
-                {error.requests && <p>{error.requests}</p>}
               </div>
             </div>
           )}
@@ -759,13 +752,82 @@ const TireInquiryDashboard: React.FC = () => {
             </div>
           )}
 
-          {selectedVehicle && requests.length === 0 && !loading && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 text-lg mb-2">No requests found</p>
-              <p className="text-gray-400 text-sm">No tire requests have been made for vehicle {selectedVehicle}</p>
+          {selectedVehicle && !loading && (
+            <div className="mt-6">
+              {requests.length > 0 ? (
+                <>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Requests for Vehicle: {selectedVehicle}
+                  </h3>
+                  <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg shadow">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Order #
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tire Details
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Supplier
+                          </th>
+                          <th scope="col" className="relative px-6 py-3">
+                            <span className="sr-only">Actions</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {requests.map((request) => (
+                          <tr key={request.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="text-sm font-medium text-gray-900">{request.orderNumber}</span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(request.status)}`}>
+                                {request.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="text-sm text-gray-500">{formatDate(request.requestDate)}</span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">Size: {request.tireDetails.size}</div>
+                              <div className="text-sm text-gray-500">Qty: {request.tireDetails.quantity}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{request.supplierDetails.name}</div>
+                              <div className="text-sm text-gray-500">{request.supplierDetails.phone}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <button
+                                onClick={() => window.location.href = `/request/${request.id}`}
+                                className="text-blue-600 hover:text-blue-900 transition-colors"
+                              >
+                                View Details
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 text-lg mb-2">No requests found</p>
+                  <p className="text-gray-400 text-sm">No tire requests have been made for vehicle {selectedVehicle}</p>
+                </div>
+              )}
             </div>
           )}
         </div>

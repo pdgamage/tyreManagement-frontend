@@ -544,20 +544,20 @@ const UserInquiryDashboard: React.FC = () => {
                   >
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0">
+                        <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="flex-shrink-0 mt-1">
                               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                                 <FileText className="w-5 h-5 text-blue-600" />
                               </div>
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-gray-900">
+                              <h3 className="text-lg font-semibold text-gray-900">
                                 Request #{request.id}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {formatDate(request.requestDate)}
-                              </p>
+                              </h3>
+                              <div className="text-sm text-gray-500 mt-1">
+                                Submitted on {formatDate(request.requestDate)}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 flex-wrap">
@@ -574,7 +574,7 @@ const UserInquiryDashboard: React.FC = () => {
                           </div>
                         </div>
                         
-                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="mt-4 flex flex-wrap gap-4">
                           {request.orderNumber && (
                             <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
                               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
@@ -599,7 +599,7 @@ const UserInquiryDashboard: React.FC = () => {
                             </div>
                           )}
                           
-                          {request.tireCount && request.tireCount > 0 && (
+                          {(request.tireCount ?? 0) > 0 && (
                             <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
                               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
                                 <Package className="w-4 h-4 text-amber-600" />

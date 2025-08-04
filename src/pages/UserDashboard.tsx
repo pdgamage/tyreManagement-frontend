@@ -270,12 +270,7 @@ const UserDashboard = () => {
               </button>
               <button
                 onClick={() => {
-                  // Pass the current vehicle filter to the inquiry dashboard
-                  const params = new URLSearchParams();
-                  if (vehicleFilter) {
-                    params.append('vehicle', vehicleFilter);
-                  }
-                  navigate(`/user/inquiry-dashboard?${params.toString()}`);
+                  navigate('/user/inquiry-dashboard');
                 }}
                 className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
               >

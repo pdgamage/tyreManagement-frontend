@@ -291,7 +291,14 @@ const UserDashboard = () => {
                 </span>
               </button>
               <button
-                onClick={() => navigate('/user/inquiry-dashboard')}
+                onClick={() => {
+                  // Pass the current vehicle filter to the inquiry dashboard
+                  const params = new URLSearchParams();
+                  if (vehicleFilter) {
+                    params.append('vehicle', vehicleFilter);
+                  }
+                  navigate(`/user/inquiry-dashboard?${params.toString()}`);
+                }}
                 className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
               >
                 <FileText className="w-5 h-5" />

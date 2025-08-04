@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls, API_CONFIG } from "../config/api";
-import { Calendar, FileText, ArrowLeft, Search, Filter, Car, Package, User, Phone, Mail, MapPin, Clock, AlertCircle } from "lucide-react";
+import { Calendar, FileText, ArrowLeft, Search, Filter, Car, Package, User, Phone, Mail, MapPin, Clock, AlertCircle, Eye } from "lucide-react";
+
+// Constants
+const STATUS_MESSAGES = {
+  LOADING: "Loading...",
+  NO_VEHICLE: "Please select a vehicle",
+  NO_REQUESTS: "No requests found for this vehicle",
+  ERROR: "An error occurred while fetching data"
+};
 
 interface Vehicle {
   id: string;
@@ -45,27 +53,62 @@ interface RequestDetail {
 }
 
 const TireInquiryDashboard: React.FC = () => {
+  // State management
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
   const [requests, setRequests] = useState<RequestDetail[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RequestDetail | null>(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [reportResults, setReportResults] = useState<RequestDetail[]>([]);
+  
   const navigate = useNavigate();
+
+  // Reset states when vehicle changes
+  useEffect(() => {
+    if (!selectedVehicle) {
+      setRequests([]);
+      setError(null);
+    }
+  }, [selectedVehicle]);
 
   // Fetch all registered vehicles
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const res = await fetch(apiUrls.vehicles());
-        if (!res.ok) throw new Error('Failed to fetch vehicles');
+        setLoading(true);
+        const res = await fetch(apiUrls.vehicles(), {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.message || 'Failed to fetch vehicles');
+        }
+
         const data = await res.json();
-        setVehicles(data);
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid vehicle data received');
+        }
+
+        setVehicles(data.map(vehicle => ({
+          ...vehicle,
+          vehicleNumber: vehicle.vehicleNumber || 'Unknown',
+          brand: vehicle.brand || 'N/A',
+          model: vehicle.model || 'N/A'
+        })));
+        setError(null);
       } catch (err) {
-        setError("Failed to load vehicles");
+        setError("Failed to load vehicles. Please try again.");
         console.error("Error fetching vehicles:", err);
+        setVehicles([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchVehicles();
@@ -73,37 +116,59 @@ const TireInquiryDashboard: React.FC = () => {
 
   // Fetch requests for selected vehicle
   const handleSearch = async () => {
-    if (!selectedVehicle) return;
+    if (!selectedVehicle) {
+      setError("Please select a vehicle");
+      return;
+    }
+
     setLoading(true);
     setError(null);
+    setRequests([]);
+
     try {
       const url = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
       const res = await fetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       });
       
+      if (res.status === 404) {
+        setRequests([]);
+        setError("No requests found for this vehicle");
+        return;
+      }
+
       if (!res.ok) {
-        if (res.status === 404) {
-          setRequests([]);
-          return;
-        }
         const errorData = await res.json().catch(() => null);
         throw new Error(errorData?.message || 'Failed to fetch requests');
       }
       
       const data = await res.json();
-      const formattedRequests = Array.isArray(data) ? data.map(request => ({
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format');
+      }
+
+      const formattedRequests = data.map(request => ({
         ...request,
+        id: request.id || 'N/A',
         status: request.status || 'Pending',
         orderNumber: request.orderNumber || 'Not Assigned',
         supplierName: request.supplierName || 'Not Assigned',
-        supplierPhone: request.supplierPhone || 'Not Available'
-      })) : [];
+        supplierPhone: request.supplierPhone || 'Not Available',
+        created_at: request.created_at || request.submittedAt || new Date().toISOString(),
+        tireSize: request.tireSize || request.tireSizeRequired || 'Not Specified',
+        quantity: request.quantity || 0,
+        tubesQuantity: request.tubesQuantity || 0,
+        requestReason: request.requestReason || 'Not Specified'
+      }));
       
       setRequests(formattedRequests);
+      if (formattedRequests.length === 0) {
+        setError("No requests found for this vehicle");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch requests");
       console.error("Error fetching requests:", err);

@@ -21,16 +21,6 @@ interface TireRequest {
   supplierName?: string;
 }
 
-interface DateFilter {
-  startDate: string;
-  endDate: string;
-}
-
-interface FilterState {
-  date: DateFilter;
-  status: string;
-}
-
 const TireInquiryDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -41,13 +31,6 @@ const TireInquiryDashboard: React.FC = () => {
   const [requests, setRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
-  const [filters, setFilters] = useState<FilterState>({
-    date: {
-      startDate: '',
-      endDate: ''
-    },
-    status: ''
-  });
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -87,17 +70,9 @@ const TireInquiryDashboard: React.FC = () => {
     console.log('Fetching requests for vehicle:', vehicleNumber);
     setIsLoading(prev => ({ ...prev, requests: true }));
     setError(prev => ({ ...prev, requests: '' }));
-
-    // Build query parameters
-    const params = new URLSearchParams();
-    if (filters.date.startDate) params.append('startDate', filters.date.startDate);
-    if (filters.date.endDate) params.append('endDate', filters.date.endDate);
-    if (filters.status) params.append('status', filters.status);
     
     try {
-      let url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
-      const queryString = params.toString();
-      if (queryString) url += `?${queryString}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
       console.log('Making request to:', url);
       
       const response = await fetch(url, {
@@ -164,7 +139,7 @@ const TireInquiryDashboard: React.FC = () => {
       setSelectedVehicle(vehicleFromUrl);
       fetchRequests(vehicleFromUrl);
     }
-  }, [vehicleFromUrl, fetchRequests, filters]);
+  }, [vehicleFromUrl, fetchRequests]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -255,82 +230,6 @@ const TireInquiryDashboard: React.FC = () => {
       </div>
 
       <main className="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8">
-        {selectedVehicle && !isLoading.requests && (
-          <div className="space-y-6">
-            {/* Date Filter Section */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Filter Requests</h3>
-                <p className="mt-1 text-sm text-gray-500">Filter requests by date range and status</p>
-              </div>
-              <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input
-                      type="date"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={filters.date.startDate}
-                      onChange={(e) => setFilters(prev => ({
-                        ...prev,
-                        date: { ...prev.date, startDate: e.target.value }
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <input
-                      type="date"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={filters.date.endDate}
-                      onChange={(e) => setFilters(prev => ({
-                        ...prev,
-                        date: { ...prev.date, endDate: e.target.value }
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={filters.status}
-                      onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                    >
-                      <option value="">All Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                      <option value="complete">Complete</option>
-                    </select>
-                  </div>
-                  <div className="flex items-end">
-                    <div className="flex space-x-2 w-full">
-                      <button
-                        onClick={() => {
-                          setFilters({
-                            date: { startDate: '', endDate: '' },
-                            status: ''
-                          });
-                          fetchRequests(selectedVehicle);
-                        }}
-                        className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        Clear
-                      </button>
-                      <button
-                        onClick={() => fetchRequests(selectedVehicle)}
-                        className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Loading State */}
         {isLoading.requests && (
           <div className="flex flex-col items-center justify-center p-12 space-y-4">

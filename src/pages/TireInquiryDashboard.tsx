@@ -164,20 +164,30 @@ const TireInquiryDashboard: React.FC = () => {
 
   // --- Redesigned Dashboard Layout ---
   return (
+
     <div className="min-h-screen bg-gray-50">
       {/* Banner/Header */}
-      <div className="w-full bg-gradient-to-r from-blue-700 to-blue-500 shadow-lg">
-        <div className="max-w-7xl mx-auto flex items-center px-6 py-8 gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-7 h-7 text-white" />
-          </button>
-          <div className="flex items-center gap-3">
+      <div className="w-full bg-gradient-to-r from-blue-700 to-blue-500 shadow-lg relative">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-8 gap-4 w-full">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 bg-white/10 hover:bg-white/20 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-7 h-7 text-white" />
+            </button>
             <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
             <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow">Tire Inquiry Dashboard</h1>
+          </div>
+          {/* Search Option in Banner */}
+          <div className="w-full md:w-1/3 flex justify-end mt-4 md:mt-0">
+            <input
+              type="text"
+              placeholder="Search requests..."
+              className="w-full md:w-72 px-4 py-2 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white focus:bg-white/30 transition"
+              style={{ backdropFilter: 'blur(4px)' }}
+            />
           </div>
         </div>
       </div>

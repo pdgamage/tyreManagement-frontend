@@ -113,12 +113,16 @@ const TireInquiryDashboard: React.FC = () => {
     requests?: string;
   }>({});
 
-  // Report states
+  // Report states and loading
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [reportResults, setReportResults] = useState<RequestDetail[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  
+  // Handle view details click
+  const handleViewDetails = useCallback((requestId: string) => {
+    window.location.href = `/request/${requestId}`;
+  }, []);
 
   // Fetch vehicles function
   const fetchVehicles = useCallback(async () => {
@@ -173,14 +177,13 @@ const TireInquiryDashboard: React.FC = () => {
     try {
       console.log('Fetching requests for vehicle:', vehicleNumber);
       const response = await fetch(
-        `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(vehicleNumber)}`,
+        `${API_CONFIG.BASE_URL}/api/requests/by-vehicle/${encodeURIComponent(vehicleNumber)}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          },
-          credentials: 'include'
+          }
         }
       );
 
@@ -262,45 +265,6 @@ const TireInquiryDashboard: React.FC = () => {
       setError(prev => ({ ...prev, requests: undefined }));
     }
   }, [selectedVehicle, fetchRequests]);
-
-  // Fetch requests for selected vehicle
-  const handleSearch = async () => {
-    if (!selectedVehicle) {
-      setError({ requests: "Please select a vehicle" });
-      return;
-    }
-
-    setLoading(true);
-    setError({});
-    setRequests([]);
-
-    try {
-      const url = `${API_CONFIG.BASE_URL}/api/requests/vehicle/${encodeURIComponent(selectedVehicle)}`;
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-      
-      if (res.status === 404) {
-        setRequests([]);
-        setError({ requests: "No requests found for this vehicle" });
-        return;
-      }
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message || 'Failed to fetch requests');
-      }
-      
-      const data = await res.json();
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid response format');
-      }
-
-      const formattedRequests = data.map(request => ({
         id: request.id,
         vehicleNumber: request.vehicleNumber,
         status: request.status || 'Pending',
@@ -358,8 +322,14 @@ const TireInquiryDashboard: React.FC = () => {
     setLoading(true);
     setError({});
     try {
-      const url = `${apiUrls.requests()}?startDate=${dateFrom}&endDate=${dateTo}`;
-      const res = await fetch(url);
+      const url = `${API_CONFIG.BASE_URL}/api/requests/report?from=${dateFrom}&to=${dateTo}`;
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       if (!res.ok) throw new Error('Failed to fetch report data');
       const data = await res.json();
       
@@ -538,68 +508,6 @@ const TireInquiryDashboard: React.FC = () => {
           )}
 
           {/* Results Section */}
-          {requests.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Requests for Vehicle: {selectedVehicle}
-              </h3>
-              <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order #
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Supplier
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tire Details
-                      </th>
-                      <th scope="col" className="relative px-6 py-3">
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {requests.map((request) => (
-                      <tr key={request.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {request.orderNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(request.status)}`}>
-                            {request.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {request.supplierDetails.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {request.supplierDetails.phone}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              // Handle viewing full details
-                              console.log('View full details:', request);
-                            }}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
               <div className="mt-6 space-y-6">
                 {requests.map(req => (
                   <div key={req.id} className="bg-gray-50 rounded-xl p-6 border border-gray-200">

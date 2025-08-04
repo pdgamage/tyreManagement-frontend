@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Calendar } from "lucide-react";
-import { format, subDays } from 'date-fns';
+import { ArrowLeft, AlertCircle, Loader2, X } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -22,11 +21,6 @@ interface TireRequest {
   supplierName?: string;
 }
 
-interface DateRange {
-  startDate: string;
-  endDate: string;
-}
-
 const TireInquiryDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -35,14 +29,8 @@ const TireInquiryDashboard: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl);
   const [requests, setRequests] = useState<TireRequest[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
-  const [showDateFilter, setShowDateFilter] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: format(subDays(new Date(), 30), 'yyyy-MM-dd'),
-    endDate: format(new Date(), 'yyyy-MM-dd')
-  });
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -121,15 +109,10 @@ const TireInquiryDashboard: React.FC = () => {
       }));
       
       setRequests(formattedRequests);
-      // Apply date filter to the newly fetched requests
-      const filtered = applyDateFilter(formattedRequests, dateRange);
-      setFilteredRequests(filtered);
       
       if (formattedRequests.length === 0) {
         console.log('No requests found for the selected vehicle');
         setError(prev => ({ ...prev, requests: 'No requests found for this vehicle' }));
-      } else if (filtered.length === 0) {
-        setError(prev => ({ ...prev, requests: 'No requests found in the selected date range' }));
       } else {
         setError(prev => ({ ...prev, requests: '' }));
       }
@@ -157,47 +140,6 @@ const TireInquiryDashboard: React.FC = () => {
       fetchRequests(vehicleFromUrl);
     }
   }, [vehicleFromUrl, fetchRequests]);
-
-  const applyDateFilter = (requests: TireRequest[], range: DateRange): TireRequest[] => {
-    if (!range.startDate || !range.endDate) return requests;
-    
-    const start = new Date(range.startDate);
-    const end = new Date(range.endDate);
-    end.setHours(23, 59, 59, 999); // Include the entire end day
-    
-    return requests.filter(request => {
-      const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || 0);
-      return requestDate >= start && requestDate <= end;
-    });
-  };
-
-  const handleDateRangeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'startDate' | 'endDate') => {
-    const newDateRange = {
-      ...dateRange,
-      [field]: e.target.value
-    };
-    setDateRange(newDateRange);
-    
-    // Apply the new date filter to the current requests
-    const filtered = applyDateFilter(requests, newDateRange);
-    setFilteredRequests(filtered);
-    
-    if (filtered.length === 0 && requests.length > 0) {
-      setError(prev => ({ ...prev, requests: 'No requests found in the selected date range' }));
-    } else {
-      setError(prev => ({ ...prev, requests: '' }));
-    }
-  };
-
-  const resetDateFilter = () => {
-    const newDateRange = {
-      startDate: format(subDays(new Date(), 30), 'yyyy-MM-dd'),
-      endDate: format(new Date(), 'yyyy-MM-dd')
-    };
-    setDateRange(newDateRange);
-    setFilteredRequests(requests);
-    setError(prev => ({ ...prev, requests: '' }));
-  };
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -336,7 +278,7 @@ const TireInquiryDashboard: React.FC = () => {
         )}
 
         {/* Requests List */}
-        {!isLoading.requests && !error.requests && filteredRequests.length > 0 && (
+        {!isLoading.requests && !error.requests && requests.length > 0 && (
           <div className="bg-white shadow overflow-hidden sm:rounded-lg">
             <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -347,7 +289,7 @@ const TireInquiryDashboard: React.FC = () => {
               </p>
             </div>
             <ul className="divide-y divide-gray-200">
-              {filteredRequests.map((request) => (
+              {requests.map((request) => (
                 <li key={request.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -393,59 +335,6 @@ const TireInquiryDashboard: React.FC = () => {
           </div>
         )}
       </main>
-
-      {/* Date Range Filter Panel */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => setShowDateFilter(!showDateFilter)}
-              className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              {showDateFilter ? 'Hide Date Filter' : 'Filter by Date Range'}
-            </button>
-            
-            {showDateFilter && (
-              <div className="flex-1 ml-4 flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700">From:</label>
-                  <input
-                    type="date"
-                    value={dateRange.startDate}
-                    onChange={(e) => handleDateRangeChange(e, 'startDate')}
-                    className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-                    max={dateRange.endDate}
-                  />
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700">To:</label>
-                  <input
-                    type="date"
-                    value={dateRange.endDate}
-                    onChange={(e) => handleDateRangeChange(e, 'endDate')}
-                    className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-                    min={dateRange.startDate}
-                    max={format(new Date(), 'yyyy-MM-dd')}
-                  />
-                </div>
-                
-                <button
-                  onClick={resetDateFilter}
-                  className="ml-4 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
-                >
-                  Reset
-                </button>
-                
-                <div className="ml-4 text-sm text-gray-500">
-                  Showing {filteredRequests.length} of {requests.length} requests
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

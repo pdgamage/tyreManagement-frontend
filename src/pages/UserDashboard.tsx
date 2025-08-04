@@ -6,6 +6,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { apiUrls } from "../config/api";
 import { useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   UserCircle,
   LogOut,
@@ -16,11 +18,12 @@ import {
   XCircle,
   AlertCircle,
   TrendingUp,
-  Calendar,
+  Calendar as CalendarIcon,
   Activity,
   ShoppingCart,
   Package,
   X,
+  CalendarDays,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -35,6 +38,8 @@ const UserDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [vehicleFilter, setVehicleFilter] = useState<string>("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -96,7 +101,7 @@ const UserDashboard = () => {
     new Set(userRequests.map((req: any) => req.vehicleNumber).filter(Boolean))
   ).sort();
 
-  // Filter requests based on active filter and vehicle number
+  // Filter requests based on active filter, vehicle number, and date range
   const getFilteredRequests = () => {
     let result;
     switch (activeFilter) {
@@ -121,14 +126,32 @@ const UserDashboard = () => {
       default:
         result = userRequests;
     }
-    
+
     // Apply vehicle number filter if set
     if (vehicleFilter) {
-      result = result.filter((req: any) => 
+      result = result.filter((req: any) =>
         req.vehicleNumber.toLowerCase().includes(vehicleFilter.toLowerCase())
       );
     }
-    
+
+    // Apply date range filter if either start or end date is set
+    if (startDate || endDate) {
+      result = result.filter((req: any) => {
+        const requestDate = new Date(req.submittedAt || req.createdAt);
+        const start = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : null;
+        const end = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : null;
+
+        if (start && end) {
+          return requestDate >= start && requestDate <= end;
+        } else if (start) {
+          return requestDate >= start;
+        } else if (end) {
+          return requestDate <= end;
+        }
+        return true;
+      });
+    }
+
     return result;
   };
 
@@ -325,33 +348,90 @@ const UserDashboard = () => {
                   </button>
                 )}
               </div>
-              
+
               {uniqueVehicleNumbers.length > 0 && (
                 <div className="relative">
                   <select
                     value={vehicleFilter}
                     onChange={(e) => setVehicleFilter(e.target.value)}
-                    className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="block w-full px-4 py-2 pr-8 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select Vehicle</option>
+                    <option value="">All Vehicles</option>
                     {uniqueVehicleNumbers.map((vehicleNumber) => (
                       <option key={vehicleNumber} value={vehicleNumber}>
                         {vehicleNumber}
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
               )}
-              
+
               {vehicleFilter && (
                 <span className="text-sm text-white">
                   {getFilteredRequests().length} requests found
                 </span>
+              )}
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+              <div className="relative flex-1">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  selectsStart
+                  startDate={startDate}
+                  endDate={endDate}
+                  maxDate={endDate || new Date()}
+                  placeholderText="Start Date"
+                  className="block w-full px-4 py-2 pr-8 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <CalendarDays className="w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+              <div className="relative flex-1">
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  selectsEnd
+                  startDate={startDate}
+                  endDate={endDate}
+                  minDate={startDate}
+                  maxDate={new Date()}
+                  placeholderText="End Date"
+                  className="block w-full px-4 py-2 pr-8 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <CalendarDays className="w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                  className="px-3 py-2 text-sm text-red-600 bg-red-50 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Clear Dates
+                </button>
               )}
             </div>
           </div>

@@ -72,7 +72,7 @@ const TireInquiryDashboard: React.FC = () => {
     setError(prev => ({ ...prev, requests: '' }));
     
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/by-vehicle/${encodeURIComponent(vehicleNumber)}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
       console.log('Making request to:', url);
       
       const response = await fetch(url, {

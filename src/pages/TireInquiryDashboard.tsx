@@ -206,12 +206,28 @@ const UserInquiryDashboard: React.FC = () => {
     
     // Apply date range filter first
     if (isDateFilterActive && startDate && endDate) {
-      const start = new Date(startDate + "T00:00:00"); // Start of day
-      const end = new Date(endDate + "T23:59:59");     // End of day
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
 
       results = results.filter(request => {
-        const requestDate = new Date(request.requestDate);
-        return requestDate >= start && requestDate <= end;
+        try {
+          const requestDate = new Date(request.requestDate);
+          // Normalize request date to remove time zone issues
+          requestDate.setHours(0, 0, 0, 0);
+          return requestDate >= start && requestDate <= end;
+        } catch (err) {
+          console.error('Invalid date format:', request.requestDate);
+          return false;
+        }
+      });
+
+      console.log('Date filtering:', {
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        filteredCount: results.length,
+        totalRequests: requests.length
       });
     }
 
@@ -372,39 +388,56 @@ const UserInquiryDashboard: React.FC = () => {
           </h3>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <input
-                type="date"
-                className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  setIsDateFilterActive(false);
-                }}
-                max={endDate || undefined}
-              />
-              <span className="text-gray-500">to</span>
-              <input
-                type="date"
-                className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
-                  setIsDateFilterActive(false);
-                }}
-                min={startDate || undefined}
-              />
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  value={startDate}
+                  onChange={(e) => {
+                    const newDate = e.target.value;
+                    setStartDate(newDate);
+                    setIsDateFilterActive(false);
+                    // If end date is before new start date, update it
+                    if (endDate && new Date(endDate) < new Date(newDate)) {
+                      setEndDate(newDate);
+                    }
+                  }}
+                  max={endDate || undefined}
+                />
+              </div>
+              <span className="text-gray-500 self-end mb-2">to</span>
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1">End Date</label>
+                <input
+                  type="date"
+                  className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  value={endDate}
+                  onChange={(e) => {
+                    const newDate = e.target.value;
+                    setEndDate(newDate);
+                    setIsDateFilterActive(false);
+                    // If start date is after new end date, update it
+                    if (startDate && new Date(startDate) > new Date(newDate)) {
+                      setStartDate(newDate);
+                    }
+                  }}
+                  min={startDate || undefined}
+                />
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
                   if (startDate && endDate) {
+                    console.log('Applying date filter:', { startDate, endDate });
                     setIsDateFilterActive(true);
+                    fetchAllRequests(); // Fetch all requests when applying date filter
                   }
                 }}
                 disabled={!startDate || !endDate}
                 className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                View All Requests in Date Range
+                Apply Date Filter
               </button>
               {isDateFilterActive && (
                 <button
@@ -414,6 +447,9 @@ const UserInquiryDashboard: React.FC = () => {
                     setIsDateFilterActive(false);
                     if (selectedVehicle) {
                       fetchRequests(selectedVehicle);
+                    } else {
+                      setRequests([]);
+                      setFilteredRequests([]);
                     }
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -421,6 +457,9 @@ const UserInquiryDashboard: React.FC = () => {
                   Clear Date Filter
                 </button>
               )}
+            </div>
+          </div>
+        </div>
             </div>
           </div>
         </div>

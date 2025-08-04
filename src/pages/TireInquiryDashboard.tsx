@@ -1,21 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { 
-  ArrowLeft, 
-  ArrowRight,
-  AlertCircle, 
-  Loader2, 
-  X, 
-  Truck, 
-  Calendar, 
-  ChevronDown, 
-  ChevronLeft, 
-  ChevronRight,
-  FileText,
-  List,
-  RefreshCw
-} from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, X } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -169,366 +155,188 @@ const TireInquiryDashboard: React.FC = () => {
   };
 
   const getStatusBadgeColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'in progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('pending')) return 'bg-yellow-100 text-yellow-800';
+    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-100 text-green-800';
+    if (statusLower.includes('rejected')) return 'bg-red-100 text-red-800';
+    return 'bg-gray-100 text-gray-800';
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate(-1)} 
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Tire Inquiry</h1>
-                <p className="text-sm text-gray-500">View and manage tire requests</p>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
+        <div className="flex items-center space-x-4 mb-6">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 hover:bg-blue-700 rounded-full"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Vehicle Selection Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <div className="px-6 py-5 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Vehicle Selection</h2>
-          </div>
-          <div className="px-6 py-5">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="vehicle-select" className="block text-sm font-medium text-gray-700 mb-1">
-                  Select Vehicle
-                </label>
-                <div className="flex space-x-3">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Truck className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <select
-                      id="vehicle-select"
-                      value={selectedVehicle}
-                      onChange={handleVehicleChange}
-                      className="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                      disabled={isLoading.vehicles}
-                    >
-                      <option value="">Select a vehicle</option>
-                      {vehicles.map(v => (
-                        <option key={v.id} value={v.vehicleNumber}>
-                          {v.vehicleNumber} - {v.brand} {v.model}
-                        </option>
-                      ))}
-                    </select>
-                    {isLoading.vehicles && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
-                      </div>
-                    )}
-                  </div>
-                  {selectedVehicle && (
-                    <button
-                      onClick={() => {
-                        setSelectedVehicle('');
-                        navigate('/user/inquiry-dashboard');
-                      }}
-                      className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      title="Clear selection"
-                      aria-label="Clear vehicle selection"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Clear
-                    </button>
-                  )}
+        
+        <div className="max-w-3xl">
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-white">
+                Select Vehicle
+              </label>
+              {isLoading.vehicles && (
+                <div className="flex items-center text-sm text-gray-300">
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  Loading vehicles...
                 </div>
+              )}
+            </div>
+            
+            {error.vehicles && (
+              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {error.vehicles}
               </div>
+            )}
+            
+            <div className="flex space-x-2">
+              <select
+                value={selectedVehicle}
+                onChange={handleVehicleChange}
+                className="flex-1 p-2 rounded-lg text-gray-900"
+                disabled={isLoading.vehicles}
+              >
+                <option value="">Select a vehicle</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.vehicleNumber}>
+                    {v.vehicleNumber} - {v.brand} {v.model}
+                  </option>
+                ))}
+              </select>
               
-              {error.vehicles && (
-                <div className="rounded-md bg-red-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">Error loading vehicles</h3>
-                      <div className="mt-2 text-sm text-red-700">
-                        <p>{error.vehicles}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {selectedVehicle && (
+                <button
+                  onClick={() => {
+                    setSelectedVehicle('');
+                    navigate('/user/inquiry-dashboard');
+                  }}
+                  className="p-2 hover:text-red-200"
+                  title="Clear selection"
+                  aria-label="Clear vehicle selection"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               )}
             </div>
           </div>
         </div>
+      </div>
 
+      <main className="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8">
         {/* Loading State */}
         {isLoading.requests && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-8 text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-50">
-                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Loading Requests</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Fetching tire requests for {selectedVehicle}...
-              </p>
-              <div className="mt-4 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-600 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-              </div>
-            </div>
+          <div className="flex flex-col items-center justify-center p-12 space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+            <p className="text-gray-600">Loading requests for {selectedVehicle}...</p>
           </div>
         )}
 
         {/* Error State */}
         {!isLoading.requests && error.requests && (
-          <div className="rounded-xl bg-red-50 border border-red-100 overflow-hidden">
-            <div className="p-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
-                    <AlertCircle className="h-6 w-6 text-red-600" />
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Unable to load requests
-                  </h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{error.requests}</p>
-                  </div>
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => selectedVehicle && fetchRequests(selectedVehicle)}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      <RefreshCw className="-ml-0.5 mr-1.5 h-3.5 w-3.5" />
-                      Try Again
-                    </button>
-                  </div>
+          <div className="p-4 mb-6 bg-red-50 border-l-4 border-red-400 rounded">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error loading requests</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error.requests}</p>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Empty State - No requests */}
+        {/* Empty State */}
         {!isLoading.requests && !error.requests && requests.length === 0 && selectedVehicle && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-12 text-center">
-              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gray-50">
-                <FileText className="h-10 w-10 text-gray-400" />
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No requests found</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                No tire requests were found for vehicle <span className="font-medium">{selectedVehicle}</span>.
-              </p>
-              <div className="mt-6">
-                <button
-                  type="button"
-                  onClick={() => fetchRequests(selectedVehicle)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <RefreshCw className="-ml-1 mr-2 h-4 w-4" />
-                  Refresh
-                </button>
-              </div>
+          <div className="text-center py-12 px-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+              <AlertCircle className="w-8 h-8 text-gray-400" />
             </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No requests found</h3>
+            <p className="text-gray-500">No tire requests were found for vehicle {selectedVehicle}.</p>
           </div>
         )}
 
         {/* Initial State - No vehicle selected */}
         {!isLoading.requests && !selectedVehicle && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-12 text-center">
-              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-blue-50">
-                <Truck className="h-10 w-10 text-blue-600" />
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No vehicle selected</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Please select a vehicle from the dropdown above to view its tire requests.
-              </p>
-              <div className="mt-6">
-                <div className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <List className="-ml-1 mr-2 h-4 w-4 text-gray-500" />
-                  View All Vehicles
-                </div>
-              </div>
+          <div className="text-center py-12 px-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
             </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No vehicle selected</h3>
+            <p className="text-gray-500">Please select a vehicle to view its tire requests.</p>
           </div>
         )}
 
         {/* Requests List */}
         {!isLoading.requests && !error.requests && requests.length > 0 && (
-          <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Tire Requests
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Showing {requests.length} request{requests.length !== 1 ? 's' : ''} for {selectedVehicle}
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <div className="relative">
-                    <select
-                      className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      defaultValue="all"
-                    >
-                      <option value="all">All Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="in-progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                      <ChevronDown className="h-4 w-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Tire Requests for {selectedVehicle}
+              </h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                Showing {requests.length} request{requests.length !== 1 ? 's' : ''}
+              </p>
             </div>
-            
-            <div className="divide-y divide-gray-200">
+            <ul className="divide-y divide-gray-200">
               {requests.map((request) => (
-                <div 
-                  key={request.id} 
-                  className="px-6 py-4 hover:bg-gray-50 transition-colors duration-150"
-                >
-                  <div className="flex items-start justify-between">
+                <li key={request.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center">
-                        <h4 className="text-base font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-blue-600 truncate">
                           Request #{request.id}
-                        </h4>
+                        </p>
                         <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)}`}>
                           {request.status}
                         </span>
                       </div>
-                      
-                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-start">
-                          <Calendar className="flex-shrink-0 h-5 w-5 text-gray-400 mt-0.5" />
-                          <div className="ml-2">
-                            <p className="text-xs text-gray-500">Request Date</p>
-                            <p className="text-gray-900">
-                              {new Date(request.requestDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </p>
-                          </div>
+                      <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+                        <div className="mt-2 flex items-center text-sm text-gray-500">
+                          <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                          </svg>
+                          {new Date(request.requestDate).toLocaleDateString()}
                         </div>
-                        
                         {request.orderNumber && (
-                          <div className="flex items-start">
-                            <div className="flex-shrink-0 h-5 w-5 rounded-full bg-gray-100 flex items-center justify-center mt-0.5">
-                              <span className="text-xs text-gray-500">#</span>
-                            </div>
-                            <div className="ml-2">
-                              <p className="text-xs text-gray-500">Order Number</p>
-                              <p className="text-gray-900">{request.orderNumber}</p>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {request.supplierName && (
-                          <div className="flex items-start">
-                            <Truck className="flex-shrink-0 h-5 w-5 text-gray-400 mt-0.5" />
-                            <div className="ml-2">
-                              <p className="text-xs text-gray-500">Supplier</p>
-                              <p className="text-gray-900">{request.supplierName}</p>
-                            </div>
+                          <div className="mt-2 flex items-center text-sm text-gray-500">
+                            <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Order #{request.orderNumber}
                           </div>
                         )}
                       </div>
                     </div>
-                    
                     <div className="ml-4 flex-shrink-0">
                       <button
                         type="button"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                         onClick={() => handleViewDetails(request.id)}
-                        className="inline-flex items-center px-3.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                         aria-label={`View details for request ${request.orderNumber || request.id}`}
                       >
-                        <span>View Details</span>
-                        <ArrowRight className="ml-1.5 h-4 w-4" />
+                        View Details
                       </button>
                     </div>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
-            
-            <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  Previous
-                </button>
-                <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  Next
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to <span className="font-medium">10</span> of{' '}
-                    <span className="font-medium">{requests.length}</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                      <span className="sr-only">Previous</span>
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <button
-                      aria-current="page"
-                      className="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                    >
-                      1
-                    </button>
-                    <button className="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                      2
-                    </button>
-                    <button className="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                      3
-                    </button>
-                    <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                      <span className="sr-only">Next</span>
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
+            </ul>
           </div>
         )}
       </main>
     </div>
   );
-}
+};
 
 export default TireInquiryDashboard;

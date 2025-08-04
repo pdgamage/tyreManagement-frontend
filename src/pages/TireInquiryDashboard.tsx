@@ -27,7 +27,7 @@ const statusOptions = [
   { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
-  { value: "complete", label: "Complete", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
+  { value: "complete", label: "Complete - Sent to Customer Officer", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
 ];
 
 const UserInquiryDashboard: React.FC = () => {
@@ -536,8 +536,13 @@ const UserInquiryDashboard: React.FC = () => {
                           </p>
                           <span className={`ml-3 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)} border flex items-center`}>
                             {getStatusIcon(request.status)}
-                            {request.status}
+                            {request.status.toLowerCase() === 'complete' ? 'Complete - Sent to Customer Officer' : request.status}
                           </span>
+                          {request.status.toLowerCase() === 'complete' && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              The order has been sent to the customer officer for processing
+                            </p>
+                          )}
                         </div>
                         
                         <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">

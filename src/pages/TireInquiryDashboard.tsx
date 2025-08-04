@@ -7,25 +7,10 @@ interface Vehicle {
   id: string;
   vehicleNumber: string;
   brand: string;
-  model: string;                  </div>
-          </div>
-        </div>
+  model: string;
+}
 
-        {/* Dashboard Stats (only shown when vehicle is selected) */}
-        {selectedVehicle && requests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>>
-          </div>
-        </div>
-
-        {/* Dashboard Stats (only shown when vehicle is selected) */}
-        {selectedVehicle && requests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>rface TireRequest {
+interface TireRequest {
   id: string;
   vehicleNumber: string;
   status: string;
@@ -477,6 +462,7 @@ const UserInquiryDashboard: React.FC = () => {
         </div>
             </div>
           </div>
+        </div>
 
         {/* Dashboard Stats (only shown when vehicle is selected) */}
         {selectedVehicle && requests.length > 0 && (

@@ -9,7 +9,9 @@ import {
   Package, 
   User, 
   AlertCircle,
-  Loader2
+  Loader2,
+  Calendar,
+  Filter
 } from "lucide-react";
 
 // Constants
@@ -88,6 +90,11 @@ interface TireRequest {
   [key: string]: any;
 }
 
+interface RequestDetail extends TireRequest {
+  created_at?: string;
+  submittedAt?: string;
+}
+
 const TireInquiryDashboard: React.FC = () => {
   const navigate = useNavigate();
 
@@ -95,7 +102,6 @@ const TireInquiryDashboard: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
   const [requests, setRequests] = useState<TireRequest[]>([]);
-  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   
   // Loading and error states
   const [isLoading, setIsLoading] = useState({
@@ -106,6 +112,12 @@ const TireInquiryDashboard: React.FC = () => {
     vehicles?: string;
     requests?: string;
   }>({});
+
+  // Report states
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [reportResults, setReportResults] = useState<RequestDetail[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Fetch vehicles function
   const fetchVehicles = useCallback(async () => {
@@ -251,12 +263,12 @@ const TireInquiryDashboard: React.FC = () => {
   // Fetch requests for selected vehicle
   const handleSearch = async () => {
     if (!selectedVehicle) {
-      setError("Please select a vehicle");
+      setError({ requests: "Please select a vehicle" });
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setError({});
     setRequests([]);
 
     try {
@@ -271,7 +283,7 @@ const TireInquiryDashboard: React.FC = () => {
       
       if (res.status === 404) {
         setRequests([]);
-        setError("No requests found for this vehicle");
+        setError({ requests: "No requests found for this vehicle" });
         return;
       }
 
@@ -286,25 +298,51 @@ const TireInquiryDashboard: React.FC = () => {
       }
 
       const formattedRequests = data.map(request => ({
-        ...request,
-        id: request.id || 'N/A',
+        id: request.id,
+        vehicleNumber: request.vehicleNumber,
         status: request.status || 'Pending',
         orderNumber: request.orderNumber || 'Not Assigned',
-        supplierName: request.supplierName || 'Not Assigned',
-        supplierPhone: request.supplierPhone || 'Not Available',
-        created_at: request.created_at || request.submittedAt || new Date().toISOString(),
-        tireSize: request.tireSize || request.tireSizeRequired || 'Not Specified',
-        quantity: request.quantity || 0,
-        tubesQuantity: request.tubesQuantity || 0,
-        requestReason: request.requestReason || 'Not Specified'
+        requestDate: request.created_at || request.submittedAt,
+        supplierDetails: {
+          name: request.supplierName || 'Not Assigned',
+          phone: request.supplierPhone || 'Not Available',
+          email: request.supplierEmail || 'Not Available'
+        },
+        tireDetails: {
+          size: request.tireSize || request.tireSizeRequired || 'Not Specified',
+          quantity: request.quantity || 0,
+          tubesQuantity: request.tubesQuantity || 0,
+          reason: request.requestReason || 'Not Specified',
+          make: request.existingTireMake || 'Not Specified'
+        },
+        vehicleDetails: {
+          brand: request.vehicleBrand || 'Unknown',
+          model: request.vehicleModel || 'Unknown',
+          lastReplacement: request.lastReplacementDate || 'Not Available',
+          kmReading: {
+            current: request.presentKmReading || 0,
+            previous: request.previousKmReading || 0
+          }
+        },
+        requesterDetails: {
+          name: request.requesterName || 'Not Specified',
+          department: request.userSection || 'Not Specified',
+          costCenter: request.costCenter || 'Not Specified'
+        },
+        approvalNotes: {
+          supervisor: request.supervisor_notes,
+          technicalManager: request.technical_manager_note,
+          engineer: request.engineer_note,
+          customerOfficer: request.customer_officer_note
+        }
       }));
       
       setRequests(formattedRequests);
       if (formattedRequests.length === 0) {
-        setError("No requests found for this vehicle");
+        setError({ requests: "No requests found for this vehicle" });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch requests");
+      setError({ requests: err instanceof Error ? err.message : "Failed to fetch requests" });
       console.error("Error fetching requests:", err);
     } finally {
       setLoading(false);
@@ -315,22 +353,61 @@ const TireInquiryDashboard: React.FC = () => {
   const handleReportSearch = async () => {
     if (!dateFrom || !dateTo) return;
     setLoading(true);
-    setError(null);
+    setError({});
     try {
       const url = `${apiUrls.requests()}?startDate=${dateFrom}&endDate=${dateTo}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch report data');
       const data = await res.json();
+      
       // Filter by date range on frontend as well
       const filteredData = data.filter((req: RequestDetail) => {
-        const requestDate = new Date(req.created_at || req.submittedAt);
+        const requestDate = new Date(req.created_at || req.submittedAt || '');
         const fromDate = new Date(dateFrom);
         const toDate = new Date(dateTo);
         return requestDate >= fromDate && requestDate <= toDate;
-      });
+      }).map((request: RequestDetail) => ({
+        ...request,
+        id: request.id,
+        vehicleNumber: request.vehicleNumber,
+        status: request.status || 'Pending',
+        orderNumber: request.orderNumber || 'Not Assigned',
+        requestDate: request.created_at || request.submittedAt,
+        supplierDetails: {
+          name: request.supplierName || 'Not Assigned',
+          phone: request.supplierPhone || 'Not Available',
+          email: request.supplierEmail || 'Not Available'
+        },
+        tireDetails: {
+          size: request.tireSize || request.tireSizeRequired || 'Not Specified',
+          quantity: request.quantity || 0,
+          tubesQuantity: request.tubesQuantity || 0,
+          reason: request.requestReason || 'Not Specified',
+          make: request.existingTireMake || 'Not Specified'
+        },
+        vehicleDetails: {
+          brand: request.vehicleBrand || 'Unknown',
+          model: request.vehicleModel || 'Unknown',
+          lastReplacement: request.lastReplacementDate || 'Not Available',
+          kmReading: {
+            current: request.presentKmReading || 0,
+            previous: request.previousKmReading || 0
+          }
+        },
+        requesterDetails: {
+          name: request.requesterName || 'Not Specified',
+          department: request.userSection || 'Not Specified',
+          costCenter: request.costCenter || 'Not Specified'
+        }
+      }));
+      
       setReportResults(Array.isArray(filteredData) ? filteredData : []);
+      
+      if (filteredData.length === 0) {
+        setError({ requests: "No requests found for the selected date range" });
+      }
     } catch (err) {
-      setError("Failed to fetch report data");
+      setError({ requests: "Failed to fetch report data" });
       console.error("Error fetching report data:", err);
     } finally {
       setLoading(false);
@@ -369,33 +446,6 @@ const TireInquiryDashboard: React.FC = () => {
         return "bg-red-100 text-red-800";
       case "order cancelled":
         return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "-";
-    try {
-      return new Date(dateString).toLocaleString();
-    } catch {
-      return dateString;
-    }
-  };
-
-  // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "complete":
-      case "order placed":
-        return "bg-green-100 text-green-800";
-      case "approved":
-        return "bg-blue-100 text-blue-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -484,10 +534,13 @@ const TireInquiryDashboard: React.FC = () => {
             </div>
           )}
 
-          {error && (
+          {(error.vehicles || error.requests) && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center space-x-2">
               <AlertCircle className="w-5 h-5 text-red-500" />
-              <span className="text-red-700">{error}</span>
+              <div className="text-red-700">
+                {error.vehicles && <p>{error.vehicles}</p>}
+                {error.requests && <p>{error.requests}</p>}
+              </div>
             </div>
           )}
 
@@ -523,26 +576,26 @@ const TireInquiryDashboard: React.FC = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {requests.map((request) => (
-                      <tr key={req.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={request.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {req.orderNumber}
+                          {request.orderNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(req.status)}`}>
-                            {req.status}
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(request.status)}`}>
+                            {request.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {req.supplierName}
+                          {request.supplierDetails.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {req.supplierPhone}
+                          {request.supplierDetails.phone}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => {
                               // Handle viewing full details
-                              console.log('View full details:', req);
+                              console.log('View full details:', request);
                             }}
                             className="text-blue-600 hover:text-blue-900 mr-4"
                           >
@@ -779,21 +832,21 @@ const TireInquiryDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {reportResults.map(req => (
-                      <tr key={req.id} className="border-t border-gray-100 hover:bg-green-50">
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">#{req.id}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.vehicleNumber}</td>
+                    {reportResults.map(request => (
+                      <tr key={request.id} className="border-t border-gray-100 hover:bg-green-50">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">#{request.id}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.vehicleNumber}</td>
                         <td className="px-4 py-3 text-sm">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(req.status)}`}>
-                            {req.status}
+                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(request.status)}`}>
+                            {request.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.orderNumber || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.supplierName || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{formatDate(req.created_at || req.submittedAt)}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.tireSize || req.tireSizeRequired || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.quantity || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{req.requesterName || "-"}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.orderNumber}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.supplierDetails.name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{formatDate(request.requestDate)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.tireDetails.size}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.tireDetails.quantity}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{request.requesterDetails.name}</td>
                       </tr>
                     ))}
                   </tbody>

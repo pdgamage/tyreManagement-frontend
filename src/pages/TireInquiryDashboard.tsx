@@ -404,7 +404,7 @@ const TireInquiryDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">>
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-4 py-8 mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">

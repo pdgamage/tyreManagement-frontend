@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls, API_CONFIG } from "../config/api";
-import { Calendar, FileText, ArrowLeft, Search, Filter, Car, Package, AlertCircle } from "lucide-react";
+import { Calendar, FileText, ArrowLeft, Search, Car, Package, AlertCircle } from "lucide-react";
 
 interface Vehicle {
   id: string;

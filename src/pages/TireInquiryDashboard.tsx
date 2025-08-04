@@ -61,27 +61,55 @@ const TireInquiryDashboard: React.FC = () => {
   }, []);
 
   const fetchRequests = useCallback(async (vehicleNumber: string) => {
-    if (!vehicleNumber) return;
+    if (!vehicleNumber) {
+      console.log('No vehicle number provided, skipping request fetch');
+      setRequests([]);
+      return;
+    }
+    
+    console.log('Fetching requests for vehicle:', vehicleNumber);
     setIsLoading(prev => ({ ...prev, requests: true }));
     setError(prev => ({ ...prev, requests: '' }));
+    
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/by-vehicle/${vehicleNumber}`;
-      console.log('Fetching requests from:', url);
-      const response = await fetch(url);
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/by-vehicle/${encodeURIComponent(vehicleNumber)}`;
+      console.log('Making request to:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any required authentication headers here
+        },
+      });
+      
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Request failed with status:', response.status, 'Response:', errorText);
         throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
       }
+      
       const data = await response.json();
-      console.log('Requests data received:', data);
-      setRequests(Array.isArray(data) ? data : []);
+      console.log('Received requests data:', data);
+      
+      const requestsData = Array.isArray(data) ? data : [];
+      console.log(`Found ${requestsData.length} requests for vehicle ${vehicleNumber}`);
+      
+      setRequests(requestsData);
+      
+      if (requestsData.length === 0) {
+        console.log('No requests found for the selected vehicle');
+      }
+      
     } catch (err: any) {
-      console.error('Error fetching requests:', err);
+      console.error('Error in fetchRequests:', err);
       setError(prev => ({ 
         ...prev, 
         requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
       }));
     } finally {
+      console.log('Finished loading requests');
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
   }, []);

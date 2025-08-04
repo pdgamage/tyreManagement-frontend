@@ -23,6 +23,7 @@ import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
+import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -63,6 +64,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/user/request-details/:id"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <RequestDetailsPage />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

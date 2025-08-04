@@ -148,6 +148,12 @@ const TireInquiryDashboard: React.FC = () => {
     if (value) fetchRequests(value);
   };
 
+  const handleViewDetails = (requestId: string) => {
+    navigate(`/user/request-details/${requestId}`, {
+      state: { fromInquiry: true }
+    });
+  };
+
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
     if (statusLower.includes('pending')) return 'bg-yellow-100 text-yellow-800';
@@ -315,8 +321,9 @@ const TireInquiryDashboard: React.FC = () => {
                     <div className="ml-4 flex-shrink-0">
                       <button
                         type="button"
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        onClick={() => console.log('View details', request.id)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        onClick={() => handleViewDetails(request.id)}
+                        aria-label={`View details for request ${request.orderNumber || request.id}`}
                       >
                         View Details
                       </button>

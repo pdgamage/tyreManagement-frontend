@@ -164,77 +164,76 @@ const TireInquiryDashboard: React.FC = () => {
 
   // --- Redesigned Dashboard Layout ---
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center space-x-4">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-2 hover:bg-blue-800 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
+    <div className="min-h-screen bg-gray-50">
+      {/* Banner/Header */}
+      <div className="w-full bg-gradient-to-r from-blue-700 to-blue-500 shadow-lg">
+        <div className="max-w-7xl mx-auto flex items-center px-6 py-8 gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-7 h-7 text-white" />
           </button>
-          <h1 className="text-3xl font-bold tracking-tight">Tire Inquiry Dashboard</h1>
-        </div>
-      </div>
-
-      {/* Vehicle Selection Card */}
-      <div className="max-w-2xl mx-auto -mt-12 z-10 relative">
-        <div className="bg-white shadow-md rounded-2xl p-6 border border-blue-100 flex flex-col gap-2">
-          <h2 className="text-lg font-semibold text-blue-900 mb-2 flex items-center">
-            <span className="mr-2">Select Vehicle</span>
-            {isLoading.vehicles && (
-              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-            )}
-          </h2>
-          {error.vehicles && (
-            <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-              {error.vehicles}
-            </div>
-          )}
-          <div className="flex space-x-2 items-center">
-            <select
-              value={selectedVehicle}
-              onChange={handleVehicleChange}
-              className="flex-1 p-3 rounded-lg border border-blue-300 text-gray-900 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm bg-blue-50 hover:bg-blue-100"
-              disabled={isLoading.vehicles}
-            >
-              <option value="">Select a vehicle</option>
-              {vehicles.map(v => (
-                <option key={v.id} value={v.vehicleNumber}>
-                  {v.vehicleNumber} - {v.brand} {v.model}
-                </option>
-              ))}
-            </select>
-            {selectedVehicle && (
-              <button
-                onClick={() => {
-                  setSelectedVehicle('');
-                  navigate('/user/inquiry-dashboard');
-                }}
-                className="p-2 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-lg border border-gray-200 transition"
-                title="Clear selection"
-                aria-label="Clear vehicle selection"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
+          <div className="flex items-center gap-3">
+            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+            <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow">Tire Inquiry Dashboard</h1>
           </div>
         </div>
       </div>
 
-      {/* Filters Card */}
-      {selectedVehicle && (
-        <div className="max-w-4xl mx-auto mt-8">
-          <div className="bg-blue-50 shadow-sm rounded-xl p-5 border border-blue-100">
+      {/* Main Card */}
+      <div className="max-w-4xl mx-auto -mt-12 z-10 relative">
+        <div className="bg-white shadow-lg rounded-2xl p-8 border border-blue-100 flex flex-col gap-6">
+          {/* Vehicle Selection */}
+          <div>
+            <label className="block text-base font-semibold text-blue-900 mb-2">Select Vehicle</label>
+            <div className="flex space-x-2 items-center">
+              <select
+                value={selectedVehicle}
+                onChange={handleVehicleChange}
+                className="flex-1 p-3 rounded-lg border border-blue-300 text-gray-900 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm bg-blue-50 hover:bg-blue-100"
+                disabled={isLoading.vehicles}
+              >
+                <option value="">Select a vehicle</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.vehicleNumber}>
+                    {v.vehicleNumber} - {v.brand} {v.model}
+                  </option>
+                ))}
+              </select>
+              {selectedVehicle && (
+                <button
+                  onClick={() => {
+                    setSelectedVehicle('');
+                    navigate('/user/inquiry-dashboard');
+                  }}
+                  className="p-2 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-lg border border-gray-200 transition"
+                  title="Clear selection"
+                  aria-label="Clear vehicle selection"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+            {isLoading.vehicles && (
+              <div className="flex items-center mt-2 text-blue-600 text-sm"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading vehicles...</div>
+            )}
+            {error.vehicles && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {error.vehicles}
+              </div>
+            )}
+          </div>
+          {/* Filter Section Placeholder */}
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
             <h2 className="text-base font-semibold text-blue-900 mb-2">Filter Requests</h2>
             {/* Add filter controls here if needed */}
           </div>
         </div>
-      )}
+      </div>
 
-      <main className="max-w-5xl mx-auto p-4 sm:px-6 lg:px-8 mt-8">
+      <main className="max-w-5xl mx-auto p-4 sm:px-6 lg:px-8 mt-12">
         {/* Loading State */}
         {isLoading.requests && (
           <div className="flex flex-col items-center justify-center p-12 space-y-4">

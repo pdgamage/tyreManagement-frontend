@@ -44,9 +44,6 @@ const UserInquiryDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [isDateFilterActive, setIsDateFilterActive] = useState(false);
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -71,53 +68,6 @@ const UserInquiryDashboard: React.FC = () => {
       }));
     } finally {
       setIsLoading(prev => ({ ...prev, vehicles: false }));
-    }
-  }, []);
-
-  const fetchAllRequests = useCallback(async () => {
-    setIsLoading(prev => ({ ...prev, requests: true }));
-    setError(prev => ({ ...prev, requests: '' }));
-    
-    try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
-      }
-      
-      const result = await response.json();
-      const requestsData = Array.isArray(result.data) ? result.data : [];
-      
-      const formattedRequests = requestsData.map((req: any) => ({
-        id: req.id?.toString() || '',
-        vehicleNumber: req.vehicleNumber || '',
-        status: req.status || 'unknown',
-        orderNumber: req.orderNumber || '',
-        requestDate: req.requestDate || req.submittedAt || new Date().toISOString(),
-        submittedAt: req.submittedAt,
-        supplierName: req.supplierName || 'N/A',
-        tireCount: req.tireCount || 0,
-      }));
-      
-      setRequests(formattedRequests);
-      setFilteredRequests(formattedRequests);
-      
-    } catch (err: any) {
-      console.error('Error in fetchAllRequests:', err);
-      setError(prev => ({ 
-        ...prev, 
-        requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
-      }));
-      setRequests([]);
-      setFilteredRequests([]);
-    } finally {
-      setIsLoading(prev => ({ ...prev, requests: false }));
     }
   }, []);
 
@@ -191,48 +141,12 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to fetch all requests when date filter is active
-  useEffect(() => {
-    if (isDateFilterActive) {
-      fetchAllRequests();
-    } else if (selectedVehicle) {
-      fetchRequests(selectedVehicle);
-    }
-  }, [isDateFilterActive, selectedVehicle, fetchAllRequests, fetchRequests]);
-
-  // Effect to filter requests based on all criteria
+  // Effect to filter requests based on criteria
   useEffect(() => {
     let results = requests;
     
-    // Apply date range filter first
-    if (isDateFilterActive && startDate && endDate) {
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-
-      results = results.filter(request => {
-        try {
-          const requestDate = new Date(request.requestDate);
-          // Normalize request date to remove time zone issues
-          requestDate.setHours(0, 0, 0, 0);
-          return requestDate >= start && requestDate <= end;
-        } catch (err) {
-          console.error('Invalid date format:', request.requestDate);
-          return false;
-        }
-      });
-
-      console.log('Date filtering:', {
-        startDate: start.toISOString(),
-        endDate: end.toISOString(),
-        filteredCount: results.length,
-        totalRequests: requests.length
-      });
-    }
-
-    // If vehicle is selected and date filter is not active, filter by vehicle
-    if (selectedVehicle && !isDateFilterActive) {
+    // If vehicle is selected, filter by vehicle
+    if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
     }
     
@@ -254,7 +168,7 @@ const UserInquiryDashboard: React.FC = () => {
     }
     
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, startDate, endDate, isDateFilterActive, selectedVehicle]);
+  }, [searchTerm, statusFilter, requests, selectedVehicle]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -380,89 +294,6 @@ const UserInquiryDashboard: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-6">
-        {/* Date Range Filter - Always Visible */}
-        <div className="mb-6 bg-white rounded-xl shadow-md p-5">
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-            <Filter className="w-5 h-5 mr-2 text-blue-600" />
-            Date Range Filter
-          </h3>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600 mb-1">Start Date</label>
-                <input
-                  type="date"
-                  className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  value={startDate}
-                  onChange={(e) => {
-                    const newDate = e.target.value;
-                    setStartDate(newDate);
-                    setIsDateFilterActive(false);
-                    // If end date is before new start date, update it
-                    if (endDate && new Date(endDate) < new Date(newDate)) {
-                      setEndDate(newDate);
-                    }
-                  }}
-                  max={endDate || undefined}
-                />
-              </div>
-              <span className="text-gray-500 self-end mb-2">to</span>
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600 mb-1">End Date</label>
-                <input
-                  type="date"
-                  className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  value={endDate}
-                  onChange={(e) => {
-                    const newDate = e.target.value;
-                    setEndDate(newDate);
-                    setIsDateFilterActive(false);
-                    // If start date is after new end date, update it
-                    if (startDate && new Date(startDate) > new Date(newDate)) {
-                      setStartDate(newDate);
-                    }
-                  }}
-                  min={startDate || undefined}
-                />
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (startDate && endDate) {
-                    console.log('Applying date filter:', { startDate, endDate });
-                    setIsDateFilterActive(true);
-                    fetchAllRequests(); // Fetch all requests when applying date filter
-                  }
-                }}
-                disabled={!startDate || !endDate}
-                className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Apply Date Filter
-              </button>
-              {isDateFilterActive && (
-                <button
-                  onClick={() => {
-                    setStartDate("");
-                    setEndDate("");
-                    setIsDateFilterActive(false);
-                    if (selectedVehicle) {
-                      fetchRequests(selectedVehicle);
-                    } else {
-                      setRequests([]);
-                      setFilteredRequests([]);
-                    }
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Clear Date Filter
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-            </div>
-          </div>
-        </div>
 
         {/* Dashboard Stats (only shown when vehicle is selected) */}
         {selectedVehicle && requests.length > 0 && (
@@ -662,11 +493,11 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {(searchTerm || statusFilter !== "all" || isDateFilterActive)
+                  {(searchTerm || statusFilter !== "all")
                     ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
                     : `No tire requests were found for vehicle ${selectedVehicle}.`}
                 </p>
-                {(searchTerm || statusFilter !== "all" || isDateFilterActive) && (
+                {(searchTerm || statusFilter !== "all") && (
                   <button
                     onClick={() => {
                       setSearchTerm("");

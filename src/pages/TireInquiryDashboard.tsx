@@ -44,6 +44,9 @@ const UserInquiryDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [isDateFilterActive, setIsDateFilterActive] = useState(false);
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -160,9 +163,21 @@ const UserInquiryDashboard: React.FC = () => {
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
     }
+
+    // Apply date range filter
+    if (isDateFilterActive && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Include the entire end date
+
+      results = results.filter(request => {
+        const requestDate = new Date(request.requestDate);
+        return requestDate >= start && requestDate <= end;
+      });
+    }
     
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests]);
+  }, [searchTerm, statusFilter, requests, startDate, endDate, isDateFilterActive]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -369,17 +384,42 @@ const UserInquiryDashboard: React.FC = () => {
               Filter Requests
             </h3>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="relative flex-1 max-w-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+              <div className="flex flex-col md:flex-row gap-4 flex-1">
+                <div className="relative flex-1 max-w-md">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search by order #, request ID, or supplier..."
+                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search by order #, request ID, or supplier..."
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <input
+                    type="date"
+                    className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    value={startDate}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setIsDateFilterActive(true);
+                    }}
+                    max={endDate || undefined}
+                  />
+                  <span className="text-gray-500">to</span>
+                  <input
+                    type="date"
+                    className="block px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    value={endDate}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setIsDateFilterActive(true);
+                    }}
+                    min={startDate || undefined}
+                  />
+                </div>
               </div>
               
               <div className="flex space-x-3">
@@ -425,15 +465,18 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {(searchTerm || statusFilter !== "all") && (
+                {(searchTerm || statusFilter !== "all" || isDateFilterActive) && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
+                      setStartDate("");
+                      setEndDate("");
+                      setIsDateFilterActive(false);
                     }}
                     className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    Reset
+                    Reset All Filters
                   </button>
                 )}
               </div>

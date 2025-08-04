@@ -34,12 +34,27 @@ const TireInquiryDashboard: React.FC = () => {
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
+    setError(prev => ({ ...prev, vehicles: '' }));
     try {
-      const response = await fetch(`${API_CONFIG.baseUrl}/vehicles`);
-      if (!response.ok) throw new Error('Failed to fetch vehicles');
-      setVehicles(await response.json());
-    } catch (err) {
-      setError(prev => ({ ...prev, vehicles: 'Failed to load vehicles' }));
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`;
+      console.log('Fetching vehicles from:', url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch vehicles: ${response.status} ${errorText}`);
+      }
+      const data = await response.json();
+      console.log('Vehicles data received:', data);
+      if (!Array.isArray(data)) {
+        throw new Error('Expected an array of vehicles but received something else');
+      }
+      setVehicles(data);
+    } catch (err: any) {
+      console.error('Error fetching vehicles:', err);
+      setError(prev => ({ 
+        ...prev, 
+        vehicles: `Failed to load vehicles: ${err?.message || 'Unknown error'}` 
+      }));
     } finally {
       setIsLoading(prev => ({ ...prev, vehicles: false }));
     }
@@ -48,12 +63,24 @@ const TireInquiryDashboard: React.FC = () => {
   const fetchRequests = useCallback(async (vehicleNumber: string) => {
     if (!vehicleNumber) return;
     setIsLoading(prev => ({ ...prev, requests: true }));
+    setError(prev => ({ ...prev, requests: '' }));
     try {
-      const response = await fetch(`${API_CONFIG.baseUrl}/requests/by-vehicle/${vehicleNumber}`);
-      if (!response.ok) throw new Error('Failed to fetch requests');
-      setRequests(await response.json());
-    } catch (err) {
-      setError(prev => ({ ...prev, requests: 'Failed to load requests' }));
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/by-vehicle/${vehicleNumber}`;
+      console.log('Fetching requests from:', url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
+      }
+      const data = await response.json();
+      console.log('Requests data received:', data);
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Error fetching requests:', err);
+      setError(prev => ({ 
+        ...prev, 
+        requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
+      }));
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
@@ -89,38 +116,65 @@ const TireInquiryDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
         <div className="flex items-center space-x-4 mb-6">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-blue-700 rounded-full">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 hover:bg-blue-700 rounded-full"
+            aria-label="Go back"
+          >
             <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-2xl font-bold">Tire Inquiry Dashboard</h1>
         </div>
         
         <div className="max-w-3xl">
-          <label className="block text-sm font-medium mb-2">Select Vehicle</label>
-          <div className="flex space-x-2">
-            <select
-              value={selectedVehicle}
-              onChange={handleVehicleChange}
-              className="flex-1 p-2 rounded-lg text-gray-900"
-            >
-              <option value="">Select a vehicle</option>
-              {vehicles.map(v => (
-                <option key={v.id} value={v.vehicleNumber}>
-                  {v.vehicleNumber} - {v.brand} {v.model}
-                </option>
-              ))}
-            </select>
-            {selectedVehicle && (
-              <button
-                onClick={() => {
-                  setSelectedVehicle('');
-                  navigate('/user/inquiry-dashboard');
-                }}
-                className="p-2 hover:text-red-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-white">
+                Select Vehicle
+              </label>
+              {isLoading.vehicles && (
+                <div className="flex items-center text-sm text-gray-300">
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  Loading vehicles...
+                </div>
+              )}
+            </div>
+            
+            {error.vehicles && (
+              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {error.vehicles}
+              </div>
             )}
+            
+            <div className="flex space-x-2">
+              <select
+                value={selectedVehicle}
+                onChange={handleVehicleChange}
+                className="flex-1 p-2 rounded-lg text-gray-900"
+                disabled={isLoading.vehicles}
+              >
+                <option value="">Select a vehicle</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.vehicleNumber}>
+                    {v.vehicleNumber} - {v.brand} {v.model}
+                  </option>
+                ))}
+              </select>
+              
+              {selectedVehicle && (
+                <button
+                  onClick={() => {
+                    setSelectedVehicle('');
+                    navigate('/user/inquiry-dashboard');
+                  }}
+                  className="p-2 hover:text-red-200"
+                  title="Clear selection"
+                  aria-label="Clear vehicle selection"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

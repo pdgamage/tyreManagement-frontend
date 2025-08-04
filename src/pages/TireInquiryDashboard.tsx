@@ -265,54 +265,41 @@ const TireInquiryDashboard: React.FC = () => {
       setError(prev => ({ ...prev, requests: undefined }));
     }
   }, [selectedVehicle, fetchRequests]);
-        id: request.id,
-        vehicleNumber: request.vehicleNumber,
-        status: request.status || 'Pending',
-        orderNumber: request.orderNumber || 'Not Assigned',
-        requestDate: request.created_at || request.submittedAt,
-        supplierDetails: {
-          name: request.supplierName || 'Not Assigned',
-          phone: request.supplierPhone || 'Not Available',
-          email: request.supplierEmail || 'Not Available'
-        },
-        tireDetails: {
-          size: request.tireSize || request.tireSizeRequired || 'Not Specified',
-          quantity: request.quantity || 0,
-          tubesQuantity: request.tubesQuantity || 0,
-          reason: request.requestReason || 'Not Specified',
-          make: request.existingTireMake || 'Not Specified'
-        },
-        vehicleDetails: {
-          brand: request.vehicleBrand || 'Unknown',
-          model: request.vehicleModel || 'Unknown',
-          lastReplacement: request.lastReplacementDate || 'Not Available',
-          kmReading: {
-            current: request.presentKmReading || 0,
-            previous: request.previousKmReading || 0
-          }
-        },
-        requesterDetails: {
-          name: request.requesterName || 'Not Specified',
-          department: request.userSection || 'Not Specified',
-          costCenter: request.costCenter || 'Not Specified'
-        },
-        approvalNotes: {
-          supervisor: request.supervisor_notes,
-          technicalManager: request.technical_manager_note,
-          engineer: request.engineer_note,
-          customerOfficer: request.customer_officer_note
-        }
-      }));
-      
-      setRequests(formattedRequests);
-      if (formattedRequests.length === 0) {
-        setError({ requests: "No requests found for this vehicle" });
-      }
-    } catch (err) {
-      setError({ requests: err instanceof Error ? err.message : "Failed to fetch requests" });
-      console.error("Error fetching requests:", err);
-    } finally {
-      setLoading(false);
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Get status badge color
+  const getStatusBadgeColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "complete":
+      case "order placed":
+        return "bg-green-100 text-green-800";
+      case "supervisor approved":
+      case "technical-manager approved":
+      case "engineer approved":
+      case "customer-officer approved":
+      case "approved":
+        return "bg-blue-100 text-blue-800";
+      case "supervisor rejected":
+      case "technical-manager rejected":
+      case "engineer rejected":
+      case "customer-officer rejected":
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "order cancelled":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Calendar, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -539,58 +539,86 @@ const UserInquiryDashboard: React.FC = () => {
                 {filteredRequests.map((request) => (
                   <li 
                     key={request.id} 
-                    className="px-6 py-5 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                    className="group px-6 py-5 hover:bg-gray-50 transition-colors duration-150 cursor-pointer border-l-4 border-transparent hover:border-blue-500"
                     onClick={() => handleViewDetails(request.id)}
                   >
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center">
-                          <p className="text-base font-semibold text-gray-900 truncate">
-                            Request #{request.id}
-                          </p>
-                          <span className={`ml-3 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(request.status)} border flex items-center`}>
-                            {getStatusIcon(request.status)}
-                            {request.status.toLowerCase() === 'complete' ? 'Complete - Sent to Customer Officer' : request.status}
-                          </span>
-                          {request.status.toLowerCase() === 'complete' && (
-                            <p className="mt-1 text-xs text-gray-500">
-                              The order has been sent to the customer officer for processing
-                            </p>
-                          )}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="flex-shrink-0">
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-blue-600" />
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-lg font-semibold text-gray-900">
+                                Request #{request.id}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {formatDate(request.requestDate)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
+                              {getStatusIcon(request.status)}
+                              {request.status.toLowerCase() === 'complete' ? 'Complete - Sent to Customer Officer' : request.status}
+                            </span>
+                            {request.status.toLowerCase() === 'complete' && (
+                              <p className="text-sm text-gray-600 italic flex items-center">
+                                <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />
+                                Sent to customer officer for processing
+                              </p>
+                            )}
+                          </div>
                         </div>
                         
-                        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
-                          <div className="flex items-center">
-                            <Calendar className="flex-shrink-0 mr-2 h-4 w-4 text-gray-400" />
-                            {formatDate(request.requestDate)}
-                          </div>
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {request.orderNumber && (
-                            <div className="flex items-center">
-                              <FileText className="flex-shrink-0 mr-2 h-4 w-4 text-gray-400" />
-                              Order #{request.orderNumber}
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <FileText className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Order Number</p>
+                                <p className="text-sm font-medium text-gray-900">#{request.orderNumber}</p>
+                              </div>
                             </div>
                           )}
+                          
                           {request.supplierName && request.supplierName !== 'N/A' && (
-                            <div className="flex items-center">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Supplier: {request.supplierName}
-                              </span>
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                <Building className="w-4 h-4 text-purple-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Supplier</p>
+                                <p className="text-sm font-medium text-gray-900">{request.supplierName}</p>
+                              </div>
                             </div>
                           )}
+                          
                           {request.tireCount && request.tireCount > 0 && (
-                            <div className="flex items-center">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                                {request.tireCount} tire{request.tireCount !== 1 ? 's' : ''}
-                              </span>
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg group-hover:bg-white">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                <Package className="w-4 h-4 text-amber-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Tires Requested</p>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {request.tireCount} tire{request.tireCount !== 1 ? 's' : ''}
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
                       
-                      <div className="mt-4 md:mt-0 md:ml-4 md:flex-shrink-0">
+                      <div className="mt-4 md:mt-0 md:ml-6 md:flex-shrink-0 flex items-center">
                         <button
                           type="button"
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 group-hover:shadow-md"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleViewDetails(request.id);

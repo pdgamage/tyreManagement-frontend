@@ -150,6 +150,25 @@ const UserInquiryDashboard: React.FC = () => {
   useEffect(() => {
     let results = requests;
     
+    // Apply date range filter first (works independently of vehicle selection)
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+      
+      if (start || end) {
+        results = results.filter(request => {
+          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+          if (start && requestDate < start) return false;
+          if (end) {
+            const endOfDay = new Date(end);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (requestDate > endOfDay) return false;
+          }
+          return true;
+        });
+      }
+    }
+
     // If vehicle is selected, filter by vehicle
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
@@ -170,25 +189,6 @@ const UserInquiryDashboard: React.FC = () => {
         request.id.toLowerCase().includes(term) ||
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
-    }
-    
-    // Apply date range filter
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
-          if (end) {
-            const endOfDay = new Date(end);
-            endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
-          }
-          return true;
-        });
-      }
     }
     
     setFilteredRequests(results);

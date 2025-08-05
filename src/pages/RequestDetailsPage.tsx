@@ -307,47 +307,6 @@ const RequestDetailsPage: React.FC = () => {
               </div>
             </div>
             
-            {/* Additional Information Section */}
-            <div className="py-6 px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-pink-50 to-rose-50 p-4 rounded-xl border border-pink-100">
-                <div className="flex items-center mb-2">
-                  <User className="w-5 h-5 text-pink-500 mr-2" />
-                  <dt className="text-sm font-medium text-pink-700">Engineer Name</dt>
-                </div>
-                <dd className="text-lg font-semibold text-gray-900">
-                  {request.engineerName || <span className="text-gray-400">Not specified</span>}
-                </dd>
-              </div>
-              
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-100">
-                <div className="flex items-center mb-2">
-                  <Calendar className="w-5 h-5 text-indigo-500 mr-2" />
-                  <dt className="text-sm font-medium text-indigo-700">Approval Date</dt>
-                </div>
-                <dd className="text-lg font-semibold text-gray-900">
-                  {request.approvalDate ? (
-                    new Date(request.approvalDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })
-                  ) : (
-                    <span className="text-gray-400">Not available</span>
-                  )}
-                </dd>
-              </div>
-              
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
-                <div className="flex items-center mb-2">
-                  <Info className="w-5 h-5 text-amber-500 mr-2" />
-                  <dt className="text-sm font-medium text-amber-700">Remarks</dt>
-                </div>
-                <dd className="text-sm font-medium text-gray-900">
-                  {request.remarks || <span className="text-gray-400">No remarks</span>}
-                </dd>
-              </div>
-            </div>
-            
             {/* Supplier Section */}
             <div className="py-6 px-6">
               <div className="flex items-center mb-4">

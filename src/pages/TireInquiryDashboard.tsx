@@ -574,7 +574,7 @@ const UserInquiryDashboard: React.FC = () => {
                       type="text"
                       name="search"
                       id="search"
-                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-10 py-1.5 text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-800 shadow-sm"
+                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-10 py-2.5 sm:text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-800 shadow-sm"
                       placeholder="Search by order #, ID, or supplier..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}

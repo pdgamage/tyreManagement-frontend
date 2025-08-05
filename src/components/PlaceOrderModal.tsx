@@ -41,6 +41,12 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
       setError(null);
       setSuccess(null);
       fetchSuppliers();
+      
+      // Set current date and time when opening modal
+      const now = new Date();
+      // Format date to YYYY-MM-DDThh:mm
+      const formattedDate = now.toISOString().slice(0, 16);
+      setOrderPlacedDate(formattedDate);
     }
   }, [isOpen]);
 
@@ -173,7 +179,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setSelectedSupplierId(null);
     setOrderNotes("");
     setOrderNumber("");
-    setOrderPlacedDate("");
+    // Reset to current date and time when closing
+    const now = new Date();
+    setOrderPlacedDate(now.toISOString().slice(0, 16));
     setError(null);
     onClose();
   };

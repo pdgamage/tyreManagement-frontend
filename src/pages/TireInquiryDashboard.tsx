@@ -551,7 +551,7 @@ const UserInquiryDashboard: React.FC = () => {
                     >
                       <span className="flex items-center">
                         {statusOptions.find(opt => opt.value === statusFilter)?.icon}
-                        <span className="ml-2 truncate">
+                        <span className="ml-2 truncate text-gray-800">
                           {statusOptions.find(opt => opt.value === statusFilter)?.label || 'All Statuses'}
                         </span>
                       </span>

@@ -190,7 +190,9 @@ const RequestDetailsPage: React.FC = () => {
                 <span className={`mr-2 ${statusColors.icon}`}>
                   {getStatusIcon(request.status)}
                 </span>
-                <span className="capitalize">{request.status.toLowerCase()}</span>
+                <span className="capitalize">
+                  {request.status.toLowerCase() === 'complete' ? 'Complete (Engineer Approved)' : request.status.toLowerCase()}
+                </span>
               </span>
             </div>
           </div>

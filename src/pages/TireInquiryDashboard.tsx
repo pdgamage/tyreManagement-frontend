@@ -48,20 +48,10 @@ const UserInquiryDashboard: React.FC = () => {
     startDate: '',
     endDate: ''
   });
-  
   // Local state for date filter inputs
-  const [dateInput, setDateInput] = useState({ 
-    startDate: '', 
-    endDate: '' 
-  });
+  const [dateInput, setDateInput] = useState({ startDate: '', endDate: '' });
   const [showDateFilter, setShowDateFilter] = useState(false);
   
-  // Helper function to format date for display
-  const formatDateForInput = (date: Date | null): string => {
-    if (!date) return '';
-    return date.toISOString().split('T')[0];
-  };
-
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
     setError(prev => ({ ...prev, vehicles: '' }));
@@ -253,73 +243,44 @@ const UserInquiryDashboard: React.FC = () => {
       }
       
       // 1. Apply date range filter if dates are selected
-      const hasStartDate = dateRange.startDate && dateRange.startDate.trim() !== '';
-      const hasEndDate = dateRange.endDate && dateRange.endDate.trim() !== '';
-      
-      if (hasStartDate || hasEndDate) {
+      if (dateRange.startDate || dateRange.endDate) {
         try {
-          // Use submittedAt as the primary date field
           const requestDate = request.submittedAt || request.requestDate || request.created_at;
+          const requestDateObj = requestDate ? new Date(requestDate) : null;
           
-          if (!requestDate) {
-            console.log('Skipping request - missing date field:', request.id);
-            return false;
+          if (!requestDateObj || isNaN(requestDateObj.getTime())) {
+            console.log('Skipping request due to invalid date:', request.id, requestDate);
+            return false; // Skip if no valid date
           }
           
-          // Parse the request date
-          const requestDateObj = new Date(requestDate);
-          if (isNaN(requestDateObj.getTime())) {
-            console.log('Skipping request - invalid date format:', request.id, requestDate);
-            return false;
-          }
+          // Create date objects for comparison
+          const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
+          const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
           
-          // Parse filter dates if they exist
-          const startDate = hasStartDate ? new Date(dateRange.startDate) : null;
-          const endDate = hasEndDate ? new Date(dateRange.endDate) : null;
+          // Normalize request date to start of day for comparison
+          const normalizedRequestDate = new Date(requestDateObj);
+          normalizedRequestDate.setHours(12, 0, 0, 0);
           
-          // Set time to start of day (00:00:00.000) for start date
           if (startDate) {
             const normalizedStartDate = new Date(startDate);
             normalizedStartDate.setHours(0, 0, 0, 0);
-            
-            const requestDateStart = new Date(requestDateObj);
-            requestDateStart.setHours(0, 0, 0, 0);
-            
-            if (requestDateStart < normalizedStartDate) {
-              console.log('Filtering out - before start date:', {
-                requestId: request.id,
-                requestDate: requestDateObj.toISOString(),
-                startDate: normalizedStartDate.toISOString()
-              });
+            if (normalizedRequestDate < normalizedStartDate) {
+              console.log('Filtering out request - before start date:', request.id, normalizedRequestDate, normalizedStartDate);
               return false;
             }
           }
           
-          // Set time to end of day (23:59:59.999) for end date
           if (endDate) {
             const normalizedEndDate = new Date(endDate);
             normalizedEndDate.setHours(23, 59, 59, 999);
-            
-            const requestDateEnd = new Date(requestDateObj);
-            requestDateEnd.setHours(23, 59, 59, 999);
-            
-            if (requestDateEnd > normalizedEndDate) {
-              console.log('Filtering out - after end date:', {
-                requestId: request.id,
-                requestDate: requestDateObj.toISOString(),
-                endDate: normalizedEndDate.toISOString()
-              });
+            if (normalizedRequestDate > normalizedEndDate) {
+              console.log('Filtering out request - after end date:', request.id, normalizedRequestDate, normalizedEndDate);
               return false;
             }
           }
           
         } catch (error) {
-          console.error('Error processing date filter:', {
-            error,
-            requestId: request.id,
-            requestDate: request.submittedAt || request.requestDate || request.created_at,
-            dateRange
-          });
+          console.error('Error processing date filter:', error, 'Request ID:', request.id);
           return false;
         }
       }
@@ -847,18 +808,8 @@ const UserInquiryDashboard: React.FC = () => {
                             <input
                               type="date"
                               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                              value={dateRange.startDate || ''}
-                              onChange={(e) => {
-                                const newStartDate = e.target.value;
-                                setDateRange(prev => ({
-                                  ...prev,
-                                  startDate: newStartDate,
-                                  // Reset end date if it's before the new start date
-                                  endDate: prev.endDate && newStartDate && new Date(prev.endDate) < new Date(newStartDate) 
-                                    ? '' 
-                                    : prev.endDate
-                                }));
-                              }}
+                              value={dateRange.startDate}
+                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
                             />
                           </div>
                           <div>
@@ -866,12 +817,9 @@ const UserInquiryDashboard: React.FC = () => {
                             <input
                               type="date"
                               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                              value={dateRange.endDate || ''}
-                              onChange={(e) => setDateRange(prev => ({
-                                ...prev,
-                                endDate: e.target.value
-                              }))}
-                              min={dateRange.startDate || ''}
+                              value={dateRange.endDate}
+                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                              min={dateRange.startDate}
                             />
                           </div>
                         </div>

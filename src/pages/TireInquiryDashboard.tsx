@@ -65,7 +65,8 @@ const UserInquiryDashboard: React.FC = () => {
   const vehicleFromUrl = searchParams.get('vehicle') || '';
   
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl);
+  // Initialize selectedVehicle with empty string to show no requests by default
+  const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl || '');
   const [requests, setRequests] = useState<TireRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
@@ -329,12 +330,11 @@ const UserInquiryDashboard: React.FC = () => {
     
     // Update URL with the new vehicle selection
     const searchParams = new URLSearchParams(window.location.search);
-    if (value && value !== '' && value !== 'Select Vehicle') {
-      if (value === 'All Vehicles') {
-        searchParams.delete('vehicle');
-      } else {
-        searchParams.set('vehicle', value);
-      }
+    
+    if (value === 'All Vehicles') {
+      searchParams.delete('vehicle');
+    } else if (value && value !== 'Select Vehicle') {
+      searchParams.set('vehicle', value);
     } else {
       searchParams.delete('vehicle');
     }
@@ -343,12 +343,12 @@ const UserInquiryDashboard: React.FC = () => {
     const newUrl = searchParams.toString() ? `?${searchParams.toString()}` : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
     
-    // Fetch requests based on selection
-    if (value === 'Select Vehicle') {
-      // Show no requests for 'Select Vehicle'
+    // Update requests based on selection
+    if (value === 'Select Vehicle' || value === '') {
+      // Show no requests for 'Select Vehicle' or empty selection
       setRequests([]);
-    } else if (value === 'All Vehicles' || value === '') {
-      // Show all requests for 'All Vehicles' or no selection
+    } else if (value === 'All Vehicles') {
+      // Show all requests for 'All Vehicles'
       fetchAllRequests();
     } else {
       // Show requests for specific vehicle

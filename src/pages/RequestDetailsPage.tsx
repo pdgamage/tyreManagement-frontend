@@ -182,7 +182,7 @@ const RequestDetailsPage: React.FC = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Order Number</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {request.orderNumber || 'N/A'}
+                  {request.orderNumber || 'The order has not yet been placed with a supplier'}
                 </dd>
               </div>
               
@@ -196,7 +196,7 @@ const RequestDetailsPage: React.FC = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Supplier</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <div className="font-medium">{request.supplierName || 'N/A'}</div>
+                  <div className="font-medium">{request.supplierName || 'The order has not yet been placed with a supplier'}</div>
                   {request.supplierPhone && (
                     <div className="mt-1 flex items-center">
                       <svg className="h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

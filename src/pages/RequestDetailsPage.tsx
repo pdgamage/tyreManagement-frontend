@@ -287,7 +287,9 @@ const RequestDetailsPage: React.FC = () => {
                   {new Date(request.requestDate || request.submittedAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
-                    day: 'numeric'
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
                   })}
                 </dd>
               </div>

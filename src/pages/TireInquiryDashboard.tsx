@@ -148,12 +148,21 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to filter requests based on all criteria
+  // Effect to handle vehicle selection and fetch requests
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetchRequests(selectedVehicle);
+    } else {
+      setFilteredRequests([]);
+    }
+  }, [selectedVehicle, fetchRequests]);
+
+  // Effect to apply filters to the fetched requests
   useEffect(() => {
     let results = [...requests];
 
-    // Apply date range filter (using submittedAt)
-    if (dateRange.startDate || dateRange.endDate) {
+    // Only apply date range filter if no vehicle is selected
+    if (!selectedVehicle && (dateRange.startDate || dateRange.endDate)) {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
@@ -177,13 +186,8 @@ const UserInquiryDashboard: React.FC = () => {
         }
       });
     }
-
-    // Apply vehicle filter if selected
-    if (selectedVehicle) {
-      results = results.filter(request => request.vehicleNumber === selectedVehicle);
-    }
     
-    // Apply status filter
+    // Apply status filter to either vehicle or date filtered results
     if (statusFilter !== "all") {
       results = results.filter(request => 
         request.status.toLowerCase().includes(statusFilter)
@@ -194,14 +198,14 @@ const UserInquiryDashboard: React.FC = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(request => 
-        request.orderNumber?.toLowerCase().includes(term) || 
-        request.id?.toLowerCase().includes(term) ||
+        (request.orderNumber?.toLowerCase().includes(term) ?? false) || 
+        (request.id?.toLowerCase().includes(term) ?? false) ||
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
     }
     
     setFilteredRequests(results);
-  }, [requests, dateRange.startDate, dateRange.endDate, selectedVehicle, statusFilter, searchTerm]);
+  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm, selectedVehicle]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;

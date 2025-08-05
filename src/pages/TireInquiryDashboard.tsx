@@ -152,6 +152,12 @@ const UserInquiryDashboard: React.FC = () => {
   useEffect(() => {
     if (selectedVehicle) {
       fetchRequests(selectedVehicle);
+      // Clear date range when selecting a vehicle
+      setDateRange({ startDate: '', endDate: '' });
+      setDateInput({ startDate: '', endDate: '' });
+    } else if (dateRange.startDate || dateRange.endDate) {
+      // If no vehicle selected but we have date range, fetch all requests
+      fetchRequests(''); // Pass empty string to fetch all requests
     } else {
       setFilteredRequests([]);
     }
@@ -161,30 +167,46 @@ const UserInquiryDashboard: React.FC = () => {
   useEffect(() => {
     let results = [...requests];
 
-    // Only apply date range filter if no vehicle is selected
+    // Apply date range filter if dates are selected and no vehicle is selected
     if (!selectedVehicle && (dateRange.startDate || dateRange.endDate)) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      if (start) start.setHours(0, 0, 0, 0);
-      if (end) end.setHours(23, 59, 59, 999);
-      
-      results = results.filter(request => {
-        if (!request.submittedAt) return false;
+      try {
+        const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+        const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
         
-        try {
-          const requestDate = new Date(request.submittedAt);
-          if (isNaN(requestDate.getTime())) return false;
+        if (start) start.setHours(0, 0, 0, 0);
+        if (end) end.setHours(23, 59, 59, 999);
+        
+        console.log('Filtering by date range:', { start, end });
+        
+        results = results.filter(request => {
+          if (!request.submittedAt) return false;
           
-          if (start && requestDate < start) return false;
-          if (end && requestDate > end) return false;
-          
-          return true;
-        } catch (error) {
-          console.error('Error processing date:', request.submittedAt, error);
-          return false;
-        }
-      });
+          try {
+            const requestDate = new Date(request.submittedAt);
+            if (isNaN(requestDate.getTime())) {
+              console.log('Invalid request date:', request.submittedAt);
+              return false;
+            }
+            
+            if (start && requestDate < start) {
+              console.log('Before start date:', requestDate, start);
+              return false;
+            }
+            if (end && requestDate > end) {
+              console.log('After end date:', requestDate, end);
+              return false;
+            }
+            
+            console.log('Date within range:', requestDate);
+            return true;
+          } catch (error) {
+            console.error('Error processing date:', request.submittedAt, error);
+            return false;
+          }
+        });
+      } catch (error) {
+        console.error('Error in date range filtering:', error);
+      }
     }
     
     // Apply status filter to either vehicle or date filtered results

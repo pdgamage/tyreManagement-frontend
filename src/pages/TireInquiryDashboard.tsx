@@ -148,33 +148,8 @@ const UserInquiryDashboard: React.FC = () => {
 
   // Effect to filter requests based on criteria
   useEffect(() => {
-    let results = [...requests]; // Create a new array to avoid mutating the original
+    let results = requests;
     
-    // Apply date range filter if any date is selected
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      results = results.filter(request => {
-        const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-        if (isNaN(requestDate.getTime())) return false; // Skip invalid dates
-        
-        if (start) {
-          const startOfDay = new Date(start);
-          startOfDay.setHours(0, 0, 0, 0);
-          if (requestDate < startOfDay) return false;
-        }
-        
-        if (end) {
-          const endOfDay = new Date(end);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (requestDate > endOfDay) return false;
-        }
-        
-        return true;
-      });
-    }
-
     // If vehicle is selected, filter by vehicle
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
@@ -191,10 +166,29 @@ const UserInquiryDashboard: React.FC = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(request => 
-        request.orderNumber?.toLowerCase().includes(term) || 
-        request.id?.toLowerCase().includes(term) ||
+        request.orderNumber.toLowerCase().includes(term) || 
+        request.id.toLowerCase().includes(term) ||
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
+    }
+    
+    // Apply date range filter
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+      
+      if (start || end) {
+        results = results.filter(request => {
+          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+          if (start && requestDate < start) return false;
+          if (end) {
+            const endOfDay = new Date(end);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (requestDate > endOfDay) return false;
+          }
+          return true;
+        });
+      }
     }
     
     setFilteredRequests(results);
@@ -398,73 +392,7 @@ const UserInquiryDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Date Filter Section (always visible) */}
-        <div className="mb-6 bg-white rounded-xl shadow-md p-5">
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-            <Filter className="w-5 h-5 mr-2 text-blue-600" />
-            Filter by Date Range
-          </h3>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <button
-                type="button"
-                className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
-                  showDateFilter || dateRange.startDate || dateRange.endDate
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-                onClick={() => setShowDateFilter(!showDateFilter)}
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                {dateRange.startDate || dateRange.endDate ? (
-                  <span className="text-sm">
-                    {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
-                  </span>
-                ) : (
-                  <span>Select Date Range</span>
-                )}
-              </button>
-              {showDateFilter && (
-                <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
-                      <input
-                        type="date"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        value={dateRange.startDate}
-                        onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
-                      <input
-                        type="date"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        value={dateRange.endDate}
-                        onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
-                        min={dateRange.startDate}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {(dateRange.startDate || dateRange.endDate) && (
-              <button
-                onClick={() => {
-                  setDateRange({ startDate: '', endDate: '' });
-                }}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Clear Date Filter
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Other Filters Section (only shown when vehicle is selected) */}
+        {/* Filters Section (only shown when vehicle is selected) */}
         {selectedVehicle && (
           <div className="mb-6 bg-white rounded-xl shadow-md p-5">
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
@@ -530,17 +458,66 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {(searchTerm || statusFilter !== "all") && (
-                  <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setStatusFilter("all");
-                    }}
-                    className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    Reset Filters
-                  </button>
-                )}
+                <div className="flex space-x-3">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
+                        showDateFilter || dateRange.startDate || dateRange.endDate
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => setShowDateFilter(!showDateFilter)}
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      {dateRange.startDate || dateRange.endDate ? (
+                        <span className="text-sm">
+                          {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                        </span>
+                      ) : (
+                        <span>Date Range</span>
+                      )}
+                    </button>
+                    {showDateFilter && (
+                      <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.startDate}
+                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.endDate}
+                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                              min={dateRange.startDate}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                        setDateRange({ startDate: '', endDate: '' });
+                      }}
+                      className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      Reset All
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

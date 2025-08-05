@@ -775,7 +775,9 @@ const UserInquiryDashboard: React.FC = () => {
                   >
                     <div className="flex items-center">
                       <Filter className="w-4 h-4 mr-2 text-gray-500" />
-                      {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
+                      <span className="text-gray-700">
+                        {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
+                      </span>
                     </div>
                     {isStatusDropdownOpen ? (
                       <ChevronUp className="ml-2 h-4 w-4" />

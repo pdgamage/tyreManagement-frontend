@@ -141,15 +141,64 @@ const UserInquiryDashboard: React.FC = () => {
   useEffect(() => {
     if (vehicleFromUrl) {
       setSelectedVehicle(vehicleFromUrl);
-      fetchRequests(vehicleFromUrl);
     }
-  }, [vehicleFromUrl, fetchRequests]);
+  }, [vehicleFromUrl]);
 
   // Effect to filter requests based on criteria
+  const fetchAllRequests = useCallback(async () => {
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch requests');
+      }
+      const result = await response.json();
+      const requestsData = Array.isArray(result.data) ? result.data : [];
+      
+      const formattedRequests = requestsData.map((req: any) => ({
+        id: req.id?.toString() || '',
+        vehicleNumber: req.vehicleNumber || '',
+        status: req.status || 'unknown',
+        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
+        requestDate: req.submittedAt || new Date().toISOString(), // Use submittedAt as primary date
+        submittedAt: req.submittedAt,
+        supplierName: req.supplierName || 'The order has not yet been placed with a supplier',
+        tireCount: req.tireCount || 0,
+      }));
+      
+      setRequests(formattedRequests);
+    } catch (err) {
+      console.error('Error fetching all requests:', err);
+      setError(prev => ({ ...prev, requests: 'Failed to load requests' }));
+    }
+  }, []);
+
+  // Effect to fetch all requests initially
+  useEffect(() => {
+    fetchAllRequests();
+  }, [fetchAllRequests]);
+
   useEffect(() => {
     let results = requests;
     
-    // If vehicle is selected, filter by vehicle
+    // Apply date range filter first
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+      
+      results = results.filter(request => {
+        const requestDate = new Date(request.submittedAt || request.requestDate || '');
+        if (start && requestDate < start) return false;
+        if (end) {
+          const endOfDay = new Date(end);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (requestDate > endOfDay) return false;
+        }
+        return true;
+      });
+    }
+
+    // Then apply vehicle filter if selected
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
     }
@@ -169,25 +218,6 @@ const UserInquiryDashboard: React.FC = () => {
         request.id.toLowerCase().includes(term) ||
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
-    }
-    
-    // Apply date range filter
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
-          if (end) {
-            const endOfDay = new Date(end);
-            endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
-          }
-          return true;
-        });
-      }
     }
     
     setFilteredRequests(results);

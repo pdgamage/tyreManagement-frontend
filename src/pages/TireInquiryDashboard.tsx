@@ -988,9 +988,11 @@ const UserInquiryDashboard: React.FC = () => {
                               <h3 className="text-lg font-semibold text-gray-900">
                                 Request #{request.id}
                               </h3>
-                              <div className="text-sm text-gray-500 mt-1">
-                                Submitted on {request.requestDate ? formatDate(request.requestDate) : 'date not available'}
-                              </div>
+                              {request.requestDate && (
+                                <div className="text-sm text-gray-500 mt-1">
+                                  Submitted on {formatDate(request.requestDate)}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-3 flex-wrap">

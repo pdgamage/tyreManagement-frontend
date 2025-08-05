@@ -53,7 +53,7 @@ const RequestDetailsPage: React.FC = () => {
   const getStatusIcon = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
     
-    if (statusLower.includes('approved') || statusLower === 'complete' || statusLower === 'engineer approved') {
+    if (statusLower.includes('approved') || statusLower === 'complete') {
       return <CheckCircle className="w-5 h-5" />;
     }
     
@@ -77,15 +77,6 @@ const RequestDetailsPage: React.FC = () => {
         text: 'text-emerald-700',
         border: 'border border-emerald-200',
         icon: 'text-emerald-500'
-      };
-    }
-    
-    if (statusLower === 'engineer approved') {
-      return {
-        bg: 'bg-gradient-to-r from-green-100 to-emerald-100',
-        text: 'text-emerald-800 font-semibold',
-        border: 'border-2 border-emerald-300',
-        icon: 'text-emerald-600'
       };
     }
     

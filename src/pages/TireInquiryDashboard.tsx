@@ -41,10 +41,16 @@ const UserInquiryDashboard: React.FC = () => {
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [dateRange, setDateRange] = useState({
     startDate: '',
     endDate: ''
   });
+  // Local state for date filter inputs
+  const [dateInput, setDateInput] = useState({ startDate: '', endDate: '' });
+  const [showDateFilter, setShowDateFilter] = useState(false);
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -142,94 +148,140 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  useEffect(() => {
-    if (selectedVehicle) {
-      fetchRequests(selectedVehicle);
-    } else {
-      setRequests([]);
-      setFilteredRequests([]);
+  // Fetch all requests on initial load
+  const fetchAllRequests = useCallback(async () => {
+    try {
+      setIsLoading(prev => ({ ...prev, requests: true }));
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
+      }
+      
+      const data = await response.json();
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Error fetching requests:', err);
+      setError(prev => ({
+        ...prev,
+        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
+      }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, requests: false }));
     }
-  }, [selectedVehicle, fetchRequests]);
+  }, []);
 
-  useEffect(() => {
-    if (!requests.length) {
-      console.log('No requests to filter');
-      setFilteredRequests([]);
+  // Fetch requests for a specific vehicle
+  const fetchVehicleRequests = useCallback(async (vehicleNumber: string) => {
+    if (!vehicleNumber) {
+      await fetchAllRequests();
       return;
     }
     
     try {
-      const filtered = requests.filter(request => {
-        // Apply date range filter if dates are selected
-        if (dateRange.startDate || dateRange.endDate) {
-          try {
-            const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
-            if (!requestDate || isNaN(requestDate.getTime())) {
-              console.log('Skipping request with invalid date:', request.id);
-              return false; // Skip if no valid date
-            }
-            
-            // Create date objects for comparison
-            const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
-            const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
-            
-            // Set time to start/end of day for accurate comparison
-            if (startDate) startDate.setHours(0, 0, 0, 0);
-            if (endDate) endDate.setHours(23, 59, 59, 999);
-            
-            // Check if request date is within range
-            if (startDate && requestDate < startDate) {
-              console.log('Request before start date:', request.id, requestDate, startDate);
-              return false;
-            }
-            if (endDate && requestDate > endDate) {
-              console.log('Request after end date:', request.id, requestDate, endDate);
-              return false;
-            }
-            
-          } catch (error) {
-            console.error('Error processing date filter for request:', request.id, error);
-            return false;
-          }
-        }
-        
-        return true; // Include request if it passes all filters
-      });
+      setIsLoading(prev => ({ ...prev, requests: true }));
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       
-      console.log('Filtered requests:', filtered.length, 'out of', requests.length);
-      setFilteredRequests(filtered);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch vehicle requests: ${response.status} ${errorText}`);
+      }
       
-    } catch (error) {
-      console.error('Error in filter processing:', error);
-      // If there's an error in filtering, show all requests
-      setFilteredRequests(requests);
+      const data = await response.json();
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Error fetching vehicle requests:', err);
+      setError(prev => ({
+        ...prev,
+        requests: `Failed to load vehicle requests: ${err?.message || 'Unknown error'}`
+      }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, requests: false }));
     }
-  }, [requests, dateRange.startDate, dateRange.endDate]);
+  }, [fetchAllRequests]);
 
-  const handleVehicleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Handle vehicle selection changes
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetchVehicleRequests(selectedVehicle);
+    } else {
+      fetchAllRequests();
+    }
+  }, [selectedVehicle, fetchVehicleRequests, fetchAllRequests]);
+
+  // Apply filters to the requests
+  useEffect(() => {
+    if (!requests.length) {
+      setFilteredRequests([]);
+      return;
+    }
+    
+    console.log('Applying filters to requests:', requests.length, 'requests');
+    
+    // Apply all filters in sequence
+    const filtered = requests.filter(request => {
+      // 1. Apply date range filter if dates are selected
+      if (dateRange.startDate || dateRange.endDate) {
+        try {
+          const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
+          if (!requestDate || isNaN(requestDate.getTime())) {
+            return false; // Skip if no valid date
+          }
+          
+          // Create date objects for comparison
+          const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
+          const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
+          
+          // Set time to start/end of day for accurate comparison
+          if (startDate) startDate.setHours(0, 0, 0, 0);
+          if (endDate) endDate.setHours(23, 59, 59, 999);
+          
+          // Check if request date is within range
+          if (startDate && requestDate < startDate) return false;
+          if (endDate && requestDate > endDate) return false;
+          
+        } catch (error) {
+          console.error('Error processing date filter:', error);
+          return false;
+        }
+      }
+      
+      // 2. Apply status filter
+      if (statusFilter !== "all" && !request.status.toLowerCase().includes(statusFilter)) {
+        return false;
+      }
+      
+      // 3. Apply search term filter
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
+        const matchesId = request.id?.toLowerCase().includes(term) ?? false;
+        const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
+        
+        if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
+          return false;
+        }
+      }
+      
+      return true; // Include request if it passes all filters
+    });
+    
+    console.log('Filtered requests:', filtered.length, 'out of', requests.length);
+    setFilteredRequests(filtered);
+    
+  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
+
+  const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedVehicle(value);
     navigate(value ? `?vehicle=${value}` : '/user/inquiry-dashboard');
-    
-    // Clear previous requests while loading
-    setRequests([]);
-    setFilteredRequests([]);
-    
-    if (value) {
-      try {
-        await fetchRequests(value);
-      } catch (error) {
-        console.error('Error fetching vehicle requests:', error);
-        setError(prev => ({
-          ...prev,
-          requests: `Failed to load requests: ${error instanceof Error ? error.message : 'Unknown error'}`
-        }));
-      }
-    } else {
-      // If no vehicle selected, clear the requests
-      setRequests([]);
-      setFilteredRequests([]);
-    }
+    if (value) fetchRequests(value);
   };
 
   const handleViewDetails = (requestId: string) => {
@@ -343,41 +395,149 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
             
             {/* Date Range Filter */}
-            {selectedVehicle && (
-              <div className="mb-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div className="w-full">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Date Range</label>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <input
-                        type="date"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        value={dateRange.startDate}
-                        onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
-                      />
-                      <span className="self-center text-gray-500">to</span>
-                      <input
-                        type="date"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        value={dateRange.endDate}
-                        onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
-                        min={dateRange.startDate}
-                      />
-                      {(dateRange.startDate || dateRange.endDate) && (
-                        <button
-                          onClick={() => setDateRange({ startDate: '', endDate: '' })}
-                          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          Clear
-                        </button>
-                      )}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-blue-100">
+                  Filter by Date Range
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="flex-1">
+                  <label className="block text-xs text-blue-200 mb-1">From</label>
+                  <input
+                    type="date"
+                    value={dateInput.startDate}
+                    onChange={(e) => setDateInput({...dateInput, startDate: e.target.value})}
+                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs text-blue-200 mb-1">To</label>
+                  <input
+                    type="date"
+                    value={dateInput.endDate}
+                    onChange={(e) => setDateInput({...dateInput, endDate: e.target.value})}
+                    min={dateInput.startDate}
+                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <button
+                    onClick={() => setDateRange({ startDate: dateInput.startDate, endDate: dateInput.endDate })}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
+                    disabled={!dateInput.startDate && !dateInput.endDate}
+                    title="Apply date range filter"
+                  >
+                    Apply
+                  </button>
+                  {(dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      onClick={() => { 
+                        setDateRange({ startDate: '', endDate: '' }); 
+                        setDateInput({ startDate: '', endDate: '' }); 
+                      }}
+                      className="px-4 py-2 text-xs text-blue-200 hover:text-white transition-colors duration-200"
+                      title="Clear date range"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status and Search Filters */}
+          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-blue-100 mb-2">
+                    Filter by Status
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="relative w-full bg-white/90 border border-blue-300/50 rounded-lg shadow-sm pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                    >
+                      <span className="flex items-center">
+                        {statusOptions.find(opt => opt.value === statusFilter)?.icon}
+                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Select status...'}
+                      </span>
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        {isStatusDropdownOpen ? (
+                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                        )}
+                      </span>
+                    </button>
+                    
+                    {isStatusDropdownOpen && (
+                      <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
+                        <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                          {statusOptions.map((option) => (
+                            <li
+                              key={option.value}
+                              className={`text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 ${statusFilter === option.value ? 'bg-blue-100' : ''}`}
+                              onClick={() => {
+                                setStatusFilter(option.value);
+                                setIsStatusDropdownOpen(false);
+                              }}
+                            >
+                              <div className="flex items-center">
+                                <span className="font-normal block truncate">
+                                  {option.icon}
+                                  {option.label}
+                                </span>
+                              </div>
+                              {statusFilter === option.value && (
+                                <span className="text-blue-600 absolute inset-y-0 right-0 flex items-center pr-4">
+                                  <CheckCircle className="h-5 w-5" />
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Search Filter */}
+                <div>
+                  <label htmlFor="search" className="block text-sm font-medium text-blue-100 mb-2">
+                    Search Requests
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 text-gray-400" />
                     </div>
+                    <input
+                      type="text"
+                      name="search"
+                      id="search"
+                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-12 sm:text-sm border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm"
+                      placeholder="Search by order #, ID, or supplier"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                        onClick={() => setSearchTerm('')}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
-
         </div>
       </header>
 
@@ -456,6 +616,137 @@ const UserInquiryDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Filters Section (only shown when vehicle is selected) */}
+        {selectedVehicle && (
+          <div className="mb-6 bg-white rounded-xl shadow-md p-5">
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <Filter className="w-5 h-5 mr-2 text-blue-600" />
+              Filter Requests
+            </h3>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex-1">
+                <div className="relative max-w-md">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search by order #, request ID, or supplier..."
+                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-between w-full md:w-56 px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                  >
+                    <div className="flex items-center">
+                      <Filter className="w-4 h-4 mr-2 text-gray-500" />
+                      {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
+                    </div>
+                    {isStatusDropdownOpen ? (
+                      <ChevronUp className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    )}
+                  </button>
+                  
+                  {isStatusDropdownOpen && (
+                    <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                      <div className="py-1">
+                        {statusOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                              statusFilter === option.value
+                                ? "bg-blue-50 text-blue-800"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                            onClick={() => {
+                              setStatusFilter(option.value);
+                              setIsStatusDropdownOpen(false);
+                            }}
+                          >
+                            {option.icon}
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex space-x-3">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
+                        showDateFilter || dateRange.startDate || dateRange.endDate
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => setShowDateFilter(!showDateFilter)}
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      {dateRange.startDate || dateRange.endDate ? (
+                        <span className="text-sm">
+                          {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                        </span>
+                      ) : (
+                        <span>Date Range</span>
+                      )}
+                    </button>
+                    {showDateFilter && (
+                      <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.startDate}
+                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.endDate}
+                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                              min={dateRange.startDate}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                        setDateRange({ startDate: '', endDate: '' });
+                      }}
+                      className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      Reset All
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Dashboard Content */}
         <div className="space-y-6">
           {/* Loading State */}
@@ -499,8 +790,21 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {`No tire requests were found for vehicle ${selectedVehicle}.`}
+                  {(searchTerm || statusFilter !== "all")
+                    ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
+                    : `No tire requests were found for vehicle ${selectedVehicle}.`}
                 </p>
+                {(searchTerm || statusFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStatusFilter("all");
+                    }}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Clear Filters
+                  </button>
+                )}
               </div>
             </div>
           )}

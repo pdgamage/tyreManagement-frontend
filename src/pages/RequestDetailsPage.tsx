@@ -13,6 +13,12 @@ interface RequestDetails {
   supplierName: string;
   supplierPhone?: string;
   supplierEmail?: string;
+  engineerName?: string;
+  approvalDate?: string;
+  remarks?: string;
+  quantity?: number;
+  tubesQuantity?: number;
+  tireSize?: string;
 }
 
 const RequestDetailsPage: React.FC = () => {
@@ -264,6 +270,80 @@ const RequestDetailsPage: React.FC = () => {
                     month: 'short',
                     day: 'numeric'
                   })}
+                </dd>
+              </div>
+            </div>
+            
+            {/* Tire Details Section */}
+            <div className="py-6 px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+                <div className="flex items-center mb-2">
+                  <span className="w-5 h-5 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full text-xs font-medium mr-2">#</span>
+                  <dt className="text-sm font-medium text-blue-700">Tire Quantity</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.quantity || <span className="text-gray-400">-</span>}
+                </dd>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                <div className="flex items-center mb-2">
+                  <span className="w-5 h-5 flex items-center justify-center bg-green-100 text-green-600 rounded-full text-xs font-medium mr-2">#</span>
+                  <dt className="text-sm font-medium text-green-700">Tubes Quantity</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.tubesQuantity || <span className="text-gray-400">-</span>}
+                </dd>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-4 rounded-xl border border-purple-100">
+                <div className="flex items-center mb-2">
+                  <span className="w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-600 rounded-full text-xs font-medium mr-2">#</span>
+                  <dt className="text-sm font-medium text-purple-700">Tire Size</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.tireSize || <span className="text-gray-400">Not specified</span>}
+                </dd>
+              </div>
+            </div>
+            
+            {/* Additional Information Section */}
+            <div className="py-6 px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-pink-50 to-rose-50 p-4 rounded-xl border border-pink-100">
+                <div className="flex items-center mb-2">
+                  <User className="w-5 h-5 text-pink-500 mr-2" />
+                  <dt className="text-sm font-medium text-pink-700">Engineer Name</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.engineerName || <span className="text-gray-400">Not specified</span>}
+                </dd>
+              </div>
+              
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-100">
+                <div className="flex items-center mb-2">
+                  <Calendar className="w-5 h-5 text-indigo-500 mr-2" />
+                  <dt className="text-sm font-medium text-indigo-700">Approval Date</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.approvalDate ? (
+                    new Date(request.approvalDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })
+                  ) : (
+                    <span className="text-gray-400">Not available</span>
+                  )}
+                </dd>
+              </div>
+              
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
+                <div className="flex items-center mb-2">
+                  <Info className="w-5 h-5 text-amber-500 mr-2" />
+                  <dt className="text-sm font-medium text-amber-700">Remarks</dt>
+                </div>
+                <dd className="text-sm font-medium text-gray-900">
+                  {request.remarks || <span className="text-gray-400">No remarks</span>}
                 </dd>
               </div>
             </div>

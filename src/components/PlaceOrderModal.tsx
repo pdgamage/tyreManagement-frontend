@@ -31,9 +31,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   );
   const [orderNumber, setOrderNumber] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
-  const [orderDate, setOrderDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -108,7 +105,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
-            orderPlacedDateTime: orderDate ? new Date(orderDate).toISOString() : new Date().toISOString(),
           }),
         }
       );
@@ -174,7 +170,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleClose = () => {
     setSelectedSupplierId(null);
     setOrderNotes("");
-    setOrderDate(new Date().toISOString().split('T')[0]);
     setError(null);
     onClose();
   };
@@ -276,32 +271,17 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             />
           </div>
 
-          {/* Order Date */}
-          <div className="mb-4">
-            <label htmlFor="orderDate" className="block text-sm font-medium text-gray-700 mb-1">
-              Order Date *
-            </label>
-            <input
-              type="date"
-              id="orderDate"
-              value={orderDate}
-              onChange={(e) => setOrderDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
           {/* Order Notes */}
-          <div className="mb-4">
-            <label htmlFor="orderNotes" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Order Notes (Optional)
             </label>
             <textarea
-              id="orderNotes"
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               value={orderNotes}
               onChange={(e) => setOrderNotes(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={3}
+              placeholder="Add any special instructions or notes for the supplier..."
             />
           </div>
 

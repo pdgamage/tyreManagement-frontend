@@ -221,60 +221,35 @@ const UserInquiryDashboard: React.FC = () => {
       setFilteredRequests([]);
       return;
     }
-    
-    console.log('Applying filters to requests:', requests.length, 'requests');
-    
     // Apply all filters in sequence
     const filtered = requests.filter(request => {
-      // 1. Apply date range filter if dates are selected
+      // Date range filter
       if (dateRange.startDate || dateRange.endDate) {
-        try {
-          const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
-          if (!requestDate || isNaN(requestDate.getTime())) {
-            return false; // Skip if no valid date
-          }
-          
-          // Create date objects for comparison
-          const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
-          const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
-          
-          // Set time to start/end of day for accurate comparison
-          if (startDate) startDate.setHours(0, 0, 0, 0);
-          if (endDate) endDate.setHours(23, 59, 59, 999);
-          
-          // Check if request date is within range
-          if (startDate && requestDate < startDate) return false;
-          if (endDate && requestDate > endDate) return false;
-          
-        } catch (error) {
-          console.error('Error processing date filter:', error);
-          return false;
-        }
+        const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
+        if (!requestDate || isNaN(requestDate.getTime())) return false;
+        const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
+        const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
+        if (startDate) startDate.setHours(0, 0, 0, 0);
+        if (endDate) endDate.setHours(23, 59, 59, 999);
+        if (startDate && requestDate < startDate) return false;
+        if (endDate && requestDate > endDate) return false;
       }
-      
-      // 2. Apply status filter
+      // Status filter
       if (statusFilter !== "all" && !request.status.toLowerCase().includes(statusFilter)) {
         return false;
       }
-      
-      // 3. Apply search term filter
+      // Search filter
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
-        const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
-        const matchesId = request.id?.toLowerCase().includes(term) ?? false;
-        const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
-        
-        if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
-          return false;
-        }
+        return (
+          (request.orderNumber?.toLowerCase().includes(term) ?? false) ||
+          (request.id?.toLowerCase().includes(term) ?? false) ||
+          (request.supplierName?.toLowerCase().includes(term) ?? false)
+        );
       }
-      
-      return true; // Include request if it passes all filters
+      return true;
     });
-    
-    console.log('Filtered requests:', filtered.length, 'out of', requests.length);
     setFilteredRequests(filtered);
-    
   }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

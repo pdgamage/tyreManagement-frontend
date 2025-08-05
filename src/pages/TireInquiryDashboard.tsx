@@ -726,8 +726,8 @@ const UserInquiryDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Filters Section (only shown when vehicle is selected) */}
-        {selectedVehicle && (
+        {/* Filters Section - Hidden as per user request */}
+        {false && selectedVehicle && (
           <div className="mb-6 bg-white rounded-xl shadow-md p-5">
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
               <Filter className="w-5 h-5 mr-2 text-blue-600" />

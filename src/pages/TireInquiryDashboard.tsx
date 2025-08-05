@@ -148,27 +148,81 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to handle vehicle selection and fetch requests
+  // Fetch all requests on initial load
+  const fetchAllRequests = useCallback(async () => {
+    try {
+      setIsLoading(prev => ({ ...prev, requests: true }));
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
+      }
+      
+      const data = await response.json();
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Error fetching requests:', err);
+      setError(prev => ({
+        ...prev,
+        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
+      }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, requests: false }));
+    }
+  }, []);
+
+  // Fetch requests for a specific vehicle
+  const fetchVehicleRequests = useCallback(async (vehicleNumber: string) => {
+    if (!vehicleNumber) {
+      await fetchAllRequests();
+      return;
+    }
+    
+    try {
+      setIsLoading(prev => ({ ...prev, requests: true }));
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch vehicle requests: ${response.status} ${errorText}`);
+      }
+      
+      const data = await response.json();
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Error fetching vehicle requests:', err);
+      setError(prev => ({
+        ...prev,
+        requests: `Failed to load vehicle requests: ${err?.message || 'Unknown error'}`
+      }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, requests: false }));
+    }
+  }, [fetchAllRequests]);
+
+  // Handle vehicle selection changes
   useEffect(() => {
     if (selectedVehicle) {
-      fetchRequests(selectedVehicle);
-      // Clear date range when selecting a vehicle
-      setDateRange({ startDate: '', endDate: '' });
-      setDateInput({ startDate: '', endDate: '' });
-    } else if (dateRange.startDate || dateRange.endDate) {
-      // If no vehicle selected but we have date range, fetch all requests
-      fetchRequests(''); // Pass empty string to fetch all requests
+      fetchVehicleRequests(selectedVehicle);
     } else {
-      setFilteredRequests([]);
+      fetchAllRequests();
     }
-  }, [selectedVehicle, fetchRequests]);
+  }, [selectedVehicle, fetchVehicleRequests, fetchAllRequests]);
 
-  // Effect to apply filters to the fetched requests
+  // Apply filters to the requests
   useEffect(() => {
+    if (!requests.length) return;
+    
     let results = [...requests];
 
-    // Apply date range filter if dates are selected and no vehicle is selected
-    if (!selectedVehicle && (dateRange.startDate || dateRange.endDate)) {
+    // Apply date range filter if dates are selected
+    if (dateRange.startDate || dateRange.endDate) {
       try {
         const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
         const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
@@ -291,15 +345,69 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
           
-          {/* Date Range Filter */}
-          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20 mb-4">
-            <div className="max-w-4xl mx-auto">
+          {/* Combined Filters Section */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Vehicle Selection Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-blue-100">
+                  Filter by Vehicle
+                </label>
+                {isLoading.vehicles && (
+                  <div className="flex items-center text-xs text-blue-200">
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    Loading...
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Car className="h-4 w-4 text-blue-400" />
+                  </div>
+                  <select
+                    value={selectedVehicle}
+                    onChange={handleVehicleChange}
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    disabled={isLoading.vehicles}
+                  >
+                    <option value="">All Vehicles</option>
+                    {vehicles.map((vehicle) => (
+                      <option key={vehicle.vehicleNumber} value={vehicle.vehicleNumber}>
+                        {vehicle.vehicleNumber} - {vehicle.brand} {vehicle.model}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedVehicle && (
+                    <button
+                      onClick={() => {
+                        setSelectedVehicle('');
+                        navigate('/user/inquiry-dashboard');
+                      }}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-400 hover:text-white transition-colors"
+                      title="Clear selection"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {error.vehicles && (
+                <div className="mt-2 text-xs text-red-200 flex items-start">
+                  <AlertCircle className="w-3.5 h-3.5 mr-1 mt-0.5 flex-shrink-0" />
+                  <span>{error.vehicles}</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Date Range Filter */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium text-blue-100">
                   Filter by Date Range
                 </label>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
                 <div className="flex-1">
                   <label className="block text-xs text-blue-200 mb-1">From</label>
                   <input
@@ -319,81 +427,120 @@ const UserInquiryDashboard: React.FC = () => {
                     className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
                   />
                 </div>
-                <button
-                  onClick={() => setDateRange({ startDate: dateInput.startDate, endDate: dateInput.endDate })}
-                  className="mt-5 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
-                  disabled={!dateInput.startDate && !dateInput.endDate}
-                >
-                  Search
-                </button>
-                {(dateRange.startDate || dateRange.endDate) && (
+                <div className="flex flex-col space-y-1">
                   <button
-                    onClick={() => { setDateRange({ startDate: '', endDate: '' }); setDateInput({ startDate: '', endDate: '' }); }}
-                    className="mt-5 p-2 text-blue-200 hover:text-white transition-colors duration-200"
-                    title="Clear date range"
+                    onClick={() => setDateRange({ startDate: dateInput.startDate, endDate: dateInput.endDate })}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
+                    disabled={!dateInput.startDate && !dateInput.endDate}
+                    title="Apply date range filter"
                   >
-                    <X className="w-5 h-5" />
+                    Apply
                   </button>
-                )}
+                  {(dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      onClick={() => { 
+                        setDateRange({ startDate: '', endDate: '' }); 
+                        setDateInput({ startDate: '', endDate: '' }); 
+                      }}
+                      className="px-4 py-2 text-xs text-blue-200 hover:text-white transition-colors duration-200"
+                      title="Clear date range"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Vehicle Selection Card */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+          {/* Status and Search Filters */}
+          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium text-blue-100">
-                  Select Vehicle to View Requests
-                </label>
-                {isLoading.vehicles && (
-                  <div className="flex items-center text-sm text-blue-200">
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                    Loading vehicles...
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-blue-100 mb-2">
+                    Filter by Status
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="relative w-full bg-white/90 border border-blue-300/50 rounded-lg shadow-sm pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                    >
+                      <span className="flex items-center">
+                        {statusOptions.find(opt => opt.value === statusFilter)?.icon}
+                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Select status...'}
+                      </span>
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        {isStatusDropdownOpen ? (
+                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                        )}
+                      </span>
+                    </button>
+                    
+                    {isStatusDropdownOpen && (
+                      <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
+                        <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                          {statusOptions.map((option) => (
+                            <li
+                              key={option.value}
+                              className={`text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 ${statusFilter === option.value ? 'bg-blue-100' : ''}`}
+                              onClick={() => {
+                                setStatusFilter(option.value);
+                                setIsStatusDropdownOpen(false);
+                              }}
+                            >
+                              <div className="flex items-center">
+                                <span className="font-normal block truncate">
+                                  {option.icon}
+                                  {option.label}
+                                </span>
+                              </div>
+                              {statusFilter === option.value && (
+                                <span className="text-blue-600 absolute inset-y-0 right-0 flex items-center pr-4">
+                                  <CheckCircle className="h-5 w-5" />
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              
-              {error.vehicles && (
-                <div className="mb-4 p-3 bg-red-500/20 rounded-lg text-red-100 text-sm flex items-start">
-                  <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{error.vehicles}</span>
-                </div>
-              )}
-              
-              <div className="flex space-x-3">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Car className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <select
-                    value={selectedVehicle}
-                    onChange={handleVehicleChange}
-                    className="block w-full pl-10 pr-12 py-3 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium"
-                    disabled={isLoading.vehicles}
-                  >
-                    <option value="">Select a vehicle...</option>
-                    {vehicles.map(v => (
-                      <option key={v.id} value={v.vehicleNumber}>
-                        {v.vehicleNumber} - {v.brand} {v.model}
-                      </option>
-                    ))}
-                  </select>
                 </div>
                 
-                {selectedVehicle && (
-                  <button
-                    onClick={() => {
-                      setSelectedVehicle('');
-                      navigate('/user/inquiry-dashboard');
-                    }}
-                    className="p-3 text-blue-200 hover:text-white transition-colors duration-200"
-                    title="Clear selection"
-                    aria-label="Clear vehicle selection"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
+                {/* Search Filter */}
+                <div>
+                  <label htmlFor="search" className="block text-sm font-medium text-blue-100 mb-2">
+                    Search Requests
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      name="search"
+                      id="search"
+                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-12 sm:text-sm border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm"
+                      placeholder="Search by order #, ID, or supplier"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                        onClick={() => setSearchTerm('')}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

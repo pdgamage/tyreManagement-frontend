@@ -1017,8 +1017,8 @@ const UserInquiryDashboard: React.FC = () => {
                             <div>
                               <p className="text-xs text-gray-500">Order Number</p>
                               <p className="text-sm font-medium text-gray-900">
-                                {request.orderNumber === 'The order has not yet been placed with a supplier' 
-                                  ? <span className="italic text-gray-500">{request.orderNumber}</span>
+                                {!request.orderNumber || request.orderNumber === 'The order has not yet been placed with a supplier' 
+                                  ? <span className="italic text-gray-500">The order has not yet been placed with a supplier</span>
                                   : `#${request.orderNumber}`}
                               </p>
                             </div>
@@ -1031,8 +1031,8 @@ const UserInquiryDashboard: React.FC = () => {
                             <div>
                               <p className="text-xs text-gray-500">Supplier</p>
                               <p className="text-sm font-medium text-gray-900">
-                                {request.supplierName === 'The order has not yet been placed with a supplier'
-                                  ? <span className="italic text-gray-500">{request.supplierName}</span>
+                                {!request.supplierName || request.supplierName === 'The order has not yet been placed with a supplier'
+                                  ? <span className="italic text-gray-500">The order has not yet been placed with a supplier</span>
                                   : request.supplierName}
                               </p>
                             </div>

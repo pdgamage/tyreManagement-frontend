@@ -231,8 +231,12 @@ const UserInquiryDashboard: React.FC = () => {
     console.log('Current filters - search:', searchTerm, 'status:', statusFilter, 'vehicle:', selectedVehicle);
     
     // Apply all filters in sequence
-    const filtered = requests.filter(request => {
-      if (!request) return false;
+    const filtered = [...requests].filter(request => {
+      // Skip if request is invalid
+      if (!request || typeof request !== 'object') {
+        console.log('Skipping invalid request:', request);
+        return false;
+      }
       // 0. Apply vehicle filter first if a vehicle is selected
       if (selectedVehicle && request.vehicleNumber !== selectedVehicle) {
         return false;
@@ -292,13 +296,17 @@ const UserInquiryDashboard: React.FC = () => {
       // 3. Apply search term filter
       if (searchTerm && searchTerm.trim()) {
         const term = searchTerm.toLowerCase().trim();
-        const orderNumber = request.orderNumber?.toLowerCase() || '';
-        const id = request.id?.toLowerCase() || '';
-        const supplierName = request.supplierName?.toLowerCase() || '';
+        const orderNumber = (request.orderNumber || '').toString().toLowerCase();
+        const id = (request.id || '').toString().toLowerCase();
+        const supplierName = (request.supplierName || '').toString().toLowerCase();
         
-        if (!orderNumber.includes(term) && 
-            !id.includes(term) && 
-            !supplierName.includes(term)) {
+        // Check if any field contains the search term
+        const matchesSearch = 
+          orderNumber.includes(term) || 
+          id.includes(term) || 
+          supplierName.includes(term);
+          
+        if (!matchesSearch) {
           return false;
         }
       }
@@ -310,6 +318,22 @@ const UserInquiryDashboard: React.FC = () => {
     setFilteredRequests(filtered);
     
   }, [requests, selectedVehicle, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
+
+  // Handle search input changes and update URL
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Update URL with search term for shareable links
+    const searchParams = new URLSearchParams(window.location.search);
+    if (value) {
+      searchParams.set('search', value);
+    } else {
+      searchParams.delete('search');
+    }
+    // Use replace to avoid adding to browser history for each keystroke
+    window.history.replaceState({}, '', `?${searchParams.toString()}`);
+  };
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -691,7 +715,7 @@ const UserInquiryDashboard: React.FC = () => {
                     placeholder="Search by order #, request ID, or supplier..."
                     className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
                     onKeyDown={(e) => {
                       // Prevent form submission on Enter key
                       if (e.key === 'Enter') {

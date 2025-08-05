@@ -41,12 +41,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
       setError(null);
       setSuccess(null);
       fetchSuppliers();
-      
-      // Set current date and time when opening modal
-      const now = new Date();
-      // Format date to YYYY-MM-DDThh:mm
-      const formattedDate = now.toISOString().slice(0, 16);
-      setOrderPlacedDate(formattedDate);
     }
   }, [isOpen]);
 
@@ -98,9 +92,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         phone: selectedSupplier.phone
       });
 
-      // Extract only the date portion from the datetime
-      const dateOnly = orderPlacedDate ? orderPlacedDate.split('T')[0] : null;
-
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -115,7 +106,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
-            orderPlacedDate: dateOnly, // Send only the date portion
+            orderPlacedDate: orderPlacedDate,
           }),
         }
       );
@@ -182,9 +173,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setSelectedSupplierId(null);
     setOrderNotes("");
     setOrderNumber("");
-    // Reset to current date and time when closing
-    const now = new Date();
-    setOrderPlacedDate(now.toISOString().slice(0, 16));
+    setOrderPlacedDate("");
     setError(null);
     onClose();
   };

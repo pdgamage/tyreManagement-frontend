@@ -70,7 +70,7 @@ const UserInquiryDashboard: React.FC = () => {
   const [requests, setRequests] = useState<TireRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
-  const [error, setError] = useState({ vehicles: '', requests: '' });
+  const [error, setError] = useState<{ vehicles: string | null; requests: string | null }>({ vehicles: null, requests: null });
   
   // Handle error state updates safely
   const updateError = useCallback((field: 'vehicles' | 'requests', message: string) => {
@@ -150,35 +150,17 @@ const UserInquiryDashboard: React.FC = () => {
     fetchVehicles();
   }, [fetchVehicles]);
 
+  // Initialize requests based on URL parameter or default to empty
   useEffect(() => {
     if (vehicleFromUrl) {
+      // If there's a vehicle in the URL, select it and fetch its requests
       setSelectedVehicle(vehicleFromUrl);
       fetchRequests(vehicleFromUrl);
+    } else {
+      // If no vehicle in URL, ensure we start with no requests
+      setRequests([]);
     }
   }, [vehicleFromUrl, fetchRequests]);
-
-  useEffect(() => {
-    const fetchInitialRequests = async () => {
-      try {
-        setIsLoading(prev => ({ ...prev, requests: true }));
-        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`);
-        if (!response.ok) throw new Error('Failed to fetch requests');
-        const data = await response.json();
-        setRequests(data);
-        setError(prev => ({ ...prev, requests: null }));
-      } catch (err) {
-        console.error('Error fetching requests:', err);
-        setError(prev => ({
-          ...prev,
-          requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
-        }));
-      } finally {
-        setIsLoading(prev => ({ ...prev, requests: false }));
-      }
-    };
-
-    fetchInitialRequests();
-  }, []);
 
   // Fetch all requests
   const fetchAllRequests = useCallback(async (vehicleNumber?: string) => {

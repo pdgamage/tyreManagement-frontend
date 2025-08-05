@@ -217,71 +217,65 @@ const UserInquiryDashboard: React.FC = () => {
 
   // Apply filters to the requests
   useEffect(() => {
-    if (!requests.length) return;
+    if (!requests.length) {
+      setFilteredRequests([]);
+      return;
+    }
     
-    let results = [...requests];
-
-    // Apply date range filter if dates are selected
-    if (dateRange.startDate || dateRange.endDate) {
-      try {
-        const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-        const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-        
-        if (start) start.setHours(0, 0, 0, 0);
-        if (end) end.setHours(23, 59, 59, 999);
-        
-        console.log('Filtering by date range:', { start, end });
-        
-        results = results.filter(request => {
-          if (!request.submittedAt) return false;
-          
-          try {
-            const requestDate = new Date(request.submittedAt);
-            if (isNaN(requestDate.getTime())) {
-              console.log('Invalid request date:', request.submittedAt);
-              return false;
-            }
-            
-            if (start && requestDate < start) {
-              console.log('Before start date:', requestDate, start);
-              return false;
-            }
-            if (end && requestDate > end) {
-              console.log('After end date:', requestDate, end);
-              return false;
-            }
-            
-            console.log('Date within range:', requestDate);
-            return true;
-          } catch (error) {
-            console.error('Error processing date:', request.submittedAt, error);
-            return false;
+    console.log('Applying filters to requests:', requests.length, 'requests');
+    
+    // Apply all filters in sequence
+    const filtered = requests.filter(request => {
+      // 1. Apply date range filter if dates are selected
+      if (dateRange.startDate || dateRange.endDate) {
+        try {
+          const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
+          if (!requestDate || isNaN(requestDate.getTime())) {
+            return false; // Skip if no valid date
           }
-        });
-      } catch (error) {
-        console.error('Error in date range filtering:', error);
+          
+          // Create date objects for comparison
+          const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
+          const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
+          
+          // Set time to start/end of day for accurate comparison
+          if (startDate) startDate.setHours(0, 0, 0, 0);
+          if (endDate) endDate.setHours(23, 59, 59, 999);
+          
+          // Check if request date is within range
+          if (startDate && requestDate < startDate) return false;
+          if (endDate && requestDate > endDate) return false;
+          
+        } catch (error) {
+          console.error('Error processing date filter:', error);
+          return false;
+        }
       }
-    }
+      
+      // 2. Apply status filter
+      if (statusFilter !== "all" && !request.status.toLowerCase().includes(statusFilter)) {
+        return false;
+      }
+      
+      // 3. Apply search term filter
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
+        const matchesId = request.id?.toLowerCase().includes(term) ?? false;
+        const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
+        
+        if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
+          return false;
+        }
+      }
+      
+      return true; // Include request if it passes all filters
+    });
     
-    // Apply status filter to either vehicle or date filtered results
-    if (statusFilter !== "all") {
-      results = results.filter(request => 
-        request.status.toLowerCase().includes(statusFilter)
-      );
-    }
+    console.log('Filtered requests:', filtered.length, 'out of', requests.length);
+    setFilteredRequests(filtered);
     
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      results = results.filter(request => 
-        (request.orderNumber?.toLowerCase().includes(term) ?? false) || 
-        (request.id?.toLowerCase().includes(term) ?? false) ||
-        (request.supplierName?.toLowerCase().includes(term) ?? false)
-      );
-    }
-    
-    setFilteredRequests(results);
-  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm, selectedVehicle]);
+  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;

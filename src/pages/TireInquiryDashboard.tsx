@@ -146,11 +146,35 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to filter requests based on criteria
+  // Effect to filter requests by date range
   useEffect(() => {
-    let results = requests;
+    let results = [...requests];
     
-    // If vehicle is selected, filter by vehicle
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+      
+      if (start || end) {
+        results = results.filter(request => {
+          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+          const startOfDay = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
+          const endOfDay = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
+          
+          if (startOfDay && requestDate < startOfDay) return false;
+          if (endOfDay && requestDate > endOfDay) return false;
+          return true;
+        });
+      }
+    }
+
+    setRequests(results); // Update the base requests with date filtered results
+  }, [dateRange.startDate, dateRange.endDate]);
+
+  // Effect to apply vehicle and other filters
+  useEffect(() => {
+    let results = [...requests];
+    
+    // Apply vehicle filter if selected
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
     }
@@ -172,27 +196,8 @@ const UserInquiryDashboard: React.FC = () => {
       );
     }
     
-    // Apply date range filter
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
-          if (end) {
-            const endOfDay = new Date(end);
-            endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
-          }
-          return true;
-        });
-      }
-    }
-    
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, selectedVehicle, dateRange]);
+  }, [searchTerm, statusFilter, requests, selectedVehicle]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -256,8 +261,49 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
           
+          {/* Date Range Filter */}
+          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20 mb-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-blue-100">
+                  Filter by Date Range
+                </label>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <label className="block text-xs text-blue-200 mb-1">From</label>
+                  <input
+                    type="date"
+                    value={dateRange.startDate}
+                    onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs text-blue-200 mb-1">To</label>
+                  <input
+                    type="date"
+                    value={dateRange.endDate}
+                    onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                    min={dateRange.startDate}
+                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
+                  />
+                </div>
+                {(dateRange.startDate || dateRange.endDate) && (
+                  <button
+                    onClick={() => setDateRange({ startDate: '', endDate: '' })}
+                    className="mt-5 p-2 text-blue-200 hover:text-white transition-colors duration-200"
+                    title="Clear date range"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Vehicle Selection Card */}
-          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium text-blue-100">

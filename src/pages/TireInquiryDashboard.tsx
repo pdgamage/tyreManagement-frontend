@@ -173,13 +173,14 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, []);
 
-  // Effect to fetch all requests initially
+  // Effect to fetch all requests initially and when date range changes
   useEffect(() => {
     fetchAllRequests();
-  }, [fetchAllRequests]);
+    // After fetching, we'll apply the date filter in the filtering useEffect
+  }, [fetchAllRequests, dateRange.startDate, dateRange.endDate]);
 
   useEffect(() => {
-    let results = requests;
+    let results = [...requests]; // Create a new array to avoid mutations
     
     // Apply date range filter first
     if (dateRange.startDate || dateRange.endDate) {
@@ -188,12 +189,11 @@ const UserInquiryDashboard: React.FC = () => {
       
       results = results.filter(request => {
         const requestDate = new Date(request.submittedAt || request.requestDate || '');
-        if (start && requestDate < start) return false;
-        if (end) {
-          const endOfDay = new Date(end);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (requestDate > endOfDay) return false;
-        }
+        const startOfDay = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
+        const endOfDay = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
+        
+        if (startOfDay && requestDate < startOfDay) return false;
+        if (endOfDay && requestDate > endOfDay) return false;
         return true;
       });
     }

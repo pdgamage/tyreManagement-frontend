@@ -22,6 +22,29 @@ interface TireRequest {
   tireCount?: number;
 }
 
+// Helper function to format dates safely
+const formatDate = (dateString?: string | null): string => {
+  if (!dateString) return 'Date not available';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', dateString);
+      return 'Invalid date';
+    }
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Date error';
+  }
+};
+
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
   { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
@@ -960,7 +983,7 @@ const UserInquiryDashboard: React.FC = () => {
                                 Request #{request.id}
                               </h3>
                               <div className="text-sm text-gray-500 mt-1">
-                                Submitted on {formatDate(request.requestDate)}
+                                Submitted {request.requestDate ? formatDate(request.requestDate) : 'date not available'}
                               </div>
                             </div>
                           </div>

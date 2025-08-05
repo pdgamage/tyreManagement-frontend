@@ -262,14 +262,11 @@ const UserInquiryDashboard: React.FC = () => {
     // Apply all filters in sequence
     const filtered = [...requests].filter(request => {
       // Skip if request is invalid
-      if (!request || typeof request !== 'object') {
-        console.log('Skipping invalid request:', request);
-        return false;
-      }
-      // 0. Apply vehicle filter first if a vehicle is selected
-      if (selectedVehicle && request.vehicleNumber !== selectedVehicle) {
-        return false;
-      }
+      if (!request || typeof request !== 'object') return false;
+      // Skip vehicle filter if 'Select Vehicle' is selected
+      if (selectedVehicle === '') return true;
+      // Apply vehicle filter only if a specific vehicle is selected
+      if (selectedVehicle && request.vehicleNumber !== selectedVehicle) return false;
       
       // 1. Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
@@ -367,8 +364,15 @@ const UserInquiryDashboard: React.FC = () => {
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedVehicle(value);
-    navigate(value ? `?vehicle=${value}` : '/user/inquiry-dashboard');
-    // The useEffect will handle the request fetching when selectedVehicle changes
+    // Update URL if a specific vehicle is selected
+    if (value) {
+      navigate(`?vehicle=${value}`);
+    } else {
+      // Clear vehicle from URL if 'Select Vehicle' or 'All Vehicles' is selected
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete('vehicle');
+      window.history.replaceState({}, '', `?${searchParams.toString()}`);
+    }
   };
 
   const handleViewDetails = (requestId: string) => {
@@ -452,6 +456,8 @@ const UserInquiryDashboard: React.FC = () => {
                     className="block w-full pl-10 pr-10 py-2.5 text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     disabled={isLoading.vehicles}
                   >
+                    
+                    <option value="">Select Vehicle</option>
                     <option value="">All Vehicles</option>
                     {vehicles.map((vehicle) => (
                       <option key={vehicle.vehicleNumber} value={vehicle.vehicleNumber}>

@@ -78,22 +78,19 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, []);
 
-  const fetchRequests = useCallback(async (vehicleNumber: string) => {
-    if (!vehicleNumber) {
-      setRequests([]);
-      setFilteredRequests([]);
-      return;
-    }
-    
+  const fetchRequests = useCallback(async (vehicleNumber?: string) => {
     setIsLoading(prev => ({ ...prev, requests: true }));
     setError(prev => ({ ...prev, requests: '' }));
     
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
+      let url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      
+      if (vehicleNumber) {
+        url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
+      }
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
       
       if (!response.ok) {
@@ -101,37 +98,44 @@ const UserInquiryDashboard: React.FC = () => {
         throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
       }
       
-      const result = await response.json();
-      const requestsData = Array.isArray(result.data) ? result.data : [];
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        throw new Error('Invalid JSON response from server');
+      }
       
-      const formattedRequests = requestsData.map((req: any) => ({
-        id: req.id?.toString() || '',
-        vehicleNumber: req.vehicleNumber || '',
-        status: req.status || 'unknown',
-        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
-        requestDate: req.requestDate || req.submittedAt || new Date().toISOString(),
-        submittedAt: req.submittedAt,
-        supplierName: req.supplierName || 'The order has not yet been placed with a supplier',
-        tireCount: req.tireCount || 0,
+      // Handle both direct array responses and { data: [...] } responses
+      const responseData = Array.isArray(result) ? result : (result.data || []);
+      
+      // Ensure all requests have the required fields
+      const formattedRequests = responseData.map((req: any) => ({
+        id: req.id || req.requestId || `req-${Math.random().toString(36).substr(2, 9)}`,
+        vehicleNumber: req.vehicleNumber || (vehicleNumber || 'Unknown'),
+        status: req.status || 'pending',
+        orderNumber: req.orderNumber || '',
+        requestDate: req.requestDate || req.submittedAt || req.created_at || new Date().toISOString(),
+        submittedAt: req.submittedAt || req.created_at,
+        supplierName: req.supplierName || req.supplier_name || 'N/A',
+        tireCount: req.tireCount || req.tire_count || 0,
       }));
       
       setRequests(formattedRequests);
-      setFilteredRequests(formattedRequests);
       
       if (formattedRequests.length === 0) {
-        setError(prev => ({ ...prev, requests: 'No requests found for this vehicle' }));
+        const noDataMsg = vehicleNumber 
+          ? `No requests found for vehicle ${vehicleNumber}`
+          : 'No requests found';
+        setError(prev => ({ ...prev, requests: noDataMsg }));
       } else {
         setError(prev => ({ ...prev, requests: '' }));
       }
-      
     } catch (err: any) {
-      console.error('Error in fetchRequests:', err);
-      setError(prev => ({ 
-        ...prev, 
-        requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
+      console.error('Error fetching requests:', err);
+      setError(prev => ({
+        ...prev,
+        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
       }));
-      setRequests([]);
-      setFilteredRequests([]);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
@@ -209,11 +213,11 @@ const UserInquiryDashboard: React.FC = () => {
   // Handle vehicle selection changes
   useEffect(() => {
     if (selectedVehicle) {
-      fetchVehicleRequests(selectedVehicle);
+      fetchRequests(selectedVehicle);
     } else {
       fetchAllRequests();
     }
-  }, [selectedVehicle, fetchVehicleRequests, fetchAllRequests]);
+  }, [selectedVehicle]);
 
   // Apply filters to the requests
   useEffect(() => {
@@ -222,15 +226,23 @@ const UserInquiryDashboard: React.FC = () => {
       return;
     }
     
-    console.log('Applying filters to requests:', requests.length, 'requests');
+    console.log('Applying filters to requests:', requests.length, 'requests');    
     
     // Apply all filters in sequence
     const filtered = requests.filter(request => {
+      // 0. Apply vehicle filter first if a vehicle is selected
+      if (selectedVehicle && request.vehicleNumber !== selectedVehicle) {
+        return false;
+      }
+      
       // 1. Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
         try {
-          const requestDate = request.submittedAt ? new Date(request.submittedAt) : null;
-          if (!requestDate || isNaN(requestDate.getTime())) {
+          const requestDate = request.submittedAt || request.requestDate || request.created_at;
+          const requestDateObj = requestDate ? new Date(requestDate) : null;
+          
+          if (!requestDateObj || isNaN(requestDateObj.getTime())) {
+            console.log('Skipping request due to invalid date:', request.id, requestDate);
             return false; // Skip if no valid date
           }
           
@@ -238,31 +250,37 @@ const UserInquiryDashboard: React.FC = () => {
           const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
           const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
           
-          // Set time to start/end of day for accurate comparison
-          const normalizedRequestDate = new Date(requestDate);
+          // Normalize request date to start of day for comparison
+          const normalizedRequestDate = new Date(requestDateObj);
           normalizedRequestDate.setHours(12, 0, 0, 0);
           
           if (startDate) {
             const normalizedStartDate = new Date(startDate);
             normalizedStartDate.setHours(0, 0, 0, 0);
-            if (normalizedRequestDate < normalizedStartDate) return false;
+            if (normalizedRequestDate < normalizedStartDate) {
+              console.log('Filtering out request - before start date:', request.id, normalizedRequestDate, normalizedStartDate);
+              return false;
+            }
           }
           
           if (endDate) {
             const normalizedEndDate = new Date(endDate);
             normalizedEndDate.setHours(23, 59, 59, 999);
-            if (normalizedRequestDate > normalizedEndDate) return false;
+            if (normalizedRequestDate > normalizedEndDate) {
+              console.log('Filtering out request - after end date:', request.id, normalizedRequestDate, normalizedEndDate);
+              return false;
+            }
           }
           
         } catch (error) {
-          console.error('Error processing date filter:', error);
+          console.error('Error processing date filter:', error, 'Request ID:', request.id);
           return false;
         }
       }
       
       // 2. Apply status filter
       if (statusFilter !== "all") {
-        const requestStatus = request.status?.toLowerCase() || '';
+        const requestStatus = (request.status || '').toLowerCase();
         if (!requestStatus.includes(statusFilter.toLowerCase())) {
           return false;
         }
@@ -286,13 +304,13 @@ const UserInquiryDashboard: React.FC = () => {
     console.log('Filtered requests:', filtered.length, 'out of', requests.length);
     setFilteredRequests(filtered);
     
-  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
+  }, [requests, selectedVehicle, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedVehicle(value);
     navigate(value ? `?vehicle=${value}` : '/user/inquiry-dashboard');
-    if (value) fetchRequests(value);
+    // The useEffect will handle the request fetching when selectedVehicle changes
   };
 
   const handleViewDetails = (requestId: string) => {

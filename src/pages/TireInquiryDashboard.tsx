@@ -173,32 +173,41 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, []);
 
-  // Effect to fetch all requests initially and when date range changes
+  // Effect to fetch all requests initially
   useEffect(() => {
     fetchAllRequests();
-    // After fetching, we'll apply the date filter in the filtering useEffect
-  }, [fetchAllRequests, dateRange.startDate, dateRange.endDate]);
+  }, [fetchAllRequests]);
 
+  // Effect for date range filtering
+  const [dateFilteredRequests, setDateFilteredRequests] = useState<TireRequest[]>([]);
+  
   useEffect(() => {
-    let results = [...requests]; // Create a new array to avoid mutations
+    let results = [...requests];
     
-    // Apply date range filter first
+    // Apply only date range filter
     if (dateRange.startDate || dateRange.endDate) {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
       results = results.filter(request => {
         const requestDate = new Date(request.submittedAt || request.requestDate || '');
-        const startOfDay = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
-        const endOfDay = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
+        const startOfDay = start ? new Date(new Date(start).setHours(0, 0, 0, 0)) : null;
+        const endOfDay = end ? new Date(new Date(end).setHours(23, 59, 59, 999)) : null;
         
         if (startOfDay && requestDate < startOfDay) return false;
         if (endOfDay && requestDate > endOfDay) return false;
         return true;
       });
     }
+    
+    setDateFilteredRequests(results);
+  }, [requests, dateRange.startDate, dateRange.endDate]);
 
-    // Then apply vehicle filter if selected
+  // Effect for other filters (vehicle, status)
+  useEffect(() => {
+    let results = [...dateFilteredRequests];
+    
+    // Apply vehicle filter if selected
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
     }

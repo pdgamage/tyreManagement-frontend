@@ -172,23 +172,38 @@ const UserInquiryDashboard: React.FC = () => {
       );
     }
     
-    // Apply date range filter
+    // Apply date range filter using submittedAt column
     if (dateRange.startDate || dateRange.endDate) {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
+      results = results.filter(request => {
+        if (!request.submittedAt) return false; // Skip if no submittedAt date
+        
+        try {
+          const submittedDate = new Date(request.submittedAt);
+          if (isNaN(submittedDate.getTime())) return false; // Skip invalid dates
+          
+          submittedDate.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
+          
+          if (start) {
+            const startOfDay = new Date(start);
+            startOfDay.setHours(0, 0, 0, 0);
+            if (submittedDate < startOfDay) return false;
+          }
+          
           if (end) {
             const endOfDay = new Date(end);
             endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
+            if (submittedDate > endOfDay) return false;
           }
+          
           return true;
-        });
-      }
+        } catch (error) {
+          console.error('Error processing date:', request.submittedAt, error);
+          return false;
+        }
+      });
     }
     
     setFilteredRequests(results);

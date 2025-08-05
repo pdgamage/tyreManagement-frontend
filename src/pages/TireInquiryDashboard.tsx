@@ -126,7 +126,6 @@ const UserInquiryDashboard: React.FC = () => {
         ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}?vehicleNumber=${encodeURIComponent(vehicleNumber)}`
         : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
 
-      console.log('Fetching requests from URL:', url);
       const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -137,45 +136,7 @@ const UserInquiryDashboard: React.FC = () => {
       }
       
       const data = await response.json();
-      const requestsData = Array.isArray(data) ? data : [];
-      
-      // Debug logging for request statuses
-      console.log('========== REQUESTS DEBUG INFO ==========');
-      console.log('Total requests fetched:', requestsData.length);
-      
-      console.log('\n--- All Request Statuses ---');
-      const statusCounts: Record<string, number> = {};
-      requestsData.forEach(req => {
-        statusCounts[req.status] = (statusCounts[req.status] || 0) + 1;
-      });
-      console.table(statusCounts);
-      
-      console.log('\n--- Detailed Requests Info ---');
-      requestsData.forEach((req, index) => {
-        console.log(`\nRequest #${index + 1}:`);
-        console.log(`- ID: ${req.id}`);
-        console.log(`- Status: "${req.status}"`);
-        console.log(`- Order #: ${req.orderNumber || 'N/A'}`);
-        console.log(`- Vehicle: ${req.vehicleNumber}`);
-        console.log(`- Submitted: ${req.submittedAt || 'N/A'}`);
-        console.log(`- Created: ${req.requestDate || req.created_at || 'N/A'}`);
-        
-        // Check if this request would be included in Orders Placed
-        const status = req.status?.toLowerCase() || '';
-        const isIncluded = status.includes('approved') || status.includes('complete');
-        console.log(`- Included in Orders Placed: ${isIncluded ? '✅' : '❌'}`);
-      });
-      
-      console.log('\n--- Orders Placed Calculation ---');
-      const placedOrders = requestsData.filter(r => {
-        const status = r.status?.toLowerCase() || '';
-        return status.includes('approved') || status.includes('complete');
-      });
-      console.log(`Total Orders Placed: ${placedOrders.length} (${placedOrders.map(r => r.id).join(', ')})`);
-      
-      console.log('========== END REQUESTS DEBUG ==========\n');
-      
-      setRequests(requestsData);
+      setRequests(Array.isArray(data) ? data : []);
       updateError('requests', '');
     } catch (err: unknown) {
       console.error('Error fetching vehicle requests:', err);
@@ -731,16 +692,7 @@ const UserInquiryDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Orders Placed</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {(() => {
-                      const placedOrders = requests.filter(r => {
-                        const status = r.status.toLowerCase();
-                        const isPlaced = status.includes('approved') || status.includes('complete');
-                        console.log(`Request ID: ${r.id}, Status: ${r.status}, Included in Orders Placed: ${isPlaced}`);
-                        return isPlaced;
-                      });
-                      console.log('Total Orders Placed count:', placedOrders.length);
-                      return placedOrders.length;
-                    })()}
+                    {requests.filter(r => r.status.toLowerCase().includes('approved') || r.status.toLowerCase().includes('complete')).length}
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-purple-50 text-purple-600">

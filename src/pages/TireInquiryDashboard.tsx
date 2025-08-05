@@ -147,57 +147,49 @@ const UserInquiryDashboard: React.FC = () => {
   }, [vehicleFromUrl, fetchRequests]);
 
   // Effect to filter requests by date range
-  useEffect(() => {
-    let results = [...requests];
-    
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          const startOfDay = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
-          const endOfDay = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
-          
-          if (startOfDay && requestDate < startOfDay) return false;
-          if (endOfDay && requestDate > endOfDay) return false;
-          return true;
-        });
-      }
-    }
-
-    setRequests(results); // Update the base requests with date filtered results
-  }, [dateRange.startDate, dateRange.endDate]);
+useEffect(() => {
+  let results = [...requests];
+  // Date range filter (using submittedAt)
+  if (dateRange.startDate || dateRange.endDate) {
+    const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+    const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+    results = results.filter(request => {
+      if (!request.submittedAt) return false;
+      const requestDate = new Date(request.submittedAt);
+      const startOfDay = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
+      const endOfDay = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
+      if (startOfDay && requestDate < startOfDay) return false;
+      if (endOfDay && requestDate > endOfDay) return false;
+      return true;
+    });
+  }
+  setFilteredRequests(results);
+}, [requests, dateRange.startDate, dateRange.endDate]);
 
   // Effect to apply vehicle and other filters
-  useEffect(() => {
-    let results = [...requests];
-    
-    // Apply vehicle filter if selected
-    if (selectedVehicle) {
-      results = results.filter(request => request.vehicleNumber === selectedVehicle);
-    }
-    
-    // Apply status filter
-    if (statusFilter !== "all") {
-      results = results.filter(request => 
-        request.status.toLowerCase().includes(statusFilter)
-      );
-    }
-    
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      results = results.filter(request => 
-        request.orderNumber.toLowerCase().includes(term) || 
-        request.id.toLowerCase().includes(term) ||
-        (request.supplierName?.toLowerCase().includes(term) ?? false)
-      );
-    }
-    
-    setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, selectedVehicle]);
+useEffect(() => {
+  let results = [...requests];
+  // Apply vehicle filter if selected
+  if (selectedVehicle) {
+    results = results.filter(request => request.vehicleNumber === selectedVehicle);
+  }
+  // Apply status filter
+  if (statusFilter !== "all") {
+    results = results.filter(request => 
+      request.status.toLowerCase().includes(statusFilter)
+    );
+  }
+  // Apply search filter
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    results = results.filter(request => 
+      request.orderNumber.toLowerCase().includes(term) || 
+      request.id.toLowerCase().includes(term) ||
+      (request.supplierName?.toLowerCase().includes(term) ?? false)
+    );
+  }
+  setFilteredRequests(results);
+}, [requests, searchTerm, statusFilter, selectedVehicle]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;

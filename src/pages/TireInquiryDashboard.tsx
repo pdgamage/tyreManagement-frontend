@@ -315,27 +315,21 @@ const UserInquiryDashboard: React.FC = () => {
     
     if (value === 'All Vehicles') {
       searchParams.delete('vehicle');
+      // Fetch all requests when 'All Vehicles' is selected
+      fetchAllRequests();
     } else if (value && value !== 'Select Vehicle') {
       searchParams.set('vehicle', value);
+      // Fetch requests for specific vehicle
+      fetchAllRequests(value);
     } else {
+      // 'Select Vehicle' or empty selection
       searchParams.delete('vehicle');
+      setRequests([]);
     }
     
     // Update URL without page reload
     const newUrl = searchParams.toString() ? `?${searchParams.toString()}` : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
-    
-    // Update requests based on selection
-    if (value === 'Select Vehicle' || value === '') {
-      // Show no requests for 'Select Vehicle' or empty selection
-      setRequests([]);
-    } else if (value === 'All Vehicles') {
-      // Show all requests for 'All Vehicles'
-      fetchAllRequests();
-    } else {
-      // Show requests for specific vehicle
-      fetchAllRequests(value);
-    }
   };
 
   const handleViewDetails = (requestId: string) => {

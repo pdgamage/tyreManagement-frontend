@@ -98,6 +98,9 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         phone: selectedSupplier.phone
       });
 
+      // Extract only the date portion from the datetime
+      const dateOnly = orderPlacedDate ? orderPlacedDate.split('T')[0] : null;
+
       const response = await fetch(
         `${apiUrls.requestById(request?.id || "")}/place-order`,
         {
@@ -112,7 +115,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
-            orderPlacedDate: orderPlacedDate,
+            orderPlacedDate: dateOnly, // Send only the date portion
           }),
         }
       );

@@ -221,15 +221,18 @@ const UserInquiryDashboard: React.FC = () => {
 
   // Apply filters to the requests
   useEffect(() => {
-    if (!requests.length) {
+    if (!requests || !Array.isArray(requests)) {
+      console.log('No requests or invalid requests array');
       setFilteredRequests([]);
       return;
     }
     
-    console.log('Applying filters to requests:', requests.length, 'requests');    
+    console.log('Applying filters to requests:', requests.length, 'requests');
+    console.log('Current filters - search:', searchTerm, 'status:', statusFilter, 'vehicle:', selectedVehicle);
     
     // Apply all filters in sequence
     const filtered = requests.filter(request => {
+      if (!request) return false;
       // 0. Apply vehicle filter first if a vehicle is selected
       if (selectedVehicle && request.vehicleNumber !== selectedVehicle) {
         return false;
@@ -287,13 +290,15 @@ const UserInquiryDashboard: React.FC = () => {
       }
       
       // 3. Apply search term filter
-      if (searchTerm.trim()) {
+      if (searchTerm && searchTerm.trim()) {
         const term = searchTerm.toLowerCase().trim();
-        const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
-        const matchesId = request.id?.toLowerCase().includes(term) ?? false;
-        const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
-      
-        if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
+        const orderNumber = request.orderNumber?.toLowerCase() || '';
+        const id = request.id?.toLowerCase() || '';
+        const supplierName = request.supplierName?.toLowerCase() || '';
+        
+        if (!orderNumber.includes(term) && 
+            !id.includes(term) && 
+            !supplierName.includes(term)) {
           return false;
         }
       }

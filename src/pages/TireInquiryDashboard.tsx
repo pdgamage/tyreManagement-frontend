@@ -48,6 +48,8 @@ const UserInquiryDashboard: React.FC = () => {
     startDate: '',
     endDate: ''
   });
+  // Local state for date filter inputs
+  const [dateInput, setDateInput] = useState({ startDate: '', endDate: '' });
   const [showDateFilter, setShowDateFilter] = useState(false);
   
   const fetchVehicles = useCallback(async () => {
@@ -266,8 +268,8 @@ useEffect(() => {
                   <label className="block text-xs text-blue-200 mb-1">From</label>
                   <input
                     type="date"
-                    value={dateRange.startDate}
-                    onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                    value={dateInput.startDate}
+                    onChange={(e) => setDateInput({...dateInput, startDate: e.target.value})}
                     className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
                   />
                 </div>
@@ -275,15 +277,22 @@ useEffect(() => {
                   <label className="block text-xs text-blue-200 mb-1">To</label>
                   <input
                     type="date"
-                    value={dateRange.endDate}
-                    onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
-                    min={dateRange.startDate}
+                    value={dateInput.endDate}
+                    onChange={(e) => setDateInput({...dateInput, endDate: e.target.value})}
+                    min={dateInput.startDate}
                     className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
                   />
                 </div>
+                <button
+                  onClick={() => setDateRange({ startDate: dateInput.startDate, endDate: dateInput.endDate })}
+                  className="mt-5 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
+                  disabled={!dateInput.startDate && !dateInput.endDate}
+                >
+                  Search
+                </button>
                 {(dateRange.startDate || dateRange.endDate) && (
                   <button
-                    onClick={() => setDateRange({ startDate: '', endDate: '' })}
+                    onClick={() => { setDateRange({ startDate: '', endDate: '' }); setDateInput({ startDate: '', endDate: '' }); }}
                     className="mt-5 p-2 text-blue-200 hover:text-white transition-colors duration-200"
                     title="Clear date range"
                   >

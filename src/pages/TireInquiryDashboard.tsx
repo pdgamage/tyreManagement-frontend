@@ -148,25 +148,31 @@ const UserInquiryDashboard: React.FC = () => {
 
   // Effect to filter requests based on criteria
   useEffect(() => {
-    let results = requests;
+    let results = [...requests]; // Create a new array to avoid mutating the original
     
-    // Apply date range filter first (works independently of vehicle selection)
+    // Apply date range filter if any date is selected
     if (dateRange.startDate || dateRange.endDate) {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
-          if (end) {
-            const endOfDay = new Date(end);
-            endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
-          }
-          return true;
-        });
-      }
+      results = results.filter(request => {
+        const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+        if (isNaN(requestDate.getTime())) return false; // Skip invalid dates
+        
+        if (start) {
+          const startOfDay = new Date(start);
+          startOfDay.setHours(0, 0, 0, 0);
+          if (requestDate < startOfDay) return false;
+        }
+        
+        if (end) {
+          const endOfDay = new Date(end);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (requestDate > endOfDay) return false;
+        }
+        
+        return true;
+      });
     }
 
     // If vehicle is selected, filter by vehicle
@@ -185,8 +191,8 @@ const UserInquiryDashboard: React.FC = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(request => 
-        request.orderNumber.toLowerCase().includes(term) || 
-        request.id.toLowerCase().includes(term) ||
+        request.orderNumber?.toLowerCase().includes(term) || 
+        request.id?.toLowerCase().includes(term) ||
         (request.supplierName?.toLowerCase().includes(term) ?? false)
       );
     }

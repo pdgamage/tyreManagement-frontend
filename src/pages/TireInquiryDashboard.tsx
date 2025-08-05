@@ -142,10 +142,10 @@ const UserInquiryDashboard: React.FC = () => {
         id: req.id || req.requestId || `req-${Math.random().toString(36).substr(2, 9)}`,
         vehicleNumber: req.vehicleNumber || (vehicleNumber || 'Unknown'),
         status: req.status || 'pending',
-        orderNumber: req.orderNumber || '',
+        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
         requestDate: req.requestDate || req.submittedAt || req.created_at || new Date().toISOString(),
         submittedAt: req.submittedAt || req.created_at,
-        supplierName: req.supplierName || req.supplier_name || 'N/A',
+        supplierName: req.supplierName || req.supplier_name || 'The order has not yet been placed with a supplier',
         tireCount: req.tireCount || req.tire_count || 0,
       }));
       

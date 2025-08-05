@@ -10,6 +10,7 @@ interface RequestDetails {
   orderNumber: string;
   submittedAt: string;
   requestDate: string;
+  orderPlacedDate?: string;
   supplierName: string;
   supplierPhone?: string;
   supplierEmail?: string;
@@ -258,6 +259,24 @@ const RequestDetailsPage: React.FC = () => {
                   )}
                 </dd>
               </div>
+              
+              {request.orderPlacedDate && (
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
+                  <div className="flex items-center mb-2">
+                    <Calendar className="w-5 h-5 text-amber-500 mr-2" />
+                    <dt className="text-sm font-medium text-amber-700">Order Placed Date</dt>
+                  </div>
+                  <dd className="text-lg font-semibold text-gray-900">
+                    {new Date(request.orderPlacedDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </dd>
+                </div>
+              )}
               
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
                 <div className="flex items-center mb-2">

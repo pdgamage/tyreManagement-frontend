@@ -69,9 +69,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   <p><span className="font-medium">ID:</span> {request.id}</p>
                   <p><span className="font-medium">Status:</span> {request.status || '-'}</p>
                   <p><span className="font-medium">Submitted:</span> {formatDate(request.submittedAt)}</p>
-                  {request.orderTimestamp && (
-                    <p><span className="font-medium">Order Placed:</span> {formatDate(request.orderTimestamp)}</p>
-                  )}
                   <p><span className="font-medium">Reason:</span> {request.requestReason}</p>
                   <p><span className="font-medium">Comments:</span> {request.comments || 'N/A'}</p>
                 </div>

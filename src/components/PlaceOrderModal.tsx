@@ -31,11 +31,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   );
   const [orderNumber, setOrderNumber] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
-  const [orderPlacedDate, setOrderPlacedDate] = useState(() => {
-    const now = new Date();
-    // Format: YYYY-MM-DDThh:mm
-    return now.toISOString().slice(0, 16);
-  });
+  const [orderPlacedDate, setOrderPlacedDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -110,7 +106,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
-            orderPlacedDate: new Date(orderPlacedDate).toISOString(),  // Convert to ISO format for database
+            orderPlacedDate: orderPlacedDate,
           }),
         }
       );
@@ -177,8 +173,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setSelectedSupplierId(null);
     setOrderNotes("");
     setOrderNumber("");
-    const now = new Date();
-    setOrderPlacedDate(now.toISOString().slice(0, 16));
+    setOrderPlacedDate("");
     setError(null);
     onClose();
   };

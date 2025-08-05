@@ -178,13 +178,13 @@ const UserInquiryDashboard: React.FC = () => {
     fetchAllRequests();
   }, [fetchAllRequests]);
 
-  // Effect for date range filtering
-  const [dateFilteredRequests, setDateFilteredRequests] = useState<TireRequest[]>([]);
-  
+
+
+  // Effect for applying all filters
   useEffect(() => {
     let results = [...requests];
-    
-    // Apply only date range filter
+
+    // Apply date range filter
     if (dateRange.startDate || dateRange.endDate) {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
@@ -199,14 +199,7 @@ const UserInquiryDashboard: React.FC = () => {
         return true;
       });
     }
-    
-    setDateFilteredRequests(results);
-  }, [requests, dateRange.startDate, dateRange.endDate]);
 
-  // Effect for other filters (vehicle, status)
-  useEffect(() => {
-    let results = [...dateFilteredRequests];
-    
     // Apply vehicle filter if selected
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
@@ -236,7 +229,6 @@ const UserInquiryDashboard: React.FC = () => {
     const value = e.target.value;
     setSelectedVehicle(value);
     navigate(value ? `?vehicle=${value}` : '/user/inquiry-dashboard');
-    if (value) fetchRequests(value);
   };
 
   const handleViewDetails = (requestId: string) => {
@@ -559,7 +551,7 @@ const UserInquiryDashboard: React.FC = () => {
           {isLoading.requests && (
             <div className="flex flex-col items-center justify-center p-12 space-y-4 bg-white rounded-xl shadow">
               <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-              <p className="text-gray-600">Loading requests for {selectedVehicle}...</p>
+              <p className="text-gray-600">Loading requests...</p>
               <p className="text-sm text-gray-500">Please wait while we fetch your data</p>
             </div>
           )}
@@ -576,7 +568,7 @@ const UserInquiryDashboard: React.FC = () => {
                       <p>{error.requests}</p>
                     </div>
                     <button
-                      onClick={() => fetchRequests(selectedVehicle)}
+                      onClick={() => fetchAllRequests()}
                       className="mt-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       Retry
@@ -588,7 +580,7 @@ const UserInquiryDashboard: React.FC = () => {
           )}
 
           {/* Empty State */}
-          {!isLoading.requests && !error.requests && filteredRequests.length === 0 && selectedVehicle && (
+          {!isLoading.requests && !error.requests && filteredRequests.length === 0 && (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="text-center py-12 px-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
@@ -596,34 +588,20 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {(searchTerm || statusFilter !== "all")
-                    ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
-                    : `No tire requests were found for vehicle ${selectedVehicle}.`}
+                  We couldn't find any requests matching your criteria. Try adjusting your filters.
                 </p>
-                {(searchTerm || statusFilter !== "all") && (
+                {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
+                      setDateRange({ startDate: '', endDate: '' });
                     }}
                     className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    Clear Filters
+                    Clear All Filters
                   </button>
                 )}
-              </div>
-            </div>
-          )}
-
-          {/* Initial State - No vehicle selected */}
-          {!isLoading.requests && !selectedVehicle && (
-            <div className="bg-white rounded-xl shadow overflow-hidden">
-              <div className="text-center py-12 px-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                  <Car className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-1">No vehicle selected</h3>
-                <p className="text-gray-500">Select a vehicle from the dropdown above to view its tire requests and inquiries.</p>
               </div>
             </div>
           )}

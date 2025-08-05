@@ -49,6 +49,8 @@ const UserInquiryDashboard: React.FC = () => {
     endDate: ''
   });
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [showVehicleFilter, setShowVehicleFilter] = useState(false);
+  const [vehicleFilter, setVehicleFilter] = useState('');
 
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -146,46 +148,55 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to filter requests based on criteria
   useEffect(() => {
+    // Filter requests based on search term and status
     let results = requests;
     
-    // If vehicle is selected, filter by vehicle
-    if (selectedVehicle) {
-      results = results.filter(request => request.vehicleNumber === selectedVehicle);
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      results = results.filter(request => request.status === statusFilter);
     }
     
-    // Apply status filter
-    if (statusFilter !== "all") {
-      results = results.filter(request => 
-        request.status.toLowerCase().includes(statusFilter)
+    // Apply search term filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      results = results.filter(
+        request =>
+          request.orderNumber?.toLowerCase().includes(term) ||
+          request.id.toLowerCase().includes(term) ||
+          request.supplierName?.toLowerCase().includes(term) ||
+          request.vehicleNumber.toLowerCase().includes(term)
       );
     }
     
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    // Apply vehicle filter
+    if (vehicleFilter) {
       results = results.filter(request => 
-        request.orderNumber.toLowerCase().includes(term) || 
-        request.id.toLowerCase().includes(term) ||
-        (request.supplierName?.toLowerCase().includes(term) ?? false)
+        request.vehicleNumber.toLowerCase().includes(vehicleFilter.toLowerCase())
       );
     }
     
     // Apply date range filter
-    if (dateRange.startDate && dateRange.endDate) {
-      const start = new Date(dateRange.startDate);
-      const end = new Date(dateRange.endDate);
-      end.setHours(23, 59, 59, 999); // Include the entire end day
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
-      results = results.filter(request => {
-        const requestDate = new Date(request.requestDate || request.submittedAt);
-        return requestDate >= start && requestDate <= end;
-      });
+      if (start || end) {
+        results = results.filter(request => {
+          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+          if (start && requestDate < start) return false;
+          if (end) {
+            const endOfDay = new Date(end);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (requestDate > endOfDay) return false;
+          }
+          return true;
+        });
+      }
     }
     
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, selectedVehicle, dateRange]);
+  }, [requests, searchTerm, statusFilter, dateRange, vehicleFilter]);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -463,34 +474,94 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="flex space-x-2">
-                  <button
-                    type="button"
-                    className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
-                      showDateFilter || dateRange.startDate || dateRange.endDate
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                    onClick={() => setShowDateFilter(!showDateFilter)}
-                  >
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    {dateRange.startDate || dateRange.endDate ? (
-                      <span className="text-sm">
-                        {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
-                      </span>
-                    ) : (
-                      <span>Date Range</span>
+                <div className="flex flex-wrap gap-2">
+                  {/* Vehicle Number Filter */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
+                        showVehicleFilter || vehicleFilter
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => setShowVehicleFilter(!showVehicleFilter)}
+                    >
+                      <Car className="h-4 w-4 mr-2" />
+                      {vehicleFilter || 'Vehicle Number'}
+                    </button>
+                    {showVehicleFilter && (
+                      <div className="absolute z-10 mt-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="p-2">
+                          <input
+                            type="text"
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter vehicle number"
+                            value={vehicleFilter}
+                            onChange={(e) => setVehicleFilter(e.target.value)}
+                          />
+                        </div>
+                      </div>
                     )}
-                  </button>
-                  {(searchTerm || statusFilter !== 'all' || dateRange.startDate || dateRange.endDate) && (
+                  </div>
+
+                  {/* Date Range Filter */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
+                        showDateFilter || dateRange.startDate || dateRange.endDate
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => setShowDateFilter(!showDateFilter)}
+                    >
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      {dateRange.startDate || dateRange.endDate ? (
+                        <span className="text-sm">
+                          {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                        </span>
+                      ) : (
+                        <span>Date Range</span>
+                      )}
+                    </button>
+                    {showDateFilter && (
+                      <div className="absolute z-10 mt-1 p-4 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                              value={dateRange.startDate}
+                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                              value={dateRange.endDate}
+                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                              min={dateRange.startDate}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reset Button */}
+                  {(searchTerm || statusFilter !== 'all' || dateRange.startDate || dateRange.endDate || vehicleFilter) && (
                     <button
                       type="button"
                       onClick={() => {
                         setSearchTerm('');
                         setStatusFilter('all');
                         setDateRange({ startDate: '', endDate: '' });
+                        setVehicleFilter('');
                       }}
-                      className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 h-10"
                     >
                       Reset All
                     </button>

@@ -239,12 +239,20 @@ const UserInquiryDashboard: React.FC = () => {
           const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
           
           // Set time to start/end of day for accurate comparison
-          if (startDate) startDate.setHours(0, 0, 0, 0);
-          if (endDate) endDate.setHours(23, 59, 59, 999);
+          const normalizedRequestDate = new Date(requestDate);
+          normalizedRequestDate.setHours(12, 0, 0, 0);
           
-          // Check if request date is within range
-          if (startDate && requestDate < startDate) return false;
-          if (endDate && requestDate > endDate) return false;
+          if (startDate) {
+            const normalizedStartDate = new Date(startDate);
+            normalizedStartDate.setHours(0, 0, 0, 0);
+            if (normalizedRequestDate < normalizedStartDate) return false;
+          }
+          
+          if (endDate) {
+            const normalizedEndDate = new Date(endDate);
+            normalizedEndDate.setHours(23, 59, 59, 999);
+            if (normalizedRequestDate > normalizedEndDate) return false;
+          }
           
         } catch (error) {
           console.error('Error processing date filter:', error);
@@ -253,17 +261,20 @@ const UserInquiryDashboard: React.FC = () => {
       }
       
       // 2. Apply status filter
-      if (statusFilter !== "all" && !request.status.toLowerCase().includes(statusFilter)) {
-        return false;
+      if (statusFilter !== "all") {
+        const requestStatus = request.status?.toLowerCase() || '';
+        if (!requestStatus.includes(statusFilter.toLowerCase())) {
+          return false;
+        }
       }
       
       // 3. Apply search term filter
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase().trim();
         const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
         const matchesId = request.id?.toLowerCase().includes(term) ?? false;
         const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
-        
+      
         if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
           return false;
         }
@@ -447,13 +458,13 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Status and Search Filters */}
+          {/* Status and Search Filters - Improved */}
           <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
                 {/* Status Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-blue-100 mb-2">
+                <div className="w-full sm:w-64">
+                  <label className="block text-sm font-medium text-blue-100 mb-1">
                     Filter by Status
                   </label>
                   <div className="relative">
@@ -464,7 +475,9 @@ const UserInquiryDashboard: React.FC = () => {
                     >
                       <span className="flex items-center">
                         {statusOptions.find(opt => opt.value === statusFilter)?.icon}
-                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Select status...'}
+                        <span className="ml-2 truncate">
+                          {statusOptions.find(opt => opt.value === statusFilter)?.label || 'All Statuses'}
+                        </span>
                       </span>
                       <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                         {isStatusDropdownOpen ? (
@@ -476,7 +489,10 @@ const UserInquiryDashboard: React.FC = () => {
                     </button>
                     
                     {isStatusDropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
+                      <div 
+                        className="absolute z-20 mt-1 w-full rounded-md bg-white shadow-lg"
+                        onMouseLeave={() => setIsStatusDropdownOpen(false)}
+                      >
                         <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
                           {statusOptions.map((option) => (
                             <li
@@ -490,7 +506,7 @@ const UserInquiryDashboard: React.FC = () => {
                               <div className="flex items-center">
                                 <span className="font-normal block truncate">
                                   {option.icon}
-                                  {option.label}
+                                  <span className="ml-2">{option.label}</span>
                                 </span>
                               </div>
                               {statusFilter === option.value && (
@@ -507,8 +523,8 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 
                 {/* Search Filter */}
-                <div>
-                  <label htmlFor="search" className="block text-sm font-medium text-blue-100 mb-2">
+                <div className="flex-1">
+                  <label htmlFor="search" className="block text-sm font-medium text-blue-100 mb-1">
                     Search Requests
                   </label>
                   <div className="relative rounded-md shadow-sm">
@@ -519,22 +535,40 @@ const UserInquiryDashboard: React.FC = () => {
                       type="text"
                       name="search"
                       id="search"
-                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-12 sm:text-sm border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm"
-                      placeholder="Search by order #, ID, or supplier"
+                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-10 py-2.5 sm:text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm"
+                      placeholder="Search by order #, ID, or supplier..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Escape' && setSearchTerm('')}
                     />
                     {searchTerm && (
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
                         onClick={() => setSearchTerm('')}
+                        title="Clear search"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     )}
                   </div>
                 </div>
+                
+                {/* Clear Filters Button */}
+                {(statusFilter !== 'all' || searchTerm) && (
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      className="h-[42px] px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      onClick={() => {
+                        setStatusFilter('all');
+                        setSearchTerm('');
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

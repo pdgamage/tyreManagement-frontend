@@ -218,11 +218,16 @@ const UserInquiryDashboard: React.FC = () => {
       // Skip if request is invalid
       if (!request || typeof request !== 'object') return false;
       
-      // Apply vehicle filter only if a specific vehicle is selected
-      if (selectedVehicle && selectedVehicle !== 'Select Vehicle' && request.vehicleNumber !== selectedVehicle) {
+      // Apply vehicle filter
+      if (selectedVehicle === 'Select Vehicle') {
+        // Show no requests when 'Select Vehicle' is selected
+        return false;
+      } else if (selectedVehicle && selectedVehicle !== 'All Vehicles' && request.vehicleNumber !== selectedVehicle) {
+        // When a specific vehicle is selected, only show matching requests
         console.log('Filtering out request - vehicle mismatch:', request.id, request.vehicleNumber, '!==', selectedVehicle);
         return false;
       }
+      // If 'All Vehicles' is selected or no vehicle filter is applied, include the request
       
       // 1. Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
@@ -324,8 +329,12 @@ const UserInquiryDashboard: React.FC = () => {
     
     // Update URL with the new vehicle selection
     const searchParams = new URLSearchParams(window.location.search);
-    if (value && value !== '') {
-      searchParams.set('vehicle', value);
+    if (value && value !== '' && value !== 'Select Vehicle') {
+      if (value === 'All Vehicles') {
+        searchParams.delete('vehicle');
+      } else {
+        searchParams.set('vehicle', value);
+      }
     } else {
       searchParams.delete('vehicle');
     }
@@ -334,11 +343,16 @@ const UserInquiryDashboard: React.FC = () => {
     const newUrl = searchParams.toString() ? `?${searchParams.toString()}` : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
     
-    // Fetch requests with the new filter
-    if (value && value !== '') {
-      fetchAllRequests(value);
-    } else {
+    // Fetch requests based on selection
+    if (value === 'Select Vehicle') {
+      // Show no requests for 'Select Vehicle'
+      setRequests([]);
+    } else if (value === 'All Vehicles' || value === '') {
+      // Show all requests for 'All Vehicles' or no selection
       fetchAllRequests();
+    } else {
+      // Show requests for specific vehicle
+      fetchAllRequests(value);
     }
   };
 

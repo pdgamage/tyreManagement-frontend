@@ -22,7 +22,7 @@ interface TireRequest {
   tireCount?: number;
 }
 
-// Helper function to format dates safely
+// Helper function to format dates in the format 'DD MMM YYYY, hh:mm A'
 const formatDate = (dateString?: string | null): string => {
   if (!dateString) return 'Date not available';
   
@@ -32,13 +32,19 @@ const formatDate = (dateString?: string | null): string => {
       console.warn('Invalid date string:', dateString);
       return 'Invalid date';
     }
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    
+    return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
   } catch (error) {
     console.error('Error formatting date:', error);
     return 'Date error';
@@ -983,7 +989,7 @@ const UserInquiryDashboard: React.FC = () => {
                                 Request #{request.id}
                               </h3>
                               <div className="text-sm text-gray-500 mt-1">
-                                Submitted {request.requestDate ? formatDate(request.requestDate) : 'date not available'}
+                                Submitted on {request.requestDate ? formatDate(request.requestDate) : 'date not available'}
                               </div>
                             </div>
                           </div>

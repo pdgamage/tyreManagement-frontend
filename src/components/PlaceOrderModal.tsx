@@ -31,6 +31,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   );
   const [orderNumber, setOrderNumber] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
+  const [orderPlacedDate, setOrderPlacedDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -105,6 +106,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
+            orderPlacedDate: orderPlacedDate,
           }),
         }
       );
@@ -170,6 +172,8 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const handleClose = () => {
     setSelectedSupplierId(null);
     setOrderNotes("");
+    setOrderNumber("");
+    setOrderPlacedDate("");
     setError(null);
     onClose();
   };
@@ -267,6 +271,20 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
               onChange={(e) => setOrderNumber(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter order number"
+              required
+            />
+          </div>
+
+          {/* Order Placed Date */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Order Placed Date *
+            </label>
+            <input
+              type="datetime-local"
+              value={orderPlacedDate}
+              onChange={(e) => setOrderPlacedDate(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
           </div>

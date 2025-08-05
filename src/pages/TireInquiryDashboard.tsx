@@ -463,30 +463,39 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                <button
-                  type="button"
-                  className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
-                    showDateFilter || dateRange.startDate || dateRange.endDate
-                      ? 'bg-blue-50 text-blue-700 border-blue-200'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setShowDateFilter(!showDateFilter)}
-                >
-                  <CalendarIcon className="h-4 w-4 mr-2" />
-                  {dateRange.startDate || dateRange.endDate ? (
-                    <span className="text-sm">
-                      {new Date(dateRange.startDate).toLocaleDateString()} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
-                    </span>
-                  ) : (
-                    <span>Date Range</span>
-                  )}
-                </button>
-                    }}
-                    className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
+                      showDateFilter || dateRange.startDate || dateRange.endDate
+                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setShowDateFilter(!showDateFilter)}
                   >
-                    Reset Search & Status
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    {dateRange.startDate || dateRange.endDate ? (
+                      <span className="text-sm">
+                        {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                      </span>
+                    ) : (
+                      <span>Date Range</span>
+                    )}
                   </button>
-                )}
+                  {(searchTerm || statusFilter !== 'all' || dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setStatusFilter('all');
+                        setDateRange({ startDate: '', endDate: '' });
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      Reset All
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

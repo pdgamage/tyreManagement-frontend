@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package, Calendar as CalendarIcon } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -44,7 +44,12 @@ const UserInquiryDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
-  
+  const [dateRange, setDateRange] = useState({
+    startDate: '',
+    endDate: ''
+  });
+  const [showDateFilter, setShowDateFilter] = useState(false);
+
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
     setError(prev => ({ ...prev, vehicles: '' }));
@@ -167,8 +172,32 @@ const UserInquiryDashboard: React.FC = () => {
       );
     }
     
+    // Apply date range filter
+    if (dateRange.startDate && dateRange.endDate) {
+      const start = new Date(dateRange.startDate);
+      const end = new Date(dateRange.endDate);
+      end.setHours(23, 59, 59, 999); // Include the entire end day
+      
+      results = results.filter(request => {
+        const requestDate = new Date(request.requestDate || request.submittedAt);
+        return requestDate >= start && requestDate <= end;
+      });
+    }
+    
     setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, selectedVehicle]);
+  }, [searchTerm, statusFilter, requests, selectedVehicle, dateRange]);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDateRange(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const resetDateFilter = () => {
+    setDateRange({ startDate: '', endDate: '' });
+  };
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -370,55 +399,55 @@ const UserInquiryDashboard: React.FC = () => {
 
         {/* Filters Section (only shown when vehicle is selected) */}
         {selectedVehicle && (
-          <div className="mb-6 bg-white rounded-xl shadow-md p-5">
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <Filter className="w-5 h-5 mr-2 text-blue-600" />
-              Filter Requests
-            </h3>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1">
-                <div className="relative max-w-md">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search by order #, request ID, or supplier..."
-                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
                 </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Search by order number, ID, or supplier..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
               </div>
-              
-              <div className="flex space-x-3">
+
+              <div className="flex gap-2">
                 <div className="relative">
                   <button
                     type="button"
-                    className="inline-flex items-center justify-between w-full md:w-56 px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-10"
                     onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                   >
-                    <div className="flex items-center">
-                      <Filter className="w-4 h-4 mr-2 text-gray-500" />
-                      {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
-                    </div>
+                    <Filter className="h-4 w-4 mr-2" />
+                    {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Status'}
                     {isStatusDropdownOpen ? (
                       <ChevronUp className="ml-2 h-4 w-4" />
                     ) : (
                       <ChevronDown className="ml-2 h-4 w-4" />
                     )}
                   </button>
-                  
+
                   {isStatusDropdownOpen && (
-                    <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                       <div className="py-1">
                         {statusOptions.map((option) => (
                           <button
                             key={option.value}
-                            className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                            className={`w-full text-left px-4 py-2 text-sm flex items-center ${
                               statusFilter === option.value
-                                ? "bg-blue-50 text-blue-800"
-                                : "text-gray-700 hover:bg-gray-100"
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-gray-700 hover:bg-gray-100'
                             }`}
                             onClick={() => {
                               setStatusFilter(option.value);
@@ -434,11 +463,24 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {(searchTerm || statusFilter !== "all") && (
-                  <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setStatusFilter("all");
+                <button
+                  type="button"
+                  className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-medium h-10 ${
+                    showDateFilter || dateRange.startDate || dateRange.endDate
+                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setShowDateFilter(!showDateFilter)}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {dateRange.startDate || dateRange.endDate ? (
+                    <span className="text-sm">
+                      {new Date(dateRange.startDate).toLocaleDateString()} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                    </span>
+                  ) : (
+                    <span>Date Range</span>
+                  )}
+                </button>
                     }}
                     className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >

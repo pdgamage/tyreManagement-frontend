@@ -415,7 +415,7 @@ const UserInquiryDashboard: React.FC = () => {
                   >
                     
                     <option value="">Select Vehicle</option>
-                    <option value="">All Vehicles</option>
+                    <option value="All Vehicles">All Vehicles</option>
                     {vehicles.map((vehicle) => (
                       <option key={vehicle.vehicleNumber} value={vehicle.vehicleNumber}>
                         {vehicle.vehicleNumber} - {vehicle.brand} {vehicle.model}

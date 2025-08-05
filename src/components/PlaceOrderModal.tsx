@@ -105,6 +105,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             supplierPhone: selectedSupplier.phone || '',  // Ensure we always send a value
             orderNumber: orderNumber.trim(),
             orderNotes: orderNotes.trim(),
+            orderPlacedDateTime: new Date().toISOString(), // Add current timestamp in ISO format
           }),
         }
       );

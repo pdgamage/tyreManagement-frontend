@@ -10,6 +10,7 @@ interface RequestDetails {
   orderNumber: string;
   submittedAt: string;
   requestDate: string;
+  orderPlacedDateTime?: string; // Add this line
   supplierName: string;
   supplierPhone?: string;
   supplierEmail?: string;
@@ -270,6 +271,27 @@ const RequestDetailsPage: React.FC = () => {
                     month: 'short',
                     day: 'numeric'
                   })}
+                </dd>
+              </div>
+              
+              {/* Order Placed Date */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                <div className="flex items-center mb-2">
+                  <Calendar className="w-5 h-5 text-green-500 mr-2" />
+                  <dt className="text-sm font-medium text-green-700">Order Placed On</dt>
+                </div>
+                <dd className="text-lg font-semibold text-gray-900">
+                  {request.orderPlacedDateTime ? (
+                    new Date(request.orderPlacedDateTime).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })
+                  ) : (
+                    <span className="text-gray-400">Not placed yet</span>
+                  )}
                 </dd>
               </div>
             </div>

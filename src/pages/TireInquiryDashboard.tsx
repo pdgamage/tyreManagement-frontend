@@ -713,7 +713,16 @@ const UserInquiryDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Orders Placed</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('approved') || r.status.toLowerCase().includes('complete')).length}
+                    {(() => {
+                      const placedOrders = requests.filter(r => {
+                        const status = r.status.toLowerCase();
+                        const isPlaced = status.includes('approved') || status.includes('complete');
+                        console.log(`Request ID: ${r.id}, Status: ${r.status}, Included in Orders Placed: ${isPlaced}`);
+                        return isPlaced;
+                      });
+                      console.log('Total Orders Placed count:', placedOrders.length);
+                      return placedOrders.length;
+                    })()}
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-purple-50 text-purple-600">

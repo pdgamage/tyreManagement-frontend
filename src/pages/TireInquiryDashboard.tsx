@@ -45,9 +45,10 @@ const UserInquiryDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0], // Last month
-    endDate: new Date().toISOString().split('T')[0] // Today
+    startDate: '',
+    endDate: ''
   });
+  const [showDateFilter, setShowDateFilter] = useState(false);
   
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
@@ -141,66 +142,15 @@ const UserInquiryDashboard: React.FC = () => {
   useEffect(() => {
     if (vehicleFromUrl) {
       setSelectedVehicle(vehicleFromUrl);
+      fetchRequests(vehicleFromUrl);
     }
-  }, [vehicleFromUrl]);
+  }, [vehicleFromUrl, fetchRequests]);
 
   // Effect to filter requests based on criteria
-  const fetchAllRequests = useCallback(async () => {
-    try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch requests');
-      }
-      const result = await response.json();
-      const requestsData = Array.isArray(result.data) ? result.data : [];
-      
-      const formattedRequests = requestsData.map((req: any) => ({
-        id: req.id?.toString() || '',
-        vehicleNumber: req.vehicleNumber || '',
-        status: req.status || 'unknown',
-        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
-        requestDate: req.submittedAt || new Date().toISOString(), // Use submittedAt as primary date
-        submittedAt: req.submittedAt,
-        supplierName: req.supplierName || 'The order has not yet been placed with a supplier',
-        tireCount: req.tireCount || 0,
-      }));
-      
-      setRequests(formattedRequests);
-    } catch (err) {
-      console.error('Error fetching all requests:', err);
-      setError(prev => ({ ...prev, requests: 'Failed to load requests' }));
-    }
-  }, []);
-
-  // Effect to fetch all requests initially
   useEffect(() => {
-    fetchAllRequests();
-  }, [fetchAllRequests]);
-
-
-
-  // Effect for applying all filters
-  useEffect(() => {
-    let results = [...requests];
-
-    // Apply date range filter
-    if (dateRange.startDate || dateRange.endDate) {
-      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
-      
-      results = results.filter(request => {
-        const requestDate = new Date(request.submittedAt || request.requestDate || '');
-        const startOfDay = start ? new Date(new Date(start).setHours(0, 0, 0, 0)) : null;
-        const endOfDay = end ? new Date(new Date(end).setHours(23, 59, 59, 999)) : null;
-        
-        if (startOfDay && requestDate < startOfDay) return false;
-        if (endOfDay && requestDate > endOfDay) return false;
-        return true;
-      });
-    }
-
-    // Apply vehicle filter if selected
+    let results = requests;
+    
+    // If vehicle is selected, filter by vehicle
     if (selectedVehicle) {
       results = results.filter(request => request.vehicleNumber === selectedVehicle);
     }
@@ -222,6 +172,25 @@ const UserInquiryDashboard: React.FC = () => {
       );
     }
     
+    // Apply date range filter
+    if (dateRange.startDate || dateRange.endDate) {
+      const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+      const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+      
+      if (start || end) {
+        results = results.filter(request => {
+          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+          if (start && requestDate < start) return false;
+          if (end) {
+            const endOfDay = new Date(end);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (requestDate > endOfDay) return false;
+          }
+          return true;
+        });
+      }
+    }
+    
     setFilteredRequests(results);
   }, [searchTerm, statusFilter, requests, selectedVehicle, dateRange]);
 
@@ -229,6 +198,7 @@ const UserInquiryDashboard: React.FC = () => {
     const value = e.target.value;
     setSelectedVehicle(value);
     navigate(value ? `?vehicle=${value}` : '/user/inquiry-dashboard');
+    if (value) fetchRequests(value);
   };
 
   const handleViewDetails = (requestId: string) => {
@@ -286,101 +256,61 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
           
-          {/* Vehicle Selection and Date Filter Card */}
+          {/* Vehicle Selection Card */}
           <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
-            <div className="max-w-4xl mx-auto space-y-4">
-              {/* Vehicle Selection */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-blue-100">
-                    Select Vehicle to View Requests
-                  </label>
-                  {isLoading.vehicles && (
-                    <div className="flex items-center text-sm text-blue-200">
-                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                      Loading vehicles...
-                    </div>
-                  )}
-                </div>
-                {error.vehicles && (
-                  <div className="mb-4 p-3 bg-red-500/20 rounded-lg text-red-100 text-sm flex items-start">
-                    <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>{error.vehicles}</span>
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-blue-100">
+                  Select Vehicle to View Requests
+                </label>
+                {isLoading.vehicles && (
+                  <div className="flex items-center text-sm text-blue-200">
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    Loading vehicles...
                   </div>
                 )}
-                <div className="flex space-x-3">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Car className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <select
-                      value={selectedVehicle}
-                      onChange={handleVehicleChange}
-                      className="block w-full pl-10 pr-12 py-3 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium"
-                      disabled={isLoading.vehicles}
-                    >
-                      <option value="">Select a vehicle...</option>
-                      {vehicles.map(v => (
-                        <option key={v.id} value={v.vehicleNumber}>
-                          {v.vehicleNumber} - {v.brand} {v.model}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  {selectedVehicle && (
-                    <button
-                      onClick={() => {
-                        setSelectedVehicle('');
-                        navigate('/user/inquiry-dashboard');
-                      }}
-                      className="p-3 text-blue-200 hover:text-white transition-colors duration-200"
-                      title="Clear selection"
-                      aria-label="Clear vehicle selection"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
               </div>
               
-              {/* Date Range Filter */}
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-blue-100">
-                    Filter by Date Range
-                  </label>
+              {error.vehicles && (
+                <div className="mb-4 p-3 bg-red-500/20 rounded-lg text-red-100 text-sm flex items-start">
+                  <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{error.vehicles}</span>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex-1">
-                    <label className="block text-xs text-blue-200 mb-1">From</label>
-                    <input
-                      type="date"
-                      value={dateRange.startDate}
-                      onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
-                      className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
-                    />
+              )}
+              
+              <div className="flex space-x-3">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Car className="h-5 w-5 text-blue-300" />
                   </div>
-                  <div className="flex-1">
-                    <label className="block text-xs text-blue-200 mb-1">To</label>
-                    <input
-                      type="date"
-                      value={dateRange.endDate}
-                      onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
-                      min={dateRange.startDate}
-                      className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
-                    />
-                  </div>
-                  {(dateRange.startDate || dateRange.endDate) && (
-                    <button
-                      onClick={() => setDateRange({ startDate: '', endDate: '' })}
-                      className="mt-5 p-2 text-blue-200 hover:text-white transition-colors duration-200"
-                      title="Clear date range"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
+                  <select
+                    value={selectedVehicle}
+                    onChange={handleVehicleChange}
+                    className="block w-full pl-10 pr-12 py-3 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium"
+                    disabled={isLoading.vehicles}
+                  >
+                    <option value="">Select a vehicle...</option>
+                    {vehicles.map(v => (
+                      <option key={v.id} value={v.vehicleNumber}>
+                        {v.vehicleNumber} - {v.brand} {v.model}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+                
+                {selectedVehicle && (
+                  <button
+                    onClick={() => {
+                      setSelectedVehicle('');
+                      navigate('/user/inquiry-dashboard');
+                    }}
+                    className="p-3 text-blue-200 hover:text-white transition-colors duration-200"
+                    title="Clear selection"
+                    aria-label="Clear vehicle selection"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -528,18 +458,66 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
-                  <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setStatusFilter("all");
-                      setDateRange({ startDate: '', endDate: '' });
-                    }}
-                    className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    Reset All
-                  </button>
-                )}
+                <div className="flex space-x-3">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
+                        showDateFilter || dateRange.startDate || dateRange.endDate
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => setShowDateFilter(!showDateFilter)}
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      {dateRange.startDate || dateRange.endDate ? (
+                        <span className="text-sm">
+                          {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                        </span>
+                      ) : (
+                        <span>Date Range</span>
+                      )}
+                    </button>
+                    {showDateFilter && (
+                      <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.startDate}
+                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                            <input
+                              type="date"
+                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              value={dateRange.endDate}
+                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                              min={dateRange.startDate}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                        setDateRange({ startDate: '', endDate: '' });
+                      }}
+                      className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      Reset All
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -551,7 +529,7 @@ const UserInquiryDashboard: React.FC = () => {
           {isLoading.requests && (
             <div className="flex flex-col items-center justify-center p-12 space-y-4 bg-white rounded-xl shadow">
               <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-              <p className="text-gray-600">Loading requests...</p>
+              <p className="text-gray-600">Loading requests for {selectedVehicle}...</p>
               <p className="text-sm text-gray-500">Please wait while we fetch your data</p>
             </div>
           )}
@@ -568,7 +546,7 @@ const UserInquiryDashboard: React.FC = () => {
                       <p>{error.requests}</p>
                     </div>
                     <button
-                      onClick={() => fetchAllRequests()}
+                      onClick={() => fetchRequests(selectedVehicle)}
                       className="mt-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       Retry
@@ -580,7 +558,7 @@ const UserInquiryDashboard: React.FC = () => {
           )}
 
           {/* Empty State */}
-          {!isLoading.requests && !error.requests && filteredRequests.length === 0 && (
+          {!isLoading.requests && !error.requests && filteredRequests.length === 0 && selectedVehicle && (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="text-center py-12 px-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
@@ -588,20 +566,34 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No matching requests found</h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  We couldn't find any requests matching your criteria. Try adjusting your filters.
+                  {(searchTerm || statusFilter !== "all")
+                    ? "We couldn't find any requests matching your criteria. Try adjusting your filters."
+                    : `No tire requests were found for vehicle ${selectedVehicle}.`}
                 </p>
-                {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
+                {(searchTerm || statusFilter !== "all") && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
-                      setDateRange({ startDate: '', endDate: '' });
                     }}
                     className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    Clear All Filters
+                    Clear Filters
                   </button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Initial State - No vehicle selected */}
+          {!isLoading.requests && !selectedVehicle && (
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <div className="text-center py-12 px-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                  <Car className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No vehicle selected</h3>
+                <p className="text-gray-500">Select a vehicle from the dropdown above to view its tire requests and inquiries.</p>
               </div>
             </div>
           )}

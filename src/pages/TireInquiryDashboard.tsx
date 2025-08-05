@@ -70,6 +70,15 @@ const UserInquiryDashboard: React.FC = () => {
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
+  
+  // Handle error state updates safely
+  const updateError = useCallback((field: 'vehicles' | 'requests', message: string) => {
+    setError(prev => ({
+      ...prev,
+      [field]: message
+    }));
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -112,12 +121,10 @@ const UserInquiryDashboard: React.FC = () => {
     setError(prev => ({ ...prev, requests: '' }));
     
     try {
-      let url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
-      
-      if (vehicleNumber) {
-        url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`;
-      }
-      
+      const url = vehicleNumber 
+        ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}?vehicleNumber=${encodeURIComponent(vehicleNumber)}`
+        : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+
       const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -127,44 +134,12 @@ const UserInquiryDashboard: React.FC = () => {
         throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
       }
       
-      let result;
-      try {
-        result = await response.json();
-      } catch (jsonError) {
-        throw new Error('Invalid JSON response from server');
-      }
-      
-      // Handle both direct array responses and { data: [...] } responses
-      const responseData = Array.isArray(result) ? result : (result.data || []);
-      
-      // Ensure all requests have the required fields
-      const formattedRequests = responseData.map((req: any) => ({
-        id: req.id || req.requestId || `req-${Math.random().toString(36).substr(2, 9)}`,
-        vehicleNumber: req.vehicleNumber || (vehicleNumber || 'Unknown'),
-        status: req.status || 'pending',
-        orderNumber: req.orderNumber || 'The order has not yet been placed with a supplier',
-        requestDate: req.requestDate || req.submittedAt || req.created_at || new Date().toISOString(),
-        submittedAt: req.submittedAt || req.created_at,
-        supplierName: req.supplierName || req.supplier_name || 'The order has not yet been placed with a supplier',
-        tireCount: req.tireCount || req.tire_count || 0,
-      }));
-      
-      setRequests(formattedRequests);
-      
-      if (formattedRequests.length === 0) {
-        const noDataMsg = vehicleNumber 
-          ? `No requests found for vehicle ${vehicleNumber}`
-          : 'No requests found';
-        setError(prev => ({ ...prev, requests: noDataMsg }));
-      } else {
-        setError(prev => ({ ...prev, requests: '' }));
-      }
-    } catch (err: any) {
-      console.error('Error fetching requests:', err);
-      setError(prev => ({
-        ...prev,
-        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
-      }));
+      const data = await response.json();
+      setRequests(Array.isArray(data) ? data : []);
+      updateError('requests', '');
+    } catch (err: unknown) {
+      console.error('Error fetching vehicle requests:', err);
+      updateError('requests', `Failed to load vehicle requests: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
@@ -181,72 +156,51 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Fetch all requests on initial load
-  const fetchAllRequests = useCallback(async () => {
+  useEffect(() => {
+    const fetchInitialRequests = async () => {
+      try {
+        setIsLoading(prev => ({ ...prev, requests: true }));
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`);
+        if (!response.ok) throw new Error('Failed to fetch requests');
+        const data = await response.json();
+        setRequests(data);
+        setError(prev => ({ ...prev, requests: null }));
+      } catch (err) {
+        console.error('Error fetching requests:', err);
+        setError(prev => ({
+          ...prev,
+          requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
+        }));
+      } finally {
+        setIsLoading(prev => ({ ...prev, requests: false }));
+      }
+    };
+
+    fetchInitialRequests();
+  }, []);
+
+  // Fetch all requests
+  const fetchAllRequests = useCallback(async (vehicleNumber?: string) => {
     try {
       setIsLoading(prev => ({ ...prev, requests: true }));
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`, {
+      let url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      if (vehicleNumber && vehicleNumber !== '') {
+        url += `?vehicleNumber=${encodeURIComponent(vehicleNumber)}`;
+      }
+      const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
-      }
-      
+      if (!response.ok) throw new Error('Failed to fetch requests');
       const data = await response.json();
       setRequests(Array.isArray(data) ? data : []);
-    } catch (err: any) {
+      updateError('requests', '');
+    } catch (err: unknown) {
       console.error('Error fetching requests:', err);
-      setError(prev => ({
-        ...prev,
-        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
-      }));
+      updateError('requests', `Failed to load requests: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
   }, []);
-
-  // Fetch requests for a specific vehicle
-  const fetchVehicleRequests = useCallback(async (vehicleNumber: string) => {
-    if (!vehicleNumber) {
-      await fetchAllRequests();
-      return;
-    }
-    
-    try {
-      setIsLoading(prev => ({ ...prev, requests: true }));
-      const response = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}/vehicle/${encodeURIComponent(vehicleNumber)}`,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to fetch vehicle requests: ${response.status} ${errorText}`);
-      }
-      
-      const data = await response.json();
-      setRequests(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.error('Error fetching vehicle requests:', err);
-      setError(prev => ({
-        ...prev,
-        requests: `Failed to load vehicle requests: ${err?.message || 'Unknown error'}`
-      }));
-    } finally {
-      setIsLoading(prev => ({ ...prev, requests: false }));
-    }
-  }, [fetchAllRequests]);
-
-  // Handle vehicle selection changes
-  useEffect(() => {
-    if (selectedVehicle) {
-      fetchRequests(selectedVehicle);
-    } else {
-      fetchAllRequests();
-    }
-  }, [selectedVehicle]);
 
   // Apply filters to the requests
   useEffect(() => {
@@ -263,10 +217,12 @@ const UserInquiryDashboard: React.FC = () => {
     const filtered = [...requests].filter(request => {
       // Skip if request is invalid
       if (!request || typeof request !== 'object') return false;
-      // Skip vehicle filter if 'Select Vehicle' is selected
-      if (selectedVehicle === '') return true;
+      
       // Apply vehicle filter only if a specific vehicle is selected
-      if (selectedVehicle && request.vehicleNumber !== selectedVehicle) return false;
+      if (selectedVehicle && selectedVehicle !== 'Select Vehicle' && request.vehicleNumber !== selectedVehicle) {
+        console.log('Filtering out request - vehicle mismatch:', request.id, request.vehicleNumber, '!==', selectedVehicle);
+        return false;
+      }
       
       // 1. Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
@@ -361,17 +317,28 @@ const UserInquiryDashboard: React.FC = () => {
     window.history.replaceState({}, '', `?${searchParams.toString()}`);
   };
 
+  // Handle vehicle selection changes
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedVehicle(value);
-    // Update URL if a specific vehicle is selected
-    if (value) {
-      navigate(`?vehicle=${value}`);
+    
+    // Update URL with the new vehicle selection
+    const searchParams = new URLSearchParams(window.location.search);
+    if (value && value !== '') {
+      searchParams.set('vehicle', value);
     } else {
-      // Clear vehicle from URL if 'Select Vehicle' or 'All Vehicles' is selected
-      const searchParams = new URLSearchParams(window.location.search);
       searchParams.delete('vehicle');
-      window.history.replaceState({}, '', `?${searchParams.toString()}`);
+    }
+    
+    // Update URL without page reload
+    const newUrl = searchParams.toString() ? `?${searchParams.toString()}` : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+    
+    // Fetch requests with the new filter
+    if (value && value !== '') {
+      fetchAllRequests(value);
+    } else {
+      fetchAllRequests();
     }
   };
 

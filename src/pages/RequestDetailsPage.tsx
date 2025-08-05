@@ -246,7 +246,7 @@ const RequestDetailsPage: React.FC = () => {
                 </div>
                 <dd className="text-lg font-semibold text-gray-900">
                   {request.orderNumber || (
-                    <span className="text-gray-400">Not assigned</span>
+                    <span className="text-gray-400">The order has not yet been placed with a supplier</span>
                   )}
                 </dd>
               </div>
@@ -278,7 +278,7 @@ const RequestDetailsPage: React.FC = () => {
                   <dt className="text-xs font-medium text-green-600 uppercase tracking-wider mb-1">Supplier Name</dt>
                   <dd className="text-sm font-medium text-gray-900">
                     {request.supplierName || (
-                      <span className="text-gray-400">Not assigned</span>
+                      <span className="text-gray-400">The order has not yet been placed with a supplier</span>
                     )}
                   </dd>
                 </div>

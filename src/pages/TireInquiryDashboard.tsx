@@ -126,6 +126,7 @@ const UserInquiryDashboard: React.FC = () => {
         ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}?vehicleNumber=${encodeURIComponent(vehicleNumber)}`
         : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
 
+      console.log('Fetching requests from URL:', url);
       const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -136,7 +137,27 @@ const UserInquiryDashboard: React.FC = () => {
       }
       
       const data = await response.json();
-      setRequests(Array.isArray(data) ? data : []);
+      const requestsData = Array.isArray(data) ? data : [];
+      
+      // Debug logging for request statuses
+      console.log('Fetched requests count:', requestsData.length);
+      const statusCounts: Record<string, number> = {};
+      requestsData.forEach(req => {
+        statusCounts[req.status] = (statusCounts[req.status] || 0) + 1;
+      });
+      console.log('Requests by status:', statusCounts);
+      
+      // Log the first few requests for inspection
+      const sampleRequests = requestsData.slice(0, 5);
+      console.log('Sample requests:', sampleRequests.map(r => ({
+        id: r.id,
+        status: r.status,
+        orderNumber: r.orderNumber,
+        vehicleNumber: r.vehicleNumber,
+        submittedAt: r.submittedAt
+      })));
+      
+      setRequests(requestsData);
       updateError('requests', '');
     } catch (err: unknown) {
       console.error('Error fetching vehicle requests:', err);

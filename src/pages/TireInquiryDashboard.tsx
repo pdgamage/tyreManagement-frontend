@@ -1,7 +1,71 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { 
+  ArrowLeft, AlertCircle, Loader2, X, Search, 
+  Car, Building, FileText, ChevronDown, ChevronUp, 
+  Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package 
+} from "lucide-react";
+
+// Add missing JSX namespace for React
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      div: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+      button: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
+      input: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+      span: React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
+      // Add other HTML elements as needed
+    }
+  }
+}
+
+// Status badge component
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const getStatusBadgeColor = (status: string): string => {
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-200';
+    if (statusLower.includes('approved')) return 'bg-green-50 text-green-800 border-green-200';
+    if (statusLower.includes('rejected')) return 'bg-red-50 text-red-800 border-red-200';
+    if (statusLower.includes('complete')) return 'bg-blue-50 text-blue-800 border-blue-200';
+    return 'bg-gray-50 text-gray-800 border-gray-200';
+  };
+
+  const getStatusIcon = (status: string): JSX.Element | null => {
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('pending')) return <Clock className="w-3.5 h-3.5 mr-1.5" />;
+    if (statusLower.includes('approved')) return <CheckCircle className="w-3.5 h-3.5 mr-1.5" />;
+    if (statusLower.includes('rejected')) return <XCircle className="w-3.5 h-3.5 mr-1.5" />;
+    if (statusLower.includes('complete')) return <CheckCircle className="w-3.5 h-3.5 mr-1.5" />;
+    return null;
+  };
+
+  const displayText = status.toLowerCase() === 'complete' 
+    ? 'Complete - Engineer Approved' 
+    : status;
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(status)} border flex items-center shadow-sm`}>
+      {getStatusIcon(status)}
+      {displayText}
+    </span>
+  );
+};
+
+// Format date helper function
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) 
+    ? 'Invalid date' 
+    : date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+};
 
 interface Vehicle {
   id: string;
@@ -35,12 +99,30 @@ const UserInquiryDashboard: React.FC = () => {
   const [searchParams] = useSearchParams();
   const vehicleFromUrl = searchParams.get('vehicle') || '';
   
+  // State management
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl);
   const [requests, setRequests] = useState<TireRequest[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    startDate: '',
+    endDate: ''
+  });
+  
+  // State management
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl);
+  const [requests, setRequests] = useState<TireRequest[]>([]);
+  const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
+  const [error, setError] = useState({ vehicles: '', requests: '' });
+  
+  // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -79,7 +161,6 @@ const UserInquiryDashboard: React.FC = () => {
   const fetchRequests = useCallback(async (vehicleNumber: string) => {
     if (!vehicleNumber) {
       setRequests([]);
-      setFilteredRequests([]);
       return;
     }
     
@@ -114,7 +195,6 @@ const UserInquiryDashboard: React.FC = () => {
       }));
       
       setRequests(formattedRequests);
-      setFilteredRequests(formattedRequests);
       
       if (formattedRequests.length === 0) {
         setError(prev => ({ ...prev, requests: 'No requests found for this vehicle' }));
@@ -129,7 +209,6 @@ const UserInquiryDashboard: React.FC = () => {
         requests: `Failed to load requests: ${err?.message || 'Unknown error'}` 
       }));
       setRequests([]);
-      setFilteredRequests([]);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
@@ -146,19 +225,23 @@ const UserInquiryDashboard: React.FC = () => {
     }
   }, [vehicleFromUrl, fetchRequests]);
 
-  // Effect to filter requests based on criteria
-  useEffect(() => {
-    let results = requests;
+  // Memoized filtered requests
+  const filteredRequests = useMemo(() => {
+    if (!Array.isArray(requests)) return [];
     
-    // If vehicle is selected, filter by vehicle
+    let results = [...requests];
+    
+    // Filter by vehicle if selected
     if (selectedVehicle) {
-      results = results.filter(request => request.vehicleNumber === selectedVehicle);
+      results = results.filter(request => 
+        request.vehicleNumber === selectedVehicle
+      );
     }
     
     // Apply status filter
     if (statusFilter !== "all") {
       results = results.filter(request => 
-        request.status.toLowerCase().includes(statusFilter)
+        request.status?.toLowerCase().includes(statusFilter)
       );
     }
     
@@ -166,9 +249,9 @@ const UserInquiryDashboard: React.FC = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(request => 
-        request.orderNumber.toLowerCase().includes(term) || 
-        request.id.toLowerCase().includes(term) ||
-        (request.supplierName?.toLowerCase().includes(term) ?? false)
+        (request.orderNumber?.toLowerCase().includes(term) || 
+        request.id?.toLowerCase().includes(term) ||
+        (request.supplierName?.toLowerCase().includes(term) ?? false))
       );
     }
     
@@ -177,22 +260,22 @@ const UserInquiryDashboard: React.FC = () => {
       const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
       const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
       
-      if (start || end) {
-        results = results.filter(request => {
-          const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
-          if (start && requestDate < start) return false;
-          if (end) {
-            const endOfDay = new Date(end);
-            endOfDay.setHours(23, 59, 59, 999);
-            if (requestDate > endOfDay) return false;
-          }
-          return true;
-        });
-      }
+      results = results.filter(request => {
+        const requestDate = new Date(request.requestDate || request.submittedAt || request.created_at || '');
+        if (isNaN(requestDate.getTime())) return false;
+        
+        if (start && requestDate < start) return false;
+        if (end) {
+          const endOfDay = new Date(end);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (requestDate > endOfDay) return false;
+        }
+        return true;
+      });
     }
     
-    setFilteredRequests(results);
-  }, [searchTerm, statusFilter, requests, selectedVehicle, dateRange]);
+    return results;
+  }, [requests, searchTerm, statusFilter, selectedVehicle, dateRange]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -201,39 +284,15 @@ const UserInquiryDashboard: React.FC = () => {
     if (value) fetchRequests(value);
   };
 
-  const handleViewDetails = (requestId: string) => {
-    navigate(`/user/request-details/${requestId}`, {
-      state: { fromInquiry: true }
-    });
-  };
+  const handleViewDetails = useCallback((requestId: string) => {
+    navigate(`/request/${requestId}`);
+  }, [navigate]);
 
-  const getStatusBadgeColor = (status: string) => {
-    const statusLower = status?.toLowerCase() || '';
-    if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-100';
-    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-50 text-green-800 border-green-100';
-    if (statusLower.includes('rejected')) return 'bg-red-50 text-red-800 border-red-100';
-    return 'bg-gray-50 text-gray-800 border-gray-100';
-  };
-
-  const getStatusIcon = (status: string) => {
-    const statusLower = status?.toLowerCase() || '';
-    if (statusLower.includes('pending')) return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
-    if (statusLower.includes('approved')) return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
-    if (statusLower.includes('complete')) return <Smile className="w-4 h-4 mr-1.5 text-blue-500" />;
-    if (statusLower.includes('rejected')) return <XCircle className="w-4 h-4 mr-1.5 text-red-500" />;
-    return <FileText className="w-4 h-4 mr-1.5 text-gray-500" />;
-  };
-
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  const handleResetFilters = useCallback(() => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setDateRange({ startDate: '', endDate: '' });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -392,16 +451,81 @@ const UserInquiryDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Filters Section (only shown when vehicle is selected) */}
-        {selectedVehicle && (
-          <div className="mb-6 bg-white rounded-xl shadow-md p-5">
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+        {/* Filters Section - Always Visible */}
+        <div className="mb-6 bg-white rounded-xl shadow-md p-5">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <h3 className="text-lg font-medium text-gray-900 flex items-center">
               <Filter className="w-5 h-5 mr-2 text-blue-600" />
               Filter Requests
             </h3>
+            
+            {/* Date Range Filter - Always Visible */}
+            <div className="flex flex-wrap gap-3">
+              <div className="relative">
+                <button
+                  type="button"
+                  className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
+                    showDateFilter || dateRange.startDate || dateRange.endDate
+                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setShowDateFilter(!showDateFilter)}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  {dateRange.startDate || dateRange.endDate ? (
+                    <span className="text-sm">
+                      {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
+                    </span>
+                  ) : (
+                    <span>Date Range</span>
+                  )}
+                </button>
+                {showDateFilter && (
+                  <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                        <input
+                          type="date"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          value={dateRange.startDate}
+                          onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                        <input
+                          type="date"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          value={dateRange.endDate}
+                          onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+                          min={dateRange.startDate}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Reset Button */}
+              {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Reset All
+                </button>
+              )}
+            </div>
+          </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1">
-                <div className="relative max-w-md">
+              <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Page header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Tire Request Dashboard</h1>
+            <p className="text-gray-600 mt-1">View and manage tire requests</p>
+          </div>
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-5 w-5 text-gray-400" />
                   </div>
@@ -458,52 +582,50 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="flex space-x-3">
+                {/* Status Filter - Only show when vehicle is selected */}
+                {selectedVehicle && (
                   <div className="relative">
                     <button
                       type="button"
-                      className={`inline-flex items-center px-4 py-2.5 border rounded-lg text-sm font-medium ${
-                        showDateFilter || dateRange.startDate || dateRange.endDate
-                          ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                      onClick={() => setShowDateFilter(!showDateFilter)}
+                      className="inline-flex items-center justify-between w-full md:w-56 px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                     >
-                      <Clock className="h-4 w-4 mr-2" />
-                      {dateRange.startDate || dateRange.endDate ? (
-                        <span className="text-sm">
-                          {dateRange.startDate ? new Date(dateRange.startDate).toLocaleDateString() : ''} - {dateRange.endDate ? new Date(dateRange.endDate).toLocaleDateString() : 'Now'}
-                        </span>
+                      <div className="flex items-center">
+                        <Filter className="w-4 h-4 mr-2 text-gray-500" />
+                        {statusOptions.find(opt => opt.value === statusFilter)?.label || "Filter by status"}
+                      </div>
+                      {isStatusDropdownOpen ? (
+                        <ChevronUp className="ml-2 h-4 w-4" />
                       ) : (
-                        <span>Date Range</span>
+                        <ChevronDown className="ml-2 h-4 w-4" />
                       )}
                     </button>
-                    {showDateFilter && (
-                      <div className="absolute z-10 mt-1 p-4 w-80 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
-                            <input
-                              type="date"
-                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                              value={dateRange.startDate}
-                              onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
-                            <input
-                              type="date"
-                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                              value={dateRange.endDate}
-                              onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
-                              min={dateRange.startDate}
-                            />
-                          </div>
+                    
+                    {isStatusDropdownOpen && (
+                      <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                        <div className="py-1">
+                          {statusOptions.map((option) => (
+                            <button
+                              key={option.value}
+                              className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                                statusFilter === option.value
+                                  ? "bg-blue-50 text-blue-800"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                              onClick={() => {
+                                setStatusFilter(option.value);
+                                setIsStatusDropdownOpen(false);
+                              }}
+                            >
+                              {option.icon}
+                              {option.label}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
+                )}
 
                   {(searchTerm || statusFilter !== "all" || dateRange.startDate || dateRange.endDate) && (
                     <button
@@ -638,15 +760,12 @@ const UserInquiryDashboard: React.FC = () => {
                                 Request #{request.id}
                               </h3>
                               <div className="text-sm text-gray-500 mt-1">
-                                Submitted on {formatDate(request.requestDate)}
+                                Submitted on {formatDate(request.requestDate || request.submittedAt || request.created_at)}
                               </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 flex-wrap">
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
-                              {getStatusIcon(request.status)}
-                              {request.status.toLowerCase() === 'complete' ? 'Complete - Engineer Approved' : request.status}
-                            </span>
+                            <StatusBadge status={request.status} />
                             {request.status.toLowerCase() === 'complete' && (
                               <p className="text-sm text-gray-600 italic flex items-center">
                                 <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />
@@ -720,7 +839,7 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 };

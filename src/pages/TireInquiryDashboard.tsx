@@ -381,48 +381,6 @@ const UserInquiryDashboard: React.FC = () => {
                   )}
                 </div>
               </div>
-              
-              {error.vehicles && (
-                <div className="mb-4 p-3 bg-red-500/20 rounded-lg text-red-100 text-sm flex items-start">
-                  <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{error.vehicles}</span>
-                </div>
-              )}
-              
-              <div className="flex space-x-3">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Car className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <select
-                    value={selectedVehicle}
-                    onChange={handleVehicleChange}
-                    className="block w-full pl-10 pr-12 py-3 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium"
-                    disabled={isLoading.vehicles}
-                  >
-                    <option value="">Select a vehicle...</option>
-                    {vehicles.map(v => (
-                      <option key={v.id} value={v.vehicleNumber}>
-                        {v.vehicleNumber} - {v.brand} {v.model}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                {selectedVehicle && (
-                  <button
-                    onClick={() => {
-                      setSelectedVehicle('');
-                      navigate('/user/inquiry-dashboard');
-                    }}
-                    className="p-3 text-blue-200 hover:text-white transition-colors duration-200"
-                    title="Clear selection"
-                    aria-label="Clear vehicle selection"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
             </div>
           </div>
         </div>

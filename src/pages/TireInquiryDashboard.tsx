@@ -41,9 +41,6 @@ const UserInquiryDashboard: React.FC = () => {
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState({ vehicles: '', requests: '' });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [dateRange, setDateRange] = useState({
     startDate: '',
     endDate: ''
@@ -252,30 +249,13 @@ const UserInquiryDashboard: React.FC = () => {
         }
       }
       
-      // 2. Apply status filter
-      if (statusFilter !== "all" && !request.status.toLowerCase().includes(statusFilter)) {
-        return false;
-      }
-      
-      // 3. Apply search term filter
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        const matchesOrderNumber = request.orderNumber?.toLowerCase().includes(term) ?? false;
-        const matchesId = request.id?.toLowerCase().includes(term) ?? false;
-        const matchesSupplier = request.supplierName?.toLowerCase().includes(term) ?? false;
-        
-        if (!matchesOrderNumber && !matchesId && !matchesSupplier) {
-          return false;
-        }
-      }
-      
-      return true; // Include request if it passes all filters
+      return true; // Include request if it passes date filter
     });
     
     console.log('Filtered requests:', filtered.length, 'out of', requests.length);
     setFilteredRequests(filtered);
     
-  }, [requests, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
+  }, [requests, dateRange.startDate, dateRange.endDate]);
 
   const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -447,97 +427,6 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Status and Search Filters */}
-          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Status Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-blue-100 mb-2">
-                    Filter by Status
-                  </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      className="relative w-full bg-white/90 border border-blue-300/50 rounded-lg shadow-sm pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                    >
-                      <span className="flex items-center">
-                        {statusOptions.find(opt => opt.value === statusFilter)?.icon}
-                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Select status...'}
-                      </span>
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        {isStatusDropdownOpen ? (
-                          <ChevronUp className="h-5 w-5 text-gray-500" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-gray-500" />
-                        )}
-                      </span>
-                    </button>
-                    
-                    {isStatusDropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
-                        <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                          {statusOptions.map((option) => (
-                            <li
-                              key={option.value}
-                              className={`text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 ${statusFilter === option.value ? 'bg-blue-100' : ''}`}
-                              onClick={() => {
-                                setStatusFilter(option.value);
-                                setIsStatusDropdownOpen(false);
-                              }}
-                            >
-                              <div className="flex items-center">
-                                <span className="font-normal block truncate">
-                                  {option.icon}
-                                  {option.label}
-                                </span>
-                              </div>
-                              {statusFilter === option.value && (
-                                <span className="text-blue-600 absolute inset-y-0 right-0 flex items-center pr-4">
-                                  <CheckCircle className="h-5 w-5" />
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Search Filter */}
-                <div>
-                  <label htmlFor="search" className="block text-sm font-medium text-blue-100 mb-2">
-                    Search Requests
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      name="search"
-                      id="search"
-                      className="focus:ring-blue-400 focus:border-blue-400 block w-full pl-10 pr-12 sm:text-sm border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm"
-                      placeholder="Search by order #, ID, or supplier"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                      <button
-                        type="button"
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                        onClick={() => setSearchTerm('')}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </header>
 

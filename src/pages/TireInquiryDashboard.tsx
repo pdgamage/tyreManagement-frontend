@@ -451,8 +451,9 @@ const UserInquiryDashboard: React.FC = () => {
                     onChange={handleVehicleChange}
                     className="block w-full pl-10 pr-10 py-2.5 text-sm border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     disabled={isLoading.vehicles}
+                    required
                   >
-                    <option value="">All Vehicles</option>
+                    <option value="">Select Vehicle</option>
                     {vehicles.map((vehicle) => (
                       <option key={vehicle.vehicleNumber} value={vehicle.vehicleNumber}>
                         {vehicle.vehicleNumber} - {vehicle.brand} {vehicle.model}

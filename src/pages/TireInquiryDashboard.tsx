@@ -140,22 +140,40 @@ const UserInquiryDashboard: React.FC = () => {
       const requestsData = Array.isArray(data) ? data : [];
       
       // Debug logging for request statuses
-      console.log('Fetched requests count:', requestsData.length);
+      console.log('========== REQUESTS DEBUG INFO ==========');
+      console.log('Total requests fetched:', requestsData.length);
+      
+      console.log('\n--- All Request Statuses ---');
       const statusCounts: Record<string, number> = {};
       requestsData.forEach(req => {
         statusCounts[req.status] = (statusCounts[req.status] || 0) + 1;
       });
-      console.log('Requests by status:', statusCounts);
+      console.table(statusCounts);
       
-      // Log the first few requests for inspection
-      const sampleRequests = requestsData.slice(0, 5);
-      console.log('Sample requests:', sampleRequests.map(r => ({
-        id: r.id,
-        status: r.status,
-        orderNumber: r.orderNumber,
-        vehicleNumber: r.vehicleNumber,
-        submittedAt: r.submittedAt
-      })));
+      console.log('\n--- Detailed Requests Info ---');
+      requestsData.forEach((req, index) => {
+        console.log(`\nRequest #${index + 1}:`);
+        console.log(`- ID: ${req.id}`);
+        console.log(`- Status: "${req.status}"`);
+        console.log(`- Order #: ${req.orderNumber || 'N/A'}`);
+        console.log(`- Vehicle: ${req.vehicleNumber}`);
+        console.log(`- Submitted: ${req.submittedAt || 'N/A'}`);
+        console.log(`- Created: ${req.requestDate || req.created_at || 'N/A'}`);
+        
+        // Check if this request would be included in Orders Placed
+        const status = req.status?.toLowerCase() || '';
+        const isIncluded = status.includes('approved') || status.includes('complete');
+        console.log(`- Included in Orders Placed: ${isIncluded ? '✅' : '❌'}`);
+      });
+      
+      console.log('\n--- Orders Placed Calculation ---');
+      const placedOrders = requestsData.filter(r => {
+        const status = r.status?.toLowerCase() || '';
+        return status.includes('approved') || status.includes('complete');
+      });
+      console.log(`Total Orders Placed: ${placedOrders.length} (${placedOrders.map(r => r.id).join(', ')})`);
+      
+      console.log('========== END REQUESTS DEBUG ==========\n');
       
       setRequests(requestsData);
       updateError('requests', '');

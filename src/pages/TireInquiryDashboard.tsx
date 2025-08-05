@@ -689,6 +689,33 @@ const UserInquiryDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Placed Orders Card */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-100">Placed Orders</p>
+                <p className="text-3xl font-bold mt-1">
+                  {requests.filter(r => r.status.toLowerCase().includes('approved') || r.status.toLowerCase().includes('complete')).length}
+                </p>
+                <p className="text-xs text-blue-200 mt-1">Total orders placed with suppliers</p>
+              </div>
+              <div className="p-3 rounded-full bg-white/20">
+                <Package className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-blue-500/30">
+              <div className="flex items-center text-xs text-blue-100">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>
+                <span>Active: {requests.filter(r => r.status.toLowerCase() === 'approved').length}</span>
+                <span className="mx-2">•</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-300 mr-2"></span>
+                <span>Completed: {requests.filter(r => r.status.toLowerCase() === 'complete').length}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Filters Section - Hidden as per user request */}
         {false && selectedVehicle && (
           <div className="mb-6 bg-white rounded-xl shadow-md p-5">

@@ -81,8 +81,7 @@ const UserDashboard = () => {
       req.status === "engineer rejected"
   );
   const placeOrderRequests = userRequests.filter(
-    (req: any) => req.status?.toLowerCase().includes('order placed') || 
-                req.status?.toLowerCase().includes('place order')
+    (req: any) => req.status === "order placed"
   );
   const completeOrderRequests = userRequests.filter(
     (req: any) => req.status === "complete"

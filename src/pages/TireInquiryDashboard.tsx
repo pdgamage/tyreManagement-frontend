@@ -55,6 +55,7 @@ const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
   { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
+  { value: "place_order", label: "Place Order", icon: <Package className="w-4 h-4 mr-2 text-purple-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
   { value: "complete", label: "Complete - Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
 ];
@@ -184,6 +185,19 @@ const UserInquiryDashboard: React.FC = () => {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
   }, []);
+
+  // Calculate status counts
+  const getStatusCounts = useCallback(() => {
+    if (!Array.isArray(requests)) return {};
+    
+    return requests.reduce((acc, request) => {
+      if (!request || !request.status) return acc;
+      
+      const status = request.status.toLowerCase();
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [requests]);
 
   // Apply filters to the requests
   useEffect(() => {
@@ -342,7 +356,9 @@ const UserInquiryDashboard: React.FC = () => {
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
     if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-100';
-    if (statusLower.includes('approved') || statusLower === 'complete') return 'bg-green-50 text-green-800 border-green-100';
+    if (statusLower.includes('approved')) return 'bg-green-50 text-green-800 border-green-100';
+    if (statusLower.includes('place_order')) return 'bg-purple-50 text-purple-800 border-purple-100';
+    if (statusLower.includes('complete')) return 'bg-blue-50 text-blue-800 border-blue-100';
     if (statusLower.includes('rejected')) return 'bg-red-50 text-red-800 border-red-100';
     return 'bg-gray-50 text-gray-800 border-gray-100';
   };
@@ -351,6 +367,7 @@ const UserInquiryDashboard: React.FC = () => {
     const statusLower = status?.toLowerCase() || '';
     if (statusLower.includes('pending')) return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
     if (statusLower.includes('approved')) return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
+    if (statusLower.includes('place_order')) return <Package className="w-4 h-4 mr-1.5 text-purple-500" />;
     if (statusLower.includes('complete')) return <Smile className="w-4 h-4 mr-1.5 text-blue-500" />;
     if (statusLower.includes('rejected')) return <XCircle className="w-4 h-4 mr-1.5 text-red-500" />;
     return <FileText className="w-4 h-4 mr-1.5 text-gray-500" />;

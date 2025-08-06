@@ -714,20 +714,6 @@ const UserInquiryDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Complete</p>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('complete')).length}
-                  </p>
-                </div>
-                <div className="p-3 rounded-full bg-blue-50 text-blue-600">
-                  <Smile className="w-6 h-6" />
-                </div>
-              </div>
-            </div>
             
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
               <div className="flex items-center justify-between">

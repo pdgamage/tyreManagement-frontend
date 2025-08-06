@@ -194,7 +194,7 @@ const UserInquiryDashboard: React.FC = () => {
     }
     
     console.log('Applying filters to requests:', requests.length, 'requests');
-    console.log('Current filters - search:', searchTerm, 'status:', statusFilter, 'vehicle:', selectedVehicle);
+    console.log('Current filters - search:', searchTerm, 'status:', statusFilter, 'vehicle:', selectedVehicle, 'dateRange:', dateRange);
     
     // Apply all filters in sequence
     const filtered = [...requests].filter(request => {
@@ -210,41 +210,42 @@ const UserInquiryDashboard: React.FC = () => {
         console.log('Filtering out request - vehicle mismatch:', request.id, request.vehicleNumber, '!==', selectedVehicle);
         return false;
       }
-      // If 'All Vehicles' is selected or no vehicle filter is applied, include the request
       
-      // 1. Apply date range filter if dates are selected
+      // Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
         try {
           const requestDate = request.submittedAt || request.requestDate || request.created_at;
-          const requestDateObj = requestDate ? new Date(requestDate) : null;
+          if (!requestDate) return false; // Skip if no date available
           
-          if (!requestDateObj || isNaN(requestDateObj.getTime())) {
+          const requestDateObj = new Date(requestDate);
+          if (isNaN(requestDateObj.getTime())) {
             console.log('Skipping request due to invalid date:', request.id, requestDate);
-            return false; // Skip if no valid date
+            return false;
           }
           
-          // Create date objects for comparison
-          const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
-          const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
+          // Normalize to local date (ignoring time)
+          const requestDateLocal = new Date(
+            requestDateObj.getFullYear(),
+            requestDateObj.getMonth(),
+            requestDateObj.getDate()
+          );
           
-          // Normalize request date to start of day for comparison
-          const normalizedRequestDate = new Date(requestDateObj);
-          normalizedRequestDate.setHours(12, 0, 0, 0);
-          
-          if (startDate) {
-            const normalizedStartDate = new Date(startDate);
-            normalizedStartDate.setHours(0, 0, 0, 0);
-            if (normalizedRequestDate < normalizedStartDate) {
-              console.log('Filtering out request - before start date:', request.id, normalizedRequestDate, normalizedStartDate);
+          // Handle start date filter
+          if (dateRange.startDate) {
+            const [year, month, day] = dateRange.startDate.split('-').map(Number);
+            const startDate = new Date(year, month - 1, day);
+            
+            if (requestDateLocal < startDate) {
               return false;
             }
           }
           
-          if (endDate) {
-            const normalizedEndDate = new Date(endDate);
-            normalizedEndDate.setHours(23, 59, 59, 999);
-            if (normalizedRequestDate > normalizedEndDate) {
-              console.log('Filtering out request - after end date:', request.id, normalizedRequestDate, normalizedEndDate);
+          // Handle end date filter
+          if (dateRange.endDate) {
+            const [year, month, day] = dateRange.endDate.split('-').map(Number);
+            const endDate = new Date(year, month - 1, day + 1); // Include the entire end date
+            
+            if (requestDateLocal >= endDate) {
               return false;
             }
           }
@@ -450,50 +451,75 @@ const UserInquiryDashboard: React.FC = () => {
                 <label className="block text-sm font-medium text-blue-100">
                   Filter by Date Range
                 </label>
+                {(dateRange.startDate || dateRange.endDate) && (
+                  <button
+                    onClick={() => { 
+                      setDateRange({ startDate: '', endDate: '' });
+                      setDateInput({ startDate: '', endDate: '' });
+                    }}
+                    className="text-xs text-blue-200 hover:text-white transition-colors flex items-center"
+                    title="Clear date range"
+                  >
+                    <X className="w-3 h-3 mr-1" /> Clear
+                  </button>
+                )}
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
                   <label className="block text-xs text-blue-200 mb-1">From</label>
                   <input
                     type="date"
                     value={dateInput.startDate}
-                    onChange={(e) => setDateInput({...dateInput, startDate: e.target.value})}
+                    onChange={(e) => setDateInput(prev => ({
+                      ...prev, 
+                      startDate: e.target.value,
+                      endDate: prev.endDate && e.target.value > prev.endDate ? e.target.value : prev.endDate
+                    }))}
+                    max={dateInput.endDate || new Date().toISOString().split('T')[0]}
                     className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
                   />
                 </div>
-                <div className="flex-1">
+                <div>
                   <label className="block text-xs text-blue-200 mb-1">To</label>
                   <input
                     type="date"
                     value={dateInput.endDate}
-                    onChange={(e) => setDateInput({...dateInput, endDate: e.target.value})}
-                    min={dateInput.startDate}
-                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm"
+                    onChange={(e) => setDateInput(prev => ({
+                      ...prev, 
+                      endDate: e.target.value,
+                      startDate: prev.startDate && e.target.value < prev.startDate ? e.target.value : prev.startDate
+                    }))}
+                    min={dateInput.startDate || ''}
+                    max={new Date().toISOString().split('T')[0]}
+                    disabled={!dateInput.startDate}
+                    className="block w-full px-3 py-2 border border-blue-300/50 rounded-lg bg-white/90 text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm disabled:opacity-70"
                   />
                 </div>
-                <div className="flex flex-col space-y-1">
+                <div className="flex items-end">
                   <button
-                    onClick={() => setDateRange({ startDate: dateInput.startDate, endDate: dateInput.endDate })}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
+                    onClick={() => {
+                      setDateRange({ 
+                        startDate: dateInput.startDate, 
+                        endDate: dateInput.endDate 
+                      });
+                    }}
                     disabled={!dateInput.startDate && !dateInput.endDate}
-                    title="Apply date range filter"
+                    className={`w-full py-2 px-4 rounded-lg shadow transition-colors text-sm font-medium ${
+                      dateInput.startDate || dateInput.endDate
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                    title={!dateInput.startDate && !dateInput.endDate ? 'Select at least one date' : 'Apply date range filter'}
                   >
-                    Apply
+                    {dateRange.startDate || dateRange.endDate ? 'Update Filter' : 'Apply Filter'}
                   </button>
-                  {(dateRange.startDate || dateRange.endDate) && (
-                    <button
-                      onClick={() => { 
-                        setDateRange({ startDate: '', endDate: '' }); 
-                        setDateInput({ startDate: '', endDate: '' }); 
-                      }}
-                      className="px-4 py-2 text-xs text-blue-200 hover:text-white transition-colors duration-200"
-                      title="Clear date range"
-                    >
-                      Clear
-                    </button>
-                  )}
                 </div>
               </div>
+              {(dateRange.startDate || dateRange.endDate) && (
+                <div className="mt-2 text-xs text-blue-100 text-right">
+                  Showing {dateRange.startDate || 'Start'} to {dateRange.endDate || 'End'}
+                </div>
+              )}
             </div>
           </div>
 

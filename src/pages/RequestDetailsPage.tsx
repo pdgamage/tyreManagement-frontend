@@ -190,7 +190,20 @@ const RequestDetailsPage: React.FC = () => {
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold text-white truncate">Tire Request Details</h1>
-              <p className="text-sm text-blue-100 mt-1">Request ID: {request.id}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1">
+                <p className="text-sm text-blue-100">Request ID: {request.id}</p>
+                <span className="hidden sm:inline text-blue-200">•</span>
+                <p className="text-sm text-blue-100">
+                  {new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </p>
+              </div>
             </div>
             <div className="flex items-center">
               <span className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium ${statusColors.bg} ${statusColors.text} ${statusColors.border}`}>

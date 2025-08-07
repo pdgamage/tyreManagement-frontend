@@ -178,7 +178,7 @@ const RequestDetailsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 shadow-lg">
+      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center space-x-4">
             <button

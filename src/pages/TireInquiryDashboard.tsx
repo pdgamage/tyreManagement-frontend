@@ -383,7 +383,7 @@ const UserInquiryDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <header className="bg-gradient-to-r from-green-700 to-emerald-800 text-white shadow-xl">
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">

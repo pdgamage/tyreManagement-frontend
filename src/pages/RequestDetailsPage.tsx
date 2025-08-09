@@ -18,6 +18,11 @@ const RequestDetailsPage: React.FC = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfError, setPdfError] = useState('');
   const pdfGenerated = useRef(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -385,13 +390,15 @@ const RequestDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={async () => {
-                if (isGeneratingPdf) return;
+                if (isGeneratingPdf || !isClient) return;
                 
                 try {
                   setIsGeneratingPdf(true);
                   setPdfError('');
                   
                   if (!pdfGenerated.current) {
+                    // Dynamically import the PDF generation to avoid SSR issues
+                    const { generatePdfReport } = await import('../utils/generatePdfReport');
                     const pdfUrl = await generatePdfReport(request!);
                     setPdfPreviewUrl(pdfUrl);
                     pdfGenerated.current = true;
@@ -405,8 +412,8 @@ const RequestDetailsPage: React.FC = () => {
                   setIsGeneratingPdf(false);
                 }
               }}
-              disabled={isGeneratingPdf}
-              className={`px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl ${isGeneratingPdf ? 'opacity-75 cursor-not-allowed' : 'hover:from-green-600 hover:to-emerald-700'} transition-all font-medium text-sm shadow-lg ${!isGeneratingPdf && 'hover:shadow-xl'} flex items-center`}
+              disabled={isGeneratingPdf || !isClient}
+              className={`px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl ${isGeneratingPdf || !isClient ? 'opacity-75 cursor-not-allowed' : 'hover:from-green-600 hover:to-emerald-700'} transition-all font-medium text-sm shadow-lg ${!isGeneratingPdf && isClient && 'hover:shadow-xl'} flex items-center`}
             >
               {isGeneratingPdf ? (
                 <>

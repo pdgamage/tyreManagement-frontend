@@ -1,17 +1,24 @@
+// @ts-ignore - jspdf types are not properly exported
 import { jsPDF } from 'jspdf';
+// @ts-ignore - jspdf-autotable doesn't have proper types
 import 'jspdf-autotable';
 import { RequestDetails } from '../types';
 
+// Extend the window object to include jsPDF types
+declare global {
+  interface Window {
+    jsPDF: any;
+  }
+}
+
 export const generatePdfReport = async (request: RequestDetails): Promise<string> => {
   try {
-    // Create a new PDF document with better defaults
+    // Create a new PDF document
     const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true,
-      putOnlyUsedFonts: true,
-    });
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
 
   // Add watermark function
   const addWatermark = () => {
@@ -20,23 +27,16 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
       doc.setPage(i);
       doc.setFontSize(80);
       doc.setTextColor(230, 230, 230);
-      
-      try {
-        // Set transparency
-        const ghostTextGState = doc.setGState(doc.GState({opacity: 0.1})) as any;
-        doc.setGState(ghostTextGState);
-      } catch (e) {
-        console.warn('GState not supported, watermark will be solid');
+      // Create GState with type assertion
+      const GState = (doc as any).GState;
+      if (GState) {
+        const gstate = new GState({ opacity: 0.1 });
+        doc.setGState(gstate);
       }
-      
       doc.text('SLT TMS', 105, 150, { align: 'center', angle: 45 });
-      
-      try {
-        // Reset transparency
-        const normalGState = doc.setGState(doc.GState({opacity: 1})) as any;
-        doc.setGState(normalGState);
-      } catch (e) {
-        // If setting opacity fails, continue without it
+      // Reset GState
+      if (GState) {
+        doc.setGState(new GState({ opacity: 1 }));
       }
     }
   };

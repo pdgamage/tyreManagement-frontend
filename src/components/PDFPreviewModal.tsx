@@ -2,20 +2,13 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { RequestsPDFDocument } from './RequestsPDFDocument';
+import type { Request } from '../types/types';
 
 interface PDFPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  requests: any[];
+  requests: Request[];
   selectedVehicle: string;
-  filters: {
-    status: string;
-    dateRange: {
-      startDate: string;
-      endDate: string;
-    };
-    searchTerm: string;
-  };
 }
 
 const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
@@ -23,7 +16,6 @@ const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
   onClose,
   requests,
   selectedVehicle,
-  filters,
 }) => {
   if (!isOpen) return null;
 
@@ -48,22 +40,14 @@ const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
             
             <div className="mt-4" style={{ height: '70vh' }}>
               <PDFViewer width="100%" height="100%" className="border rounded-lg">
-                <RequestsPDFDocument
-                  requests={requests}
-                  selectedVehicle={selectedVehicle}
-                  filters={filters}
-                />
+                <RequestsPDFDocument requests={requests} />
               </PDFViewer>
             </div>
 
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
               <PDFDownloadLink
                 document={
-                  <RequestsPDFDocument
-                    requests={requests}
-                    selectedVehicle={selectedVehicle}
-                    filters={filters}
-                  />
+                  <RequestsPDFDocument requests={requests} />
                 }
                 fileName={`tire-requests-${selectedVehicle || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`}
               >

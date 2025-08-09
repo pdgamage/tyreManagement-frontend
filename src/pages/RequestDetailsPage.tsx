@@ -1,10 +1,26 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User, FileText } from 'lucide-react';
-import { generatePdfReport } from '../utils/generatePdfReport';
-import PdfPreviewModal from '../components/PDFPreviewModal';
-import { RequestDetails } from '../types';
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User } from 'lucide-react';
+
+interface RequestDetails {
+  id: string;
+  vehicleNumber: string;
+  status: string;
+  orderNumber: string;
+  submittedAt: string;
+  requestDate: string;
+  orderPlacedDate?: string;
+  supplierName: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
+  engineerName?: string;
+  approvalDate?: string;
+  remarks?: string;
+  quantity?: number;
+  tubesQuantity?: number;
+  tireSize?: string;
+}
 
 const RequestDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,16 +29,6 @@ const RequestDetailsPage: React.FC = () => {
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-  const [pdfPreviewUrl, setPdfPreviewUrl] = useState('');
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [pdfError, setPdfError] = useState('');
-  const pdfGenerated = useRef(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -385,52 +391,7 @@ const RequestDetailsPage: React.FC = () => {
         </div>
         
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-end space-x-4">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={async () => {
-                if (isGeneratingPdf || !isClient) return;
-                
-                try {
-                  setIsGeneratingPdf(true);
-                  setPdfError('');
-                  
-                  if (!pdfGenerated.current) {
-                    // Dynamically import the PDF generation to avoid SSR issues
-                    const { generatePdfReport } = await import('../utils/generatePdfReport');
-                    const pdfUrl = await generatePdfReport(request!);
-                    setPdfPreviewUrl(pdfUrl);
-                    pdfGenerated.current = true;
-                  }
-                  
-                  setIsPdfModalOpen(true);
-                } catch (error) {
-                  console.error('Failed to generate PDF:', error);
-                  setPdfError('Failed to generate PDF. Please try again.');
-                } finally {
-                  setIsGeneratingPdf(false);
-                }
-              }}
-              disabled={isGeneratingPdf || !isClient}
-              className={`px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl ${isGeneratingPdf || !isClient ? 'opacity-75 cursor-not-allowed' : 'hover:from-green-600 hover:to-emerald-700'} transition-all font-medium text-sm shadow-lg ${!isGeneratingPdf && isClient && 'hover:shadow-xl'} flex items-center`}
-            >
-              {isGeneratingPdf ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Generate Report
-                </>
-              )}
-            </button>
-            {pdfError && (
-              <p className="mt-2 text-sm text-red-600">{pdfError}</p>
-            )}
-          </div>
+        <div className="mt-8 flex justify-end">
           <button
             type="button"
             onClick={() => navigate(location.state?.fromInquiry ? '/user/inquiry-dashboard' : '/user/dashboard')}
@@ -439,23 +400,6 @@ const RequestDetailsPage: React.FC = () => {
             Back to {location.state?.fromInquiry ? 'Inquiries' : 'Dashboard'}
           </button>
         </div>
-
-        {/* PDF Preview Modal */}
-        {isPdfModalOpen && request && (
-          <PdfPreviewModal
-            pdfUrl={pdfPreviewUrl}
-            fileName={`Tire_Request_${request.id}.pdf`}
-            onClose={() => setIsPdfModalOpen(false)}
-            onDownload={() => {
-              const link = document.createElement('a');
-              link.href = pdfPreviewUrl;
-              link.download = `Tire_Request_${request.id}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-          />
-        )}
       </main>
     </div>
   );

@@ -41,14 +41,32 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     }
   };
 
-  // SLT Logo URL (commented out as we're using text for now)
-  // const sltLogo = 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg';
+  // SLT Logo URL
+  const sltLogo = 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg';
   
   // Add header with logo and title
-  doc.setFontSize(22);
-  doc.setTextColor(0, 0, 0);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Tire Request Report', 105, 20, { align: 'center' });
+  try {
+    // Add SLT logo to the header
+    const img = new Image();
+    img.src = sltLogo;
+    await new Promise((resolve) => { img.onload = resolve; });
+    
+    // Add logo (width: 40mm, height will maintain aspect ratio)
+    doc.addImage(img, 'JPEG', 14, 10, 40, 40 * (img.height / img.width));
+    
+    // Adjust title position to be next to the logo
+    doc.setFontSize(22);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Tire Request Report', 105, 30, { align: 'center' });
+  } catch (error) {
+    console.error('Error loading logo:', error);
+    // Fallback to text if logo fails to load
+    doc.setFontSize(22);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Tire Request Report', 105, 20, { align: 'center' });
+  }
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');

@@ -8,6 +8,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 30,
   },
+  tireDetailsSection: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 4,
+  },
+  tireDetailHeader: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#112233',
+    marginBottom: 8,
+  },
+  tireDetailRow: {
+    flexDirection: 'row',
+    marginBottom: 4,
+    fontSize: 9,
+  },
+  tireDetailLabel: {
+    width: '30%',
+    color: '#666666',
+  },
+  tireDetailValue: {
+    width: '70%',
+    color: '#112233',
+  },
+  divider: {
+    borderBottomColor: '#dddddd',
+    borderBottomWidth: 1,
+    marginVertical: 8,
+  },
   header: {
     marginBottom: 20,
     borderBottom: 1,
@@ -224,6 +254,101 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
                 )}
                 {request.engineerNotes && (
                   <Text>Engineer Notes: {request.engineerNotes}</Text>
+                )}
+              </View>
+
+              {/* Tire Details Section */}
+              <View style={styles.tireDetailsSection}>
+                <Text style={styles.tireDetailHeader}>Tire Specifications</Text>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Size:</Text>
+                  <Text style={styles.tireDetailValue}>{request.tireSize || 'N/A'}</Text>
+                </View>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Brand:</Text>
+                  <Text style={styles.tireDetailValue}>{request.brand || 'N/A'}</Text>
+                </View>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Pattern:</Text>
+                  <Text style={styles.tireDetailValue}>{request.pattern || 'N/A'}</Text>
+                </View>
+
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Position:</Text>
+                  <Text style={styles.tireDetailValue}>{request.position || 'N/A'}</Text>
+                </View>
+
+                <View style={styles.divider} />
+                
+                <Text style={styles.tireDetailHeader}>Vehicle & Usage Information</Text>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Current KM Reading:</Text>
+                  <Text style={styles.tireDetailValue}>{request.currentKmReading || 'N/A'}</Text>
+                </View>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Last Replacement KM:</Text>
+                  <Text style={styles.tireDetailValue}>{request.lastReplacementKm || 'N/A'}</Text>
+                </View>
+
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Last Replacement Date:</Text>
+                  <Text style={styles.tireDetailValue}>
+                    {request.lastReplacementDate ? formatDate(request.lastReplacementDate) : 'N/A'}
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+                
+                <Text style={styles.tireDetailHeader}>Inspection Details</Text>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Condition:</Text>
+                  <Text style={styles.tireDetailValue}>{request.condition || 'N/A'}</Text>
+                </View>
+
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Replacement Reason:</Text>
+                  <Text style={styles.tireDetailValue}>{request.replacementReason || 'N/A'}</Text>
+                </View>
+
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Recommended Pressure:</Text>
+                  <Text style={styles.tireDetailValue}>{request.recommendedPressure || 'N/A'}</Text>
+                </View>
+
+                {request.inspectionNotes && (
+                  <View style={styles.tireDetailRow}>
+                    <Text style={styles.tireDetailLabel}>Inspection Notes:</Text>
+                    <Text style={styles.tireDetailValue}>{request.inspectionNotes}</Text>
+                  </View>
+                )}
+
+                <View style={styles.divider} />
+                
+                <Text style={styles.tireDetailHeader}>Approval Information</Text>
+                
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Approval Status:</Text>
+                  <Text style={styles.tireDetailValue}>{request.approvalStatus || 'N/A'}</Text>
+                </View>
+
+                {request.approvalDate && (
+                  <View style={styles.tireDetailRow}>
+                    <Text style={styles.tireDetailLabel}>Approval Date:</Text>
+                    <Text style={styles.tireDetailValue}>{formatDate(request.approvalDate)}</Text>
+                  </View>
+                )}
+
+                {request.approvedBy && (
+                  <View style={styles.tireDetailRow}>
+                    <Text style={styles.tireDetailLabel}>Approved By:</Text>
+                    <Text style={styles.tireDetailValue}>{request.approvedBy}</Text>
+                  </View>
                 )}
               </View>
             </View>

@@ -1,26 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User } from 'lucide-react';
-
-interface RequestDetails {
-  id: string;
-  vehicleNumber: string;
-  status: string;
-  orderNumber: string;
-  submittedAt: string;
-  requestDate: string;
-  orderPlacedDate?: string;
-  supplierName: string;
-  supplierPhone?: string;
-  supplierEmail?: string;
-  engineerName?: string;
-  approvalDate?: string;
-  remarks?: string;
-  quantity?: number;
-  tubesQuantity?: number;
-  tireSize?: string;
-}
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User, FileText } from 'lucide-react';
+import { generatePdfReport } from '../utils/generatePdfReport';
+import PdfPreviewModal from '../components/PDFPreviewModal';
+import { RequestDetails } from '../types';
 
 const RequestDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +13,9 @@ const RequestDetailsPage: React.FC = () => {
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState('');
+  const pdfGenerated = useRef(false);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -391,7 +378,22 @@ const RequestDetailsPage: React.FC = () => {
         </div>
         
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={async () => {
+              if (!pdfGenerated.current) {
+                const pdfUrl = await generatePdfReport(request!);
+                setPdfPreviewUrl(pdfUrl);
+                pdfGenerated.current = true;
+              }
+              setIsPdfModalOpen(true);
+            }}
+            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-sm shadow-lg hover:shadow-xl flex items-center"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Generate Report
+          </button>
           <button
             type="button"
             onClick={() => navigate(location.state?.fromInquiry ? '/user/inquiry-dashboard' : '/user/dashboard')}
@@ -400,6 +402,23 @@ const RequestDetailsPage: React.FC = () => {
             Back to {location.state?.fromInquiry ? 'Inquiries' : 'Dashboard'}
           </button>
         </div>
+
+        {/* PDF Preview Modal */}
+        {isPdfModalOpen && request && (
+          <PdfPreviewModal
+            pdfUrl={pdfPreviewUrl}
+            fileName={`Tire_Request_${request.id}.pdf`}
+            onClose={() => setIsPdfModalOpen(false)}
+            onDownload={() => {
+              const link = document.createElement('a');
+              link.href = pdfPreviewUrl;
+              link.download = `Tire_Request_${request.id}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+          />
+        )}
       </main>
     </div>
   );

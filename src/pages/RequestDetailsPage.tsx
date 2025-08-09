@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User, FileText } from 'lucide-react';
-import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
-import RequestPdfReport from '../components/RequestPdfReport';
-import { Button } from '../components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User } from 'lucide-react';
 
-// Define the RequestDetails interface
-export interface RequestDetails {
+interface RequestDetails {
   id: string;
   vehicleNumber: string;
   status: string;
@@ -27,49 +22,6 @@ export interface RequestDetails {
   tireSize?: string;
 }
 
-// Status badge component
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const statusConfig = {
-    pending: {
-      icon: <Clock className="w-4 h-4 mr-1" />,
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-800',
-      border: 'border-yellow-200',
-    },
-    approved: {
-      icon: <CheckCircle className="w-4 h-4 mr-1" />,
-      bg: 'bg-green-100',
-      text: 'text-green-800',
-      border: 'border-green-200',
-    },
-    rejected: {
-      icon: <XCircle className="w-4 h-4 mr-1" />,
-      bg: 'bg-red-100',
-      text: 'text-red-800',
-      border: 'border-red-200',
-    },
-    default: {
-      icon: <Info className="w-4 h-4 mr-1" />,
-      bg: 'bg-gray-100',
-      text: 'text-gray-800',
-      border: 'border-gray-200',
-    },
-  };
-
-  const config = statusConfig[status.toLowerCase() as keyof typeof statusConfig] || statusConfig.default;
-
-  return (
-    <span
-      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text} ${config.border} border`}
-    >
-      {config.icon}
-      {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
-    </span>
-  );
-};
-
-
-
 const RequestDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -77,8 +29,6 @@ const RequestDetailsPage: React.FC = () => {
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showPdfPreview, setShowPdfPreview] = useState(false);
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -226,16 +176,26 @@ const RequestDetailsPage: React.FC = () => {
   const statusColors = getStatusColor(request.status);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 mr-1" />
-            Back to {location.state?.fromInquiry ? 'Inquiries' : 'Dashboard'}
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => navigate(location.state?.fromInquiry ? '/user/inquiry-dashboard' : '/user/dashboard')}
+              className="p-2 rounded-xl hover:bg-white/10 transition-colors"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-white truncate">Tire Request Details</h1>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1">
+                <p className="text-sm text-blue-100">Request ID: {request.id}</p>
+                <span className="hidden sm:inline text-blue-200">•</span>
+                <p className="text-sm text-blue-100">
+                  {new Date().toLocaleString('en-US', {
+                    year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
@@ -401,8 +361,6 @@ const RequestDetailsPage: React.FC = () => {
                 {request.supplierPhone && (
                   <div className="bg-gradient-to-br from-cyan-50 to-sky-50 p-4 rounded-xl border border-cyan-100">
                     <dt className="text-xs font-medium text-cyan-600 uppercase tracking-wider mb-1">Phone</dt>
-                      )}
-                    </div>
                     <dd className="text-sm font-medium text-gray-900">
                       <a href={`tel:${request.supplierPhone}`} className="flex items-center hover:text-blue-600 transition-colors">
                         <svg className="w-4 h-4 text-cyan-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -443,44 +401,6 @@ const RequestDetailsPage: React.FC = () => {
           </button>
         </div>
       </main>
-      </div>
-
-      {/* PDF Preview Modal */}
-      <Dialog open={showPdfPreview} onOpenChange={setShowPdfPreview}>
-        <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-4 pb-2 border-b">
-            <div className="flex justify-between items-center">
-              <DialogTitle>Request Report Preview</DialogTitle>
-              <div className="flex gap-2">
-                <PDFDownloadLink 
-                  document={<RequestPdfReport request={request} />} 
-                  fileName={`Tire_Request_${request.orderNumber || request.id}.pdf`}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  onClick={() => setIsPdfLoading(true)}
-                  onLoadStart={() => setIsPdfLoading(true)}
-                  onLoad={() => setIsPdfLoading(false)}
-                >
-                  {({ loading }) => (
-                    <>
-                      {loading || isPdfLoading ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <FileText className="w-4 h-4 mr-2" />
-                      )}
-                      Download PDF
-                    </>
-                  )}
-                </PDFDownloadLink>
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden">
-            <PDFViewer width="100%" height="100%">
-              <RequestPdfReport request={request} />
-            </PDFViewer>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

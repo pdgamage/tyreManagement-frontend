@@ -41,18 +41,23 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     }
   };
 
-  // SLT Logo URL
-  const sltLogo = 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg';
+  // SLT Logo as data URL (converted from SVG)
+  const sltLogo = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgMTQwIj48cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0xMjAuOCA0MS4yaDE2Ljd2NTcuN2gtMTYuN3YtNTcuN3ptMjkuNyAwaDE2Ljd2NTcuN2gtMTYuN3YtNTcuN3ptLTU5LjQgMGgxNi43djU3LjdINzF2LTU3Ljd6bTI5LjcgMGgxNi43djU3LjdIMTAwLjd2LTU3Ljd6bTg5LjEgMGg0MS44YzguOSAwIDE1LjkgNy4xIDE1LjkgMTUuOHYyNi4yYzAgOC43LTcgMTUuOC0xNS45IDE1LjhoLTQxLjh2LTU3Ljh6bTE2LjcgNDEuM2gxOC4zdi0xMC4yaC0xOC4zYy0xLjYgMC0yLjkgMS4yLTIuOSAyLjd2NC44YzAgMS41IDEuMyAyLjcgMi45IDIuN3ptNDkuMS0yNS43YzAtMTEuMSA5LTUuOCA5LTEzLjNoLTE2Ljd2MjcuMWgxNi43YzAtNy41LTktMi4yLTktMTMuOHptMTYuNyAwaDBoLS4xem0tMTYuNy0yNS43aDE2LjdjMC03LjUtOS0yLjItOSAxMy44djBoMTYuN2MwLTExLjEgOS01LjggOSAxMy4zaC0xNi43djI3LjFoMTYuN2MwLTExLjEtOS01LjgtOSAxMy44aC0xNi43di01NC44em0zMy40IDBoMTYuN3Y1NC44aC0xNi43di01NC44em0zMy40IDBoMTYuN3Y1NC44aC0xNi43di01NC44em0zMy40IDBoMTYuN3Y1NC44aC0xNi43di01NC44em0zMy40IDBoMTYuN3Y1NC44aC0xNi43di01NC44em0tMTY2LjggMGMxMS4xIDAgMTkuOSA4LjkgMTkuOSAxOS45djE2LjhjMCAxMS4xLTguOSAxOS45LTE5LjkgMTkuOXYtMzkuN3ptMCA1NC44YzExLjEgMCAxOS45IDguOSAxOS45IDE5Ljl2MTYuOGMwIDExLjEtOC45IDE5LjktMTkuOSAxOS45di0zOS44em0tMTYuNy0zOWgxNi43djM5LjdoLTE2Ljd2LTM5Ljd6bTAgNTQuOGgxNi43djM5LjdoLTE2Ljd2LTM5Ljd6IiBmaWxsPSIjMDA1Qjk2Ii8+PC9zdmc+';
   
   // Add header with logo and title
   try {
     // Add SLT logo to the header
     const img = new Image();
+    img.crossOrigin = 'Anonymous'; // Handle CORS if needed
     img.src = sltLogo;
-    await new Promise((resolve) => { img.onload = resolve; });
+    
+    await new Promise((resolve, reject) => { 
+      img.onload = resolve;
+      img.onerror = reject;
+    });
     
     // Add logo (width: 40mm, height will maintain aspect ratio)
-    doc.addImage(img, 'JPEG', 14, 10, 40, 40 * (img.height / img.width));
+    doc.addImage(img, 'PNG', 14, 10, 80, 25); // Adjusted size for better visibility
     
     // Adjust title position to be next to the logo
     doc.setFontSize(22);

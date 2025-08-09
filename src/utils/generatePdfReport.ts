@@ -44,23 +44,37 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
   // SLT Logo URL (commented out as we're using text for now)
   // const sltLogo = 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg';
   
-  // Add header with logo and title
+  // Page width for centering calculations
+  const pageWidth = doc.internal.pageSize.getWidth();
+  
+  // Add centered title
   doc.setFontSize(22);
   doc.setTextColor(0, 0, 0);
   doc.setFont('helvetica', 'bold');
-  doc.text('Tire Request Report', 105, 20, { align: 'center' });
+  doc.text('Tire Request Report', pageWidth / 2, 25, { align: 'center' });
   
+  // Add request info in a centered block
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
-  doc.text(`Request ID: ${request.id}`, 14, 30);
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 36);
+  
+  // Calculate text width for proper centering
+  const requestIdText = `Request ID: ${request.id}`;
+  const dateText = `Date: ${new Date().toLocaleDateString()}`;
+  const textWidth = Math.max(
+    doc.getTextWidth(requestIdText),
+    doc.getTextWidth(dateText)
+  );
+  const startX = (pageWidth - textWidth) / 2;
+  
+  doc.text(requestIdText, startX, 40);
+  doc.text(dateText, startX, 48);
 
-  // Add request details
+  // Add centered section title
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
-  doc.text('Request Information', 14, 50);
+  doc.text('Request Information', pageWidth / 2, 65, { align: 'center' });
   
   // Request details table
   const requestData = [
@@ -71,65 +85,108 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     ['Order Placed Date', request.orderPlacedDate ? new Date(request.orderPlacedDate).toLocaleString() : 'Not placed yet'],
   ];
 
+  // Calculate table width based on content
+  const tableColumnWidths = [80, 100]; // Adjust these values as needed
+  const tableWidth = tableColumnWidths[0] + tableColumnWidths[1];
+  const tableStartX = (pageWidth - tableWidth) / 2;
+
   (doc as any).autoTable({
-    startY: 60,
+    startY: 75,
     head: [['Field', 'Value']],
     body: requestData,
     theme: 'grid',
     headStyles: { 
       fillColor: [0, 91, 150], // SLT Blue
       textColor: 255,
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'center'
     },
     styles: {
       cellPadding: 5,
       fontSize: 10,
-      cellWidth: 'wrap'
+      cellWidth: 'wrap',
+      halign: 'left',
+      valign: 'middle'
     },
     columnStyles: {
-      0: { cellWidth: 60, fontStyle: 'bold' },
-      1: { cellWidth: 'auto' }
+      0: { 
+        cellWidth: tableColumnWidths[0],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      1: { 
+        cellWidth: tableColumnWidths[1],
+        halign: 'left'
+      }
     },
-    margin: { left: 14, right: 14 }
+    margin: { 
+      left: tableStartX,
+      right: 'auto'
+    }
   });
 
-  // Add tire details
+  // Add tire details section title
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Tire Details', 14, (doc as any).lastAutoTable.finalY + 15);
+  doc.text('Tire Details', pageWidth / 2, (doc as any).lastAutoTable.finalY + 20, { align: 'center' });
   
-  const tireData = [
-    ['Tire Quantity', request.quantity || '-'],
-    ['Tubes Quantity', request.tubesQuantity || '-'],
-    ['Tire Size', request.tireSize || 'Not specified']
-  ];
+  // Tire details table
+  const tireData = request.tireDetails.map((tire: any) => [
+    tire.position || '-',
+    tire.size || '-',
+    tire.quantity || '-',
+    tire.brand || '-',
+    tire.pattern || '-',
+    tire.condition || '-',
+    tire.notes || '-',
+  ]);
+
+  // Calculate tire table width and position
+  const tireTableColumnWidths = [25, 30, 15, 30, 30, 30, 40]; // Fixed widths for all columns
+  const tireTableWidth = tireTableColumnWidths.reduce((sum, width) => sum + width, 0);
+  const tireTableStartX = (pageWidth - tireTableWidth) / 2;
 
   (doc as any).autoTable({
-    startY: (doc as any).lastAutoTable.finalY + 20,
-    head: [['Detail', 'Value']],
+    startY: (doc as any).lastAutoTable.finalY + 30,
+    head: [['Position', 'Size', 'Qty', 'Brand', 'Pattern', 'Condition', 'Notes']],
     body: tireData,
     theme: 'grid',
     headStyles: { 
       fillColor: [0, 91, 150],
       textColor: 255,
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'center'
     },
     styles: {
-      cellPadding: 5,
-      fontSize: 10
+      cellPadding: 3,
+      fontSize: 8,
+      cellWidth: 'wrap',
+      overflow: 'linebreak',
+      lineWidth: 0.1,
+      halign: 'center',
+      valign: 'middle'
     },
-    columnStyles: {
-      0: { cellWidth: 60, fontStyle: 'bold' },
-      1: { cellWidth: 'auto' }
-    },
-    margin: { left: 14, right: 14 }
+    columnStyles: Object.fromEntries(
+      tireTableColumnWidths.map((width, index) => [
+        index,
+        { 
+          cellWidth: width,
+          halign: index === 6 ? 'left' : 'center', // Left align notes, center others
+          valign: 'middle'
+        }
+      ])
+    ),
+    margin: { 
+      left: tireTableStartX,
+      right: 'auto'
+    }
   });
 
   // Add supplier information if available
   if (request.supplierName) {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Supplier Information', 14, (doc as any).lastAutoTable.finalY + 15);
+    doc.text('Supplier Information', pageWidth / 2, (doc as any).lastAutoTable.finalY + 20, { align: 'center' });
     
     const supplierData = [
       ['Supplier Name', request.supplierName],

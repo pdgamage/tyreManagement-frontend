@@ -8,4 +8,14 @@ export default defineConfig({
     port: 3000,
     host: "localhost",
   },
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: {
+          'pdf-libs': ['jspdf', 'jspdf-autotable'],
+        },
+      },
+    },
+  },
 });

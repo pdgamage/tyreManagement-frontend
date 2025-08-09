@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
-import { RequestsPDFDocument } from './RequestsPDFDocument';
+import RequestsPDFDocument from './RequestsPDFDocument';
 import type { Request } from '../types/types';
 
 interface PDFPreviewModalProps {

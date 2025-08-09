@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Building, Car, CheckCircle, ChevronDown, ChevronUp, Clock, FileText, Filter, Frown, Loader2, Package, Search, Smile, X, XCircle, Download } from 'lucide-react';
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { RequestsPDFDocument } from '../components/RequestsPDFDocument';
+import { ArrowLeft, AlertCircle, Building, Car, CheckCircle, ChevronDown, ChevronUp, Clock, FileText, Filter, Frown, Loader2, Package, Search, Smile, X, XCircle, Download, FileText } from 'lucide-react';
+import PDFPreviewModal from '../components/PDFPreviewModal';
 
 interface Vehicle {
   id: string;
@@ -22,6 +21,9 @@ interface TireRequest {
   submittedAt?: string;
   supplierName?: string;
   tireCount?: number;
+  requestDetails?: string;
+  comments?: string;
+  engineerNotes?: string;
 }
 
 // Helper function to format dates in the format 'DD MMM YYYY, hh:mm A'
@@ -74,6 +76,7 @@ const UserInquiryDashboard: React.FC = () => {
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState<{ vehicles: string | null; requests: string | null }>({ vehicles: null, requests: null });
+  const [isPDFPreviewOpen, setIsPDFPreviewOpen] = useState(false);
   
   // Handle error state updates safely
   const updateError = useCallback((field: 'vehicles' | 'requests', message: string) => {
@@ -396,38 +399,47 @@ const UserInquiryDashboard: React.FC = () => {
               >
                 <ArrowLeft className="w-6 h-6" />
               </button>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry Dashboard</h1>
-                <p className="text-blue-100 opacity-90">Track and manage your tire requests and inquiries</p>
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry Dashboard</h1>
+                  <p className="text-blue-100 opacity-90">Track and manage your tire requests and inquiries</p>
+                </div>
+                {filteredRequests.length > 0 && (
+                  <div className="ml-4">
+                    <button
+                      onClick={() => setIsPDFPreviewOpen(true)}
+                      className="flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 font-medium"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Preview Report
+                    </button>
+                  </div>
+                )}
+
+                {/* PDF Preview Modal */}
+                <PDFPreviewModal
+                  isOpen={isPDFPreviewOpen}
+                  onClose={() => setIsPDFPreviewOpen(false)}
+                  requests={filteredRequests.map(request => ({
+                    id: request.id,
+                    requestDate: request.requestDate,
+                    status: request.status,
+                    orderNumber: request.orderNumber,
+                    supplierName: request.supplierName,
+                    tireCount: request.tireCount,
+                    vehicleNumber: request.vehicleNumber,
+                    requestDetails: request.requestDetails,
+                    comments: request.comments,
+                    engineerNotes: request.engineerNotes
+                  }))}
+                  selectedVehicle={selectedVehicle}
+                  filters={{
+                    status: statusFilter,
+                    dateRange,
+                    searchTerm
+                  }}
+                />
               </div>
-              {filteredRequests.length > 0 && (
-                <PDFDownloadLink
-                  document={
-                    <RequestsPDFDocument
-                      requests={filteredRequests}
-                      selectedVehicle={selectedVehicle}
-                      filters={{
-                        status: statusFilter,
-                        dateRange,
-                        searchTerm
-                      }}
-                    />
-                  }
-                  fileName={`tire-requests-${selectedVehicle || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`}
-                  className="flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:bg-blue-50 transition-colors duration-200"
-                >
-                  {({ loading }) => (
-                    <>
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Download className="w-4 h-4 mr-2" />
-                      )}
-                      Download PDF Report
-                    </>
-                  )}
-                </PDFDownloadLink>
-              )}
             </div>
           </div>
           

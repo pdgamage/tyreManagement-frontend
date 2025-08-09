@@ -189,17 +189,43 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
             <Text style={styles.col1}>Request ID</Text>
             <Text style={styles.col2}>Date</Text>
             <Text style={styles.col3}>Status</Text>
-            <Text style={styles.col4}>Order Number</Text>
-            <Text style={styles.col5}>Supplier</Text>
+            <Text style={styles.col4}>Order Details</Text>
+            <Text style={styles.col5}>Vehicle Info</Text>
           </View>
           
           {requests.map((request) => (
-            <View key={request.id} style={styles.tableRow}>
-              <Text style={styles.col1}>{request.id}</Text>
-              <Text style={styles.col2}>{formatDate(request.requestDate)}</Text>
-              <Text style={styles.col3}>{request.status}</Text>
-              <Text style={styles.col4}>{request.orderNumber || 'N/A'}</Text>
-              <Text style={styles.col5}>{request.supplierName || 'N/A'}</Text>
+            <View key={request.id}>
+              <View style={styles.tableRow}>
+                <Text style={styles.col1}>{request.id}</Text>
+                <Text style={styles.col2}>{formatDate(request.requestDate)}</Text>
+                <Text style={styles.col3}>{request.status}</Text>
+                <Text style={styles.col4}>
+                  {request.orderNumber ? `Order #${request.orderNumber}` : 'Pending'}{'\n'}
+                  {request.supplierName && `Supplier: ${request.supplierName}`}
+                </Text>
+                <Text style={styles.col5}>
+                  {request.vehicleNumber}{'\n'}
+                  {request.tireCount && `${request.tireCount} tire(s)`}
+                </Text>
+              </View>
+              {/* Additional Request Details */}
+              <View style={{
+                backgroundColor: '#f8f9fa',
+                padding: 8,
+                marginTop: 2,
+                marginBottom: 8,
+                fontSize: 8
+              }}>
+                {request.requestDetails && (
+                  <Text>Request Details: {request.requestDetails}</Text>
+                )}
+                {request.comments && (
+                  <Text>Comments: {request.comments}</Text>
+                )}
+                {request.engineerNotes && (
+                  <Text>Engineer Notes: {request.engineerNotes}</Text>
+                )}
+              </View>
             </View>
           ))}
         </View>

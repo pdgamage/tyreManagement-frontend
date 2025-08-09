@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { TireRequest } from '../types/api';
 import RequestDetailsPDF from './RequestDetailsPDF';
+import { PDFViewer } from '@react-pdf/renderer';
 
 interface PDFPreviewModalProps {
   request: TireRequest;
@@ -37,7 +38,9 @@ const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
                 </div>
                 <div className="relative flex-1 px-4 py-5">
                   <div className="h-full w-full">
-                    <RequestDetailsPDF request={request} />
+                    <PDFViewer style={{ width: '100%', height: '100%' }}>
+                      <RequestDetailsPDF request={request} />
+                    </PDFViewer>
                   </div>
                 </div>
               </div>

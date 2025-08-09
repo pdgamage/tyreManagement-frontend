@@ -1,5 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { Request } from '../types/types';
+import { Request, RequestsPDFProps } from '../types/types';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -7,6 +7,16 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#ffffff',
     padding: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#112233',
+    marginBottom: 10,
+    marginTop: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dddddd',
+    paddingBottom: 5,
   },
   tireDetailsSection: {
     marginTop: 20,
@@ -137,18 +147,7 @@ const styles = StyleSheet.create({
   },
 });
 
-interface RequestsPDFProps {
-  requests: Request[];
-  selectedVehicle: string;
-  filters: {
-    status: string;
-    dateRange: {
-      startDate: string;
-      endDate: string;
-    };
-    searchTerm: string;
-  };
-}
+// Interface is now imported from types.ts
 
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -159,12 +158,16 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, selectedVehicle, filters }) => {
-  // Calculate statistics
-  const totalRequests = requests.length;
-  const pendingRequests = requests.filter(r => r.status.toLowerCase().includes('pending')).length;
-  const approvedRequests = requests.filter(r => r.status.toLowerCase().includes('approved')).length;
-  const completedRequests = requests.filter(r => r.status.toLowerCase().includes('complete')).length;
+interface RequestsPDFProps {
+  requests: Request[];
+}
+
+export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests }) => {
+  const request = requests[0]; // Since we're showing detailed view
+
+  if (!request) {
+    return null;
+  }
 
   return (
     <Document>
@@ -173,43 +176,10 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <View>
-              <Text style={styles.title}>Tire Request Report</Text>
-              <Text style={styles.subtitle}>Vehicle: {selectedVehicle || 'All Vehicles'}</Text>
-              <Text style={styles.date}>Generated on: {new Date().toLocaleDateString()}</Text>
+              <Text style={styles.title}>Tire Request Details</Text>
+              <Text style={styles.subtitle}>Request ID: {request.id}</Text>
+              <Text style={styles.date}>{formatDate(request.requestDate)}</Text>
             </View>
-          </View>
-        </View>
-
-        {/* Filter Information */}
-        <View style={styles.filterInfo}>
-          <Text style={styles.filterText}>Status Filter: {filters.status === 'all' ? 'All Statuses' : filters.status}</Text>
-          {filters.dateRange.startDate && (
-            <Text style={styles.filterText}>
-              Date Range: {formatDate(filters.dateRange.startDate)} - {filters.dateRange.endDate ? formatDate(filters.dateRange.endDate) : 'Present'}
-            </Text>
-          )}
-          {filters.searchTerm && (
-            <Text style={styles.filterText}>Search Term: {filters.searchTerm}</Text>
-          )}
-        </View>
-
-        {/* Statistics */}
-        <View style={styles.stats}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{totalRequests}</Text>
-            <Text style={styles.statLabel}>Total Requests</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{pendingRequests}</Text>
-            <Text style={styles.statLabel}>Pending</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{approvedRequests}</Text>
-            <Text style={styles.statLabel}>Approved</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{completedRequests}</Text>
-            <Text style={styles.statLabel}>Completed</Text>
           </View>
         </View>
 
@@ -223,62 +193,100 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
             <Text style={styles.col5}>Vehicle Info</Text>
           </View>
           
-          {requests.map((request) => (
-            <View key={request.id}>
+          {requests.map((requestItem: Request) => (
+            <View key={requestItem.id}>
               <View style={styles.tableRow}>
-                <Text style={styles.col1}>{request.id}</Text>
-                <Text style={styles.col2}>{formatDate(request.requestDate)}</Text>
-                <Text style={styles.col3}>{request.status}</Text>
+                <Text style={styles.col1}>{requestItem.id}</Text>
+                <Text style={styles.col2}>{formatDate(requestItem.requestDate)}</Text>
+                <Text style={styles.col3}>{requestItem.status}</Text>
                 <Text style={styles.col4}>
-                  {request.orderNumber ? `Order #${request.orderNumber}` : 'Pending'}{'\n'}
-                  {request.supplierName && `Supplier: ${request.supplierName}`}
+                  {requestItem.orderNumber ? `Order #${requestItem.orderNumber}` : 'Pending'}{'\n'}
+                  {requestItem.supplierName && `Supplier: ${requestItem.supplierName}`}
                 </Text>
                 <Text style={styles.col5}>
-                  {request.vehicleNumber}{'\n'}
-                  {request.tireCount && `${request.tireCount} tire(s)`}
+                  {requestItem.vehicleNumber}{'\n'}
+                  {requestItem.tireCount && `${requestItem.tireCount} tire(s)`}
                 </Text>
               </View>
-              {/* Additional Request Details */}
-              <View style={{
-                backgroundColor: '#f8f9fa',
-                padding: 8,
-                marginTop: 2,
-                marginBottom: 8,
-                fontSize: 8
-              }}>
-                {request.requestDetails && (
-                  <Text>Request Details: {request.requestDetails}</Text>
-                )}
-                {request.comments && (
-                  <Text>Comments: {request.comments}</Text>
-                )}
-                {request.engineerNotes && (
-                  <Text>Engineer Notes: {request.engineerNotes}</Text>
+              {/* Request Information Section */}
+              <View style={styles.tireDetailsSection}>
+                <Text style={styles.tireDetailHeader}>Request Information</Text>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Vehicle Number:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.vehicleNumber}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Order Number:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.orderNumber || 'N/A'}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Request Date:</Text>
+                  <Text style={styles.tireDetailValue}>{formatDate(requestItem.requestDate)}</Text>
+                </View>
+                {requestItem.orderPlacedDate && (
+                  <View style={styles.tireDetailRow}>
+                    <Text style={styles.tireDetailLabel}>Order Placed Date:</Text>
+                    <Text style={styles.tireDetailValue}>{formatDate(requestItem.orderPlacedDate)}</Text>
+                  </View>
                 )}
               </View>
 
               {/* Tire Details Section */}
               <View style={styles.tireDetailsSection}>
+                <Text style={styles.tireDetailHeader}>Tire Details</Text>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Tire Quantity:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.tireCount || '1'}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Tubes Quantity:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.tubesQuantity || '-'}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Tire Size:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.tireSize || 'N/A'}</Text>
+                </View>
+              </View>
+
+              {/* Supplier Information */}
+              <View style={styles.tireDetailsSection}>
+                <Text style={styles.tireDetailHeader}>Supplier Information</Text>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Supplier Name:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.supplierName || 'N/A'}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Phone:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.supplierPhone || 'N/A'}</Text>
+                </View>
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Email:</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.supplierEmail || 'N/A'}</Text>
+                </View>
+              </View>
+
+              {/* Technical Details Section */}
+              <View style={styles.tireDetailsSection}>
                 <Text style={styles.tireDetailHeader}>Tire Specifications</Text>
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Size:</Text>
-                  <Text style={styles.tireDetailValue}>{request.tireSize || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.tireSize || 'N/A'}</Text>
                 </View>
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Brand:</Text>
-                  <Text style={styles.tireDetailValue}>{request.brand || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.brand || 'N/A'}</Text>
                 </View>
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Pattern:</Text>
-                  <Text style={styles.tireDetailValue}>{request.pattern || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.pattern || 'N/A'}</Text>
                 </View>
 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Position:</Text>
-                  <Text style={styles.tireDetailValue}>{request.position || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.position || 'N/A'}</Text>
                 </View>
 
                 <View style={styles.divider} />
@@ -287,18 +295,18 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Current KM Reading:</Text>
-                  <Text style={styles.tireDetailValue}>{request.currentKmReading || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.currentKmReading || 'N/A'}</Text>
                 </View>
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Last Replacement KM:</Text>
-                  <Text style={styles.tireDetailValue}>{request.lastReplacementKm || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.lastReplacementKm || 'N/A'}</Text>
                 </View>
 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Last Replacement Date:</Text>
                   <Text style={styles.tireDetailValue}>
-                    {request.lastReplacementDate ? formatDate(request.lastReplacementDate) : 'N/A'}
+                    {requestItem.lastReplacementDate ? formatDate(requestItem.lastReplacementDate) : 'N/A'}
                   </Text>
                 </View>
 
@@ -308,23 +316,23 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Condition:</Text>
-                  <Text style={styles.tireDetailValue}>{request.condition || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.condition || 'N/A'}</Text>
                 </View>
 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Replacement Reason:</Text>
-                  <Text style={styles.tireDetailValue}>{request.replacementReason || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.replacementReason || 'N/A'}</Text>
                 </View>
 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Recommended Pressure:</Text>
-                  <Text style={styles.tireDetailValue}>{request.recommendedPressure || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.recommendedPressure || 'N/A'}</Text>
                 </View>
 
-                {request.inspectionNotes && (
+                {requestItem.inspectionNotes && (
                   <View style={styles.tireDetailRow}>
                     <Text style={styles.tireDetailLabel}>Inspection Notes:</Text>
-                    <Text style={styles.tireDetailValue}>{request.inspectionNotes}</Text>
+                    <Text style={styles.tireDetailValue}>{requestItem.inspectionNotes}</Text>
                   </View>
                 )}
 
@@ -334,20 +342,20 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests, sele
                 
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Approval Status:</Text>
-                  <Text style={styles.tireDetailValue}>{request.approvalStatus || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>{requestItem.approvalStatus || 'N/A'}</Text>
                 </View>
 
-                {request.approvalDate && (
+                {requestItem.approvalDate && (
                   <View style={styles.tireDetailRow}>
                     <Text style={styles.tireDetailLabel}>Approval Date:</Text>
-                    <Text style={styles.tireDetailValue}>{formatDate(request.approvalDate)}</Text>
+                    <Text style={styles.tireDetailValue}>{formatDate(requestItem.approvalDate)}</Text>
                   </View>
                 )}
 
-                {request.approvedBy && (
+                {requestItem.approvedBy && (
                   <View style={styles.tireDetailRow}>
                     <Text style={styles.tireDetailLabel}>Approved By:</Text>
-                    <Text style={styles.tireDetailValue}>{request.approvedBy}</Text>
+                    <Text style={styles.tireDetailValue}>{requestItem.approvedBy}</Text>
                   </View>
                 )}
               </View>

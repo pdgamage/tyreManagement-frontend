@@ -27,6 +27,14 @@ export const preparePDFData = (request: TireRequest) => {
       requesterName: request.requesterName || 'N/A',
       requesterEmail: request.requesterEmail || 'N/A',
       requesterPhone: request.requesterPhone || 'N/A',
+      deliveryLocation: request.deliveryOfficeName 
+        ? `${request.deliveryOfficeName}${request.deliveryStreetName ? ', ' + request.deliveryStreetName : ''}${request.deliveryTown ? ', ' + request.deliveryTown : ''}`
+        : 'N/A'
+    },
+    supplierInfo: {
+      name: request.supplierName || 'Not Assigned',
+      phone: request.supplierPhone || 'N/A',
+      email: request.supplierEmail || 'N/A'
     },
     vehicleInfo: {
       id: request.vehicleId,

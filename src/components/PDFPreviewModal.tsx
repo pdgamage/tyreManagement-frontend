@@ -20,6 +20,46 @@ Font.register({
 });
 
 // Define styles
+interface PDFData {
+  id: number;
+  status: string;
+  requestInfo: {
+    orderNumber: string;
+    submittedAt: string;
+    requestReason: string;
+    requesterName: string;
+    requesterEmail: string;
+    requesterPhone: string;
+    deliveryLocation: string;
+  };
+  vehicleInfo: {
+    id: number;
+    number: string;
+    brand: string;
+    model: string;
+    department: string;
+    section: string;
+  };
+  tireDetails: {
+    sizeRequired: string;
+    quantity: number;
+    tubesQuantity: number;
+    existingMake: string;
+    currentKm: string;
+    lastReplacementDate: string;
+    kmDifference: string;
+    wearPattern: string;
+    wearIndicator: string;
+    totalPrice?: number;
+    warrantyDistance?: number;
+  };
+  supplierInfo: {
+    name: string;
+    phone: string;
+    email: string;
+  };
+}
+
 const styles = StyleSheet.create({
   page: {
     padding: 20,
@@ -63,6 +103,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#e6e6e6'
+  },
+  supplierSection: {
+    marginBottom: 12,
+    backgroundColor: '#e6f3ff',
+    padding: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#1a75ff'
   },
   sectionTitle: {
     fontSize: 12,
@@ -281,6 +329,27 @@ const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
                             <View style={styles.row}>
                               <Text style={styles.label}>Last Replacement:</Text>
                               <Text style={styles.value}>{data.tireDetails.lastReplacementDate}</Text>
+                            </View>
+                          </View>
+
+                          {/* Supplier Information */}
+                          <View style={styles.supplierSection}>
+                            <Text style={styles.sectionTitle}>Supplier Information</Text>
+                            <View style={styles.row}>
+                              <Text style={styles.label}>Supplier Name:</Text>
+                              <Text style={styles.value}>{data.supplierInfo.name}</Text>
+                            </View>
+                            <View style={styles.row}>
+                              <Text style={styles.label}>Contact Number:</Text>
+                              <Text style={styles.value}>{data.supplierInfo.phone}</Text>
+                            </View>
+                            <View style={styles.row}>
+                              <Text style={styles.label}>Email Address:</Text>
+                              <Text style={styles.value}>{data.supplierInfo.email}</Text>
+                            </View>
+                            <View style={styles.row}>
+                              <Text style={styles.label}>Delivery To:</Text>
+                              <Text style={styles.value}>{data.requestInfo.deliveryLocation}</Text>
                             </View>
                           </View>
 

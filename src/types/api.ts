@@ -63,6 +63,9 @@ export interface TireRequest {
   orderTimestamp?: string;
   orderNumber?: string;
   customer_officer_note?: string;
+  supplierName?: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
 }
 
 export interface ApiResponse<T> {

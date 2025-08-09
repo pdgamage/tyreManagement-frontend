@@ -18,7 +18,6 @@ export const formatNumber = (num: number | undefined) => {
 
 export const preparePDFData = (request: TireRequest) => {
   return {
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg',
     id: request.id,
     status: request.status || 'N/A',
     requestInfo: {

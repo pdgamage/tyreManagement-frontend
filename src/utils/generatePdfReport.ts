@@ -68,7 +68,7 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     ['Order Number', request.orderNumber || 'Not assigned'],
     ['Status', request.status],
     ['Request Date', new Date(request.requestDate || request.submittedAt).toLocaleString()],
-    ['Order Placed Date', request.orderTimestamp ? new Date(request.orderTimestamp).toLocaleString() : 'Not placed yet'],
+    ['Order Placed Date', request.orderPlacedDate ? new Date(request.orderPlacedDate).toLocaleString() : 'Not placed yet'],
   ];
 
   (doc as any).autoTable({

@@ -22,6 +22,7 @@ export const preparePDFData = (request: TireRequest) => {
     status: request.status || 'N/A',
     requestInfo: {
       orderNumber: request.orderNumber || 'Not Assigned',
+      orderPlacedDate: formatDate(request.orderPlacedDate),
       submittedAt: formatDate(request.submittedAt),
       requestReason: request.requestReason || 'N/A',
       requesterName: request.requesterName || 'N/A',

@@ -256,6 +256,10 @@ const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
                               <Text style={styles.value}>{data.requestInfo.orderNumber || 'Not Assigned'}</Text>
                             </View>
                             <View style={styles.row}>
+                              <Text style={styles.label}>Order Date:</Text>
+                              <Text style={styles.value}>{data.requestInfo.orderPlacedDate || 'Not placed yet'}</Text>
+                            </View>
+                            <View style={styles.row}>
                               <Text style={styles.label}>Status:</Text>
                               <Text style={styles.value}>{data.status}</Text>
                             </View>

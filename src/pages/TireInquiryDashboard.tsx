@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { ArrowLeft, AlertCircle, Building, Car, CheckCircle, ChevronDown, ChevronUp, Clock, FileText, Filter, Frown, Loader2, Package, Search, Smile, X, XCircle, Download } from 'lucide-react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { RequestsPDFDocument } from '../components/RequestsPDFDocument';
 
 interface Vehicle {
   id: string;
@@ -398,6 +400,34 @@ const UserInquiryDashboard: React.FC = () => {
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry Dashboard</h1>
                 <p className="text-blue-100 opacity-90">Track and manage your tire requests and inquiries</p>
               </div>
+              {filteredRequests.length > 0 && (
+                <PDFDownloadLink
+                  document={
+                    <RequestsPDFDocument
+                      requests={filteredRequests}
+                      selectedVehicle={selectedVehicle}
+                      filters={{
+                        status: statusFilter,
+                        dateRange,
+                        searchTerm
+                      }}
+                    />
+                  }
+                  fileName={`tire-requests-${selectedVehicle || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`}
+                  className="flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:bg-blue-50 transition-colors duration-200"
+                >
+                  {({ loading }) => (
+                    <>
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4 mr-2" />
+                      )}
+                      Download PDF Report
+                    </>
+                  )}
+                </PDFDownloadLink>
+              )}
             </div>
           </div>
           

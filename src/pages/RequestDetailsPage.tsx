@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User, FileText } from 'lucide-react';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import RequestPdfReport from '../components/RequestPdfReport';
+import { Button } from '../components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { useState } from 'react';
 
 interface RequestDetails {
   id: string;
@@ -29,6 +34,7 @@ const RequestDetailsPage: React.FC = () => {
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -361,6 +367,28 @@ const RequestDetailsPage: React.FC = () => {
                 {request.supplierPhone && (
                   <div className="bg-gradient-to-br from-cyan-50 to-sky-50 p-4 rounded-xl border border-cyan-100">
                     <dt className="text-xs font-medium text-cyan-600 uppercase tracking-wider mb-1">Phone</dt>
+                    <div className="flex justify-between items-center mb-6">
+                      <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <ArrowLeft className="w-5 h-5 mr-1" />
+                        Back to Dashboard
+                      </button>
+                      
+                      {request && (
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setShowPdfPreview(true)}
+                            className="gap-2"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Generate Report
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                     <dd className="text-sm font-medium text-gray-900">
                       <a href={`tel:${request.supplierPhone}`} className="flex items-center hover:text-blue-600 transition-colors">
                         <svg className="w-4 h-4 text-cyan-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -402,6 +430,40 @@ const RequestDetailsPage: React.FC = () => {
         </div>
       </main>
     </div>
+
+    {/* PDF Preview Modal */}
+    <Dialog open={showPdfPreview} onOpenChange={setShowPdfPreview}>
+      <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-4 pb-2 border-b">
+          <div className="flex justify-between items-center">
+            <DialogTitle>Request Report Preview</DialogTitle>
+            <div className="flex gap-2">
+              <PDFDownloadLink 
+                document={<RequestPdfReport request={request} />} 
+                fileName={`Tire_Request_${request.orderNumber || request.id}.pdf`}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                {({ loading }) => (
+                  <>
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <FileText className="w-4 h-4 mr-2" />
+                    )}
+                    Download PDF
+                  </>
+                )}
+              </PDFDownloadLink>
+            </div>
+          </div>
+        </DialogHeader>
+        <div className="flex-1 overflow-hidden">
+          <PDFViewer width="100%" height="100%">
+            <RequestPdfReport request={request} />
+          </PDFViewer>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

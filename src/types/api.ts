@@ -61,6 +61,7 @@ export interface TireRequest {
   engineerNotes?: string;
   engineerTimestamp?: string;
   orderTimestamp?: string;
+  orderNumber?: string;
   customer_officer_note?: string;
 }
 

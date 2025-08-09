@@ -15,6 +15,8 @@ const RequestDetailsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState('');
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState('');
   const pdfGenerated = useRef(false);
 
   useEffect(() => {
@@ -379,21 +381,49 @@ const RequestDetailsPage: React.FC = () => {
         
         {/* Action Buttons */}
         <div className="mt-8 flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={async () => {
-              if (!pdfGenerated.current) {
-                const pdfUrl = await generatePdfReport(request!);
-                setPdfPreviewUrl(pdfUrl);
-                pdfGenerated.current = true;
-              }
-              setIsPdfModalOpen(true);
-            }}
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-sm shadow-lg hover:shadow-xl flex items-center"
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            Generate Report
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={async () => {
+                if (isGeneratingPdf) return;
+                
+                try {
+                  setIsGeneratingPdf(true);
+                  setPdfError('');
+                  
+                  if (!pdfGenerated.current) {
+                    const pdfUrl = await generatePdfReport(request!);
+                    setPdfPreviewUrl(pdfUrl);
+                    pdfGenerated.current = true;
+                  }
+                  
+                  setIsPdfModalOpen(true);
+                } catch (error) {
+                  console.error('Failed to generate PDF:', error);
+                  setPdfError('Failed to generate PDF. Please try again.');
+                } finally {
+                  setIsGeneratingPdf(false);
+                }
+              }}
+              disabled={isGeneratingPdf}
+              className={`px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl ${isGeneratingPdf ? 'opacity-75 cursor-not-allowed' : 'hover:from-green-600 hover:to-emerald-700'} transition-all font-medium text-sm shadow-lg ${!isGeneratingPdf && 'hover:shadow-xl'} flex items-center`}
+            >
+              {isGeneratingPdf ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Generate Report
+                </>
+              )}
+            </button>
+            {pdfError && (
+              <p className="mt-2 text-sm text-red-600">{pdfError}</p>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => navigate(location.state?.fromInquiry ? '/user/inquiry-dashboard' : '/user/dashboard')}

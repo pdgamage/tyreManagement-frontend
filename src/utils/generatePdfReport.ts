@@ -1,10 +1,20 @@
+// @ts-ignore - jspdf types are not properly exported
 import { jsPDF } from 'jspdf';
+// @ts-ignore - jspdf-autotable doesn't have proper types
 import 'jspdf-autotable';
 import { RequestDetails } from '../types';
 
-export const generatePdfReport = (request: RequestDetails) => {
-  // Create a new PDF document
-  const doc = new jsPDF({
+// Extend the window object to include jsPDF types
+declare global {
+  interface Window {
+    jsPDF: any;
+  }
+}
+
+export const generatePdfReport = async (request: RequestDetails): Promise<string> => {
+  try {
+    // Create a new PDF document
+    const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
@@ -17,9 +27,17 @@ export const generatePdfReport = (request: RequestDetails) => {
       doc.setPage(i);
       doc.setFontSize(80);
       doc.setTextColor(230, 230, 230);
-      doc.setGState(new doc.GState({ opacity: 0.1 }));
+      // Create GState with type assertion
+      const GState = (doc as any).GState;
+      if (GState) {
+        const gstate = new GState({ opacity: 0.1 });
+        doc.setGState(gstate);
+      }
       doc.text('SLT TMS', 105, 150, { align: 'center', angle: 45 });
-      doc.setGState(new doc.GState({ opacity: 1 }));
+      // Reset GState
+      if (GState) {
+        doc.setGState(new GState({ opacity: 1 }));
+      }
     }
   };
 
@@ -158,9 +176,11 @@ export const generatePdfReport = (request: RequestDetails) => {
   // Add watermark to all pages
   addWatermark();
 
-  // Save the PDF
-  doc.save(`Tire_Request_${request.id}.pdf`);
-  
-  // Return the PDF data URL for preview
-  return doc.output('datauristring');
+    // Return the PDF data URL for preview
+    const dataUrl = doc.output('datauristring');
+    return dataUrl;
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw new Error('Failed to generate PDF. Please try again later.');
+  }
 };

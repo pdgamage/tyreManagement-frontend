@@ -20,25 +20,60 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     format: 'a4',
   });
 
-  // Add watermark function
+  // Add watermark function with SLT background image
   const addWatermark = () => {
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setFontSize(80);
-      doc.setTextColor(230, 230, 230);
-      // Create GState with type assertion
-      const GState = (doc as any).GState;
-      if (GState) {
-        const gstate = new GState({ opacity: 0.1 });
-        doc.setGState(gstate);
-      }
-      doc.text('SLT TMS', 105, 150, { align: 'center', angle: 45 });
-      // Reset GState
-      if (GState) {
-        doc.setGState(new GState({ opacity: 1 }));
-      }
-    }
+    return new Promise<void>((resolve) => {
+      const img = new Image();
+      img.src = '/img/sltbg.png';
+      
+      img.onload = () => {
+        const totalPages = doc.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          // Create GState with type assertion for opacity
+          const GState = (doc as any).GState;
+          if (GState) {
+            const gstate = new GState({ opacity: 0.1 });
+            doc.setGState(gstate);
+          }
+          // Add background image
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const imgWidth = pageWidth * 0.7; // Scale image to 70% of page width
+          const imgHeight = (img.height * imgWidth) / img.width;
+          const x = (pageWidth - imgWidth) / 2;
+          const y = (pageHeight - imgHeight) / 2;
+          
+          doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
+          
+          // Reset GState
+          if (GState) {
+            doc.setGState(new GState({ opacity: 1 }));
+          }
+        }
+        resolve();
+      };
+      
+      // If image fails to load, use text watermark as fallback
+      img.onerror = () => {
+        const totalPages = doc.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(80);
+          doc.setTextColor(230, 230, 230);
+          const GState = (doc as any).GState;
+          if (GState) {
+            const gstate = new GState({ opacity: 0.1 });
+            doc.setGState(gstate);
+          }
+          doc.text('SLT TMS', 105, 150, { align: 'center', angle: 45 });
+          if (GState) {
+            doc.setGState(new GState({ opacity: 1 }));
+          }
+        }
+        resolve();
+      };
+    });
   };
 
   // SLT Logo URL (commented out as we're using text for now)
@@ -47,11 +82,43 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
   // Page width for centering calculations
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // Add centered title
-  doc.setFontSize(22);
-  doc.setTextColor(0, 0, 0);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Tire Request Report', pageWidth / 2, 25, { align: 'center' });
+  // Add SLT logo and title
+  const addLogoAndTitle = () => {
+    return new Promise<void>((resolve) => {
+      const img = new Image();
+      img.src = '/img/slt_logo.png';
+      
+      img.onload = () => {
+        // Add logo (height: 40px, width will maintain aspect ratio)
+        const logoHeight = 40;
+        const logoWidth = (img.width * logoHeight) / img.height;
+        const logoX = 20; // 20mm from left
+        const logoY = 15; // 15mm from top
+        
+        doc.addImage(img, 'PNG', logoX, logoY, logoWidth, logoHeight);
+        
+        // Add title next to the logo
+        doc.setFontSize(22);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Tire Request Report', logoX + logoWidth + 20, logoY + (logoHeight / 2) + 5, { align: 'left', baseline: 'middle' });
+        
+        resolve();
+      };
+      
+      // Fallback if logo fails to load
+      img.onerror = () => {
+        doc.setFontSize(22);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Tire Request Report', pageWidth / 2, 25, { align: 'center' });
+        resolve();
+      };
+    });
+  };
+  
+  // Add logo and title
+  await addLogoAndTitle();
   
   // Add request info in a centered block
   doc.setFontSize(12);
@@ -231,7 +298,7 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
   }
 
   // Add watermark to all pages
-  addWatermark();
+  await addWatermark();
 
     // Return the PDF data URL for preview
     const dataUrl = doc.output('datauristring');

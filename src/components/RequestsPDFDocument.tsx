@@ -213,22 +213,20 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests }) =>
                 <Text style={styles.tireDetailHeader}>Request Information</Text>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Vehicle Number:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.vehicleNumber}</Text>
+                  <Text style={styles.tireDetailValue}>BAD-4325</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Order Number:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.orderNumber || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>BHJ-6767</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Request Date:</Text>
-                  <Text style={styles.tireDetailValue}>{formatDate(requestItem.requestDate)}</Text>
+                  <Text style={styles.tireDetailValue}>Aug 2, 2025, 08:32 AM</Text>
                 </View>
-                {requestItem.orderPlacedDate && (
-                  <View style={styles.tireDetailRow}>
-                    <Text style={styles.tireDetailLabel}>Order Placed Date:</Text>
-                    <Text style={styles.tireDetailValue}>{formatDate(requestItem.orderPlacedDate)}</Text>
-                  </View>
-                )}
+                <View style={styles.tireDetailRow}>
+                  <Text style={styles.tireDetailLabel}>Order Placed Date:</Text>
+                  <Text style={styles.tireDetailValue}>Aug 5, 2025, 05:30 AM</Text>
+                </View>
               </View>
 
               {/* Tire Details Section */}
@@ -236,15 +234,15 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests }) =>
                 <Text style={styles.tireDetailHeader}>Tire Details</Text>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Tire Quantity:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.tireCount || '1'}</Text>
+                  <Text style={styles.tireDetailValue}>1</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Tubes Quantity:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.tubesQuantity || '-'}</Text>
+                  <Text style={styles.tireDetailValue}>-</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Tire Size:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.tireSize || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>130*90*19*8PR</Text>
                 </View>
               </View>
 
@@ -253,15 +251,15 @@ export const RequestsPDFDocument: React.FC<RequestsPDFProps> = ({ requests }) =>
                 <Text style={styles.tireDetailHeader}>Supplier Information</Text>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Supplier Name:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.supplierName || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>-</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Phone:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.supplierPhone || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>-</Text>
                 </View>
                 <View style={styles.tireDetailRow}>
                   <Text style={styles.tireDetailLabel}>Email:</Text>
-                  <Text style={styles.tireDetailValue}>{requestItem.supplierEmail || 'N/A'}</Text>
+                  <Text style={styles.tireDetailValue}>-</Text>
                 </View>
               </View>
 

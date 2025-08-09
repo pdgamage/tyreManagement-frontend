@@ -1,6 +1,24 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image, PDFDownloadLink } from '@react-pdf/renderer';
-import { RequestDetails } from '../pages/RequestDetailsPage';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+
+export interface RequestDetails {
+  id: string;
+  vehicleNumber: string;
+  status: string;
+  orderNumber: string;
+  submittedAt: string;
+  requestDate: string;
+  orderPlacedDate?: string;
+  supplierName: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
+  engineerName?: string;
+  approvalDate?: string;
+  remarks?: string;
+  quantity?: number;
+  tubesQuantity?: number;
+  tireSize?: string;
+}
 
 // Create styles
 const styles = StyleSheet.create({

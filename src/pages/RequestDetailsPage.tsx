@@ -6,9 +6,8 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import RequestPdfReport from '../components/RequestPdfReport';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { useState } from 'react';
 
-interface RequestDetails {
+export interface RequestDetails {
   id: string;
   vehicleNumber: string;
   status: string;
@@ -432,38 +431,40 @@ const RequestDetailsPage: React.FC = () => {
     </div>
 
     {/* PDF Preview Modal */}
-    <Dialog open={showPdfPreview} onOpenChange={setShowPdfPreview}>
-      <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-4 pb-2 border-b">
-          <div className="flex justify-between items-center">
-            <DialogTitle>Request Report Preview</DialogTitle>
-            <div className="flex gap-2">
-              <PDFDownloadLink 
-                document={<RequestPdfReport request={request} />} 
-                fileName={`Tire_Request_${request.orderNumber || request.id}.pdf`}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                {({ loading }) => (
-                  <>
-                    {loading ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <FileText className="w-4 h-4 mr-2" />
-                    )}
-                    Download PDF
-                  </>
-                )}
-              </PDFDownloadLink>
+    {request && (
+      <Dialog open={showPdfPreview} onOpenChange={setShowPdfPreview}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-4 pb-2 border-b">
+            <div className="flex justify-between items-center">
+              <DialogTitle>Request Report Preview</DialogTitle>
+              <div className="flex gap-2">
+                <PDFDownloadLink 
+                  document={<RequestPdfReport request={request} />} 
+                  fileName={`Tire_Request_${request.orderNumber || request.id}.pdf`}
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {({ loading }) => (
+                    <>
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <FileText className="w-4 h-4 mr-2" />
+                      )}
+                      Download PDF
+                    </>
+                  )}
+                </PDFDownloadLink>
+              </div>
             </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <PDFViewer width="100%" height="100%">
+              <RequestPdfReport request={request} />
+            </PDFViewer>
           </div>
-        </DialogHeader>
-        <div className="flex-1 overflow-hidden">
-          <PDFViewer width="100%" height="100%">
-            <RequestPdfReport request={request} />
-          </PDFViewer>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    )}
   );
 };
 

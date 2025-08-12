@@ -7,6 +7,7 @@ import {
   Building, FileText, ChevronDown, ChevronUp, Filter, 
   Frown, Smile, CheckCircle, Clock, XCircle, Package 
 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Vehicle {
   id: string;
@@ -27,15 +28,28 @@ interface TireRequest {
   tireCount?: number;
   requesterName: string;
   userSection: string;
+  userId: string;
   supervisor_notes?: string;
   supervisor_decision_by?: string;
+  supervisor_approved_date?: string;
+  supervisor_rejected_date?: string;
+  technical_manager_notes?: string;
+  technical_manager_decision_by?: string;
+  technical_manager_approved_date?: string;
+  technical_manager_rejected_date?: string;
+  engineer_notes?: string;
+  engineer_approved_date?: string;
+  engineer_rejected_date?: string;
+  engineer_decision_by?: string;
 }
 
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
   { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
-  { value: "supervisor approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
-  { value: "supervisor rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> }
+  { value: "approved", label: "Supervisor Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
+  { value: "rejected", label: "Supervisor Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
+  { value: "order placed", label: "Order Placed", icon: <Package className="w-4 h-4 mr-2 text-purple-500" /> },
+  { value: "complete", label: "Complete - Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> }
 ];
 
 const SupervisorInquiryDashboard: React.FC = () => {
@@ -47,6 +61,7 @@ const SupervisorInquiryDashboard: React.FC = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(vehicleFromUrl || '');
   const [requests, setRequests] = useState<TireRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<TireRequest[]>([]);
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState({ vehicles: false, requests: false });
   const [error, setError] = useState<{ vehicles: string | null; requests: string | null }>({ vehicles: null, requests: null });
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,21 +73,34 @@ const SupervisorInquiryDashboard: React.FC = () => {
   });
   const [dateInput, setDateInput] = useState({ startDate: '', endDate: '' });
   const [showDateFilter, setShowDateFilter] = useState(false);
+  
+  // Handle error state updates safely
+  const updateError = useCallback((field: 'vehicles' | 'requests', message: string) => {
+    setError(prev => ({
+      ...prev,
+      [field]: message
+    }));
+  }, []);
 
   // Fetch vehicles
   const fetchVehicles = useCallback(async () => {
     setIsLoading(prev => ({ ...prev, vehicles: true }));
     setError(prev => ({ ...prev, vehicles: '' }));
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`);
-      if (!response.ok) throw new Error('Failed to fetch vehicles');
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VEHICLES}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch vehicles: ${response.status} ${errorText}`);
+      }
       const data = await response.json();
-      setVehicles(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) {
+        throw new Error('Expected an array of vehicles but received something else');
+      }
+      setVehicles(data);
     } catch (err: any) {
-      setError(prev => ({ 
-        ...prev, 
-        vehicles: `Failed to load vehicles: ${err?.message || 'Unknown error'}` 
-      }));
+      console.error('Error fetching vehicles:', err);
+      updateError('vehicles', `Failed to load vehicles: ${err?.message || 'Unknown error'}`);
     } finally {
       setIsLoading(prev => ({ ...prev, vehicles: false }));
     }
@@ -82,19 +110,28 @@ const SupervisorInquiryDashboard: React.FC = () => {
   const fetchRequests = useCallback(async (vehicleNumber?: string) => {
     setIsLoading(prev => ({ ...prev, requests: true }));
     setError(prev => ({ ...prev, requests: '' }));
+    
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      const baseUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
       const queryParams = new URLSearchParams();
+      
+      if (user?.id) {
+        queryParams.append('supervisorId', user.id);
+      }
       
       if (vehicleNumber && vehicleNumber !== 'All Vehicles') {
         queryParams.append('vehicleNumber', vehicleNumber);
       }
 
-      const finalUrl = queryParams.toString() ? `${url}?${queryParams.toString()}` : url;
-      const response = await fetch(finalUrl);
+      const finalUrl = queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
+      
+      const response = await fetch(finalUrl, {
+        headers: { 'Content-Type': 'application/json' },
+      });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch requests');
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch requests: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
@@ -108,16 +145,14 @@ const SupervisorInquiryDashboard: React.FC = () => {
       });
       
       setRequests(sortedRequests);
-    } catch (err: any) {
-      setError(prev => ({
-        ...prev,
-        requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
-      }));
+      updateError('requests', '');
+    } catch (err: unknown) {
       console.error('Error fetching requests:', err);
+      updateError('requests', `Failed to load requests: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
-  }, []);
+  }, [user?.id]);
 
   // Initialize component and handle fetch retries
   useEffect(() => {
@@ -147,81 +182,125 @@ const SupervisorInquiryDashboard: React.FC = () => {
     return () => clearInterval(refreshInterval);
   }, [fetchVehicles, fetchRequests, vehicleFromUrl]);
 
-  // Filter requests
+  // Filter requests based on all criteria
   useEffect(() => {
     if (!requests || !Array.isArray(requests)) {
+      console.log('No requests or invalid requests array');
       setFilteredRequests([]);
       return;
     }
-
-    let filtered = [...requests];
-
-    try {
+    
+    console.log('Applying filters to requests:', requests.length, 'requests');
+    console.log('Current filters - search:', searchTerm, 'status:', statusFilter, 'vehicle:', selectedVehicle, 'dateRange:', dateRange);
+    
+    let filtered = [...requests].filter(request => {
+      // Skip if request is invalid
+      if (!request || typeof request !== 'object') return false;
+      
       // Apply vehicle filter
-      if (selectedVehicle && selectedVehicle !== 'All Vehicles') {
-        filtered = filtered.filter(request => 
-          request.vehicleNumber && 
-          request.vehicleNumber.toLowerCase() === selectedVehicle.toLowerCase()
-        );
+      if (selectedVehicle === 'Select Vehicle') {
+        // Show no requests when 'Select Vehicle' is selected
+        return false;
+      } else if (selectedVehicle && selectedVehicle !== 'All Vehicles' && request.vehicleNumber !== selectedVehicle) {
+        // When a specific vehicle is selected, only show matching requests
+        return false;
       }
-
-      // Apply status filter
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(request => 
-          request.status && 
-          request.status.toLowerCase() === statusFilter.toLowerCase()
-        );
-      }
-
-      // Apply search filter
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(request => {
-          return (
-            (request.vehicleNumber && request.vehicleNumber.toLowerCase().includes(term)) ||
-            (request.requesterName && request.requesterName.toLowerCase().includes(term)) ||
-            (request.userSection && request.userSection.toLowerCase().includes(term)) ||
-            (request.orderNumber && request.orderNumber.toLowerCase().includes(term)) ||
-            (request.supervisor_notes && request.supervisor_notes.toLowerCase().includes(term))
-          );
-        });
-      }
-
-      // Apply date filter
+      
+      // Apply date range filter if dates are selected
       if (dateRange.startDate || dateRange.endDate) {
-        filtered = filtered.filter(request => {
-          try {
-            const requestDate = new Date(request.submittedAt || request.created_at || request.requestDate);
-            if (dateRange.startDate) {
-              const startDate = new Date(dateRange.startDate);
-              if (requestDate < startDate) return false;
-            }
-            if (dateRange.endDate) {
-              const endDate = new Date(dateRange.endDate);
-              endDate.setHours(23, 59, 59, 999); // Include the entire end date
-              if (requestDate > endDate) return false;
-            }
-            return true;
-          } catch (error) {
-            console.error('Error filtering by date:', error);
-            return true; // Include the request if date parsing fails
+        try {
+          const requestDate = request.submittedAt || request.requestDate || request.created_at;
+          if (!requestDate) return false;
+          
+          const requestDateObj = new Date(requestDate);
+          if (isNaN(requestDateObj.getTime())) {
+            console.log('Skipping request due to invalid date:', request.id, requestDate);
+            return false;
           }
-        });
+          
+          // Normalize to local date (ignoring time)
+          const requestDateLocal = new Date(
+            requestDateObj.getFullYear(),
+            requestDateObj.getMonth(),
+            requestDateObj.getDate()
+          );
+          
+          if (dateRange.startDate) {
+            const [year, month, day] = dateRange.startDate.split('-').map(Number);
+            const startDate = new Date(year, month - 1, day);
+            if (requestDateLocal < startDate) {
+              return false;
+            }
+          }
+          
+          if (dateRange.endDate) {
+            const [year, month, day] = dateRange.endDate.split('-').map(Number);
+            const endDate = new Date(year, month - 1, day + 1);
+            if (requestDateLocal >= endDate) {
+              return false;
+            }
+          }
+          
+        } catch (error) {
+          console.error('Error processing date filter:', error, 'Request ID:', request.id);
+          return false;
+        }
       }
-
-      // Sort filtered results by date (newest first)
-      filtered.sort((a, b) => {
-        const dateA = new Date(a.submittedAt || a.created_at || a.requestDate).getTime();
-        const dateB = new Date(b.submittedAt || b.created_at || b.requestDate).getTime();
-        return dateB - dateA;
-      });
-
-      setFilteredRequests(filtered);
-    } catch (error) {
-      console.error('Error in filter effect:', error);
-      setFilteredRequests(requests); // Fallback to unfiltered results
-    }
-  }, [requests, selectedVehicle, statusFilter, searchTerm, dateRange]);
+      
+      // Apply status filter
+      if (statusFilter !== "all") {
+        const requestStatus = (request.status || '').toLowerCase();
+        const statusFilterLower = statusFilter.toLowerCase();
+        
+        // Handle supervisor-specific statuses
+        if (statusFilterLower === 'approved') {
+          if (!requestStatus.includes('supervisor approved')) {
+            return false;
+          }
+        } 
+        else if (statusFilterLower === 'rejected') {
+          if (!requestStatus.includes('supervisor rejected')) {
+            return false;
+          }
+        }
+        // Handle general statuses
+        else if (!requestStatus.includes(statusFilterLower)) {
+          return false;
+        }
+      }
+      
+      // Apply search filter
+      if (searchTerm && searchTerm.trim()) {
+        const term = searchTerm.toLowerCase().trim();
+        const searchableFields = [
+          request.orderNumber,
+          request.id.toString(),
+          request.supplierName,
+          request.requesterName,
+          request.userSection,
+          request.vehicleNumber,
+          request.supervisor_notes
+        ].map(field => (field || '').toString().toLowerCase());
+        
+        if (!searchableFields.some(field => field.includes(term))) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    // Sort filtered results by date (newest first)
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.submittedAt || a.created_at || a.requestDate).getTime();
+      const dateB = new Date(b.submittedAt || b.created_at || b.requestDate).getTime();
+      return dateB - dateA;
+    });
+    
+    console.log('Filtered requests:', filtered.length, 'out of', requests.length);
+    setFilteredRequests(filtered);
+    
+  }, [requests, selectedVehicle, dateRange.startDate, dateRange.endDate, statusFilter, searchTerm]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -238,7 +317,9 @@ const SupervisorInquiryDashboard: React.FC = () => {
   };
 
   const handleViewDetails = (requestId: string) => {
-    navigate(`/supervisor/request-details/${requestId}`);
+    navigate(`/supervisor/request/${requestId}`, {
+      state: { fromInquiry: true }
+    });
   };
 
   const formatDate = (date: string) => {
@@ -251,17 +332,32 @@ const SupervisorInquiryDashboard: React.FC = () => {
     });
   };
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'supervisor approved':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'supervisor rejected':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+  const getStatusBadgeColor = (status: string) => {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-100';
+    if (statusLower.includes('approved')) {
+      if (statusLower.includes('supervisor')) return 'bg-green-50 text-green-800 border-green-100';
+      if (statusLower.includes('engineer')) return 'bg-blue-50 text-blue-800 border-blue-100';
+      return 'bg-green-50 text-green-800 border-green-100';
     }
+    if (statusLower.includes('order placed') || statusLower.includes('place order')) return 'bg-purple-50 text-purple-800 border-purple-100';
+    if (statusLower.includes('complete')) return 'bg-blue-50 text-blue-800 border-blue-100';
+    if (statusLower.includes('rejected')) return 'bg-red-50 text-red-800 border-red-100';
+    return 'bg-gray-50 text-gray-800 border-gray-100';
+  };
+
+  const getStatusIcon = (status: string) => {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('pending')) return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
+    if (statusLower.includes('approved')) {
+      if (statusLower.includes('supervisor')) return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
+      if (statusLower.includes('engineer')) return <CheckCircle className="w-4 h-4 mr-1.5 text-blue-500" />;
+      return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
+    }
+    if (statusLower.includes('order placed') || statusLower.includes('place order')) return <Package className="w-4 h-4 mr-1.5 text-purple-500" />;
+    if (statusLower.includes('complete')) return <Smile className="w-4 h-4 mr-1.5 text-blue-500" />;
+    if (statusLower.includes('rejected')) return <XCircle className="w-4 h-4 mr-1.5 text-red-500" />;
+    return <FileText className="w-4 h-4 mr-1.5 text-gray-500" />;
   };
 
   return (
@@ -396,12 +492,13 @@ const SupervisorInquiryDashboard: React.FC = () => {
                           <span className="text-sm font-medium text-gray-900">
                             Request #{request.id}
                           </span>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(request.status)}`}>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
+                            {getStatusIcon(request.status)}
                             {request.status}
                           </span>
                         </div>
                         <div className="mt-1 text-sm text-gray-500">
-                          {request.vehicleNumber} - Submitted by {request.requesterName}
+                          Vehicle: {request.vehicleNumber} - Requested by {request.requesterName}
                         </div>
                         <div className="mt-1 text-sm text-gray-500">
                           Department: {request.userSection}

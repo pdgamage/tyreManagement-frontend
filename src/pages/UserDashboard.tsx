@@ -117,7 +117,6 @@ const UserDashboard = () => {
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
-      userSection: tireRequest.userSection || "Unknown Department",
     };
   };
 

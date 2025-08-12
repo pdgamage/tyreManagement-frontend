@@ -20,7 +20,7 @@ interface RequestsContextType {
 const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
+  const [activeTab, setActiveTab] = useState<"requests" | "reports" | "inquiry">(
     "requests"
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -159,13 +159,60 @@ const SupervisorDashboard = () => {
               </svg>
               <span>Analytics & Reports</span>
             </button>
+            <button
+              onClick={() => setActiveTab("inquiry")}
+              className={`${
+                activeTab === "inquiry"
+                  ? "bg-white text-slate-700 shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-white/20"
+              } flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+              <span>Inquiry Dashboard</span>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Enhanced Main Content */}
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
-        {activeTab === "requests" ? (
+        {activeTab === "inquiry" ? (
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-8 py-6 border-b border-gray-200">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Inquiry Dashboard</h2>
+                  <p className="text-gray-600 mt-1">Comprehensive request inquiry and search features</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <div className="text-center">
+                {/* Placeholder for the inquiry dashboard, which will be implemented separately */}
+                <div className="w-16 h-16 mx-auto mb-4">
+                  <svg className="w-full h-full text-indigo-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Loading Inquiry Features...</h3>
+                <p className="text-gray-500">The inquiry dashboard is being loaded in a separate route.</p>
+                <button
+                  onClick={() => navigate('/supervisor/inquiry-dashboard')}
+                  className="mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                >
+                  Go to Inquiry Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : activeTab === "requests" ? (
           <div className="space-y-8">
             {/* Professional Overview Cards with Enhanced Spacing */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">

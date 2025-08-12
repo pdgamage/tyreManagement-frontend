@@ -528,12 +528,15 @@ const UserRequestDetails = () => {
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg">
                 {request.images.map((image, index) => (
-                  <div key={index} className="relative group">
+                  <div 
+                    key={index} 
+                    className="relative group cursor-pointer"
+                    onClick={() => openImageModal(index)}
+                  >
                     <img
                       src={image}
                       alt={`Request image ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
-                      onClick={() => openImageModal(index)}
+                      className="w-full h-24 object-cover rounded-lg hover:opacity-75 transition-opacity"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="bg-black bg-opacity-50 text-white p-2 rounded text-sm">

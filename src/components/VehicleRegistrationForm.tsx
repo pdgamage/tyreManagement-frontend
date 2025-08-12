@@ -19,18 +19,19 @@ const VehicleRegistrationForm = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [vehicleNumberError, setVehicleNumberError] = useState("");
 
-  // Redirect to login if not logged in
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
   // Auto-fill costCentre and department from user
   useEffect(() => {
     if (user) {
+      console.log("Setting user data:", user);
       setCostCentre(user.costCentre || "");
       setDepartment(user.department || "");
     }
   }, [user]);
+
+  // Redirect to login if not logged in
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   // Instant validation for vehicle number
   const handleVehicleNumberChange = (

@@ -8,7 +8,7 @@ interface Vehicle {
   make: string;
   model: string;
   type: string;
-  costCentre: string;
+  cost_centre: string;
   department: string;
   status: string;
 }
@@ -82,39 +82,39 @@ const RegisteredVehiclesTable = () => {
                   </tr>
                 ) : (
                   displayedVehicles.map((vehicle) => (
-                <tr key={vehicle.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {vehicle.vehicleNumber}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{vehicle.make}</div>
-                    <div className="text-sm text-gray-500">{vehicle.model}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {vehicle.type}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {vehicle.costCentre}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {vehicle.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => handleViewDetails(vehicle)}
-                      className="inline-flex items-center p-1 text-blue-600 hover:text-blue-900"
-                      title="View Details"
-                    >
-                      <Eye size={20} />
-                    </button>
-                  </td>
-                </tr>
+                    <tr key={vehicle.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {vehicle.vehicleNumber}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{vehicle.make}</div>
+                        <div className="text-sm text-gray-500">{vehicle.model}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {vehicle.type}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {vehicle.cost_centre}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {vehicle.department}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => handleViewDetails(vehicle)}
+                          className="inline-flex items-center p-1 text-blue-600 hover:text-blue-900"
+                          title="View Details"
+                        >
+                          <Eye size={20} />
+                        </button>
+                      </td>
+                    </tr>
                   ))
                 )}
               </tbody>
-          </table>
+            </table>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@ const RegisteredVehiclesTable = () => {
                     Cost Centre
                   </p>
                   <p className="mt-1 text-sm text-gray-900">
-                    {selectedVehicle.costCentre}
+                    {selectedVehicle.cost_centre}
                   </p>
                 </div>
                 <div>

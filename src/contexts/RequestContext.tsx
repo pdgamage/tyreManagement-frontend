@@ -38,11 +38,27 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setIsRefreshing(true);
       const res = await fetch(apiUrls.requests());
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Invalid response format - expected JSON");
+      }
+
       const data = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid data format - expected array");
+      }
+
       setRequests(data);
       setLastUpdate(Date.now());
     } catch (err) {
+      console.error("Error fetching requests:", err);
       setRequests([]);
+      // Don't throw the error - handle it gracefully
     } finally {
       setIsRefreshing(false);
     }

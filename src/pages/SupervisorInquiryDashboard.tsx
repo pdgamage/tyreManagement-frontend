@@ -83,79 +83,144 @@ const SupervisorInquiryDashboard: React.FC = () => {
     setIsLoading(prev => ({ ...prev, requests: true }));
     setError(prev => ({ ...prev, requests: '' }));
     try {
-      const url = vehicleNumber 
-        ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SUPERVISOR_REQUESTS}?vehicleNumber=${encodeURIComponent(vehicleNumber)}`
-        : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SUPERVISOR_REQUESTS}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUESTS}`;
+      const queryParams = new URLSearchParams();
+      
+      if (vehicleNumber && vehicleNumber !== 'All Vehicles') {
+        queryParams.append('vehicleNumber', vehicleNumber);
+      }
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch requests');
+      const finalUrl = queryParams.toString() ? `${url}?${queryParams.toString()}` : url;
+      const response = await fetch(finalUrl);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch requests');
+      }
+      
       const data = await response.json();
-      setRequests(Array.isArray(data) ? data : []);
+      const requests = Array.isArray(data) ? data : [];
+      
+      // Sort requests by date (newest first)
+      const sortedRequests = requests.sort((a, b) => {
+        const dateA = new Date(a.submittedAt || a.created_at || a.requestDate).getTime();
+        const dateB = new Date(b.submittedAt || b.created_at || b.requestDate).getTime();
+        return dateB - dateA;
+      });
+      
+      setRequests(sortedRequests);
     } catch (err: any) {
       setError(prev => ({
         ...prev,
         requests: `Failed to load requests: ${err?.message || 'Unknown error'}`
       }));
+      console.error('Error fetching requests:', err);
     } finally {
       setIsLoading(prev => ({ ...prev, requests: false }));
     }
   }, []);
 
-  // Initialize component
+  // Initialize component and handle fetch retries
   useEffect(() => {
-    fetchVehicles();
-    if (vehicleFromUrl) {
-      fetchRequests(vehicleFromUrl);
-    }
-  }, [fetchVehicles, vehicleFromUrl]);
+    const loadData = async () => {
+      try {
+        await fetchVehicles();
+        if (vehicleFromUrl) {
+          await fetchRequests(vehicleFromUrl);
+        } else {
+          await fetchRequests(); // Fetch all requests if no vehicle specified
+        }
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+        // Implement retry logic if needed
+      }
+    };
+    
+    loadData();
+
+    // Set up auto-refresh every 30 seconds
+    const refreshInterval = setInterval(() => {
+      if (!isLoading.requests && !isLoading.vehicles) {
+        loadData();
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [fetchVehicles, fetchRequests, vehicleFromUrl]);
 
   // Filter requests
   useEffect(() => {
-    if (!requests) {
+    if (!requests || !Array.isArray(requests)) {
       setFilteredRequests([]);
       return;
     }
 
     let filtered = [...requests];
 
-    // Apply vehicle filter
-    if (selectedVehicle && selectedVehicle !== 'All Vehicles') {
-      filtered = filtered.filter(request => request.vehicleNumber === selectedVehicle);
-    }
+    try {
+      // Apply vehicle filter
+      if (selectedVehicle && selectedVehicle !== 'All Vehicles') {
+        filtered = filtered.filter(request => 
+          request.vehicleNumber && 
+          request.vehicleNumber.toLowerCase() === selectedVehicle.toLowerCase()
+        );
+      }
 
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(request => request.status.toLowerCase() === statusFilter);
-    }
+      // Apply status filter
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(request => 
+          request.status && 
+          request.status.toLowerCase() === statusFilter.toLowerCase()
+        );
+      }
 
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(request => 
-        request.vehicleNumber.toLowerCase().includes(term) ||
-        request.requesterName.toLowerCase().includes(term) ||
-        request.userSection.toLowerCase().includes(term)
-      );
-    }
+      // Apply search filter
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(request => {
+          return (
+            (request.vehicleNumber && request.vehicleNumber.toLowerCase().includes(term)) ||
+            (request.requesterName && request.requesterName.toLowerCase().includes(term)) ||
+            (request.userSection && request.userSection.toLowerCase().includes(term)) ||
+            (request.orderNumber && request.orderNumber.toLowerCase().includes(term)) ||
+            (request.supervisor_notes && request.supervisor_notes.toLowerCase().includes(term))
+          );
+        });
+      }
 
-    // Apply date filter
-    if (dateRange.startDate || dateRange.endDate) {
-      filtered = filtered.filter(request => {
-        const requestDate = new Date(request.submittedAt || request.created_at || request.requestDate);
-        if (dateRange.startDate) {
-          const startDate = new Date(dateRange.startDate);
-          if (requestDate < startDate) return false;
-        }
-        if (dateRange.endDate) {
-          const endDate = new Date(dateRange.endDate);
-          endDate.setDate(endDate.getDate() + 1);
-          if (requestDate >= endDate) return false;
-        }
-        return true;
+      // Apply date filter
+      if (dateRange.startDate || dateRange.endDate) {
+        filtered = filtered.filter(request => {
+          try {
+            const requestDate = new Date(request.submittedAt || request.created_at || request.requestDate);
+            if (dateRange.startDate) {
+              const startDate = new Date(dateRange.startDate);
+              if (requestDate < startDate) return false;
+            }
+            if (dateRange.endDate) {
+              const endDate = new Date(dateRange.endDate);
+              endDate.setHours(23, 59, 59, 999); // Include the entire end date
+              if (requestDate > endDate) return false;
+            }
+            return true;
+          } catch (error) {
+            console.error('Error filtering by date:', error);
+            return true; // Include the request if date parsing fails
+          }
+        });
+      }
+
+      // Sort filtered results by date (newest first)
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.submittedAt || a.created_at || a.requestDate).getTime();
+        const dateB = new Date(b.submittedAt || b.created_at || b.requestDate).getTime();
+        return dateB - dateA;
       });
-    }
 
-    setFilteredRequests(filtered);
+      setFilteredRequests(filtered);
+    } catch (error) {
+      console.error('Error in filter effect:', error);
+      setFilteredRequests(requests); // Fallback to unfiltered results
+    }
   }, [requests, selectedVehicle, statusFilter, searchTerm, dateRange]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

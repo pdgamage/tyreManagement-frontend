@@ -13,6 +13,7 @@ export const API_CONFIG = {
 
     // Request endpoints
     REQUESTS: "/api/requests",
+    SUPERVISOR_REQUESTS: "/api/requests/supervisor",
 
     // Tire details endpoints
     TIRE_DETAILS: "/api/tire-details",

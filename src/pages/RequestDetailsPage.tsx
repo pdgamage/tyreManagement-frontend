@@ -1,26 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle, XCircle, Clock, Truck, Info, Calendar, Hash, User, FileText } from 'lucide-react';
+import PDFPreviewModal from '../components/PDFPreviewModal';
 
-interface RequestDetails {
-  id: string;
-  vehicleNumber: string;
-  status: string;
-  orderNumber: string;
-  submittedAt: string;
-  requestDate: string;
-  orderPlacedDate?: string;
-  supplierName: string;
-  supplierPhone?: string;
-  supplierEmail?: string;
-  engineerName?: string;
-  approvalDate?: string;
-  remarks?: string;
-  quantity?: number;
-  tubesQuantity?: number;
-  tireSize?: string;
-}
+import { TireRequest } from '../types/api';
+type RequestDetails = TireRequest;
 
 const RequestDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +14,7 @@ const RequestDetailsPage: React.FC = () => {
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -57,8 +43,8 @@ const RequestDetailsPage: React.FC = () => {
     fetchRequestDetails();
   }, [id]);
 
-  const getStatusIcon = (status: string) => {
-    const statusLower = status?.toLowerCase() || '';
+  const getStatusIcon = (status: string | undefined) => {
+    const statusLower = (status || '').toLowerCase();
     
     if (statusLower.includes('approved') || statusLower === 'complete') {
       return <CheckCircle className="w-5 h-5" />;
@@ -75,8 +61,8 @@ const RequestDetailsPage: React.FC = () => {
     return <Info className="w-5 h-5" />;
   };
 
-  const getStatusColor = (status: string) => {
-    const statusLower = status?.toLowerCase() || '';
+  const getStatusColor = (status: string | undefined) => {
+    const statusLower = (status || '').toLowerCase();
     
     if (statusLower.includes('approved') || statusLower === 'complete') {
       return {
@@ -178,7 +164,7 @@ const RequestDetailsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 shadow-lg">
+      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center space-x-4">
             <button
@@ -190,7 +176,20 @@ const RequestDetailsPage: React.FC = () => {
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold text-white truncate">Tire Request Details</h1>
-              <p className="text-sm text-blue-100 mt-1">Request ID: {request.id}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1">
+                <p className="text-sm text-blue-100">Request ID: {request.id}</p>
+                <span className="hidden sm:inline text-blue-200">•</span>
+                <p className="text-sm text-blue-100">
+                  {new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </p>
+              </div>
             </div>
             <div className="flex items-center">
               <span className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium ${statusColors.bg} ${statusColors.text} ${statusColors.border}`}>
@@ -198,7 +197,7 @@ const RequestDetailsPage: React.FC = () => {
                   {getStatusIcon(request.status)}
                 </span>
                 <span className="capitalize">
-                  {request.status.toLowerCase() === 'complete' ? 'Complete (Engineer Approved)' : request.status.toLowerCase()}
+                  {(request.status || '').toLowerCase() === 'complete' ? 'Complete (Engineer Approved)' : (request.status || '').toLowerCase()}
                 </span>
               </span>
             </div>
@@ -223,13 +222,13 @@ const RequestDetailsPage: React.FC = () => {
               </div>
               <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-lg border border-gray-200">
                 <Calendar className="inline-block w-4 h-4 mr-1 -mt-1" />
-                {new Date(request.submittedAt).toLocaleDateString('en-US', {
+                {request.submittedAt ? new Date(request.submittedAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit'
-                })}
+                }) : 'N/A'}
               </div>
             </div>
           </div>
@@ -267,7 +266,7 @@ const RequestDetailsPage: React.FC = () => {
                     <dt className="text-sm font-medium text-amber-700">Order Placed Date</dt>
                   </div>
                   <dd className="text-lg font-semibold text-gray-900">
-                    {new Date(request.orderPlacedDate).toLocaleDateString('en-US', {
+                    {new Date(request.orderPlacedDate || '').toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
@@ -284,13 +283,13 @@ const RequestDetailsPage: React.FC = () => {
                   <dt className="text-sm font-medium text-amber-700">Request Date</dt>
                 </div>
                 <dd className="text-lg font-semibold text-gray-900">
-                  {new Date(request.requestDate || request.submittedAt).toLocaleDateString('en-US', {
+                  {request.submittedAt ? new Date(request.submittedAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                  })}
+                  }) : 'N/A'}
                 </dd>
               </div>
             </div>
@@ -303,7 +302,7 @@ const RequestDetailsPage: React.FC = () => {
                   <dt className="text-sm font-medium text-blue-700">Tire Quantity</dt>
                 </div>
                 <dd className="text-lg font-semibold text-gray-900">
-                  {request.quantity || <span className="text-gray-400">-</span>}
+                  {request.quantity ?? <span className="text-gray-400">-</span>}
                 </dd>
               </div>
               
@@ -378,7 +377,15 @@ const RequestDetailsPage: React.FC = () => {
         </div>
         
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={() => setShowPDFPreview(true)}
+            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-sm shadow-lg hover:shadow-xl flex items-center"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Export as PDF
+          </button>
           <button
             type="button"
             onClick={() => navigate(location.state?.fromInquiry ? '/user/inquiry-dashboard' : '/user/dashboard')}
@@ -388,6 +395,15 @@ const RequestDetailsPage: React.FC = () => {
           </button>
         </div>
       </main>
+
+      {/* PDF Preview Modal */}
+      {request && (
+        <PDFPreviewModal
+          request={request}
+          isOpen={showPDFPreview}
+          onClose={() => setShowPDFPreview(false)}
+        />
+      )}
     </div>
   );
 };

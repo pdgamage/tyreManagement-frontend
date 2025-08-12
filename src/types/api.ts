@@ -60,9 +60,12 @@ export interface TireRequest {
   engineerApproved?: boolean;
   engineerNotes?: string;
   engineerTimestamp?: string;
-  orderPlaced?: boolean;
-  orderTimestamp?: string;
+  orderPlacedDate?: string;
+  orderNumber?: string;
   customer_officer_note?: string;
+  supplierName?: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
 }
 
 export interface ApiResponse<T> {

@@ -8,4 +8,12 @@ export default defineConfig({
     port: 3000,
     host: "localhost",
   },
+  optimizeDeps: {
+    include: ['@react-pdf/renderer'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/@react-pdf\/renderer/, /node_modules/],
+    },
+  },
 });

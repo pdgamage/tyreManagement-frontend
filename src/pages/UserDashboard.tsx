@@ -122,7 +122,7 @@ const UserDashboard = () => {
 
   // Handler functions for RequestTable
   const handleView = (request: any) => {
-    navigate(`/user/request/${request.id}`);
+    navigate(`/request/${request.id}`);
   };
 
   const handleDelete = async (id: string) => {

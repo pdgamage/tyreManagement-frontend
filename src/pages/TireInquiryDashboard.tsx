@@ -347,7 +347,17 @@ const UserInquiryDashboard: React.FC = () => {
 
   const { user } = useAuth();
   const handleViewDetails = (requestId: string) => {
-    const baseRoute = user?.role === 'supervisor' ? '/supervisor' : '/user';
+    let baseRoute;
+    switch (user?.role) {
+      case 'supervisor':
+        baseRoute = '/supervisor';
+        break;
+      case 'technical-manager':
+        baseRoute = '/technical-manager';
+        break;
+      default:
+        baseRoute = '/user';
+    }
     navigate(`${baseRoute}/request-details/${requestId}`, {
       state: { fromInquiry: true }
     });

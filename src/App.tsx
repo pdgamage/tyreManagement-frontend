@@ -141,12 +141,36 @@ export function App() {
                 }
               />
               <Route
-                path="/technical-manager/*"
+                path="/technical-manager"
                 element={
                   <RequireAuth role="technical-manager">
                     <Layout>
                       <PageTransition>
                         <TechnicalManagerDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/technical-manager/request-details/:id"
+                element={
+                  <RequireAuth role="technical-manager">
+                    <Layout>
+                      <PageTransition>
+                        <RequestDetailsPage />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/technical-manager/inquiry-dashboard"
+                element={
+                  <RequireAuth role="technical-manager">
+                    <Layout>
+                      <PageTransition>
+                        <TireInquiryDashboard />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

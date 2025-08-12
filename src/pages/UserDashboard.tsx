@@ -4,6 +4,7 @@ import RequestTable from "../components/RequestTable";
 import { TireRequest } from "../types/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
+import { useVehicles } from "../contexts/VehicleContext";
 import { apiUrls } from "../config/api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,8 +27,12 @@ import {
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const { requests, fetchRequests } = useRequests();
+  const { vehicles } = useVehicles();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Calculate unique departments from vehicles
+  const uniqueDepartments = [...new Set(vehicles.map(vehicle => vehicle.department))].filter(Boolean).length;
 
   // Removed selectedRequest state - using navigation instead of modal
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -286,7 +291,43 @@ const UserDashboard = () => {
       {/* Enhanced Main Content */}
       <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
         <div className="space-y-8">
-          {/* Professional Overview Cards */}
+          {/* Vehicle Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-blue-400/30 rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-blue-100 text-sm font-medium">Total Vehicles</p>
+              <p className="text-4xl font-bold my-1">{vehicles.length}</p>
+              <p className="text-blue-200 text-xs">Registered in system</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-purple-400/30 rounded-xl flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-purple-100 text-sm font-medium">Vehicle Types</p>
+              <p className="text-4xl font-bold my-1">{[...new Set(vehicles.map(v => v.type))].filter(Boolean).length}</p>
+              <p className="text-purple-200 text-xs">Different categories</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-orange-400/30 rounded-xl flex items-center justify-center">
+                  <UserCircle className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-orange-100 text-sm font-medium">Departments</p>
+              <p className="text-4xl font-bold my-1">{uniqueDepartments}</p>
+              <p className="text-orange-200 text-xs">Using fleet services</p>
+            </div>
+          </div>
+
+          {/* Request Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             <div
               onClick={() =>

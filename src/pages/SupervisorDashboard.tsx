@@ -3,19 +3,7 @@ import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
-i                           onView={(request) =>
-                    navigate(`/supervisor/request/${request.id}`)
-                  }
-                  }
-                  onDelete={() => {}}
-                  onPlaceOrder={() => {}}
-                  showActions={false}
-                  showPlaceOrderButton={false}
-                />
-              </div>
-            </div>
-
-            {/* Approved Requests Section */}Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 interface RequestsContextType {

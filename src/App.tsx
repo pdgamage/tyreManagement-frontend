@@ -59,7 +59,7 @@ export function App() {
               <Route
                 path="/user/inquiry-dashboard"
                 element={
-                  <RequireAuth role="user">
+                  <RequireAuth allowedRoles={["user", "supervisor"]}>
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />

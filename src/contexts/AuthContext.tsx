@@ -16,7 +16,7 @@ interface User {
   name: string;
   role: Role;
   email?: string;
-  costcentre?: string; // match the database column casing
+  costCentre?: string; // match the database column casing
   department?: string;
 }
 

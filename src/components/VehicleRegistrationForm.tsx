@@ -24,14 +24,16 @@ const VehicleRegistrationForm = () => {
     console.log("Current user data:", user);
     if (user) {
       // Make sure to update only if the values are different
-      const newCostCentre = user.costcentre || ""; // match the database column casing
+      const newCostCentre = user.costCentre || ""; // match the database column casing
       const newDepartment = user.department || "";
       
       if (costCentre !== newCostCentre) {
         setCostCentre(newCostCentre);
+        console.log("Setting costCentre to:", newCostCentre);
       }
       if (department !== newDepartment) {
         setDepartment(newDepartment);
+        console.log("Setting department to:", newDepartment);
       }
       
       console.log("Updated form values:", {
@@ -39,7 +41,7 @@ const VehicleRegistrationForm = () => {
         department: newDepartment
       });
     }
-  }, [user, costCentre, department]);
+  }, [user]);
 
   // Auto-fill costCentre and department from user
   useEffect(() => {

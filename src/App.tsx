@@ -129,6 +129,18 @@ export function App() {
                 }
               />
               <Route
+                path="/supervisor/inquiry-dashboard"
+                element={
+                  <RequireAuth role="supervisor">
+                    <Layout>
+                      <PageTransition>
+                        <TireInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/technical-manager/*"
                 element={
                   <RequireAuth role="technical-manager">

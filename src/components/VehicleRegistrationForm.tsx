@@ -12,12 +12,34 @@ const VehicleRegistrationForm = () => {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [type, setType] = useState("");
-  const [costCentre, setCostCentre] = useState("");
-  const [department, setDepartment] = useState("");
+  const [costCentre, setCostCentre] = useState(() => user?.costCentre || "");
+  const [department, setDepartment] = useState(() => user?.department || "");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [vehicleNumberError, setVehicleNumberError] = useState("");
+
+  // Initialize and update costCentre and department when user changes
+  useEffect(() => {
+    console.log("Current user data:", user);
+    if (user) {
+      // Make sure to update only if the values are different
+      const newCostCentre = user.costcentre || ""; // match the database column casing
+      const newDepartment = user.department || "";
+      
+      if (costCentre !== newCostCentre) {
+        setCostCentre(newCostCentre);
+      }
+      if (department !== newDepartment) {
+        setDepartment(newDepartment);
+      }
+      
+      console.log("Updated form values:", {
+        costCentre: newCostCentre,
+        department: newDepartment
+      });
+    }
+  }, [user, costCentre, department]);
 
   // Auto-fill costCentre and department from user
   useEffect(() => {

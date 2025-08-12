@@ -117,12 +117,12 @@ export function App() {
                 }
               />
               <Route
-                path="/supervisor/request/:id"
+                path="/supervisor/request-details/:id"
                 element={
                   <RequireAuth role="supervisor">
                     <Layout>
                       <PageTransition>
-                        <SharedRequestDetails />
+                        <RequestDetailsPage />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

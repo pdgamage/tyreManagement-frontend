@@ -1,7 +1,12 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useRequests } from "../contexts/RequestContext";
 import { useAuth } from "../contexts/AuthContext";
+
+interface LocationState {
+  fromInquiry?: boolean;
+  returnPath?: string;
+}
 import { Request } from "../types/request";
 import { apiUrls } from "../config/api";
 
@@ -10,6 +15,8 @@ const SharedRequestDetails = () => {
   const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
   const { user } = useAuth();
+  const location = useLocation();
+  const state = location.state as LocationState;
   const [request, setRequest] = useState<Request | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -527,7 +534,7 @@ const SharedRequestDetails = () => {
             <button
               type="button"
               className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-              onClick={() => navigate(isSupervisor ? "/supervisor" : "/user")}
+              onClick={() => navigate(state?.returnPath || (isSupervisor ? "/supervisor" : "/user"))}
             >
               Back
             </button>

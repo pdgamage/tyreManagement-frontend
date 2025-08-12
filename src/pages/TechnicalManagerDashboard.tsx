@@ -189,7 +189,7 @@ const TechnicalManagerDashboard = () => {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
-              <span>Technical Review</span>
+              <span>Technical Manager Reviews</span>
               <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">
                 {pendingRequests.length}
               </span>
@@ -205,7 +205,7 @@ const TechnicalManagerDashboard = () => {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <span>Technical Analytics</span>
+              <span>Technical Manager Analytics</span>
             </button>
             <button
               onClick={() => navigate("/technical-manager/inquiry-dashboard")}
@@ -231,7 +231,7 @@ const TechnicalManagerDashboard = () => {
                   <div>
                     <p className="text-amber-100 text-sm font-medium mb-2">Pending Review</p>
                     <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
-                    <p className="text-amber-200 text-xs">Awaiting technical approval</p>
+                    <p className="text-amber-200 text-xs">Awaiting technical Manager approval</p>
                   </div>
                   <div className="w-16 h-16 bg-amber-400/30 rounded-xl flex items-center justify-center">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +246,7 @@ const TechnicalManagerDashboard = () => {
                   <div>
                     <p className="text-emerald-100 text-sm font-medium mb-2">Approved</p>
                     <p className="text-4xl font-bold mb-1">{approvedRequests.length}</p>
-                    <p className="text-emerald-200 text-xs">Technically approved</p>
+                    <p className="text-emerald-200 text-xs">Technical Manager approved</p>
                   </div>
                   <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,8 +301,8 @@ const TechnicalManagerDashboard = () => {
                         <Clock className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-amber-900">Pending Technical Review</h2>
-                        <p className="text-amber-700 text-sm">Requests awaiting your technical approval</p>
+                        <h2 className="text-xl font-bold text-amber-900">Pending Technical MAnager Review</h2>
+                        <p className="text-amber-700 text-sm">Requests awaiting your technical Manager approval</p>
                       </div>
                     </div>
                   </div>
@@ -330,7 +330,7 @@ const TechnicalManagerDashboard = () => {
                         <CheckCircle2 className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-emerald-900">Technically Approved Requests</h2>
+                        <h2 className="text-xl font-bold text-emerald-900">Technical Manager Approved Requests</h2>
                         <p className="text-emerald-700 text-sm">Requests you have approved for technical specifications</p>
                       </div>
                     </div>
@@ -359,7 +359,7 @@ const TechnicalManagerDashboard = () => {
                         <XCircle className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-red-900">Technically Rejected Requests</h2>
+                        <h2 className="text-xl font-bold text-red-900">Technical Manager Rejected Requests</h2>
                         <p className="text-red-700 text-sm">Requests rejected due to technical issues</p>
                       </div>
                     </div>
@@ -391,7 +391,7 @@ const TechnicalManagerDashboard = () => {
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-blue-900">Technical Analytics & Reports</h2>
+                  <h2 className="text-xl font-bold text-blue-900">Technical Manager Analytics & Reports</h2>
                   <p className="text-blue-700 text-sm">Comprehensive technical performance insights</p>
                 </div>
               </div>
@@ -429,7 +429,7 @@ const TechnicalManagerDashboard = () => {
             <div className="p-8">
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Technical Review Notes <span className="text-red-500">*</span>
+                  Technical Manager Review Notes <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   className="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"

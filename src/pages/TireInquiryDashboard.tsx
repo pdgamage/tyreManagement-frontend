@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
+import "../styles/scrollbar.css";
 import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
 
 interface Vehicle {
@@ -989,7 +990,7 @@ const UserInquiryDashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <ul className="divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto custom-scrollbar">
                 {filteredRequests.map((request) => (
                   <li 
                     key={request.id} 

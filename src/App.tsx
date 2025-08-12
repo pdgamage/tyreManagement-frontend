@@ -24,7 +24,6 @@ import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails
 import UserRequestDetails from "./pages/UserRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
-import SupervisorInquiryDashboard from "./pages/SupervisorInquiryDashboard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -104,36 +103,12 @@ export function App() {
               />
               {/* Protected routes */}
               <Route
-                path="/supervisor"
+                path="/supervisor/*"
                 element={
                   <RequireAuth role="supervisor">
                     <Layout>
                       <PageTransition>
                         <SupervisorDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/supervisor/inquiry-dashboard"
-                element={
-                  <RequireAuth role="supervisor">
-                    <Layout>
-                      <PageTransition>
-                        <SupervisorInquiryDashboard />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/supervisor/request-details/:id"
-                element={
-                  <RequireAuth role="supervisor">
-                    <Layout>
-                      <PageTransition>
-                        <SupervisorRequestDetails />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

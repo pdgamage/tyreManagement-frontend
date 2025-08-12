@@ -1536,20 +1536,27 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
 
       setFormLoading(false);
       setSuccess(true);
-      
-      // Scroll to top to show success message
-      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       if (!editMode) {
+        // First timeout for showing the success message
         setTimeout(() => {
-          setSuccess(false);
-          setFormData({
-            ...initialFormData,
-            requesterName: user.name || "",
-            requesterEmail: user.email || "",
-          });
-          setCurrentStep(1);
-        }, 5000); // Show success message for 5 seconds
+          // Add fade-out animation class
+          const notification = document.querySelector('.animate-slide-in');
+          if (notification) {
+            notification.classList.add('animate-slide-out');
+          }
+          
+          // Second timeout to actually remove the message and reset form
+          setTimeout(() => {
+            setSuccess(false);
+            setFormData({
+              ...initialFormData,
+              requesterName: user.name || "",
+              requesterEmail: user.email || "",
+            });
+            setCurrentStep(1);
+          }, 500); // Wait for animation to complete
+        }, 3000); // Show message for 3 seconds
       }
     } catch (err) {
       setFormLoading(false);
@@ -1646,20 +1653,24 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
         </div>
       )}
       {success && (
-        <div className="p-4 mb-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-green-800">
-                Request submitted successfully!
-              </p>
-              <p className="mt-1 text-sm text-green-600">
-                Your tire request has been submitted and is now pending approval.
-              </p>
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className="p-4 rounded-lg shadow-lg bg-white border-l-4 border-green-500 max-w-md">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">Success!</h3>
+                    <p className="mt-1 text-sm text-gray-500">Your tire request has been submitted successfully.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

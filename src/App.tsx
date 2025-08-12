@@ -22,6 +22,7 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
+import SharedRequestDetails from "./pages/SharedRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
@@ -102,13 +103,26 @@ export function App() {
                 }
               />
               {/* Protected routes */}
+              {/* Supervisor Routes */}
               <Route
-                path="/supervisor/*"
+                path="/supervisor"
                 element={
                   <RequireAuth role="supervisor">
                     <Layout>
                       <PageTransition>
                         <SupervisorDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/supervisor/request/:id"
+                element={
+                  <RequireAuth role="supervisor">
+                    <Layout>
+                      <PageTransition>
+                        <SharedRequestDetails />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>
@@ -152,7 +166,15 @@ export function App() {
               />
               <Route
                 path="/supervisor/request/:id"
-                element={<SupervisorRequestDetails />}
+                element={
+                  <RequireAuth role="supervisor">
+                    <Layout>
+                      <PageTransition>
+                        <SharedRequestDetails />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
               />
               <Route
                 path="/technical-manager/request/:id"

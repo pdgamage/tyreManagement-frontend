@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { API_CONFIG } from "../config/api";
 import "../styles/scrollbar.css";
 import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
@@ -344,8 +345,10 @@ const UserInquiryDashboard: React.FC = () => {
     window.history.replaceState({}, '', newUrl);
   };
 
+  const { user } = useAuth();
   const handleViewDetails = (requestId: string) => {
-    navigate(`/user/request-details/${requestId}`, {
+    const baseRoute = user?.role === 'supervisor' ? '/supervisor' : '/user';
+    navigate(`${baseRoute}/request-details/${requestId}`, {
       state: { fromInquiry: true }
     });
   };

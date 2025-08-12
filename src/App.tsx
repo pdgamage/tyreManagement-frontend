@@ -213,12 +213,36 @@ export function App() {
                 }
               />
               <Route
-                path="/customer-officer/*"
+                path="/customer-officer"
                 element={
                   <RequireAuth role="customer-officer">
                     <Layout>
                       <PageTransition>
                         <CustomerOfficerDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/customer-officer/request-details/:id"
+                element={
+                  <RequireAuth role="customer-officer">
+                    <Layout>
+                      <PageTransition>
+                        <RequestDetailsPage />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/customer-officer/inquiry-dashboard"
+                element={
+                  <RequireAuth role="customer-officer">
+                    <Layout>
+                      <PageTransition>
+                        <TireInquiryDashboard />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

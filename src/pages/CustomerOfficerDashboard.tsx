@@ -279,7 +279,16 @@ const CustomerOfficerDashboard = () => {
               } flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3`}
             >
               <BarChart3 className="w-6 h-6" />
-              <span>Customer Analytics</span>
+              <span>Customer Officer Analytics</span>
+            </button>
+            <button
+              onClick={() => navigate("/customer-officer/inquiry-dashboard")}
+              className="text-slate-300 hover:text-white hover:bg-white/20 flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Customer Officer Inquiry</span>
             </button>
           </div>
         </div>

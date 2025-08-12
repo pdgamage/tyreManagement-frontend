@@ -358,6 +358,9 @@ const UserInquiryDashboard: React.FC = () => {
       case 'engineer':
         baseRoute = '/engineer';
         break;
+      case 'customer-officer':
+        baseRoute = '/customer-officer';
+        break;
       default:
         baseRoute = '/user';
     }

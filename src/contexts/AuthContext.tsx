@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           );
           if (res.ok) {
             const data = await res.json();
+            console.log("User data from backend:", data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
             setUser(data.user);
             // Do NOT navigate here

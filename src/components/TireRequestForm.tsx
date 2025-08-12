@@ -1536,6 +1536,9 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
 
       setFormLoading(false);
       setSuccess(true);
+      
+      // Scroll to top to show success message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       if (!editMode) {
         setTimeout(() => {
@@ -1546,7 +1549,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
             requesterEmail: user.email || "",
           });
           setCurrentStep(1);
-        }, 2000);
+        }, 5000); // Show success message for 5 seconds
       }
     } catch (err) {
       setFormLoading(false);
@@ -1643,8 +1646,22 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
         </div>
       )}
       {success && (
-        <div className="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
-          Request submitted successfully!
+        <div className="p-4 mb-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg shadow-sm">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-green-800">
+                Request submitted successfully!
+              </p>
+              <p className="mt-1 text-sm text-green-600">
+                Your tire request has been submitted and is now pending approval.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

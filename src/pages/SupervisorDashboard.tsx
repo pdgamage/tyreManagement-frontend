@@ -264,11 +264,11 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/request/${request.id}`)
+                    navigate(`/supervisor/request/${Number(request.id)}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={true}
+                  showActions={false}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -301,11 +301,11 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/request/${request.id}`)
+                    navigate(`/supervisor/request/${Number(request.id)}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={true}
+                  showActions={false}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -338,11 +338,11 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/request/${request.id}`)
+                    navigate(`/supervisor/request/${Number(request.id)}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={true}
+                  showActions={false}
                   showPlaceOrderButton={false}
                 />
               </div>

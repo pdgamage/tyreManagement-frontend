@@ -345,8 +345,8 @@ const UserInquiryDashboard: React.FC = () => {
   };
 
   const handleViewDetails = (requestId: string) => {
-    navigate(`/request/${requestId}`, {
-      state: { fromInquiry: true, returnPath: '/user/inquiry-dashboard' }
+    navigate(`/user/request-details/${requestId}`, {
+      state: { fromInquiry: true }
     });
   };
 

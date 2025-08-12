@@ -63,9 +63,7 @@ const Navigation = () => {
             <NavLink to="/supervisor" icon={<ClipboardListIcon size={20} />}>
               Requests
             </NavLink>
-            <NavLink to="/user/inquiry-dashboard" icon={<Settings2Icon size={20} />}>
-              User Inquiry
-            </NavLink>
+           
           </>
         );
       case "technical-manager":

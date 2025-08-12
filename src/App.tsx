@@ -17,10 +17,11 @@ import { useAuth } from "./contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./styles/animations.css";
 import PageTransition from "./components/PageTransition";
-import SharedRequestDetails from "./pages/SharedRequestDetails";
+import SupervisorRequestDetails from "./pages/SupervisorRequestDetails";
 import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetails";
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
+import UserRequestDetails from "./pages/UserRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
@@ -59,7 +60,7 @@ export function App() {
               <Route
                 path="/user/inquiry-dashboard"
                 element={
-                  <RequireAuth allowedRoles={["user", "supervisor"]}>
+                  <RequireAuth role="user">
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />
@@ -149,31 +150,10 @@ export function App() {
                   </RequireAuth>
                 }
               />
-              {/* Shared request details route for both user and supervisor */}
-              <Route
-                path="/request/:id"
-                element={
-                  <RequireAuth allowedRoles={["user", "supervisor"]}>
-                    <Layout>
-                      <PageTransition>
-                        <SharedRequestDetails />
-                      </PageTransition>
-                    </Layout>
-                  </RequireAuth>
-                }
-              />
-
-              {/* Legacy routes - redirect to new shared route */}
               <Route
                 path="/supervisor/request/:id"
-                element={<Navigate to="/request/:id" replace />}
+                element={<SupervisorRequestDetails />}
               />
-              <Route
-                path="/user/request/:id"
-                element={<Navigate to="/request/:id" replace />}
-              />
-
-              {/* Other role specific routes */}
               <Route
                 path="/technical-manager/request/:id"
                 element={<TechnicalManagerRequestDetails />}
@@ -185,6 +165,16 @@ export function App() {
               <Route
                 path="/customer-officer/request/:id"
                 element={<CustomerOfficerRequestDetails />}
+              />
+              <Route
+                path="/user/request/:id"
+                element={
+                  <Layout>
+                    <PageTransition>
+                      <UserRequestDetails />
+                    </PageTransition>
+                  </Layout>
+                }
               />
             </Routes>
           </RequestProvider>
@@ -198,11 +188,9 @@ export function App() {
 const RequireAuth = ({
   children,
   role,
-  allowedRoles,
 }: {
   children: ReactNode;
-  role?: string;
-  allowedRoles?: string[];
+  role: string;
 }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
@@ -215,15 +203,9 @@ const RequireAuth = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If specific role is provided, check for exact match
-  if (role && user.role !== role) {
+  if (user.role !== role) {
     return <Navigate to={`/${user.role}`} replace />;
   }
 
-  // If allowed roles array is provided, check if user's role is in the array
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={`/${user.role}`} replace />;
-  }
-
-  return children as JSX.Element;
+  return <>{children}</>;
 };

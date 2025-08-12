@@ -253,12 +253,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 </button>
               </th>
               <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                Delivery Details
-              </th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                Pricing & Warranty
-              </th>
-              <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                 Status
               </th>
               {showActions && (
@@ -292,24 +286,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   </div>
                   <div className="text-sm text-gray-500">
                     {request.userSection}
-                  </div>
-                </td>
-                {/* Delivery Details */}
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    {request.deliveryOfficeName || 'N/A'}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {[request.deliveryStreetName, request.deliveryTown].filter(Boolean).join(', ') || 'No address'}
-                  </div>
-                </td>
-                {/* Pricing & Warranty */}
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    LKR {request.totalPrice || '0.00'}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {request.warrantyDistance ? `${request.warrantyDistance}km warranty` : 'No warranty info'}
                   </div>
                 </td>
                 <td className="px-6 py-4">

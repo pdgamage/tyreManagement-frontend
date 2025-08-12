@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { usePolling } from "../hooks/usePolling";
-import { apiUrls, API_CONFIG, buildApiUrl } from "../config/api";
+import { apiUrls } from "../config/api";
 
 import type { Request as RequestType } from "../types/request";
 
@@ -38,45 +38,10 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setIsRefreshing(true);
       const res = await fetch(apiUrls.requests());
-      
-      // Handle empty response
-      if (res.status === 204) {
-        setRequests([]);
-        setLastUpdate(Date.now());
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      // Try to get the response text first
-      const text = await res.text();
-      
-      // Check if the response is empty
-      if (!text) {
-        setRequests([]);
-        setLastUpdate(Date.now());
-        return;
-      }
-
-      // Try to parse as JSON
-      try {
-        const data = JSON.parse(text);
-        if (!Array.isArray(data)) {
-          console.warn('Expected array but got:', typeof data);
-          setRequests(Array.isArray(data.data) ? data.data : []);
-        } else {
-          setRequests(data);
-        }
-        setLastUpdate(Date.now());
-      } catch (jsonError) {
-        console.error('JSON parsing error:', jsonError);
-        console.error('Raw response:', text);
-        throw new Error('Failed to parse server response');
-      }
+      const data = await res.json();
+      setRequests(data);
+      setLastUpdate(Date.now());
     } catch (err) {
-      console.error("Error fetching requests:", err);
       setRequests([]);
     } finally {
       setIsRefreshing(false);
@@ -114,9 +79,7 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       userId?: string
     ) => {
       try {
-        // Build the URL properly
-        const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.REQUESTS}/${id}/status`);
-        const res = await fetch(url, {
+        const res = await fetch(`${apiUrls.requestById(id)}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

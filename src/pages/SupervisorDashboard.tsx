@@ -46,24 +46,10 @@ const SupervisorDashboard = () => {
     fetchRequests();
   }, [fetchRequests]);
 
-  // Debug logs
-  useEffect(() => {
-    console.log('All requests:', requests);
-    console.log('Supervisor ID:', user?.id);
-    console.log('Filtered supervisor requests:', supervisorRequests);
-  }, [requests, user?.id, supervisorRequests]);
-
   // Filter requests for this supervisor only
   const supervisorRequests = requests.filter(
     (req) => req.supervisorId === user?.id // <-- Only requests for this supervisor
   );
-
-  // Debug logs
-  useEffect(() => {
-    console.log('All requests:', requests);
-    console.log('Supervisor ID:', user?.id);
-    console.log('Filtered supervisor requests:', supervisorRequests);
-  }, [requests, user?.id, supervisorRequests]);
 
   const pendingRequests = supervisorRequests.filter(
     (req) => req.status === "pending"
@@ -287,7 +273,7 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/supervisor/request-details/${request.id}`)
+                    navigate(`/supervisor/request/${request.id}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
@@ -324,7 +310,7 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/supervisor/request-details/${request.id}`)
+                    navigate(`/supervisor/request/${request.id}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
@@ -361,7 +347,7 @@ const SupervisorDashboard = () => {
                   onApprove={() => {}}
                   onReject={() => {}}
                   onView={(request) =>
-                    navigate(`/supervisor/request-details/${request.id}`)
+                    navigate(`/supervisor/request/${request.id}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}

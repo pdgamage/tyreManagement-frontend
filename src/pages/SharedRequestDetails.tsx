@@ -1,45 +1,30 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useRequests } from "../contexts/RequestContext";
-import { useAuth } from "../contexts/AuthContext";
+import TireRequestDetailsCard from "../components/TireRequestDetailsCard";
+import { Request } from "../types/request";
+import { apiUrls } from "../config/api";
 
 interface LocationState {
   fromInquiry?: boolean;
   returnPath?: string;
 }
-import { Request } from "../types/request";
-import { apiUrls } from "../config/api";
 
 const SharedRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const numericId = Number(id);
-  const { updateRequestStatus, fetchRequests } = useRequests();
-  const { user } = useAuth();
   const location = useLocation();
   const state = location.state as LocationState;
   const [request, setRequest] = useState<Request | null>(null);
-  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [imageZoom, setImageZoom] = useState(1);
-  const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [isRejecting, setIsRejecting] = useState(false);
-  const [notesError, setNotesError] = useState("");
-  const navigate = useNavigate();
-
   const isSupervisor = user?.role === "supervisor";
 
   useEffect(() => {
     const fetchRequest = async () => {
+      if (!id) return;
       setLoading(true);
       setError(null);
       try {
+        const numericId = parseInt(id, 10);
         if (isNaN(numericId)) {
           throw new Error("Invalid request ID.");
         }
@@ -52,10 +37,6 @@ const SharedRequestDetails = () => {
         }
         const data = await res.json();
         setRequest(data);
-        // If not pending, set notes to supervisor_notes from backend
-        if (data.status !== "pending" && data.supervisor_notes) {
-          setNotes(data.supervisor_notes);
-        }
       } catch (err: any) {
         setError(err.message || "Failed to load request");
       }
@@ -64,166 +45,29 @@ const SharedRequestDetails = () => {
     fetchRequest();
   }, [id]);
 
-  // Verify user has permission to view this request
-  useEffect(() => {
-    if (request && user) {
-      const hasPermission = isSupervisor 
-        ? request.supervisorId === user.id
-        : request.userId === user.id;
-      
-      if (!hasPermission) {
-        setError("You don't have permission to view this request");
-      }
-    }
-  }, [request, user, isSupervisor]);
+  if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="p-8 bg-white rounded-lg shadow-md">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p className="mt-4 text-gray-600">Loading request details...</p>
+    </div>
+  </div>;
 
-  const handleAction = async (approve: boolean) => {
-    if (!isSupervisor) return;
-
-    // Clear previous error
-    setNotesError("");
-
-    // Validate notes
-    if (!notes.trim()) {
-      setNotesError("Please enter notes before proceeding");
-      return;
-    }
-
-    if (notes.trim().length < 10) {
-      setNotesError("Notes must be at least 10 characters long");
-      return;
-    }
-
-    // Set appropriate loading state
-    if (approve) {
-      setIsApproving(true);
-    } else {
-      setIsRejecting(true);
-    }
-
-    try {
-      await updateRequestStatus(
-        id!,
-        approve ? "supervisor approved" : "supervisor rejected",
-        notes,
-        "supervisor",
-        user?.id
-      );
-      await fetchRequests();
-      navigate("/supervisor");
-    } catch {
-      alert("Failed to update request status");
-    } finally {
-      setIsApproving(false);
-      setIsRejecting(false);
-    }
-  };
-
-  // Image modal functions
-  const openImageModal = (index: number) => {
-    setCurrentImageIndex(index);
-    setShowImageModal(true);
-    setImageZoom(1);
-    setImagePan({ x: 0, y: 0 });
-  };
-
-  const closeImageModal = () => {
-    setShowImageModal(false);
-    setImageZoom(1);
-    setImagePan({ x: 0, y: 0 });
-  };
-
-  const nextImage = () => {
-    if (request?.images) {
-      const validImages = request.images.filter((img) => img);
-      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
-      setImageZoom(1);
-      setImagePan({ x: 0, y: 0 });
-    }
-  };
-
-  const prevImage = () => {
-    if (request?.images) {
-      const validImages = request.images.filter((img) => img);
-      setCurrentImageIndex(
-        (prev) => (prev - 1 + validImages.length) % validImages.length
-      );
-      setImageZoom(1);
-      setImagePan({ x: 0, y: 0 });
-    }
-  };
-
-  const zoomIn = () => {
-    setImageZoom((prev) => Math.min(prev + 0.25, 3));
-  };
-
-  const zoomOut = () => {
-    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
-  };
-
-  // Mouse drag handlers for panning
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (imageZoom > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - imagePan.x, y: e.clientY - imagePan.y });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && imageZoom > 1) {
-      setImagePan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNotes(e.target.value);
-    // Clear error when user starts typing
-    if (notesError) {
-      setNotesError("");
-    }
-  };
-
-  if (loading) return <div className="p-8 text-left">Loading...</div>;
   if (error)
-    return <div className="p-8 text-center text-red-600">Error: {error}</div>;
-  if (!request)
-    return (
-      <div className="p-8 text-center text-red-600">Request not found.</div>
-    );
+    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="p-8 bg-white rounded-lg shadow-md text-red-600">
+        <p className="font-semibold">Error: {error}</p>
+      </div>
+    </div>;
 
-  return (
-    <div className="flex items-start justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-5xl p-8 mt-10 bg-white shadow-lg md:w-4/5 rounded-xl">
-        <h2 className="flex items-center gap-2 mb-6 text-2xl font-bold text-blue-700">
-          <span>Request {request.id}</span>
-          <span
-            className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold
-            ${
-              request.status === "pending"
-                ? "bg-yellow-100 text-yellow-800"
-                : request.status === "rejected"
-                ? "bg-red-100 text-red-800"
-                : request.status.includes("approved")
-                ? "bg-green-100 text-green-800"
-                : "bg-gray-100 text-gray-800"
-            }
-          `}
-          >
-            {request.status.replace(/_/g, " ")}
-          </span>
-        </h2>
-        <form className="space-y-10">
-          {/* Vehicle & Requester Info */}
-          <div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-800">
-              Vehicle & Requester Info
+  if (!request)
+    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="p-8 bg-white rounded-lg shadow-md text-red-600">
+        <p className="font-semibold">Request not found.</p>
+      </div>
+    </div>;
+
+  return <TireRequestDetailsCard request={request} fromInquiry={state?.fromInquiry} />;
+}
             </h3>
             <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
               <div>

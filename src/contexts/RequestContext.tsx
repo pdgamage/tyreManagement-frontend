@@ -37,11 +37,21 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchRequests = useCallback(async () => {
     try {
       setIsRefreshing(true);
-      const res = await fetch(apiUrls.requests());
+      const res = await fetch(apiUrls.requests(), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+        },
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       setRequests(data);
       setLastUpdate(Date.now());
     } catch (err) {
+      console.error('Error fetching requests:', err);
       setRequests([]);
     } finally {
       setIsRefreshing(false);
@@ -83,7 +93,9 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify({ status, notes, role, userId }),
         });
 

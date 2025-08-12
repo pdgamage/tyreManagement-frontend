@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { usePolling } from "../hooks/usePolling";
 import { apiUrls } from "../config/api";
-
+import { useMsal } from "@azure/msal-react";
 import type { Request as RequestType } from "../types/request";
 
 type Request = RequestType;
@@ -29,6 +29,7 @@ const RequestContext = createContext<RequestsContextType | undefined>(
 export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { instance, accounts } = useMsal();
   const [requests, setRequests] = useState<Request[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -37,13 +38,25 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchRequests = useCallback(async () => {
     try {
       setIsRefreshing(true);
+      if (!accounts[0]) {
+        throw new Error('No active account! Please sign in first.');
+      }
+
+      const tokenRequest = {
+        scopes: ["openid", "profile", "email"],
+        account: accounts[0]
+      };
+
+      const token = await instance.acquireTokenSilent(tokenRequest);
+      
       const res = await fetch(apiUrls.requests(), {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token.accessToken}`,
         },
         credentials: 'include',
       });
+      
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -53,10 +66,16 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       console.error('Error fetching requests:', err);
       setRequests([]);
+      // If the token is expired or invalid, try to acquire it again
+      if (err instanceof Error && err.name === "InteractionRequiredAuthError") {
+        instance.acquireTokenRedirect({
+          scopes: ["openid", "profile", "email"]
+        });
+      }
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [instance, accounts]);
 
   // WebSocket disabled - using polling only for updates
 
@@ -89,11 +108,22 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       userId?: string
     ) => {
       try {
+        if (!accounts[0]) {
+          throw new Error('No active account! Please sign in first.');
+        }
+
+        const tokenRequest = {
+          scopes: ["openid", "profile", "email"],
+          account: accounts[0]
+        };
+
+        const token = await instance.acquireTokenSilent(tokenRequest);
+
         const res = await fetch(`${apiUrls.requestById(id)}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
+            "Authorization": `Bearer ${token.accessToken}`,
           },
           credentials: 'include',
           body: JSON.stringify({ status, notes, role, userId }),
@@ -108,9 +138,15 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch (error) {
         console.error("Error updating request status:", error);
         alert("Failed to update request status. Please try again.");
+        // If the token is expired or invalid, try to acquire it again
+        if (error instanceof Error && error.name === "InteractionRequiredAuthError") {
+          instance.acquireTokenRedirect({
+            scopes: ["openid", "profile", "email"]
+          });
+        }
       }
     },
-    [fetchRequests]
+    [fetchRequests, instance, accounts]
   );
 
   // Manual reconnect function

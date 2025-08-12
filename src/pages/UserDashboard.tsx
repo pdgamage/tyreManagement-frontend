@@ -117,8 +117,7 @@ const UserDashboard = () => {
     return {
       ...tireRequest,
       submittedAt: tireRequest.submittedAt || new Date().toISOString(),
-      // Only use Unknown Department if userSection is null, undefined, or empty string
-      userSection: tireRequest.userSection || tireRequest.department || "Unknown Department",
+      userSection: tireRequest.userSection || "Unknown Department",
     };
   };
 

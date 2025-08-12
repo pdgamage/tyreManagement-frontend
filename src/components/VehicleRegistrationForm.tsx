@@ -107,12 +107,13 @@ const VehicleRegistrationForm = () => {
       }
 
       try {
+        // Format the data to match the database column names
         await addVehicle({
           vehicleNumber,
           make,
           model,
           type,
-          costCentre,
+          cost_centre: costCentre, // match the database column name
           department,
           status: "active",
           registeredBy: parseInt(user.id),

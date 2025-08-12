@@ -38,23 +38,10 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setIsRefreshing(true);
       const res = await fetch(apiUrls.requests());
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('API Response:', text);
-        throw new Error(`Failed to fetch requests. Status: ${res.status}`);
-      }
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        console.error('Failed to parse JSON:', text);
-        throw new Error('Invalid JSON response from server');
-      }
+      const data = await res.json();
       setRequests(data);
       setLastUpdate(Date.now());
     } catch (err) {
-      console.error('Error fetching requests:', err);
       setRequests([]);
     } finally {
       setIsRefreshing(false);

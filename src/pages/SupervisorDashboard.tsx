@@ -5,7 +5,7 @@ import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
 i                           onView={(request) =>
                     navigate(`/supervisor/request/${request.id}`)
-                  }        navigate(`/technical-manager/request/${request.id}`)
+                  }
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}

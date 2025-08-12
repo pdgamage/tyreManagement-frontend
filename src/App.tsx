@@ -177,12 +177,36 @@ export function App() {
                 }
               />
               <Route
-                path="/engineer/*"
+                path="/engineer"
                 element={
                   <RequireAuth role="engineer">
                     <Layout>
                       <PageTransition>
                         <EngineerDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/engineer/request-details/:id"
+                element={
+                  <RequireAuth role="engineer">
+                    <Layout>
+                      <PageTransition>
+                        <RequestDetailsPage />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/engineer/inquiry-dashboard"
+                element={
+                  <RequireAuth role="engineer">
+                    <Layout>
+                      <PageTransition>
+                        <TireInquiryDashboard />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

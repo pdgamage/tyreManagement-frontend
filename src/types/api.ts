@@ -4,7 +4,7 @@ export interface Vehicle {
   make?: string;
   model?: string;
   type?: string;
-  costCentre?: string;
+  cost_centre?: string;  // match database column name
   department?: string;
   status?: string;
   registeredBy?: number;

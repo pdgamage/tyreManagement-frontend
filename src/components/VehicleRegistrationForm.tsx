@@ -107,17 +107,19 @@ const VehicleRegistrationForm = () => {
       }
 
       try {
-        // Format the data to match the database column names
-        await addVehicle({
+        // Format the data to match the database column names exactly
+        const vehicleData = {
           vehicleNumber,
           make,
           model,
           type,
-          cost_centre: costCentre, // match the database column name
+          cost_centre: costCentre, // match the exact database column name
           department,
           status: "active",
           registeredBy: parseInt(user.id),
-        });
+        };
+        console.log('Sending vehicle data:', vehicleData); // Debug log
+        await addVehicle(vehicleData);
         setSuccess(true);
         setFormLoading(false);
 

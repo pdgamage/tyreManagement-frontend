@@ -7,7 +7,6 @@ import { apiUrls } from "../config/api";
 
 const SupervisorRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
   const { user } = useAuth();
   const [request, setRequest] = useState<Request | null>(null);
@@ -31,10 +30,10 @@ const SupervisorRequestDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        if (isNaN(numericId)) {
+        if (!id) {
           throw new Error("Invalid request ID.");
         }
-        const res = await fetch(apiUrls.requestById(numericId));
+        const res = await fetch(apiUrls.requestById(id));
         if (!res.ok) {
           if (res.status === 404) {
             throw new Error("Request not found.");

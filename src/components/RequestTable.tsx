@@ -128,7 +128,7 @@ const getDescriptiveStatus = (request: Request) => {
     // Check who rejected it based on notes and decision_by fields
     if (request.supervisor_notes && request.supervisor_decision_by) {
       return "supervisor rejected";
-    } else if (request.technical_manager_note && request.technical_manager_decision_by) {
+    } else if (request.technical_manager_note && request.technical_manager_id) {
       return "technical manager rejected";
     } else if (request.engineer_note && request.engineer_decision_by) {
       return "engineer rejected";
@@ -313,6 +313,37 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
+                    {(
+                      (request.status?.toLowerCase() === "pending") ||
+                      (request.status?.toLowerCase() === "supervisor approved") ||
+                      (request.status?.toLowerCase() === "technical-manager approved") ||
+                      (request.status?.toLowerCase() === "technical manager approved")
+                    ) && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onApprove(request.id);
+                          }}
+                          className="px-4 text-emerald-600 hover:text-emerald-800"
+                          aria-label="Approve"
+                          title="Approve"
+                        >
+                          <CheckCircle2 className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onReject(request.id);
+                          }}
+                          className="px-4 text-red-600 hover:text-red-800"
+                          aria-label="Reject"
+                          title="Reject"
+                        >
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                     {showPlaceOrderButton &&
                       request.status?.toLowerCase().trim() === "complete" &&
                       !(request as any).order_placed && (

@@ -38,15 +38,17 @@ const SupervisorRequestDetails = () => {
   };
 
   const nextImage = () => {
-    if (!request?.images?.length) return;
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % request.images.length);
+    const images = request?.images;
+    if (!images?.length) return;
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     setImageZoom(1); // Reset zoom
     setImagePan({ x: 0, y: 0 }); // Reset pan
   };
 
   const prevImage = () => {
-    if (!request?.images?.length) return;
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + request.images.length) % request.images.length);
+    const images = request?.images;
+    if (!images?.length) return;
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     setImageZoom(1); // Reset zoom
     setImagePan({ x: 0, y: 0 }); // Reset pan
   };
@@ -135,7 +137,7 @@ const SupervisorRequestDetails = () => {
     try {
       if (!id) return;
       await updateRequestStatus(
-        id,
+        id, // Pass the string id as required by the function signature
         approve ? "supervisor approved" : "supervisor rejected",
         notes,
         "supervisor",

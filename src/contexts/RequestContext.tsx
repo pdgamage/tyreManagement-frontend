@@ -79,7 +79,11 @@ export const RequestProvider: React.FC<{ children: React.ReactNode }> = ({
       userId?: string
     ) => {
       try {
-        const res = await fetch(`${apiUrls.requestById(id)}/status`, {
+        const numericId = Number(id);
+        if (isNaN(numericId)) {
+          throw new Error("Invalid ID provided to updateRequestStatus");
+        }
+        const res = await fetch(`${apiUrls.requestById(numericId)}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

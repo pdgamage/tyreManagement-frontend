@@ -53,6 +53,7 @@ const SupervisorDashboard = () => {
       await fetchRequests();
     } catch (error) {
       console.error("Error fetching requests:", error);
+      alert("Failed to fetch requests. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -63,19 +64,13 @@ const SupervisorDashboard = () => {
   }, [fetchRequests]);
 
   const handleApprove = (requestId: string) => {
-    const request = supervisorRequests.find((r) => r.id === requestId);
-    if (!request) return;
-    
-    setSelectedRequest(request);
+    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
     setIsApproving(true);
     setShowNotesModal(true);
   };
 
   const handleReject = (requestId: string) => {
-    const request = supervisorRequests.find((r) => r.id === requestId);
-    if (!request) return;
-    
-    setSelectedRequest(request);
+    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
     setIsApproving(false);
     setShowNotesModal(true);
   };
@@ -86,6 +81,7 @@ const SupervisorDashboard = () => {
     try {
       setIsLoading(true);
       const status = isApproving ? "supervisor approved" : "supervisor rejected";
+      // Using spread to pass the userId as part of the options object
       await updateRequestStatus(
         selectedRequest.id,
         status,
@@ -97,7 +93,7 @@ const SupervisorDashboard = () => {
       await fetchRequestsWithLoading();
     } catch (error) {
       console.error("Error updating request status:", error);
-      // You might want to show an error message to the user here
+      alert("Failed to update request status. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -108,24 +104,19 @@ const SupervisorDashboard = () => {
     (req) => req.supervisorId === user?.id // <-- Only requests for this supervisor
   );
 
-  const pendingRequests = supervisorRequests.filter(
+  const pendingRequests = requests.filter(
     (req) => req.status === "pending"
   );
 
-  // Show approved requests done by current supervisor
-  const approvedRequests = supervisorRequests.filter(
-    (req) =>
-      req.status === "supervisor approved" &&
-      req.supervisor_decision_by === user?.id
+  const approvedRequests = requests.filter(
+    (req) => req.status === "supervisor approved"
   );
 
-  // Show rejected requests done by current supervisor only
-  const rejectedRequests = supervisorRequests.filter(
-    (req) =>
+  const rejectedRequests = requests.filter(
+    (req) => 
       req.status === "supervisor rejected" &&
       req.supervisor_notes &&
-      req.supervisor_notes.trim() !== "" &&
-      req.supervisor_decision_by === user?.id
+      req.supervisor_notes.trim() !== ""
   );
 
   // Calculate total displayed requests (only the ones shown in the dashboard)

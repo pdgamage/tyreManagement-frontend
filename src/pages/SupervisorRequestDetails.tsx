@@ -7,6 +7,7 @@ import { apiUrls } from "../config/api";
 
 const SupervisorRequestDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const numericId = Number(id);
   const { updateRequestStatus, fetchRequests } = useRequests();
   const { user } = useAuth();
   const [request, setRequest] = useState<Request | null>(null);
@@ -15,25 +16,72 @@ const SupervisorRequestDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [notesError, setNotesError] = useState("");
+  const navigate = useNavigate();
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageZoom, setImageZoom] = useState(1);
   const [imagePan, setImagePan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [isRejecting, setIsRejecting] = useState(false);
-  const [notesError, setNotesError] = useState("");
-  const navigate = useNavigate();
+
+  const openImageModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setShowImageModal(true);
+    setImageZoom(1); // Reset zoom
+    setImagePan({ x: 0, y: 0 }); // Reset pan
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+  };
+
+  const nextImage = () => {
+    if (!request?.images?.length) return;
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % request.images.length);
+    setImageZoom(1); // Reset zoom
+    setImagePan({ x: 0, y: 0 }); // Reset pan
+  };
+
+  const prevImage = () => {
+    if (!request?.images?.length) return;
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + request.images.length) % request.images.length);
+    setImageZoom(1); // Reset zoom
+    setImagePan({ x: 0, y: 0 }); // Reset pan
+  };
+
+  const zoomIn = () => setImageZoom(zoom => Math.min(zoom + 0.2, 3));
+  const zoomOut = () => setImageZoom(zoom => Math.max(zoom - 0.2, 0.5));
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - imagePan.x, y: e.clientY - imagePan.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      setImagePan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
 
   useEffect(() => {
     const fetchRequest = async () => {
       setLoading(true);
       setError(null);
       try {
-        if (!id) {
+        if (isNaN(numericId)) {
           throw new Error("Invalid request ID.");
         }
-        const res = await fetch(apiUrls.requestById(id));
+        const res = await fetch(apiUrls.requestById(numericId));
         if (!res.ok) {
           if (res.status === 404) {
             throw new Error("Request not found.");
@@ -77,8 +125,9 @@ const SupervisorRequestDetails = () => {
     }
 
     try {
+      if (!id) return;
       await updateRequestStatus(
-        id!,
+        id,
         approve ? "supervisor approved" : "supervisor rejected",
         notes,
         "supervisor",
@@ -92,69 +141,6 @@ const SupervisorRequestDetails = () => {
       setIsApproving(false);
       setIsRejecting(false);
     }
-  };
-
-  // Image modal functions
-  const openImageModal = (index: number) => {
-    setCurrentImageIndex(index);
-    setShowImageModal(true);
-    setImageZoom(1);
-    setImagePan({ x: 0, y: 0 });
-  };
-
-  const closeImageModal = () => {
-    setShowImageModal(false);
-    setImageZoom(1);
-    setImagePan({ x: 0, y: 0 });
-  };
-
-  const nextImage = () => {
-    if (request?.images) {
-      const validImages = request.images.filter((img) => img);
-      setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
-      setImageZoom(1);
-      setImagePan({ x: 0, y: 0 });
-    }
-  };
-
-  const prevImage = () => {
-    if (request?.images) {
-      const validImages = request.images.filter((img) => img);
-      setCurrentImageIndex(
-        (prev) => (prev - 1 + validImages.length) % validImages.length
-      );
-      setImageZoom(1);
-      setImagePan({ x: 0, y: 0 });
-    }
-  };
-
-  const zoomIn = () => {
-    setImageZoom((prev) => Math.min(prev + 0.25, 3));
-  };
-
-  const zoomOut = () => {
-    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
-  };
-
-  // Mouse drag handlers for panning
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (imageZoom > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - imagePan.x, y: e.clientY - imagePan.y });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && imageZoom > 1) {
-      setImagePan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
   };
 
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -400,305 +386,181 @@ const SupervisorRequestDetails = () => {
                   Total Price (LKR)
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.totalPrice
-                    ? `LKR ${Number(request.totalPrice).toLocaleString()}`
-                    : "N/A"}
+                  {request.totalPrice?.toLocaleString() || "N/A"}
                 </div>
               </div>
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
-                  Warranty Distance (KM)
+                  Selected Supplier
                 </label>
                 <div className="p-2 bg-white rounded">
-                  {request.warrantyDistance
-                    ? `${Number(request.warrantyDistance).toLocaleString()} KM`
-                    : "N/A"}
-                </div>
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
-                  Tire Wear Indicator Appeared
-                </label>
-                <div className="p-2 bg-white rounded">
-                  {request.tireWearIndicatorAppeared !== undefined
-                    ? request.tireWearIndicatorAppeared
-                      ? "Yes"
-                      : "No"
-                    : "N/A"}
+                  {(request as any).selectedSupplier || "N/A"}
                 </div>
               </div>
             </div>
           </div>
           <hr />
-          {/* Images Section with error handling */}
-          {request.images && request.images.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-800">
-                Images
-              </h3>
-              <div className="flex flex-wrap gap-3 p-4 mt-2 rounded-lg bg-gray-50">
-                {request.images.map((img, idx) =>
-                  img ? (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`Tire image ${idx + 1}`}
-                      className="object-cover w-24 h-24 transition-opacity border rounded cursor-pointer hover:opacity-80"
-                      onClick={() => openImageModal(idx)}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://via.placeholder.com/96?text=Image+Not+Found";
-                      }}
-                    />
-                  ) : null
-                )}
-              </div>
-            </div>
-          )}
-          <hr />
-          {/* Supervisor Notes */}
+
+          {/* Attached Images */}
           <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Supervisor Notes <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              className={`w-full p-2 mt-1 border rounded ${
-                notesError
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-gray-300"
-              }`}
-              placeholder="Enter notes (minimum 10 characters)..."
-              value={notes}
-              onChange={handleNotesChange}
-              rows={3}
-              readOnly={request.status !== "pending"} // Make read-only if not pending
-            />
-            {notesError && (
-              <p className="mt-1 text-sm text-red-600">{notesError}</p>
-            )}
-            {request.status === "pending" && (
-              <p className="mt-1 text-sm text-gray-500">
-                Please provide detailed notes for your decision (minimum 10
-                characters)
-              </p>
-            )}
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Attached Images
+            </h3>
+            <div className="grid grid-cols-2 gap-4 p-6 rounded-lg md:grid-cols-4 bg-gray-50">
+              {request.images && request.images.filter((img) => img).length > 0 ? (
+                request.images
+                  .filter((img) => img)
+                  .map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative w-full h-48 overflow-hidden rounded-lg cursor-pointer group"
+                      onClick={() => openImageModal(index)}
+                    >
+                      <img
+                        src={image}
+                        alt={`Request attachment ${index + 1}`}
+                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100">
+                        <span className="text-lg text-white">View</span>
+                      </div>
+                    </div>
+                  ))
+              ) : (
+                <p className="col-span-full">No images attached.</p>
+              )}
+            </div>
           </div>
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-6">
-            {request.status === "pending" && (
-              <>
-                <button
-                  type="button"
-                  className="px-6 py-2 text-white transition bg-green-600 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => handleAction(true)}
-                  disabled={isApproving || isRejecting}
-                >
-                  {isApproving ? "Approving..." : "Approve"}
-                </button>
-                <button
-                  type="button"
-                  className="px-6 py-2 text-white transition bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => setShowRejectConfirm(true)}
-                  disabled={isApproving || isRejecting}
-                >
-                  Reject
-                </button>
-              </>
-            )}
+          <hr />
+
+          {/* Notes & Actions */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Notes & Actions
+            </h3>
+            <div className="p-6 rounded-lg bg-gray-50">
+              <label className="block mb-2 font-semibold text-gray-700">
+                Supervisor Notes
+              </label>
+              <textarea
+                value={notes}
+                onChange={handleNotesChange}
+                className={`w-full p-2 border rounded ${
+                  notesError ? "border-red-500" : "border-gray-300"
+                }`}
+                rows={4}
+                placeholder="Enter your notes here..."
+                disabled={request.status !== "pending"}
+              />
+              {notesError && (
+                <p className="mt-2 text-sm text-red-600">{notesError}</p>
+              )}
+
+              {request.status === "pending" && (
+                <div className="flex justify-end mt-4 space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => handleAction(true)}
+                    disabled={isApproving || isRejecting}
+                    className="px-6 py-2 font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+                  >
+                    {isApproving ? "Approving..." : "Approve"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowRejectConfirm(true)}
+                    disabled={isApproving || isRejecting}
+                    className="px-6 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-gray-400"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Back Button */}
+          <div className="flex justify-center mt-8">
             <button
               type="button"
-              className="px-6 py-2 transition bg-gray-300 rounded hover:bg-gray-400"
-              onClick={() => navigate("/supervisor")}
+              onClick={() => navigate(-1)}
+              className="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             >
-              Cancel
+              Back to Dashboard
             </button>
           </div>
         </form>
+      </div>
+
         {/* Reject Confirmation Modal */}
         {showRejectConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-lg">
-              <h3 className="mb-4 text-lg font-semibold text-red-700">
-                Confirm Rejection
-              </h3>
-              <p className="mb-6">
-                Are you sure you want to reject this request?
-              </p>
-              <div className="flex justify-end gap-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="p-8 bg-white rounded-lg shadow-xl">
+              <h3 className="mb-4 text-lg font-bold">Confirm Rejection</h3>
+              <p>Are you sure you want to reject this request?</p>
+              <div className="flex justify-end mt-6 space-x-4">
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowRejectConfirm(false)}
-                  disabled={isRejecting}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
                     setShowRejectConfirm(false);
                     handleAction(false);
                   }}
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
                   disabled={isRejecting}
                 >
-                  {isRejecting ? "Rejecting..." : "Yes, Reject"}
+                  {isRejecting ? "Rejecting..." : "Confirm Reject"}
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Image Modal */}
-        {showImageModal && request?.images && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-95">
-            {/* Close button */}
-            <button
-              onClick={closeImageModal}
-              className="absolute z-20 p-3 text-white transition-all bg-black rounded-full bg-opacity-70 top-4 right-4 hover:bg-opacity-90"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Zoom controls */}
-            <div className="absolute z-20 flex gap-2 top-4 left-4">
-              <button
-                onClick={zoomOut}
-                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
-                title="Zoom Out"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 12H4"
-                  />
-                </svg>
-              </button>
-              <span className="px-4 py-3 text-sm font-medium text-white bg-black rounded-full bg-opacity-70">
-                {Math.round(imageZoom * 100)}%
-              </span>
-              <button
-                onClick={zoomIn}
-                className="p-3 text-white transition-all bg-black rounded-full bg-opacity-70 hover:bg-opacity-90"
-                title="Zoom In"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              </button>
+      {/* Image Modal */}
+      {showImageModal && request?.images && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
+          <div className="relative max-w-4xl max-h-full p-4">
+            <button onClick={closeImageModal} className="absolute top-0 right-0 z-50 p-2 m-4 text-white bg-gray-800 rounded-full hover:bg-gray-700">&times;</button>
+            
+            {/* Image Controls */}
+            <div className="absolute z-50 flex space-x-2 bottom-4 left-1/2 -translate-x-1/2">
+                <button onClick={zoomIn} className="px-4 py-2 text-white bg-gray-800 rounded-lg">Zoom In</button>
+                <button onClick={zoomOut} className="px-4 py-2 text-white bg-gray-800 rounded-lg">Zoom Out</button>
             </div>
 
-            {/* Navigation arrows - Always visible with higher z-index */}
-            {request.images.filter((img) => img).length > 1 && (
+            {/* Image Navigation */}
+            {request.images.length > 1 && (
               <>
-                <button
-                  onClick={prevImage}
-                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 left-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
-                >
-                  <svg
-                    className="w-8 h-8"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute z-30 p-4 text-white transition-all transform -translate-y-1/2 bg-black rounded-full bg-opacity-70 right-6 top-1/2 hover:bg-opacity-90 hover:scale-110"
-                >
-                  <svg
-                    className="w-8 h-8"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
+                <button onClick={prevImage} className="absolute left-0 z-50 p-4 text-white -translate-y-1/2 top-1/2">&#10094;</button>
+                <button onClick={nextImage} className="absolute right-0 z-50 p-4 text-white -translate-y-1/2 top-1/2">&#10095;</button>
               </>
             )}
 
-            {/* Image container */}
-            <div
-              className="flex items-center justify-center w-full h-full overflow-hidden"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              style={{
-                cursor:
-                  imageZoom > 1
-                    ? isDragging
-                      ? "grabbing"
-                      : "grab"
-                    : "default",
-              }}
-            >
-              <img
-                src={request.images.filter((img) => img)[currentImageIndex]}
-                alt={`Tire image ${currentImageIndex + 1}`}
-                className="object-contain max-w-full max-h-full transition-transform duration-200 select-none"
-                style={{
-                  transform: `scale(${imageZoom}) translate(${
-                    imagePan.x / imageZoom
-                  }px, ${imagePan.y / imageZoom}px)`,
-                  transformOrigin: "center center",
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://via.placeholder.com/800x600?text=Image+Not+Found";
-                }}
-                draggable={false}
-              />
+            <div className='overflow-hidden' onMouseUp={handleMouseUp}>
+                <img
+                    src={request.images[currentImageIndex]}
+                    alt={`viewing attachment ${currentImageIndex + 1}`}
+                    className={`transition-transform duration-200 ease-out ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    style={{
+                        transform: `scale(${imageZoom}) translate(${imagePan.x}px, ${imagePan.y}px)`,
+                        maxWidth: '90vw',
+                        maxHeight: '90vh',
+                    }}
+                    onMouseDown={handleMouseDown}
+                />
             </div>
 
-            {/* Image counter */}
-            <div className="absolute z-20 px-4 py-2 text-sm font-medium text-white transform -translate-x-1/2 bg-black rounded-full bg-opacity-70 bottom-6 left-1/2">
-              {currentImageIndex + 1} of{" "}
-              {request.images.filter((img) => img).length}
+            {/* Image Counter */}
+            <div className="absolute bottom-4 right-4 text-white bg-black bg-opacity-50 px-2 py-1 rounded">
+              {currentImageIndex + 1} / {request.images.length}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

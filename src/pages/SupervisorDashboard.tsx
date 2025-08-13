@@ -3,29 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
-import { Request } from "../types/request";
 import { useAuth } from "../contexts/AuthContext";
 
-interface RequestsContextType {
-  requests: Request[];
-  fetchRequests: () => void;
-  updateRequestStatus: (
-    id: string,
-    status: string,
-    notes: string,
-    role: string
-  ) => Promise<void>;
-}
-
 const SupervisorDashboard = () => {
-  const { requests, fetchRequests, updateRequestStatus } =
-    useRequests() as RequestsContextType & { updateRequestStatus: (
-      id: string,
-      status: string,
-      notes: string,
-      role: string,
-      userId?: string
-    ) => Promise<void> };
+  const { requests, fetchRequests } = useRequests();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
     "requests"
@@ -33,12 +14,7 @@ const SupervisorDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
-  const [notes, setNotes] = useState("");
-  const [isApproving, setIsApproving] = useState(false);
-  const [isRejecting, setIsRejecting] = useState(false);
-  const [showNotesModal, setShowNotesModal] = useState(false);
-  const [notesError, setNotesError] = useState("");
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,51 +62,6 @@ const SupervisorDashboard = () => {
 
   // Calculate total displayed requests (only the ones shown in the dashboard)
   const totalDisplayedRequests = pendingRequests.length + approvedRequests.length + rejectedRequests.length;
-
-  // Handlers for approve/reject similar to TechnicalManagerDashboard
-  const handleApprove = (requestId: string) => {
-    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
-    setIsApproving(true);
-    setIsRejecting(false);
-    setShowNotesModal(true);
-  };
-
-  const handleReject = (requestId: string) => {
-    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
-    setIsApproving(false);
-    setIsRejecting(true);
-    setShowNotesModal(true);
-  };
-
-  const handleNotesSubmit = async () => {
-    if (!selectedRequest) return;
-    setNotesError("");
-
-    if (!notes.trim()) {
-      setNotesError("Please enter notes before proceeding");
-      return;
-    }
-    if (notes.trim().length < 10) {
-      setNotesError("Notes must be at least 10 characters long");
-      return;
-    }
-
-    try {
-      await updateRequestStatus(
-        selectedRequest.id,
-        isApproving ? "supervisor approved" : "supervisor rejected",
-        notes,
-        "supervisor",
-        user?.id
-      );
-      setShowNotesModal(false);
-      setSelectedRequest(null);
-      setNotes("");
-      await fetchRequests();
-    } catch (e) {
-      alert("Failed to update request status");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -328,8 +259,8 @@ const SupervisorDashboard = () => {
                 <RequestTable
                   requests={pendingRequests}
                   title=""
-                  onApprove={handleApprove}
-                  onReject={handleReject}
+                  onApprove={() => {}}
+                  onReject={() => {}}
                   onView={(request) =>
                     navigate(`/supervisor/request/${request.id}`)
                   }
@@ -439,60 +370,7 @@ const SupervisorDashboard = () => {
           </div>
         )}
       </main>
-      {showNotesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-lg p-6 bg-white rounded-xl shadow-2xl">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              {isApproving ? "Approve Request" : "Reject Request"}
-            </h3>
-            <p className="text-sm text-gray-600 mb-2">
-              Add notes for this decision (min 10 characters)
-            </p>
-            <textarea
-              className={`w-full h-28 p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                notesError ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300"
-              }`}
-              value={notes}
-              onChange={(e) => {
-                setNotes(e.target.value);
-                if (notesError) setNotesError("");
-              }}
-              placeholder="Enter your notes here..."
-            />
-            {notesError && (
-              <div className="mt-2 text-sm text-red-600">{notesError}</div>
-            )}
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowNotesModal(false);
-                  setSelectedRequest(null);
-                  setNotes("");
-                  setNotesError("");
-                  setIsApproving(false);
-                  setIsRejecting(false);
-                }}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleNotesSubmit}
-                disabled={isApproving || isRejecting}
-                className={`px-4 py-2 rounded-lg text-white ${
-                  isApproving
-                    ? "bg-emerald-600 hover:bg-emerald-700"
-                    : "bg-red-600 hover:bg-red-700"
-                } disabled:opacity-60 disabled:cursor-not-allowed`}
-              >
-                {isApproving ? "Confirm Approve" : "Confirm Reject"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };

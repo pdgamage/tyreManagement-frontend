@@ -3,10 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
+import { Request } from "../types/request";
 import { useAuth } from "../contexts/AuthContext";
 
+interface RequestsContextType {
+  requests: Request[];
+  fetchRequests: () => void;
+  updateRequestStatus: (
+    id: string,
+    status: string,
+    notes: string,
+    role: string
+  ) => Promise<void>;
+}
+
 const SupervisorDashboard = () => {
-  const { requests, fetchRequests } = useRequests();
+  const { requests, fetchRequests } = useRequests() as RequestsContextType;
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"requests" | "reports">(
     "requests"
@@ -14,7 +26,6 @@ const SupervisorDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,10 +43,7 @@ const SupervisorDashboard = () => {
   }, []);
 
   useEffect(() => {
-    console.log("SupervisorDashboard: Fetching requests...");
-    fetchRequests()
-      .then(() => console.log("SupervisorDashboard: Requests fetched successfully."))
-      .catch(err => console.error("SupervisorDashboard: Error fetching requests:", err));
+    fetchRequests();
   }, [fetchRequests]);
 
   // Filter requests for this supervisor only
@@ -269,9 +277,8 @@ const SupervisorDashboard = () => {
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={true}
+                  showActions={false}
                   showPlaceOrderButton={false}
-                  showDeleteButton={false}
                 />
               </div>
             </div>
@@ -308,7 +315,6 @@ const SupervisorDashboard = () => {
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
                   showActions={false}
-                  showDeleteButton={false}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -346,7 +352,6 @@ const SupervisorDashboard = () => {
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
                   showActions={false}
-                  showDeleteButton={false}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -373,13 +378,8 @@ const SupervisorDashboard = () => {
           </div>
         )}
       </main>
-
     </div>
   );
 };
 
 export default SupervisorDashboard;
-
-// Notes Modal UI
-// Placed at the end to keep component concise; could be refactored if needed
-// Render modal portal within the component's return if showNotesModal is true

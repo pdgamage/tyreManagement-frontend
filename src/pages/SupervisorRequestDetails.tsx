@@ -88,10 +88,18 @@ const SupervisorRequestDetails = () => {
           }
           throw new Error("Failed to fetch request.");
         }
-        const data = await res.json();
-        setRequest(data);
+        const text = await res.text();
+        console.log("SupervisorRequestDetails: Raw response from server:", text);
+        let data;
+        try {
+          data = JSON.parse(text);
+          setRequest(data);
+        } catch (jsonError) {
+          console.error("SupervisorRequestDetails: Failed to parse JSON:", jsonError);
+          throw new Error("Invalid JSON response from server.");
+        }
         // If not pending, set notes to supervisor_notes from backend
-        if (data.status !== "pending" && data.supervisor_notes) {
+        if (data && data.status !== "pending" && data.supervisor_notes) {
           setNotes(data.supervisor_notes);
         }
       } catch (err: any) {

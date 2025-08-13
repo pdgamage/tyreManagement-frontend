@@ -32,7 +32,10 @@ const SupervisorDashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchRequests();
+    console.log("SupervisorDashboard: Fetching requests...");
+    fetchRequests()
+      .then(() => console.log("SupervisorDashboard: Requests fetched successfully."))
+      .catch(err => console.error("SupervisorDashboard: Error fetching requests:", err));
   }, [fetchRequests]);
 
   // Filter requests for this supervisor only

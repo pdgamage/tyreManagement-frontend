@@ -5,6 +5,7 @@ import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
 import { useAuth } from "../contexts/AuthContext";
+import { CheckCircle2, XCircle, Clock } from "lucide-react";
 
 interface RequestsContextType {
   requests: Request[];
@@ -18,14 +19,17 @@ interface RequestsContextType {
 }
 
 const SupervisorDashboard = () => {
-  const { requests, fetchRequests } = useRequests() as RequestsContextType;
+  const { requests, fetchRequests, updateRequestStatus } = useRequests() as RequestsContextType;
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
-    "requests"
-  );
+  const [activeTab, setActiveTab] = useState<"requests" | "reports">("requests");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
+  const [notes, setNotes] = useState("");
+  const [isApproving, setIsApproving] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,9 +46,52 @@ const SupervisorDashboard = () => {
     };
   }, []);
 
+  const fetchRequestsWithLoading = async () => {
+    setIsLoading(true);
+    try {
+      await fetchRequests();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchRequests();
+    fetchRequestsWithLoading();
   }, [fetchRequests]);
+
+  const handleApprove = (requestId: string) => {
+    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
+    setIsApproving(true);
+    setShowNotesModal(true);
+  };
+
+  const handleReject = (requestId: string) => {
+    setSelectedRequest(requests.find((r) => r.id === requestId) || null);
+    setIsApproving(false);
+    setShowNotesModal(true);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!selectedRequest) return;
+    
+    try {
+      setIsLoading(true);
+      const status = isApproving ? "supervisor approved" : "supervisor rejected";
+      await updateRequestStatus(
+        selectedRequest.id,
+        status,
+        notes,
+        "supervisor"
+      );
+      setShowNotesModal(false);
+      setNotes("");
+      await fetchRequests();
+    } catch (error) {
+      console.error("Error updating request status:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Filter requests for this supervisor only
   const supervisorRequests = requests.filter(
@@ -76,6 +123,60 @@ const SupervisorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Notes Modal */}
+      {showNotesModal && selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">
+              {isApproving ? 'Approve Request' : 'Reject Request'}
+            </h3>
+            <p className="mb-4">
+              {isApproving
+                ? 'Please add any notes for this approval:'
+                : 'Please provide a reason for rejection:'}
+            </p>
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-lg mb-4 h-32"
+              placeholder={isApproving ? 'Optional notes...' : 'Reason for rejection...'}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              required={!isApproving}
+            />
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowNotesModal(false);
+                  setNotes('');
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                className={`px-4 py-2 text-white rounded-lg transition-colors ${
+                  isApproving
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : 'bg-red-500 hover:bg-red-600'
+                }`}
+                disabled={isLoading || (!isApproving && !notes.trim())}
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Processing...
+                  </div>
+                ) : isApproving ? (
+                  'Approve'
+                ) : (
+                  'Reject'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Professional Header with Enhanced Design */}
       <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -270,14 +371,14 @@ const SupervisorDashboard = () => {
                 <RequestTable
                   requests={pendingRequests}
                   title=""
-                  onApprove={() => {}}
-                  onReject={() => {}}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                   onView={(request) =>
                     navigate(`/supervisor/request-details/${request.id}`)
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={false}
+                  showActions={true}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -314,7 +415,7 @@ const SupervisorDashboard = () => {
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={false}
+                  showActions={true}
                   showPlaceOrderButton={false}
                 />
               </div>
@@ -351,7 +452,7 @@ const SupervisorDashboard = () => {
                   }
                   onDelete={() => {}}
                   onPlaceOrder={() => {}}
-                  showActions={false}
+                  showActions={true}
                   showPlaceOrderButton={false}
                 />
               </div>

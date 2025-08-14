@@ -358,7 +358,9 @@ const UserRequestDetails = () => {
                   Total Price
                 </label>
                 <div className="p-2 bg-gray-100 rounded">
-                  {request.totalPrice ? `LKR ${request.totalPrice.toLocaleString()}` : "N/A"}
+                  {request.totalPrice
+                    ? `LKR ${request.totalPrice.toLocaleString()}`
+                    : "N/A"}
                 </div>
               </div>
               <div>
@@ -366,7 +368,9 @@ const UserRequestDetails = () => {
                   Warranty Distance
                 </label>
                 <div className="p-2 bg-gray-100 rounded">
-                  {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : "N/A"}
+                  {request.warrantyDistance
+                    ? `${request.warrantyDistance.toLocaleString()} KM`
+                    : "N/A"}
                 </div>
               </div>
             </div>
@@ -577,8 +581,8 @@ const UserRequestDetails = () => {
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg">
                 {request.images.map((image, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="relative group cursor-pointer"
                     onClick={() => openImageModal(index)}
                   >
@@ -600,7 +604,7 @@ const UserRequestDetails = () => {
 
           {/* Update Button */}
           {canEdit() && hasChanges && (
-            <div className="flex justify-end mt-8">
+            <div className="flex justify-start mt-8">
               <button
                 onClick={handleUpdateRequest}
                 disabled={isUpdating}

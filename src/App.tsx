@@ -22,7 +22,6 @@ import TechnicalManagerRequestDetails from "./pages/TechnicalManagerRequestDetai
 import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
-import SharedRequestDetails from "./pages/SharedRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
@@ -254,7 +253,7 @@ export function App() {
                   <RequireAuth role="supervisor">
                     <Layout>
                       <PageTransition>
-                        <SharedRequestDetails />
+                        <SupervisorRequestDetails />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

@@ -2,7 +2,7 @@
 export const API_CONFIG = {
   BASE_URL:
     import.meta.env.VITE_API_BASE_URL ||
-    "https://tyremanagement-backend-production-8fed.up.railway.app",
+    "http://tyremanagement-backend-production-b135.up.railway.app",
   ENDPOINTS: {
     // User endpoints
     USERS: "/api/users",

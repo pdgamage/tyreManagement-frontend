@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import ReactDOM from 'react-dom/client';
 import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import PlaceOrderModal from "../components/PlaceOrderModal";
+import ReceiptTemplate from "../components/ReceiptTemplate";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { apiUrls } from "../config/api";
 import {
   UserCircle,
-  ChevronDown,
   LogOut,
   ShoppingCart,
   BarChart3,
@@ -94,6 +95,37 @@ const CustomerOfficerDashboard = () => {
   const handlePlaceOrder = (request: Request) => {
     setOrderRequest(request);
     setShowPlaceOrderModal(true);
+  };
+
+  const handleDownloadReceipt = async (request: Request) => {
+    try {
+      const response = await fetch(apiUrls.getReceiptByOrder(request.id));
+      if (response.ok) {
+        const receiptData = await response.json();
+        const modalContainer = document.createElement('div');
+        modalContainer.style.position = 'fixed';
+        modalContainer.style.zIndex = '9999';
+        modalContainer.style.inset = '0';
+        modalContainer.id = 'receipt-modal-container';
+        document.body.appendChild(modalContainer);
+
+        // Create a root and render the ReceiptTemplate component
+        const root = ReactDOM.createRoot(modalContainer);
+        root.render(
+          <ReceiptTemplate 
+            receipt={receiptData} 
+            onClose={() => {
+              root.unmount();
+              modalContainer.remove();
+            }}
+          />
+        );
+      } else {
+        console.error('Failed to fetch receipt');
+      }
+    } catch (error) {
+      console.error('Error downloading receipt:', error);
+    }
   };
 
   const handleOrderPlaced = async () => {
@@ -418,6 +450,7 @@ const CustomerOfficerDashboard = () => {
                     onDelete={handleDelete}
                     onPlaceOrder={handlePlaceOrder}
                     onCancelOrder={handleCancelOrder}
+                    onDownloadReceipt={handleDownloadReceipt}
                     showActions={true}
                     showPlaceOrderButton={true}
                     showCancelButton={true}

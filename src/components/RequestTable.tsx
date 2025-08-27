@@ -10,12 +10,39 @@ import {
   Eye,
   ShoppingCart,
   X,
+  Download,
 } from "lucide-react";
 import type { Request } from "../types/request";
 
 const getStatusStyles = (status: string) => {
-  switch (status?.toLowerCase()) {
-    case "pending":
+  switch (status?.toLowerCase()) {                      {showPlaceOrderButton &&
+                      request.status?.toLowerCase().trim() === "complete" &&
+                      !(request as any).order_placed && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onPlaceOrder(request);
+                          }}
+                          className="px-4 text-gray-500 hover:text-green-700"
+                          aria-label="Place Order"
+                          title="Place Order"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                        </button>
+                      )}
+                      {request.status?.toLowerCase() === "order placed" && onDownloadReceipt && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDownloadReceipt(request);
+                          }}
+                          className="px-4 text-gray-500 hover:text-blue-700"
+                          aria-label="Download Receipt"
+                          title="Download Receipt"
+                        >
+                          <Download className="w-5 h-5" />
+                        </button>
+                      )}ding":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -147,10 +174,11 @@ interface RequestTableProps {
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
   onCancelOrder?: (id: string) => void;
+  onDownloadReceipt?: (request: Request) => void; // New prop for downloading receipt
   showActions?: boolean;
-  showPlaceOrderButton?: boolean; // New prop to control place order button visibility
-  showCancelButton?: boolean; // New prop to control cancel order button visibility
-  showDeleteButton?: boolean; // New prop to control delete button visibility
+  showPlaceOrderButton?: boolean;
+  showCancelButton?: boolean;
+  showDeleteButton?: boolean;
 }
 
 const RequestTable: React.FC<RequestTableProps> = ({
@@ -162,10 +190,11 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onDelete,
   onPlaceOrder,
   onCancelOrder,
+  onDownloadReceipt,
   showActions = true,
-  showPlaceOrderButton = false, // Default to false for security
-  showCancelButton = false, // Default to false for security
-  showDeleteButton = true, // Default to true for backward compatibility
+  showPlaceOrderButton = false,
+  showCancelButton = false,
+  showDeleteButton = true
 }) => {
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -376,11 +405,24 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <X className="w-5 h-5" />
                         </button>
                       )}
+                    {request.status?.toLowerCase() === "order placed" && onDownloadReceipt && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDownloadReceipt(request);
+                        }}
+                        className="px-4 text-gray-500 hover:text-blue-700"
+                        aria-label="Download Receipt"
+                        title="Download Receipt"
+                      >
+                        <Download className="w-5 h-5" />
+                      </button>
+                    )}
                     {showDeleteButton && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDelete(request.id); // <-- Remove window.confirm, just call onDelete
+                          onDelete(request.id);
                         }}
                         className="px-4 text-gray-500 hover:text-red-700"
                         aria-label="Delete"

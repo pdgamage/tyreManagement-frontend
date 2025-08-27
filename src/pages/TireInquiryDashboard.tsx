@@ -416,8 +416,8 @@ const UserInquiryDashboard: React.FC = () => {
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry Dashboard</h1>
-                <p className="text-blue-100 opacity-90">Track and manage your tire requests and inquiries</p>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Inquiry and Reports</h1>
+                <p className="text-blue-100 opacity-90">Track, manage and export your tire requests and reports</p>
               </div>
             </div>
           </div>

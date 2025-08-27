@@ -75,8 +75,10 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               <div className="text-right">
                 <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
                 <p className="text-gray-600 mt-2">Receipt #: {receipt.receiptNumber}</p>
-                <p className="text-gray-600">Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
+                <p className="text-gray-600">Generated Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
                 <p className="text-gray-600">Order #: {receipt.orderId}</p>
+                <p className="text-gray-600">Submitted Date: {new Date(receipt.submittedDate).toLocaleDateString()}</p>
+                <p className="text-gray-600">Order Placed Date: {new Date(receipt.orderPlacedDate).toLocaleDateString()}</p>
               </div>
             </div>
 

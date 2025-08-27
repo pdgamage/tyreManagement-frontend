@@ -16,6 +16,8 @@ export interface Receipt {
   supplierAddress?: string;
   items: ReceiptItem[];
   notes?: string;
+  submittedDate: string;
+  orderPlacedDate: string;
 }
 
 export interface ReceiptItem {

@@ -59,5 +59,4 @@ export interface Request {
   supplierName?: string;
   supplierPhone?: string;
   supplierEmail?: string;
-  supplierAddress?: string;
 }

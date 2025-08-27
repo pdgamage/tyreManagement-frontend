@@ -367,14 +367,6 @@ const CustomerOfficerRequestDetails = () => {
                   {request.supplierEmail || "N/A"}
                 </div>
               </div>
-              <div>
-                <label className="block mb-1 font-semibold text-gray-700">
-                  Supplier Address
-                </label>
-                <div className="p-2 bg-white rounded">
-                  {request.supplierAddress || "N/A"}
-                </div>
-              </div>
             </div>
           </div>
           <hr />

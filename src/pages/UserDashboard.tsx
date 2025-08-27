@@ -550,6 +550,7 @@ const UserDashboard = () => {
                   showActions={true}
                   showPlaceOrderButton={false}
                   showCancelButton={false}
+                  showDeleteButton={true}
                 />
               ) : (
                 <div className="text-center py-12">

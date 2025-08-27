@@ -313,12 +313,14 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    {(
-                      (request.status?.toLowerCase() === "pending") ||
-                      (request.status?.toLowerCase() === "supervisor approved") ||
-                      (request.status?.toLowerCase() === "technical-manager approved") ||
-                      (request.status?.toLowerCase() === "technical manager approved")
-                    ) && (
+                    {/* Hide approve/reject buttons for users, only show for specific roles */}
+                    {(window.location.pathname.includes('/supervisor/') || 
+                      window.location.pathname.includes('/technical-manager/') ||
+                      window.location.pathname.includes('/engineer/')) && 
+                      (request.status?.toLowerCase() === "pending" ||
+                       request.status?.toLowerCase() === "supervisor approved" ||
+                       request.status?.toLowerCase() === "technical-manager approved" ||
+                       request.status?.toLowerCase() === "technical manager approved") && (
                       <>
                         <button
                           onClick={(e) => {

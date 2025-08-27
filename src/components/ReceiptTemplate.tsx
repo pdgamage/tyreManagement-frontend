@@ -92,9 +92,8 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto pt-20 pb-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <div id="receipt-template" className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-10 print:shadow-none">
-              <div className="max-w-3xl mx-auto">
+          <div id="receipt-template" className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-10 print:shadow-none">
+            <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-start">
                   <div className="mt-4">
@@ -244,6 +243,7 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               <p className="text-center text-gray-500 text-sm">
                 Thank you for your business!
               </p>
+              </div>
             </div>
           </div>
         </div>

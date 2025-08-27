@@ -10,7 +10,7 @@ import {
   Eye,
   ShoppingCart,
   X,
-  Download,
+
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -148,7 +148,7 @@ interface RequestTableProps {
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
   onCancelOrder?: (id: string) => void;
-  onDownloadReceipt?: (request: Request) => void; // New prop for downloading receipt
+
   showActions?: boolean;
   showPlaceOrderButton?: boolean;
   showCancelButton?: boolean;
@@ -164,7 +164,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onDelete,
   onPlaceOrder,
   onCancelOrder,
-  onDownloadReceipt,
+
   showActions = true,
   showPlaceOrderButton = false,
   showCancelButton = false,
@@ -379,25 +379,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <X className="w-5 h-5" />
                         </button>
                       )}
-                    {request.status?.toLowerCase() === "order placed" && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Download button clicked');
-                          console.log('Request:', request);
-                          if (onDownloadReceipt) {
-                            onDownloadReceipt(request);
-                          } else {
-                            console.error('onDownloadReceipt is not defined');
-                          }
-                        }}
-                        className="inline-flex items-center justify-center px-4 py-2 text-gray-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
-                        aria-label="Download Receipt"
-                        title="Download Receipt"
-                      >
-                        <Download className="w-5 h-5" />
-                      </button>
-                    )}
+
                     {showDeleteButton && (
                       <button
                         onClick={(e) => {

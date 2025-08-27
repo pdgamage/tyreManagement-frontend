@@ -65,47 +65,82 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
           )}
         </div>
 
-        <div id="receipt-template" className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-10 print:shadow-none">
-          <div className="max-w-3xl mx-auto">
-            {/* Header */}
-            <div className="flex justify-between items-start">
-              <div className="mt-4">
-                <h2 className="text-2xl font-bold text-gray-900">SLT Mobitel Tire Management</h2>
-              </div>
-              <div className="text-right">
-                <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
-                <p className="text-gray-600 mt-2">Receipt #: {receipt.receiptNumber}</p>
-                <p className="text-gray-600">Generated Date: {receipt.dateGenerated ? new Date(receipt.dateGenerated).toLocaleDateString() : 'N/A'}</p>
-                <p className="text-gray-600">Request #: {receipt.requestId || receipt.orderId}</p>
-                <p className="text-gray-600">Order #: {receipt.orderNumber || 'N/A'}</p>
-                <p className="text-gray-600">Submitted Date: {receipt.submittedDate ? new Date(receipt.submittedDate).toLocaleDateString() : 'N/A'}</p>
-                <p className="text-gray-600">Order Placed Date: {receipt.orderPlacedDate ? new Date(receipt.orderPlacedDate).toLocaleDateString() : 'N/A'}</p>
-              </div>
-            </div>
-
-            {/* Customer & Vehicle Info */}
+            <div id="receipt-template" className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-10 print:shadow-none">
+              <div className="max-w-3xl mx-auto">
+                {/* Header */}
+                <div className="flex justify-between items-start">
+                  <div className="mt-4">
+                    <h2 className="text-2xl font-bold text-gray-900">SLT Mobitel Tire Management</h2>
+                  </div>
+                  <div className="text-right">
+                    <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
+                    <p className="text-gray-600 mt-2">Receipt #: {receipt.receiptNumber || 'N/A'}</p>
+                    <p className="text-gray-600">
+                      Generated Date: {receipt.dateGenerated ? 
+                        new Date(receipt.dateGenerated).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                    </p>
+                    <p className="text-gray-600">Request #: {receipt.requestId || receipt.orderId || 'N/A'}</p>
+                    <p className="text-gray-600">Order #: {receipt.orderNumber || 'N/A'}</p>
+                    <p className="text-gray-600">
+                      Submitted Date: {receipt.submittedDate ? 
+                        new Date(receipt.submittedDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                    </p>
+                    <p className="text-gray-600">
+                      Order Placed Date: {receipt.orderPlacedDate ? 
+                        new Date(receipt.orderPlacedDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                    </p>
+                  </div>
+                </div>            {/* Customer & Vehicle Info */}
             <div className="mt-8 grid grid-cols-2 gap-8">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Vehicle Details</h3>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Vehicle Number: {receipt.vehicleNumber || 'N/A'}</p>
-                  <p className="text-gray-600">Brand: {receipt.vehicleBrand || 'N/A'}</p>
-                  <p className="text-gray-600">Model: {receipt.vehicleModel || 'N/A'}</p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Vehicle Number:</span> {receipt.vehicleNumber || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Brand:</span> {receipt.vehicleBrand || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Model:</span> {receipt.vehicleModel || 'N/A'}
+                  </p>
                 </div>
                 <div className="mt-4">
-                  <p className="text-gray-600">Customer Officer: {receipt.customerOfficerName || 'N/A'}</p>
-                  <p className="text-gray-600">Officer ID: {receipt.customerOfficerId || 'N/A'}</p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Customer Officer:</span> {receipt.customerOfficerName || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Officer ID:</span> {receipt.customerOfficerId || 'N/A'}
+                  </p>
                 </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Supplier Details</h3>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Name: {receipt.supplierName || 'N/A'}</p>
-                  <p className="text-gray-600">Email: {receipt.supplierEmail || 'N/A'}</p>
-                  <p className="text-gray-600">Phone: {receipt.supplierPhone || 'N/A'}</p>
-                  {receipt.supplierAddress && (
-                    <p className="text-gray-600">Address: {receipt.supplierAddress}</p>
-                  )}
+                  <p className="text-gray-600">
+                    <span className="font-medium">Name:</span> {receipt.supplierName || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Email:</span> {receipt.supplierEmail || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Phone:</span> {receipt.supplierPhone || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Address:</span> {receipt.supplierAddress || 'N/A'}
+                  </p>
                 </div>
               </div>
             </div>

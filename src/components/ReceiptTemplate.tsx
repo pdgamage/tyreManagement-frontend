@@ -75,11 +75,11 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               <div className="text-right">
                 <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
                 <p className="text-gray-600 mt-2">Receipt #: {receipt.receiptNumber}</p>
-                <p className="text-gray-600">Generated Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
-                <p className="text-gray-600">Request #: {receipt.orderId}</p>
-                <p className="text-gray-600">Order #: {receipt.orderNumber}</p>
-                <p className="text-gray-600">Submitted Date: {new Date(receipt.submittedDate).toLocaleDateString()}</p>
-                <p className="text-gray-600">Order Placed Date: {new Date(receipt.orderPlacedDate).toLocaleDateString()}</p>
+                <p className="text-gray-600">Generated Date: {receipt.dateGenerated ? new Date(receipt.dateGenerated).toLocaleDateString() : 'N/A'}</p>
+                <p className="text-gray-600">Request #: {receipt.requestId || receipt.orderId}</p>
+                <p className="text-gray-600">Order #: {receipt.orderNumber || 'N/A'}</p>
+                <p className="text-gray-600">Submitted Date: {receipt.submittedDate ? new Date(receipt.submittedDate).toLocaleDateString() : 'N/A'}</p>
+                <p className="text-gray-600">Order Placed Date: {receipt.orderPlacedDate ? new Date(receipt.orderPlacedDate).toLocaleDateString() : 'N/A'}</p>
               </div>
             </div>
 
@@ -88,17 +88,24 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Vehicle Details</h3>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Vehicle Number: {receipt.vehicleNumber}</p>
-                  <p className="text-gray-600">Brand: {receipt.vehicleBrand}</p>
-                  <p className="text-gray-600">Model: {receipt.vehicleModel}</p>
+                  <p className="text-gray-600">Vehicle Number: {receipt.vehicleNumber || 'N/A'}</p>
+                  <p className="text-gray-600">Brand: {receipt.vehicleBrand || 'N/A'}</p>
+                  <p className="text-gray-600">Model: {receipt.vehicleModel || 'N/A'}</p>
+                </div>
+                <div className="mt-4">
+                  <p className="text-gray-600">Customer Officer: {receipt.customerOfficerName || 'N/A'}</p>
+                  <p className="text-gray-600">Officer ID: {receipt.customerOfficerId || 'N/A'}</p>
                 </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Supplier Details</h3>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Name: {receipt.supplierName}</p>
-                  <p className="text-gray-600">Email: {receipt.supplierEmail}</p>
-                  <p className="text-gray-600">Phone: {receipt.supplierPhone}</p>
+                  <p className="text-gray-600">Name: {receipt.supplierName || 'N/A'}</p>
+                  <p className="text-gray-600">Email: {receipt.supplierEmail || 'N/A'}</p>
+                  <p className="text-gray-600">Phone: {receipt.supplierPhone || 'N/A'}</p>
+                  {receipt.supplierAddress && (
+                    <p className="text-gray-600">Address: {receipt.supplierAddress}</p>
+                  )}
                 </div>
               </div>
             </div>

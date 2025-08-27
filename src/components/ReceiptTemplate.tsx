@@ -15,7 +15,20 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
     if (!receiptElement) return;
 
     try {
-      const canvas = await html2canvas(receiptElement);
+      // Set background to white for PDF
+      const originalBackground = receiptElement.style.background;
+      receiptElement.style.background = 'white';
+
+      const canvas = await html2canvas(receiptElement, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      // Restore original background
+      receiptElement.style.background = originalBackground;
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -27,7 +40,8 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`receipt-${receipt.receiptNumber}.pdf`);
+      const fileName = `receipt-${receipt.receiptNumber || 'unknown'}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(fileName);
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
@@ -38,32 +52,41 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="fixed top-4 right-4 space-x-2 print:hidden">
-          <button
-            onClick={downloadAsPDF}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
-          >
-            <FileDown size={20} />
-            <span>Download PDF</span>
-          </button>
-          <button
-            onClick={handlePrint}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-colors"
-          >
-            <Printer size={20} />
-            <span>Print</span>
-          </button>
-          {onClose && (
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Fixed header with buttons */}
+      <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-50 print:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-900">Receipt View</h1>
+          <div className="flex space-x-3">
             <button
-              onClick={onClose}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              onClick={downloadAsPDF}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors shadow-sm"
             >
-              Close
+              <FileDown size={20} />
+              <span>Download PDF</span>
             </button>
-          )}
+            <button
+              onClick={handlePrint}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-colors shadow-sm"
+            >
+              <Printer size={20} />
+              <span>Print</span>
+            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+              >
+                Close
+              </button>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto pt-20 pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div id="receipt-template" className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-10 print:shadow-none">
               <div className="max-w-3xl mx-auto">

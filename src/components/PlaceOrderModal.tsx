@@ -3,8 +3,7 @@ import { X } from "lucide-react";
 import type { Request } from "../types/request";
 import type { TireRequest } from "../types/api";
 import { apiUrls } from "../config/api";
-import type { Receipt } from "../types/Receipt";
-import ReceiptTemplate from "./ReceiptTemplate";
+
 
 interface Supplier {
   id: number;
@@ -37,9 +36,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [receiptData, setReceiptData] = useState<Receipt | null>(null);
-
   useEffect(() => {
     if (isOpen) {
       setError(null);
@@ -122,31 +118,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         const result = JSON.parse(responseText);
         console.log("Order placed successfully:", result);
 
-        // Generate receipt
-        try {
-          const receiptResponse = await fetch(`${apiUrls.requestById(request?.id || "")}/generate-receipt`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              orderId: request?.id,
-              supplierId: selectedSupplierId,
-              orderNumber: orderNumber,
-              orderDate: orderPlacedDate,
-              notes: orderNotes
-            }),
-          });
 
-          if (receiptResponse.ok) {
-            const receiptData = await receiptResponse.json();
-            // Show receipt modal
-            setShowReceipt(true);
-            setReceiptData(receiptData);
-          }
-        } catch (err) {
-          console.error("Error generating receipt:", err);
-        }
 
         // Show success message
         setSuccess(
@@ -205,8 +177,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setOrderNumber("");
     setOrderPlacedDate("");
     setError(null);
-    setShowReceipt(false);
-    setReceiptData(null);
     onClose();
   };
 
@@ -214,17 +184,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      {showReceipt && receiptData ? (
-        <ReceiptTemplate 
-          receipt={receiptData} 
-          onClose={() => {
-            setShowReceipt(false);
-            setReceiptData(null);
-            onClose();
-          }}
-        />
-      ) : (
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">
             Place Order - Request #{request.id}
@@ -392,7 +352,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           </div>
         </form>
       </div>
-      )}
     </div>
   );
 };

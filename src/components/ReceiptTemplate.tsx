@@ -69,21 +69,8 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
           <div className="max-w-3xl mx-auto">
             {/* Header */}
             <div className="flex justify-between items-start">
-              <div>
-                <img 
-                  src={receipt.companyDetails.logo || '/company-logo.png'} 
-                  alt="Company Logo" 
-                  className="h-16 w-auto"
-                />
-                <div className="mt-4">
-                  <h2 className="text-2xl font-bold text-gray-900">{receipt.companyDetails.name}</h2>
-                  <p className="text-gray-600">{receipt.companyDetails.address}</p>
-                  <p className="text-gray-600">{receipt.companyDetails.phone}</p>
-                  <p className="text-gray-600">{receipt.companyDetails.email}</p>
-                  {receipt.companyDetails.website && (
-                    <p className="text-gray-600">{receipt.companyDetails.website}</p>
-                  )}
-                </div>
+              <div className="mt-4">
+                <h2 className="text-2xl font-bold text-gray-900">SLT Mobitel Tire Management</h2>
               </div>
               <div className="text-right">
                 <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
@@ -106,11 +93,11 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Supplier Details</h3>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Name: {receipt.supplierDetails.name}</p>
-                  <p className="text-gray-600">Email: {receipt.supplierDetails.email}</p>
-                  <p className="text-gray-600">Phone: {receipt.supplierDetails.phone}</p>
-                  {receipt.supplierDetails.address && (
-                    <p className="text-gray-600">Address: {receipt.supplierDetails.address}</p>
+                  <p className="text-gray-600">Name: {receipt.supplierName}</p>
+                  <p className="text-gray-600">Email: {receipt.supplierEmail}</p>
+                  <p className="text-gray-600">Phone: {receipt.supplierPhone}</p>
+                  {receipt.supplierAddress && (
+                    <p className="text-gray-600">Address: {receipt.supplierAddress}</p>
                   )}
                 </div>
               </div>
@@ -160,36 +147,7 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-gray-50">
-                  <tr>
-                    <td colSpan={2} />
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                      Subtotal
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${receipt.subtotal.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2} />
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                      Tax
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${receipt.tax.toFixed(2)}
-                    </td>
-                  </tr>
-                  {receipt.discount && receipt.discount > 0 && (
-                    <tr>
-                      <td colSpan={2} />
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                        Discount
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                        -${receipt.discount.toFixed(2)}
-                      </td>
-                    </tr>
-                  )}
+                <tfoot>
                   <tr className="bg-gray-100">
                     <td colSpan={2} />
                     <td className="px-6 py-4 whitespace-nowrap text-base font-bold text-gray-900 text-right">
@@ -203,32 +161,18 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
               </table>
             </div>
 
-            {/* Payment Info & Notes */}
-            <div className="mt-8 grid grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Payment Information</h3>
-                <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Status: {receipt.paymentStatus}</p>
-                  {receipt.paymentMethod && (
-                    <p className="text-gray-600">Method: {receipt.paymentMethod}</p>
-                  )}
-                </div>
+            {/* Notes */}
+            {receipt.notes && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Notes</h3>
+                <p className="mt-4 text-gray-600">{receipt.notes}</p>
               </div>
-              <div>
-                {receipt.notes && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Notes</h3>
-                    <p className="mt-4 text-gray-600">{receipt.notes}</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
 
             {/* Footer */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <p className="text-center text-gray-500 text-sm">
-                Thank you for your business! If you have any questions about this receipt, please contact
-                {' '}{receipt.companyDetails.name} at {receipt.companyDetails.phone} or {receipt.companyDetails.email}
+                Thank you for your business!
               </p>
             </div>
           </div>

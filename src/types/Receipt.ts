@@ -10,27 +10,12 @@ export interface Receipt {
   vehicleNumber: string;
   vehicleBrand: string;
   vehicleModel: string;
-  supplierDetails: {
-    name: string;
-    email: string;
-    phone: string;
-    address?: string;
-  };
+  supplierName: string;
+  supplierEmail: string;
+  supplierPhone: string;
+  supplierAddress?: string;
   items: ReceiptItem[];
-  subtotal: number;
-  tax: number;
-  discount?: number;
-  paymentMethod?: string;
-  paymentStatus: string;
   notes?: string;
-  companyDetails: {
-    name: string;
-    address: string;
-    phone: string;
-    email: string;
-    website?: string;
-    logo?: string;
-  };
 }
 
 export interface ReceiptItem {

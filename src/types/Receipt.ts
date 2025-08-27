@@ -18,6 +18,7 @@ export interface Receipt {
   notes?: string;
   submittedDate: string;
   orderPlacedDate: string;
+  orderNumber: string;
 }
 
 export interface ReceiptItem {

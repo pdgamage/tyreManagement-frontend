@@ -4,7 +4,7 @@ import { useRequests } from "../contexts/RequestContext";
 import RequestTable from "../components/RequestTable";
 import RequestReports from "../components/RequestReports";
 import PlaceOrderModal from "../components/PlaceOrderModal";
-import ReceiptTemplate from "../components/ReceiptTemplate";
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { apiUrls } from "../config/api";
@@ -97,138 +97,7 @@ const CustomerOfficerDashboard = () => {
     setShowPlaceOrderModal(true);
   };
 
-  const handleDownloadReceipt = async (request: Request) => {
-    try {
-      console.log('Fetching receipt for request:', request);
-      
-      // Show loading state
-      const loadingToast = document.createElement('div');
-      loadingToast.textContent = 'Loading receipt...';
-      loadingToast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px;
-        background: #4F46E5;
-        color: white;
-        border-radius: 8px;
-        z-index: 10000;
-      `;
-      document.body.appendChild(loadingToast);
 
-      // Use the correct URL with request ID
-      const url = apiUrls.getReceiptByOrder(request.id);
-      console.log('Fetching from URL:', url);
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to fetch receipt:', errorText);
-        throw new Error(`Failed to fetch receipt: ${errorText}`);
-      }
-
-      const receiptData = await response.json();
-      console.log('Received receipt data:', receiptData);
-
-      if (!receiptData || !receiptData.receiptNumber) {
-        throw new Error('Invalid receipt data received');
-      }
-
-      // Remove loading toast
-      loadingToast.remove();
-
-      // Create modal container for receipt
-      const modalContainer = document.createElement('div');
-      modalContainer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity 0.2s ease-in-out;
-      `;
-      modalContainer.id = 'receipt-modal-container';
-      document.body.appendChild(modalContainer);
-
-      // Create a root and render the ReceiptTemplate component
-      const root = ReactDOM.createRoot(modalContainer);
-      
-      // Create the content container
-      const contentContainer = document.createElement('div');
-      contentContainer.style.cssText = `
-        background: white;
-        border-radius: 8px;
-        max-width: 800px;
-        width: 90%;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding: 24px;
-        position: relative;
-      `;
-      modalContainer.appendChild(contentContainer);
-
-      root.render(
-        <ReceiptTemplate 
-          receipt={receiptData} 
-          onClose={() => {
-            modalContainer.style.opacity = '0';
-            setTimeout(() => {
-              root.unmount();
-              modalContainer.remove();
-            }, 200);
-          }}
-        />
-      );
-
-      // Add fade in animation
-      requestAnimationFrame(() => {
-        modalContainer.style.opacity = '1';
-      });
-
-    } catch (error) {
-      console.error('Error downloading receipt:', error);
-      
-      // Remove loading toast if it exists
-      const existingToast = document.querySelector('#loading-toast');
-      if (existingToast) {
-        existingToast.remove();
-      }
-
-      // Show error message to user
-      const errorToast = document.createElement('div');
-      errorToast.textContent = error instanceof Error ? error.message : 'Failed to download receipt. Please try again.';
-      errorToast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px;
-        background: #EF4444;
-        color: white;
-        border-radius: 8px;
-        z-index: 10000;
-        opacity: 0;
-        transition: opacity 0.2s ease-in-out;
-      `;
-      document.body.appendChild(errorToast);
-
-      // Fade in error toast
-      requestAnimationFrame(() => {
-        errorToast.style.opacity = '1';
-      });
-
-      // Remove error toast after 3 seconds
-      setTimeout(() => {
-        errorToast.style.opacity = '0';
-        setTimeout(() => errorToast.remove(), 200);
-      }, 3000);
-    }
-  };
 
   const handleOrderPlaced = async () => {
     // Refresh the requests list after order is placed
@@ -552,7 +421,6 @@ const CustomerOfficerDashboard = () => {
                     onDelete={handleDelete}
                     onPlaceOrder={handlePlaceOrder}
                     onCancelOrder={handleCancelOrder}
-                    onDownloadReceipt={handleDownloadReceipt}
                     showActions={true}
                     showPlaceOrderButton={true}
                     showCancelButton={true}

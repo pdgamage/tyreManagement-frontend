@@ -22,10 +22,7 @@ export const API_CONFIG = {
     // Supplier endpoints
     SUPPLIERS: "/api/suppliers",
 
-    // Receipt endpoints
-    RECEIPTS: "/api/receipts",
-    GENERATE_RECEIPT: "/api/requests/:requestId/generate-receipt",
-    GET_RECEIPT_BY_ORDER: "/api/requests/:orderId/receipt",
+
 
     // Health check
     HEALTH: "/api/health",
@@ -68,12 +65,7 @@ export const apiUrls = {
   // Supplier URLs
   suppliers: () => buildApiUrl(API_CONFIG.ENDPOINTS.SUPPLIERS),
 
-  // Receipt URLs
-  receipts: () => buildApiUrl(API_CONFIG.ENDPOINTS.RECEIPTS),
-  generateReceipt: (requestId: string | number) => 
-    `${API_CONFIG.BASE_URL}/api/requests/${requestId}/generate-receipt`,
-  getReceiptByOrder: (orderId: string | number) => 
-    `${API_CONFIG.BASE_URL}/api/requests/${orderId}/receipt`,
+
 
   // Health check
   health: () => buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH),

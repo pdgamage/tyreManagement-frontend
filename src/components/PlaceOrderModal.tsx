@@ -3,6 +3,9 @@ import { X } from "lucide-react";
 import type { Request } from "../types/request";
 import type { TireRequest } from "../types/api";
 import { apiUrls } from "../config/api";
+import ReceiptTemplate from "./ReceiptTemplate";
+import { Receipt } from "../types/Receipt";
+import { ReceiptService } from "../services/ReceiptService";
 
 interface Supplier {
   id: number;
@@ -35,6 +38,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [generatedReceipt, setGeneratedReceipt] = useState<Receipt | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -124,15 +128,20 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
         );
         setError(null);
 
-        // Wait 2 seconds to show success message, then close
-        setTimeout(() => {
-          onOrderPlaced();
-          onClose();
-          // Reset form
-          setSelectedSupplierId(null);
-          setOrderNotes("");
-          setSuccess(null);
-        }, 2000);
+        // Generate receipt and show it so user can download
+        try {
+          const resAny: any = await ReceiptService.generateReceipt(String(request?.id));
+          // ReceiptService may return { receipt, items } or the receipt directly
+          const receiptObj: any = resAny && resAny.receipt ? resAny.receipt : resAny;
+          setGeneratedReceipt(receiptObj as Receipt);
+        } catch (genErr) {
+          console.error("Error generating receipt after order:", genErr);
+          // still proceed but tell user
+          setError("Order placed but failed to generate receipt. Check logs.");
+        }
+
+        // Notify parent list to refresh
+        onOrderPlaced();
       } else {
         const errorData = await response.json();
         // Check if the error is just a database issue but email was sent
@@ -148,15 +157,15 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           setSuccess("Order placed successfully! Email sent to supplier.");
           setError(null);
 
-          // Wait 2 seconds to show success message, then close
-          setTimeout(() => {
+          // In error fallback case where email sent but DB had an issue, still try to generate receipt
+          try {
+            const resAny: any = await ReceiptService.generateReceipt(String(request?.id));
+            const receiptObj: any = resAny && resAny.receipt ? resAny.receipt : resAny;
+            setGeneratedReceipt(receiptObj as Receipt);
             onOrderPlaced();
-            onClose();
-            // Reset form
-            setSelectedSupplierId(null);
-            setOrderNotes("");
-            setSuccess(null);
-          }, 2000);
+          } catch (genErr) {
+            console.error("Error generating receipt in fallback:", genErr);
+          }
         } else {
           setError(errorData.error || "Failed to place order");
         }
@@ -175,6 +184,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
     setOrderNumber("");
     setOrderPlacedDate("");
     setError(null);
+  setGeneratedReceipt(null);
     onClose();
   };
 
@@ -182,7 +192,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">
             Place Order - Request #{request.id}
@@ -194,7 +204,6 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             <X className="w-6 h-6" />
           </button>
         </div>
-
         {/* Request Summary */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-semibold text-gray-800 mb-2">Order Summary</h3>
@@ -217,7 +226,21 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        {/* If a receipt was generated, show the receipt preview + download instead of the form */}
+        {generatedReceipt ? (
+          <div>
+            <ReceiptTemplate
+              receipt={generatedReceipt}
+              onClose={() => {
+                // Close the receipt and the modal
+                setGeneratedReceipt(null);
+                setSuccess(null);
+                onClose();
+              }}
+            />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
           {/* Supplier Selection */}
           <div className="mb-6">
             <h3 className="font-semibold text-gray-800 mb-3">
@@ -349,6 +372,7 @@ const PlaceOrderModal: React.FC<PlaceOrderModalProps> = ({
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

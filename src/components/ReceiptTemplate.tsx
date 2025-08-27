@@ -1,12 +1,6 @@
 import React from 'react';
 import { Receipt } from '../types/Receipt';
-imp                <p className="text-gray-600">Receipt #: {receipt.receiptNumber}</p>
-                <p className="text-gray-600">Generated Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
-                <p className="text-gray-600">Request #: {receipt.requestId}</p>
-                <p className="text-gray-600">Order #: {receipt.orderNumber}</p>
-                <p className="text-gray-600">Order ID: {receipt.orderId}</p>
-                <p className="text-gray-600">Submitted Date: {new Date(receipt.submittedDate).toLocaleDateString()}</p>
-                <p className="text-gray-600">Order Placed Date: {new Date(receipt.orderPlacedDate).toLocaleDateString()}</p>FileDown, Printer } from 'lucide-react';
+import { FileDown, Printer } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 

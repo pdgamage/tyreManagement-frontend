@@ -1,87 +1,101 @@
 import * as XLSX from 'xlsx';
 
-export interface TireDetails {
-  id: string;
-  type: string;
-  size: string;
-  brand: string;
-  position: string;
-  quantity: number;
-  damage: string;
-  mileage: number;
-  requestId: string;
-}
-
 export interface RequestData {
   id: string;
+  userId: string;
+  vehicleId: string;
   vehicleNumber: string;
+  quantity: number;
+  tubesQuantity: number;
+  tireSize: string;
+  requestReason: string;
+  requesterName: string;
+  requesterEmail: string;
+  requesterPhone: string;
+  vehicleBrand: string;
+  vehicleModel: string;
+  lastReplacementDate: string;
+  existingTireMake: string;
+  tireSizeRequired: string;
+  presentKmReading: number;
+  previousKmReading: number;
+  tireWearPattern: string;
+  comments: string;
   status: string;
+  submittedAt: string;
+  supervisor_notes: string;
+  technical_manager_note: string;
+  engineer_note: string;
+  customer_officer_note: string;
+  supervisorId: string;
+  technical_manager_id: string;
+  supervisor_decision_by: string;
+  engineer_decision_by: string;
+  customer_officer_decision_by: string;
+  deliveryOfficeName: string;
+  deliveryStreetName: string;
+  deliveryTown: string;
+  totalPrice: number;
+  warrantyDistance: number;
+  tireWearIndicatorAppeared: boolean;
+  Department: string;
+  CostCenter: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierPhone: string;
   orderNumber: string;
-  requestDate: string;
-  created_at?: string;
-  submittedAt?: string;
-  approvedAt?: string;
-  rejectedAt?: string;
-  orderPlacedAt?: string;
-  completedAt?: string;
-  supplierName?: string;
-  tireCount?: number;
-  requestedBy?: string;
-  approvedBy?: string;
-  rejectedBy?: string;
-  remarks?: string;
-  rejectReason?: string;
-  costCentre?: string;
-  department?: string;
-  tireDetails?: TireDetails[];
-  totalCost?: number;
-  paymentStatus?: string;
-  deliveryStatus?: string;
-  engineerRemarks?: string;
-  expectedDeliveryDate?: string;
-  actualDeliveryDate?: string;
+  orderNotes: string;
+  orderPlacedDate: string;
 }
 
 export const exportToExcel = (data: RequestData[], fileName: string = 'tire_requests') => {
-  // Transform data for Excel with all available details
+  // Transform data for Excel with the exact database columns
   const excelData = data.map(request => ({
     'Request ID': request.id,
+    'User ID': request.userId,
+    'Vehicle ID': request.vehicleId,
     'Vehicle Number': request.vehicleNumber,
+    'Quantity': request.quantity,
+    'Tubes Quantity': request.tubesQuantity,
+    'Tire Size': request.tireSize,
+    'Request Reason': request.requestReason,
+    'Requester Name': request.requesterName,
+    'Requester Email': request.requesterEmail,
+    'Requester Phone': request.requesterPhone,
+    'Vehicle Brand': request.vehicleBrand,
+    'Vehicle Model': request.vehicleModel,
+    'Last Replacement Date': request.lastReplacementDate ? new Date(request.lastReplacementDate).toLocaleString() : 'N/A',
+    'Existing Tire Make': request.existingTireMake,
+    'Tire Size Required': request.tireSizeRequired,
+    'Present KM Reading': request.presentKmReading,
+    'Previous KM Reading': request.previousKmReading,
+    'Tire Wear Pattern': request.tireWearPattern,
+    'Comments': request.comments,
     'Status': request.status,
-    'Order Number': request.orderNumber || 'Not assigned',
-    'Supplier': request.supplierName || 'Not assigned',
-    'Department': request.department || 'Not assigned',
-    'Cost Centre': request.costCentre || 'Not assigned',
-    'Total Cost': request.totalCost || 0,
-    'Payment Status': request.paymentStatus || 'Not updated',
-    'Delivery Status': request.deliveryStatus || 'Not updated',
-    'Expected Delivery': request.expectedDeliveryDate ? new Date(request.expectedDeliveryDate).toLocaleString() : 'Not set',
-    'Actual Delivery': request.actualDeliveryDate ? new Date(request.actualDeliveryDate).toLocaleString() : 'Not delivered',
-    'Tire Count': request.tireCount || 0,
-    'Requested By': request.requestedBy || 'Not available',
-    'Approved By': request.approvedBy || 'Not approved',
-    'Rejected By': request.rejectedBy || 'Not rejected',
-    'Remarks': request.remarks || 'No remarks',
-    'Reject Reason': request.rejectReason || 'N/A',
-    'Engineer Remarks': request.engineerRemarks || 'No remarks',
-    'Request Date': request.requestDate ? new Date(request.requestDate).toLocaleString() : 'N/A',
-    'Created At': request.created_at ? new Date(request.created_at).toLocaleString() : 'N/A',
     'Submitted At': request.submittedAt ? new Date(request.submittedAt).toLocaleString() : 'N/A',
-    'Approved At': request.approvedAt ? new Date(request.approvedAt).toLocaleString() : 'N/A',
-    'Rejected At': request.rejectedAt ? new Date(request.rejectedAt).toLocaleString() : 'N/A',
-    'Order Placed At': request.orderPlacedAt ? new Date(request.orderPlacedAt).toLocaleString() : 'N/A',
-    'Completed At': request.completedAt ? new Date(request.completedAt).toLocaleString() : 'N/A',
-    // Include tire details if available
-    ...request.tireDetails?.reduce((acc, tire, index) => ({
-      ...acc,
-      [`Tire ${index + 1} Type`]: tire.type,
-      [`Tire ${index + 1} Size`]: tire.size,
-      [`Tire ${index + 1} Brand`]: tire.brand,
-      [`Tire ${index + 1} Position`]: tire.position,
-      [`Tire ${index + 1} Quantity`]: tire.quantity,
-      [`Tire ${index + 1} Damage`]: tire.damage,
-      [`Tire ${index + 1} Mileage`]: tire.mileage
-    }), {}) || {}
+    'Supervisor Notes': request.supervisor_notes,
+    'Technical Manager Note': request.technical_manager_note,
+    'Engineer Note': request.engineer_note,
+    'Customer Officer Note': request.customer_officer_note,
+    'Supervisor ID': request.supervisorId,
+    'Technical Manager ID': request.technical_manager_id,
+    'Supervisor Decision By': request.supervisor_decision_by,
+    'Engineer Decision By': request.engineer_decision_by,
+    'Customer Officer Decision By': request.customer_officer_decision_by,
+    'Delivery Office Name': request.deliveryOfficeName,
+    'Delivery Street Name': request.deliveryStreetName,
+    'Delivery Town': request.deliveryTown,
+    'Total Price': request.totalPrice,
+    'Warranty Distance': request.warrantyDistance,
+    'Tire Wear Indicator Appeared': request.tireWearIndicatorAppeared ? 'Yes' : 'No',
+    'Department': request.Department,
+    'Cost Center': request.CostCenter,
+    'Supplier Name': request.supplierName,
+    'Supplier Email': request.supplierEmail,
+    'Supplier Phone': request.supplierPhone,
+    'Order Number': request.orderNumber,
+    'Order Notes': request.orderNotes,
+    'Order Placed Date': request.orderPlacedDate ? new Date(request.orderPlacedDate).toLocaleString() : 'N/A'
   }));
 
   // Create worksheet

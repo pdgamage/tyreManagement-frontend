@@ -384,8 +384,9 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           onDownloadReceipt(request);
+                          console.log('Download receipt clicked for request:', request.id);
                         }}
-                        className="px-4 text-gray-500 hover:text-blue-700"
+                        className="px-4 text-gray-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
                         aria-label="Download Receipt"
                         title="Download Receipt"
                       >

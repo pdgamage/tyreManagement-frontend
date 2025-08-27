@@ -99,32 +99,41 @@ const CustomerOfficerDashboard = () => {
 
   const handleDownloadReceipt = async (request: Request) => {
     try {
+      console.log('Fetching receipt for request:', request.id);
       const response = await fetch(apiUrls.getReceiptByOrder(request.id));
-      if (response.ok) {
-        const receiptData = await response.json();
-        const modalContainer = document.createElement('div');
-        modalContainer.style.position = 'fixed';
-        modalContainer.style.zIndex = '9999';
-        modalContainer.style.inset = '0';
-        modalContainer.id = 'receipt-modal-container';
-        document.body.appendChild(modalContainer);
-
-        // Create a root and render the ReceiptTemplate component
-        const root = ReactDOM.createRoot(modalContainer);
-        root.render(
-          <ReceiptTemplate 
-            receipt={receiptData} 
-            onClose={() => {
-              root.unmount();
-              modalContainer.remove();
-            }}
-          />
-        );
-      } else {
-        console.error('Failed to fetch receipt');
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to fetch receipt:', errorText);
+        return;
       }
+
+      const receiptData = await response.json();
+      console.log('Received receipt data:', receiptData);
+
+      // Create modal container for receipt
+      const modalContainer = document.createElement('div');
+      modalContainer.style.position = 'fixed';
+      modalContainer.style.zIndex = '9999';
+      modalContainer.style.inset = '0';
+      modalContainer.id = 'receipt-modal-container';
+      document.body.appendChild(modalContainer);
+
+      // Create a root and render the ReceiptTemplate component
+      const root = ReactDOM.createRoot(modalContainer);
+      root.render(
+        <ReceiptTemplate 
+          receipt={receiptData} 
+          onClose={() => {
+            root.unmount();
+            modalContainer.remove();
+          }}
+        />
+      );
     } catch (error) {
       console.error('Error downloading receipt:', error);
+      // Show error message to user
+      alert('Failed to download receipt. Please try again.');
     }
   };
 

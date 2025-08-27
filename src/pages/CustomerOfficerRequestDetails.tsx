@@ -325,6 +325,56 @@ const CustomerOfficerRequestDetails = () => {
                   {request.comments || "N/A"}
                 </div>
               </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Tubes Quantity
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.tubesQuantity || "N/A"}
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+
+          {/* Supplier Details */}
+          <div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              Supplier Details
+            </h3>
+            <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Supplier Name
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.supplierName || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Supplier Phone
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.supplierPhone || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Supplier Email
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.supplierEmail || "N/A"}
+                </div>
+              </div>
+              <div>
+                <label className="block mb-1 font-semibold text-gray-700">
+                  Supplier Address
+                </label>
+                <div className="p-2 bg-white rounded">
+                  {request.supplierAddress || "N/A"}
+                </div>
+              </div>
             </div>
           </div>
           <hr />

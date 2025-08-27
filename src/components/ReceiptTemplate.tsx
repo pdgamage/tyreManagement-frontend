@@ -1,6 +1,12 @@
 import React from 'react';
 import { Receipt } from '../types/Receipt';
-import { FileDown, Printer } from 'lucide-react';
+imp                <p className="text-gray-600">Receipt #: {receipt.receiptNumber}</p>
+                <p className="text-gray-600">Generated Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
+                <p className="text-gray-600">Request #: {receipt.requestId}</p>
+                <p className="text-gray-600">Order #: {receipt.orderNumber}</p>
+                <p className="text-gray-600">Order ID: {receipt.orderId}</p>
+                <p className="text-gray-600">Submitted Date: {new Date(receipt.submittedDate).toLocaleDateString()}</p>
+                <p className="text-gray-600">Order Placed Date: {new Date(receipt.orderPlacedDate).toLocaleDateString()}</p>FileDown, Printer } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -71,13 +77,16 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
             <div className="flex justify-between items-start">
               <div className="mt-4">
                 <h2 className="text-2xl font-bold text-gray-900">SLT Mobitel Tire Management</h2>
+                <p className="text-gray-600 mt-2">Customer Officer: {receipt.customerOfficerName}</p>
+                <p className="text-gray-600">Officer ID: {receipt.customerOfficerId}</p>
               </div>
               <div className="text-right">
                 <h1 className="text-4xl font-extrabold text-gray-900">RECEIPT</h1>
                 <p className="text-gray-600 mt-2">Receipt #: {receipt.receiptNumber}</p>
                 <p className="text-gray-600">Generated Date: {new Date(receipt.dateGenerated).toLocaleDateString()}</p>
-                <p className="text-gray-600">Request #: {receipt.orderId}</p>
+                <p className="text-gray-600">Request #: {receipt.requestId}</p>
                 <p className="text-gray-600">Order #: {receipt.orderNumber}</p>
+                <p className="text-gray-600">Order ID: {receipt.orderId}</p>
                 <p className="text-gray-600">Submitted Date: {new Date(receipt.submittedDate).toLocaleDateString()}</p>
                 <p className="text-gray-600">Order Placed Date: {new Date(receipt.orderPlacedDate).toLocaleDateString()}</p>
               </div>
@@ -171,9 +180,20 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
 
             {/* Footer */}
             <div className="mt-12 pt-8 border-t border-gray-200">
-              <p className="text-center text-gray-500 text-sm">
-                Thank you for your business!
-              </p>
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <p className="text-gray-600">SLT Mobitel Tire Management</p>
+                  <p className="text-gray-600">123 Corporate Drive, Colombo</p>
+                  <p className="text-gray-600">Phone: +94 11 234 5678</p>
+                  <p className="text-gray-600">Email: tiremanagement@cpc.lk</p>
+                  <p className="text-gray-600">Web: www.cpc.lk</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-500 text-sm">
+                    Thank you for your business!
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -55,17 +55,4 @@ export interface Request {
   customer_officer_decision_by?: string;
   order_placed?: boolean;
   order_timestamp?: Date | string;
-  // Supplier information
-  supplierDetails?: {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-  };
-  supplierName?: string;
-  supplierEmail?: string;
-  supplierPhone?: string;
-  orderNumber?: string;
-  orderPlacedDate?: Date | string;
-  orderNotes?: string;
 }

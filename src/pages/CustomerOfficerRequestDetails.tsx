@@ -395,6 +395,72 @@ const CustomerOfficerRequestDetails = () => {
           </div>
           <hr />
 
+          {/* Supplier Information */}
+          {(request.status === "order placed" && (request.supplierDetails || request.supplierName)) && (
+            <>
+              <div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                  Supplier Information
+                </h3>
+                <div className="grid grid-cols-1 gap-6 p-6 rounded-lg md:grid-cols-2 bg-gray-50">
+                  <div>
+                    <label className="block mb-1 font-semibold text-gray-700">
+                      Supplier Name
+                    </label>
+                    <div className="p-2 bg-white rounded">
+                      {request.supplierDetails?.name || request.supplierName || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-semibold text-gray-700">
+                      Supplier Email
+                    </label>
+                    <div className="p-2 bg-white rounded">
+                      {request.supplierDetails?.email || request.supplierEmail || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-semibold text-gray-700">
+                      Supplier Phone
+                    </label>
+                    <div className="p-2 bg-white rounded">
+                      {request.supplierDetails?.phone || request.supplierPhone || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-semibold text-gray-700">
+                      Supplier Address
+                    </label>
+                    <div className="p-2 bg-white rounded">
+                      {request.supplierDetails?.address || "N/A"}
+                    </div>
+                  </div>
+                  {request.orderNumber && (
+                    <div>
+                      <label className="block mb-1 font-semibold text-gray-700">
+                        Order Number
+                      </label>
+                      <div className="p-2 bg-white rounded">
+                        {request.orderNumber}
+                      </div>
+                    </div>
+                  )}
+                  {request.orderPlacedDate && (
+                    <div>
+                      <label className="block mb-1 font-semibold text-gray-700">
+                        Order Placed Date
+                      </label>
+                      <div className="p-2 bg-white rounded">
+                        {new Date(request.orderPlacedDate).toLocaleString()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <hr />
+            </>
+          )}
+
           {/* Images Section */}
           {request.images && request.images.length > 0 && (
             <div>

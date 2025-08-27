@@ -36,4 +36,19 @@ export class ReceiptService {
       throw error;
     }
   }
+
+  static async getReceiptByOrderId(orderId: string): Promise<Receipt> {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/receipts/order/${orderId}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch receipt');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching receipt:', error);
+      throw error;
+    }
+  }
 }

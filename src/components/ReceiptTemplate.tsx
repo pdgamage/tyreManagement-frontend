@@ -96,9 +96,6 @@ const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
                   <p className="text-gray-600">Name: {receipt.supplierName}</p>
                   <p className="text-gray-600">Email: {receipt.supplierEmail}</p>
                   <p className="text-gray-600">Phone: {receipt.supplierPhone}</p>
-                  {receipt.supplierAddress && (
-                    <p className="text-gray-600">Address: {receipt.supplierAddress}</p>
-                  )}
                 </div>
               </div>
             </div>

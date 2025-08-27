@@ -61,7 +61,6 @@ export interface Request {
     name: string;
     email: string;
     phone: string;
-    address?: string;
   };
   supplierName?: string;
   supplierEmail?: string;

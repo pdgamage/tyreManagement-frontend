@@ -9,6 +9,11 @@ interface ReceiptProps {
   onClose?: () => void;
 }
 
+interface ReceiptProps {
+  receipt: Receipt;
+  onClose?: () => void;
+}
+
 const ReceiptTemplate: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
   const downloadAsPDF = async () => {
     const receiptElement = document.getElementById('receipt-template');

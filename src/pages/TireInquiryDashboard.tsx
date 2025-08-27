@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { API_CONFIG } from "../config/api";
 import "../styles/scrollbar.css";
-import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, X, Search, Car, Building, FileText, ChevronDown, ChevronUp, Filter, Frown, Smile, CheckCircle, Clock, XCircle, Package, FileDown } from "lucide-react";
+import { exportToExcel } from "../utils/exportToExcel";
 
 interface Vehicle {
   id: string;
@@ -670,6 +671,19 @@ const UserInquiryDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Export Button */}
+          {selectedVehicle && filteredRequests.length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => exportToExcel(filteredRequests, `tire_requests_${selectedVehicle.replace(/\s+/g, '_')}`)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 shadow-sm"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Export to Excel
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

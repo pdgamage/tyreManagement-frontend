@@ -379,14 +379,19 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <X className="w-5 h-5" />
                         </button>
                       )}
-                    {request.status?.toLowerCase() === "order placed" && onDownloadReceipt && (
+                    {request.status?.toLowerCase() === "order placed" && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDownloadReceipt(request);
-                          console.log('Download receipt clicked for request:', request.id);
+                          console.log('Download button clicked');
+                          console.log('Request:', request);
+                          if (onDownloadReceipt) {
+                            onDownloadReceipt(request);
+                          } else {
+                            console.error('onDownloadReceipt is not defined');
+                          }
                         }}
-                        className="px-4 text-gray-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+                        className="inline-flex items-center justify-center px-4 py-2 text-gray-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
                         aria-label="Download Receipt"
                         title="Download Receipt"
                       >

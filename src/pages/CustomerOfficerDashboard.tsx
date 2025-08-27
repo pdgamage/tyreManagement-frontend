@@ -99,23 +99,51 @@ const CustomerOfficerDashboard = () => {
 
   const handleDownloadReceipt = async (request: Request) => {
     try {
-      console.log('Fetching receipt for request:', request.id);
+      console.log('Fetching receipt for request:', request);
+      
+      // Show loading state
+      const loadingToast = document.createElement('div');
+      loadingToast.textContent = 'Loading receipt...';
+      loadingToast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px;
+        background: #4F46E5;
+        color: white;
+        border-radius: 8px;
+        z-index: 10000;
+      `;
+      document.body.appendChild(loadingToast);
+
       const response = await fetch(apiUrls.getReceiptByOrder(request.id));
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Failed to fetch receipt:', errorText);
-        return;
+        throw new Error(`Failed to fetch receipt: ${errorText}`);
       }
 
       const receiptData = await response.json();
       console.log('Received receipt data:', receiptData);
 
+      // Remove loading toast
+      loadingToast.remove();
+
       // Create modal container for receipt
       const modalContainer = document.createElement('div');
-      modalContainer.style.position = 'fixed';
-      modalContainer.style.zIndex = '9999';
-      modalContainer.style.inset = '0';
+      modalContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      `;
       modalContainer.id = 'receipt-modal-container';
       document.body.appendChild(modalContainer);
 
@@ -125,15 +153,44 @@ const CustomerOfficerDashboard = () => {
         <ReceiptTemplate 
           receipt={receiptData} 
           onClose={() => {
-            root.unmount();
-            modalContainer.remove();
+            // Add fade out animation
+            modalContainer.style.opacity = '0';
+            setTimeout(() => {
+              root.unmount();
+              modalContainer.remove();
+            }, 200);
           }}
         />
       );
+
+      // Add fade in animation
+      setTimeout(() => {
+        modalContainer.style.transition = 'opacity 0.2s ease-in-out';
+        modalContainer.style.opacity = '1';
+      }, 0);
+
     } catch (error) {
       console.error('Error downloading receipt:', error);
       // Show error message to user
-      alert('Failed to download receipt. Please try again.');
+      const errorToast = document.createElement('div');
+      errorToast.textContent = 'Failed to download receipt. Please try again.';
+      errorToast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px;
+        background: #EF4444;
+        color: white;
+        border-radius: 8px;
+        z-index: 10000;
+      `;
+      document.body.appendChild(errorToast);
+
+      // Remove error toast after 3 seconds
+      setTimeout(() => {
+        errorToast.style.opacity = '0';
+        setTimeout(() => errorToast.remove(), 200);
+      }, 3000);
     }
   };
 

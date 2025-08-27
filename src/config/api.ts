@@ -71,9 +71,9 @@ export const apiUrls = {
   // Receipt URLs
   receipts: () => buildApiUrl(API_CONFIG.ENDPOINTS.RECEIPTS),
   generateReceipt: (requestId: string | number) => 
-    buildApiUrl(API_CONFIG.ENDPOINTS.GENERATE_RECEIPT.replace(':requestId', requestId.toString())),
+    `${API_CONFIG.BASE_URL}/api/requests/${requestId}/generate-receipt`,
   getReceiptByOrder: (orderId: string | number) => 
-    buildApiUrl(API_CONFIG.ENDPOINTS.GET_RECEIPT_BY_ORDER.replace(':orderId', orderId.toString())),
+    `${API_CONFIG.BASE_URL}/api/requests/${orderId}/receipt`,
 
   // Health check
   health: () => buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH),

@@ -15,34 +15,8 @@ import {
 import type { Request } from "../types/request";
 
 const getStatusStyles = (status: string) => {
-  switch (status?.toLowerCase()) {                      {showPlaceOrderButton &&
-                      request.status?.toLowerCase().trim() === "complete" &&
-                      !(request as any).order_placed && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onPlaceOrder(request);
-                          }}
-                          className="px-4 text-gray-500 hover:text-green-700"
-                          aria-label="Place Order"
-                          title="Place Order"
-                        >
-                          <ShoppingCart className="w-5 h-5" />
-                        </button>
-                      )}
-                      {request.status?.toLowerCase() === "order placed" && onDownloadReceipt && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDownloadReceipt(request);
-                          }}
-                          className="px-4 text-gray-500 hover:text-blue-700"
-                          aria-label="Download Receipt"
-                          title="Download Receipt"
-                        >
-                          <Download className="w-5 h-5" />
-                        </button>
-                      )}ding":
+  switch (status?.toLowerCase()) {
+    case "pending":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",

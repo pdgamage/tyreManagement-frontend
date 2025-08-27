@@ -126,21 +126,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 </div>
               </div>
 
-              {/* Supplier Information - Only show if order is placed */}
-              {request.status === 'order placed' && (
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Supplier Information</h4>
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Supplier Name:</span> {request.supplierName || "N/A"}</p>
-                    <p><span className="font-medium">Supplier Email:</span> {request.supplierEmail || "N/A"}</p>
-                    <p><span className="font-medium">Supplier Phone:</span> {request.supplierPhone || "N/A"}</p>
-                    <p><span className="font-medium">Order Number:</span> {request.orderNumber || "N/A"}</p>
-                    <p><span className="font-medium">Order Notes:</span> {request.orderNotes || "N/A"}</p>
-                    <p><span className="font-medium">Order Date:</span> {request.orderPlacedDate ? formatDate(request.orderPlacedDate) : "N/A"}</p>
-                  </div>
-                </div>
-              )}
-
               {/* Cancellation Information - Only show for cancelled orders */}
               {request.status === 'order cancelled' && request.customer_officer_note && (
                 <div className="col-span-full space-y-4">

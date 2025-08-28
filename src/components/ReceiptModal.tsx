@@ -5,6 +5,7 @@ import type { Order } from '../types/Order';
 import { format } from 'date-fns';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import OrderReceipt from './OrderReceipt';
+import { generateReceiptNumber } from '../utils/receiptUtils';
 
 const requestToOrder = (request: Request): Order => ({
   id: Number(request.id),
@@ -151,8 +152,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             <div className="space-y-2">
               <div>
                 <p className="text-sm font-semibold">Order Details:</p>
-                <p className="text-sm">Order Number: <span className="text-gray-700">{request.id}</span></p>
-                <p className="text-sm">Submitted Date: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
+                <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
+                <p className="text-sm">Request ID: <span className="text-gray-600">#{request.id}</span></p>
+                <p className="text-sm">Submitted: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
                 <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
               </div>
               <div className="mt-3">
@@ -194,15 +196,20 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2">Item</th>
-                    <th className="text-center p-2">Size</th>
+                    <th className="text-left p-2">Item Description</th>
+                    <th className="text-center p-2">Make/Size</th>
                     <th className="text-center p-2">Qty</th>
                     <th className="text-right p-2">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <tr className="border-b bg-gray-50">
+                    <td className="p-2 text-sm" colSpan={4}>
+                      <span className="font-medium">Existing Tire:</span> {request.existingTireMake || 'N/A'}
+                    </td>
+                  </tr>
                   <tr className="border-b">
-                    <td className="p-2">Tires</td>
+                    <td className="p-2">New Tires</td>
                     <td className="text-center">{request.tireSize}</td>
                     <td className="text-center">{request.quantity}</td>
                     <td className="text-right">{formatCurrency(request.totalPrice)}</td>

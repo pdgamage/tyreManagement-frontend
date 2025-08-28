@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { Order } from '../types/Order';
+import { generateReceiptNumber } from '../utils/receiptUtils';
 
 // Define styles for the PDF
 const styles = StyleSheet.create({
@@ -62,6 +63,30 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 10,
   },
+  // New table styles
+  table: {
+    display: 'flex',
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
+    marginVertical: 10,
+  },
+  tableRow: {
+    margin: 'auto',
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#bfbfbf',
+    minHeight: 25,
+  },
+  tableHeader: {
+    backgroundColor: '#f3f4f6',
+  },
+  tableCell: {
+    margin: 'auto',
+    padding: 5,
+    fontSize: 10,
+  },
 });
 
 // PDF Document Component
@@ -74,13 +99,13 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
       </View>
 
       {/* Company Information */}
-      <View style={styles.companyInfo}>
-        <Text style={styles.value}>Sri Lanka Transport Board</Text>
-        <Text style={styles.label}>Order Number: {order.orderNumber}</Text>
-        <Text style={styles.label}>Date: {format(new Date(order.orderPlacedDate), 'dd/MM/yyyy')}</Text>
-      </View>
-
-        {/* Customer Information */}
+          <View style={styles.companyInfo}>
+            <Text style={styles.value}>Sri Lanka Transport Board</Text>
+            <Text style={styles.label}>Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}</Text>
+            <Text style={styles.label}>Request ID: #{order.id}</Text>
+            <Text style={styles.label}>Date Submitted: {format(new Date(order.submittedAt), 'dd/MM/yyyy')}</Text>
+            <Text style={styles.label}>Date Order Placed: {order.orderPlacedDate ? format(new Date(order.orderPlacedDate), 'dd/MM/yyyy') : '-'}</Text>
+          </View>        {/* Customer Information */}
       <View style={styles.section}>
         <Text style={styles.value}>Requester Information</Text>
         <View style={styles.row}>
@@ -154,27 +179,42 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
         </View>
       </View>
 
-      {/* Order Details */}
+      {/* Order Details Table */}
       <View style={styles.section}>
         <Text style={styles.value}>Order Details</Text>
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Tire Size:</Text>
-            <Text style={styles.value}>{order.tireSize}</Text>
-          </View>
-          <View style={styles.column}>
-            <Text style={styles.label}>Quantity:</Text>
-            <Text style={styles.value}>{order.quantity}</Text>
-          </View>
+        {/* Existing Tire Info */}
+        <View style={[styles.row, { backgroundColor: '#f9fafb', padding: 8, marginBottom: 8 }]}>
+          <Text style={styles.label}>Existing Tire Make: {order.existingTireMake || 'N/A'}</Text>
         </View>
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Tubes Quantity:</Text>
-            <Text style={styles.value}>{order.tubesQuantity}</Text>
+        {/* New Items Table */}
+        <View style={styles.table}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
+            <Text style={[styles.tableCell, { flex: 2 }]}>Item Description</Text>
+            <Text style={[styles.tableCell, { flex: 1.5 }]}>Make/Size</Text>
+            <Text style={[styles.tableCell, { flex: 0.5 }]}>Qty</Text>
+            <Text style={[styles.tableCell, { flex: 1, textAlign: 'right' }]}>Amount</Text>
           </View>
-          <View style={styles.column}>
-            <Text style={styles.label}>Warranty Distance:</Text>
-            <Text style={styles.value}>{`${order.warrantyDistance} km`}</Text>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableCell, { flex: 2 }]}>New Tires</Text>
+            <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
+            <Text style={[styles.tableCell, { flex: 0.5 }]}>{order.quantity}</Text>
+            <Text style={[styles.tableCell, { flex: 1, textAlign: 'right' }]}>
+              {`LKR ${order.totalPrice.toFixed(2)}`}
+            </Text>
+          </View>
+          {order.tubesQuantity > 0 && (
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, { flex: 2 }]}>Tubes</Text>
+              <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
+              <Text style={[styles.tableCell, { flex: 0.5 }]}>{order.tubesQuantity}</Text>
+              <Text style={[styles.tableCell, { flex: 1, textAlign: 'right' }]}>Included</Text>
+            </View>
+          )}
+          <View style={[styles.tableRow, { borderTopWidth: 1, marginTop: 4 }]}>
+            <Text style={[styles.tableCell, { flex: 3.5, textAlign: 'right', fontWeight: 'bold' }]}>Total:</Text>
+            <Text style={[styles.tableCell, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>
+              {`LKR ${order.totalPrice.toFixed(2)}`}
+            </Text>
           </View>
         </View>
       </View>

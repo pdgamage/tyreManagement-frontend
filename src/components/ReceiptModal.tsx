@@ -43,7 +43,13 @@ interface ReceiptModalProps {
 
 const formatDate = (date: string | Date | undefined) => {
   if (!date) return '-';
-  return format(new Date(date), 'dd/MM/yyyy');
+  try {
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
+    return format(parsedDate, 'dd/MM/yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '-';
+  }
 };
 
 const formatCurrency = (amount: number | undefined) => {
@@ -155,9 +161,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <div>
                 <p className="text-sm font-semibold">Order Information:</p>
                 <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
-                <p className="text-sm">Request ID: <span className="text-gray-600">#{request.id}</span></p>
+                <p className="text-sm">Order Number: <span className="text-gray-600">#{request.id}</span></p>
                 <p className="text-sm">Order Submitted: <span className="text-gray-700">{request.submittedAt ? formatDate(request.submittedAt) : '-'}</span></p>
-                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
+                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(new Date(request.order_timestamp)) : '-'}</span></p>
               </div>
               <div className="mt-3">
                 <p className="text-sm font-semibold">Delivery Address:</p>

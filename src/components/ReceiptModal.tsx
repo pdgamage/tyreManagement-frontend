@@ -1,16 +1,38 @@
 import React from 'react';
 import { X, Download, Printer, FileDown } from 'lucide-react';
-import type { BaseRequest } from '../types/shared';
+import type { Request } from '../types/request';
+import type { Order } from '../types/Order';
 import { format } from 'date-fns';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import OrderReceipt from './OrderReceipt';
+
+const requestToOrder = (request: Request): Order => ({
+  id: Number(request.id),
+  orderNumber: request.id,
+  orderPlacedDate: request.order_timestamp?.toString() || new Date().toISOString(),
+  requesterName: request.requesterName,
+  userSection: request.userSection || '',
+  costCenter: request.costCenter || '',
+  requesterPhone: request.requesterPhone,
+  vehicleNumber: request.vehicleNumber,
+  vehicleBrand: request.vehicleBrand,
+  vehicleModel: request.vehicleModel,
+  tireSize: request.tireSize,
+  quantity: request.quantity,
+  tubesQuantity: request.tubesQuantity,
+  warrantyDistance: request.warrantyDistance || 0,
+  supplierName: request.supplierName || '',
+  supplierPhone: request.supplierPhone || '',
+  totalPrice: request.totalPrice || 0
+});
 
 interface ReceiptModalProps {
-  request: BaseRequest | null;
+  request: Request | null;
   onClose: () => void;
   isOpen: boolean;
 }
 
-const formatDate = (date: string | undefined) => {
+const formatDate = (date: string | Date | undefined) => {
   if (!date) return '-';
   return format(new Date(date), 'dd/MM/yyyy');
 };
@@ -27,7 +49,37 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
   if (!isOpen || !request) return null;
 
   const handlePrint = () => {
-    window.print();
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const content = document.getElementById('printable-receipt')?.innerHTML;
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Order Receipt - ${request.id}</title>
+            <style>
+              @page { size: A4; margin: 2cm; }
+              body { font-family: Arial, sans-serif; }
+              .receipt-container { padding: 20px; }
+              table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+              th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+              th { background-color: #f3f4f6; }
+              .header { text-align: center; margin-bottom: 2em; }
+              .footer { text-align: center; margin-top: 2em; font-size: 0.8em; }
+            </style>
+          </head>
+          <body>
+            <div class="receipt-container">
+              ${content}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
   };
 
   return (
@@ -42,7 +94,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         {/* Header with action buttons */}
         <div className="flex items-center justify-between p-4 border-b print:hidden bg-gray-50">
           <h3 className="text-lg font-semibold text-gray-900">
-            Official Order Receipt #{request.orderNumber}
+            Official Order Receipt #{request.id}
           </h3>
           <div className="flex items-center space-x-2">
             <button
@@ -53,20 +105,20 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <Printer className="w-4 h-4 mr-1.5" />
               <span className="text-sm">Print</span>
             </button>
-            <button
-              onClick={() => {
-                // Trigger PDF download
-                const element = document.getElementById('printable-receipt');
-                if (element) {
-                  window.print();
-                }
-              }}
+            <PDFDownloadLink
+              document={<OrderReceipt order={requestToOrder(request)} />}
+              fileName={`order-receipt-${request.id}.pdf`}
               className="flex items-center px-3 py-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors"
-              title="Download Receipt"
             >
-              <Download className="w-4 h-4 mr-1.5" />
-              <span className="text-sm">Download</span>
-            </button>
+              {({ loading }) => (
+                <>
+                  <Download className="w-4 h-4 mr-1.5" />
+                  <span className="text-sm">
+                    {loading ? 'Preparing...' : 'Download PDF'}
+                  </span>
+                </>
+              )}
+            </PDFDownloadLink>
             <button
               onClick={onClose}
               className="p-1.5 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
@@ -77,21 +129,26 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           </div>
         </div>
 
-        {/* Receipt Content */}
-        <div className="p-4 space-y-4" id="printable-receipt">
+          {/* Receipt Content */}
+        <div className="p-6 space-y-6" id="printable-receipt">
           {/* Receipt Header */}
-          <div className="flex justify-between items-start border-b pb-3">
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">SLTB</h1>
-              <p className="text-sm text-gray-600">Tire Management System</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-semibold text-gray-900">Date: {formatDate(request.orderPlacedDate)}</p>
-              <p className="text-sm text-gray-600">Ref: {request.id}</p>
-            </div>
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Sri Lanka Transport Board</h1>
+            <p className="text-lg text-gray-600">Tire Management System</p>
+            <p className="text-lg font-semibold mt-2">Official Purchase Order</p>
           </div>
 
-          {/* Essential Information */}
+          {/* Order Information */}
+          <div className="flex justify-between items-start border-b pb-4">
+            <div>
+              <p className="text-sm font-semibold">Order Number: <span className="text-gray-700">{request.id}</span></p>
+              <p className="text-sm">Submitted Date: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
+              <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Reference ID: {request.id}</p>
+            </div>
+          </div>          {/* Essential Information */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-1">
               <p><span className="font-medium">Requester:</span> {request.requesterName}</p>
@@ -148,7 +205,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <p><span className="font-medium">Warranty:</span> {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : '-'}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-medium">Order Number:</span> {request.orderNumber}</p>
+              <p><span className="font-medium">Order Reference:</span> {request.id}</p>
               <p><span className="font-medium">Current KM:</span> {request.presentKmReading.toLocaleString()}</p>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
@@ -250,7 +250,20 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
 // Main Component
 const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
   if (!order) return null;
-  return <OrderReceiptPDF order={order} />;
+
+  return (
+    <div className="mb-4">
+      <PDFDownloadLink
+        document={<OrderReceiptPDF order={order} />}
+        fileName={`order-receipt-${order.orderNumber}.pdf`}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+      >
+        {({ loading }) =>
+          loading ? 'Generating receipt...' : 'Download Receipt'
+        }
+      </PDFDownloadLink>
+    </div>
+  );
 };
 
 export default OrderReceipt;

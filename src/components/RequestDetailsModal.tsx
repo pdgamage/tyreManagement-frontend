@@ -130,12 +130,59 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               {/* Order Receipt - Only show for placed orders */}
               {request.status === 'order placed' && (
                 <div className="col-span-full space-y-4">
-                  <h4 className="text-lg font-semibold text-green-700 border-b border-green-200 pb-2">
-                    Order Receipt
-                  </h4>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-sm text-green-600 font-medium mb-4">Download the official receipt for this order:</p>
-                    <OrderReceipt order={request} />
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-green-700 border-b border-green-200 pb-2">
+                      Order Receipt
+                    </h4>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h5 className="text-lg font-semibold text-gray-900 mb-2">Official Order Receipt</h5>
+                        <p className="text-sm text-gray-600">Order Number: {request.orderNumber}</p>
+                        <p className="text-sm text-gray-600">Date: {formatDate(request.orderPlacedDate)}</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        {request.orderNumber && request.orderPlacedDate && (
+                          <OrderReceipt 
+                            order={{
+                              id: request.id,
+                              orderNumber: request.orderNumber,
+                              orderPlacedDate: request.orderPlacedDate,
+                              requesterName: request.requesterName,
+                              userSection: request.userSection || '',
+                              costCenter: request.costCenter || '',
+                              requesterPhone: request.requesterPhone,
+                              vehicleNumber: request.vehicleNumber,
+                              vehicleBrand: request.vehicleBrand,
+                              vehicleModel: request.vehicleModel,
+                              tireSize: request.tireSize,
+                              quantity: request.quantity,
+                              tubesQuantity: request.tubesQuantity,
+                              warrantyDistance: request.warrantyDistance || 0,
+                              supplierName: request.supplierName || '',
+                              supplierPhone: request.supplierPhone || '',
+                              totalPrice: Number(request.totalPrice) || 0
+                            }} 
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <div className="border-t border-green-200 pt-4 mt-4">
+                      <h6 className="text-sm font-medium text-gray-900 mb-2">Receipt Summary</h6>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Vehicle: {request.vehicleNumber}</p>
+                          <p className="text-sm text-gray-600">Department: {request.userSection}</p>
+                          <p className="text-sm text-gray-600">Cost Center: {request.costCenter}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Tire Size: {request.tireSize}</p>
+                          <p className="text-sm text-gray-600">Quantity: {request.quantity}</p>
+                          <p className="text-sm font-medium text-gray-900">Total: LKR {Number(request.totalPrice).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

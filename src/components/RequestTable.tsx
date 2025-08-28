@@ -10,8 +10,7 @@ import {
   Eye,
   ShoppingCart,
   X,
-  Receipt,
-  Download
+  Receipt
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -381,18 +380,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         </button>
                       )}
 
-                    {/* Receipt Download Button - Only show for order placed status */}
+                    {/* View/Download Receipt Button - Only show for order placed status */}
                     {request.status?.toLowerCase() === "order placed" && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onView(request); // This will open the modal with receipt
                         }}
-                        className="px-4 text-gray-500 hover:text-emerald-700"
-                        aria-label="Download Receipt"
-                        title="Download Receipt"
+                        className="px-4 text-gray-500 hover:text-emerald-700 flex items-center gap-1"
+                        aria-label="View Receipt"
+                        title="View Receipt"
                       >
-                        <Download className="w-5 h-5" />
+                        <Receipt className="w-5 h-5" />
                       </button>
                     )}
                     {showDeleteButton && (

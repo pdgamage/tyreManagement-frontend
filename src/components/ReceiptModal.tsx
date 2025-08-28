@@ -113,23 +113,34 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <PDFDownloadLink
                 document={<OrderReceipt order={requestToOrder(request)} />}
                 fileName={`receipt-${generateReceiptNumber(request)}.pdf`}
+                style={{ textDecoration: 'none' }}
                 className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
               >
-                {({ loading }) => (
-                  <>
-                    {loading ? (
-                      <>
+                {({ loading, error }) => {
+                  if (error) {
+                    return (
+                      <div className="flex items-center">
+                        <span className="text-red-500">Error generating PDF. Try again.</span>
+                      </div>
+                    );
+                  }
+                  
+                  if (loading) {
+                    return (
+                      <div className="flex items-center">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
-                        <span>Preparing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-5 h-5 mr-2" />
-                        <span>Download PDF</span>
-                      </>
-                    )}
-                  </>
-                )}
+                        <span>Preparing PDF...</span>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="flex items-center">
+                      <Download className="w-5 h-5 mr-2" />
+                      <span>Download Receipt</span>
+                    </div>
+                  );
+                }}
               </PDFDownloadLink>
               <button
                 onClick={onClose}

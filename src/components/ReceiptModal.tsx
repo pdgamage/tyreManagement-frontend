@@ -106,24 +106,24 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <h3 className="text-lg font-semibold text-gray-900">
             Official Order Receipt #{request.id}
           </h3>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <button
               onClick={handlePrint}
-              className="flex items-center px-3 py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+              className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm"
               title="Print Receipt"
             >
-              <Printer className="w-4 h-4 mr-1.5" />
-              <span className="text-sm">Print</span>
+              <Printer className="w-5 h-5 mr-2" />
+              <span>Print</span>
             </button>
             <PDFDownloadLink
               document={<OrderReceipt order={requestToOrder(request)} />}
               fileName={`order-receipt-${request.id}.pdf`}
-              className="flex items-center px-3 py-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors"
+              className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
             >
               {({ loading }) => (
                 <>
-                  <Download className="w-4 h-4 mr-1.5" />
-                  <span className="text-sm">
+                  <Download className="w-5 h-5 mr-2" />
+                  <span>
                     {loading ? 'Preparing...' : 'Download PDF'}
                   </span>
                 </>
@@ -131,10 +131,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             </PDFDownloadLink>
             <button
               onClick={onClose}
-              className="p-1.5 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+              className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"
               title="Close"
             >
-              <X size={20} />
+              <X size={20} className="mr-2" />
+              <span>Close</span>
             </button>
           </div>
         </div>

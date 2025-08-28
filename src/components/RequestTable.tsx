@@ -308,17 +308,18 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   </span>
                 </td>
                 {showActions && (
-                  <td className="px-6 py-4 space-x-3 text-sm font-medium text-right">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onView(request);
-                      }}
-                      className="px-4 text-gray-500 hover:text-blue-700"
-                      aria-label="View Details"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onView(request);
+                        }}
+                        className="p-2 text-gray-500 hover:text-blue-700 rounded-lg hover:bg-blue-50 transition-colors"
+                        aria-label="View Details"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
                     {/* Hide approve/reject buttons for users, only show for specific roles */}
                     {(window.location.pathname.includes('/supervisor/') || 
                       window.location.pathname.includes('/technical-manager/') ||

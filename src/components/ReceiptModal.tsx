@@ -164,7 +164,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             </div>
             <div className="text-right">
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-2">
-                <h2 className="text-xl font-bold text-blue-800">PURCHASE ORDER</h2>
+                <h2 className="text-xl font-bold text-blue-800">ORDER RECEIPT</h2>
                 <p className="text-blue-600 font-medium mt-1">Receipt No: {generateReceiptNumber(request)}</p>
               </div>
               <div className="text-sm text-gray-600">

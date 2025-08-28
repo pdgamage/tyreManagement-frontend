@@ -1,11 +1,11 @@
 export interface Order {
   id: number;
-  orderNumber: string;
-  orderPlacedDate: string;
-  submittedAt: string | Date;
+  orderNumber?: string;
+  orderPlacedDate?: string | Date;
+  submittedAt?: string | Date;
   requesterName: string;
-  userSection: string;
-  costCenter: string;
+  userSection?: string;
+  costCenter?: string;
   requesterPhone: string;
   vehicleNumber: string;
   vehicleBrand: string;
@@ -13,15 +13,15 @@ export interface Order {
   tireSize: string;
   quantity: number;
   tubesQuantity: number;
-  warrantyDistance: number;
-  supplierName: string;
-  supplierPhone: string;
-  totalPrice: number;
-  // Additional fields
+  warrantyDistance?: number;
+  supplierName?: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
+  totalPrice?: number;
+  presentKmReading?: number;
   deliveryOfficeName?: string;
   deliveryStreetName?: string;
   deliveryTown?: string;
   requestReason?: string;
   existingTireMake?: string;
-  order_placed_date?: string;
 }

@@ -4,6 +4,16 @@ import { FileDown } from 'lucide-react';
 import { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
+// Helper function to safely format dates
+const formatDate = (date: string | Date | undefined | null): string => {
+  if (!date) return '-';
+  try {
+    return format(new Date(date), 'dd/MM/yyyy');
+  } catch (error) {
+    return '-';
+  }
+};
+
 // Define styles for the PDF
 const styles = StyleSheet.create({
   page: {
@@ -232,7 +242,7 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
         <View style={styles.receiptSection}>
           <Text style={styles.headerText}>PURCHASE ORDER</Text>
           <Text style={styles.receiptNumber}>Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}</Text>
-          <Text style={[styles.label, { marginTop: 8 }]}>Date Issued: {format(new Date(order.orderPlacedDate), 'dd/MM/yyyy')}</Text>
+          <Text style={[styles.label, { marginTop: 8 }]}>Date Issued: {formatDate(order.orderPlacedDate)}</Text>
           <Text style={styles.label}>Order Reference: #{order.orderNumber}</Text>
         </View>
       </View>
@@ -241,8 +251,8 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
       <View style={styles.infoGrid}>
         <View style={styles.infoBox}>
           <Text style={styles.sectionTitle}>Order Information</Text>
-          <Text style={styles.infoText}>Submission Date: {format(new Date(order.submittedAt), 'dd/MM/yyyy')}</Text>
-          <Text style={styles.infoText}>Processing Date: {format(new Date(order.orderPlacedDate), 'dd/MM/yyyy')}</Text>
+          <Text style={styles.infoText}>Submission Date: {formatDate(order.submittedAt)}</Text>
+          <Text style={styles.infoText}>Processing Date: {formatDate(order.orderPlacedDate)}</Text>
           <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
           <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
         </View>

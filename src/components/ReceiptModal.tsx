@@ -147,125 +147,172 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
 
           {/* Receipt Content */}
         <div className="p-6 space-y-6 bg-white" id="printable-receipt">
-          {/* Receipt Header */}
-          <div className="text-center mb-6">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
-              alt="SLT Mobitel Logo" 
-              className="h-16 mx-auto mb-4"
-            />
-            <h2 className="text-xl font-bold text-gray-900 mt-4">Tire Management System</h2>
-            <p className="text-lg font-semibold mt-2 text-blue-600">Receipt No: {generateReceiptNumber(request)}</p>
-            <p className="text-lg font-semibold mt-2">Official Purchase Order</p>
-          </div>
-
-          {/* Order Information */}
-          <div className="grid grid-cols-2 gap-6 border-b pb-4">
-            <div className="space-y-2">
-              <div>
-                <p className="text-sm font-semibold">Order Information:</p>
-                <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
-                <p className="text-sm">Order Number: <span className="text-gray-600">#{request.orderNumber || '-'}</span></p>
-                <p className="text-sm">Order Submitted: <span className="text-gray-700">{request.submittedAt ? formatDate(request.submittedAt) : '-'}</span></p>
-                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</span></p>
-              </div>
-              <div className="mt-3">
-                <p className="text-sm font-semibold">Delivery Address:</p>
-                <p className="text-sm">Office: <span className="text-gray-700">{request.deliveryOfficeName || '-'}</span></p>
-                <p className="text-sm">Street: <span className="text-gray-700">{request.deliveryStreetName || '-'}</span></p>
-                <p className="text-sm">Town: <span className="text-gray-700">{request.deliveryTown || '-'}</span></p>
+          {/* Company Header */}
+          <div className="flex justify-between items-start border-b pb-6">
+            <div className="flex-1">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                alt="SLT Mobitel Logo" 
+                className="h-16"
+              />
+              <div className="mt-2 text-gray-600 text-sm">
+                <p>SLT Mobitel Head Office</p>
+                <p>Lotus Road, Colombo 01</p>
+                <p>Sri Lanka</p>
+                <p>Tel: +94 11 2399399</p>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="mt-3">
-                <p className="text-sm font-semibold">Request Details:</p>
-                <p className="text-sm">Reason: <span className="text-gray-700">{request.requestReason || '-'}</span></p>
+            <div className="text-right">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-2">
+                <h2 className="text-xl font-bold text-blue-800">PURCHASE ORDER</h2>
+                <p className="text-blue-600 font-medium mt-1">Receipt No: {generateReceiptNumber(request)}</p>
+              </div>
+              <div className="text-sm text-gray-600">
+                <p>Date Issued: {request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</p>
+                <p>Order Reference: #{request.orderNumber || '-'}</p>
+                <p>Request ID: #{request.id}</p>
               </div>
             </div>
           </div>
 
-          {/* Contact and Vehicle Information */}
-          <div className="grid grid-cols-2 gap-6 text-sm border-b pb-4">
-            <div className="space-y-2">
-              <p className="font-semibold">Contact Information:</p>
-              <p><span className="font-medium">Requester:</span> {request.requesterName}</p>
-              <p><span className="font-medium">Phone:</span> {request.requesterPhone}</p>
+          {/* Order Information & Delivery Details */}
+          <div className="grid grid-cols-2 gap-8">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-800 mb-3">Order Information</h3>
+              <div className="text-sm space-y-2">
+                <p><span className="text-gray-600">Submission Date:</span> {request.submittedAt ? formatDate(request.submittedAt) : '-'}</p>
+                <p><span className="text-gray-600">Processing Date:</span> {request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</p>
+                <p><span className="text-gray-600">Department:</span> {request.userSection || '-'}</p>
+                <p><span className="text-gray-600">Cost Center:</span> {request.costCenter || '-'}</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <p className="font-semibold">Vehicle Information:</p>
-              <p><span className="font-medium">Number:</span> {request.vehicleNumber}</p>
-              <p><span className="font-medium">Make/Model:</span> {request.vehicleBrand} {request.vehicleModel}</p>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-800 mb-3">Delivery Information</h3>
+                <div className="text-sm space-y-2">
+                  <p><span className="text-gray-600">Office:</span> {request.deliveryOfficeName || '-'}</p>
+                  <p><span className="text-gray-600">Street:</span> {request.deliveryStreetName || '-'}</p>
+                  <p><span className="text-gray-600">Town:</span> {request.deliveryTown || '-'}</p>
+                </div>
+              </div>
             </div>
-          </div>          {/* Order Details Table */}
-          <div className="mt-4">
-            <div className="bg-gray-50 rounded border text-sm">
+
+          {/* Requester and Vehicle Information */}
+          <div className="grid grid-cols-2 gap-8 mt-6">
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-gray-800 mb-3">Requester Details</h3>
+              <div className="text-sm space-y-2">
+                <p><span className="text-gray-600">Name:</span> {request.requesterName}</p>
+                <p><span className="text-gray-600">Contact:</span> {request.requesterPhone}</p>
+                <p><span className="text-gray-600">Department:</span> {request.userSection || '-'}</p>
+                <p><span className="text-gray-600">Reason:</span> {request.requestReason || '-'}</p>
+              </div>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-gray-800 mb-3">Vehicle Details</h3>
+              <div className="text-sm space-y-2">
+                <p><span className="text-gray-600">Vehicle Number:</span> {request.vehicleNumber}</p>
+                <p><span className="text-gray-600">Make/Model:</span> {request.vehicleBrand} {request.vehicleModel}</p>
+                <p><span className="text-gray-600">Current KM:</span> {request.presentKmReading?.toLocaleString() || '-'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Details Table */}
+          {/* Order Details Table */}
+          <div className="mt-6">
+            <div className="border rounded-lg overflow-hidden">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">Item Description</th>
-                    <th className="text-center p-2">Make/Size</th>
-                    <th className="text-center p-2">Qty</th>
-                    <th className="text-right p-2">Amount</th>
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="text-left p-4 font-semibold text-gray-700">Item Description</th>
+                    <th className="text-center p-4 font-semibold text-gray-700">Make/Size</th>
+                    <th className="text-center p-4 font-semibold text-gray-700">Quantity</th>
+                    <th className="text-right p-4 font-semibold text-gray-700">Amount</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr className="border-b bg-gray-50">
-                    <td className="p-2 text-sm" colSpan={4}>
-                      <span className="font-medium">Existing Tire:</span> {request.existingTireMake || 'N/A'}
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="bg-gray-50">
+                    <td className="p-4" colSpan={4}>
+                      <span className="font-medium text-gray-700">Current Tire Details:</span>
+                      <span className="ml-2 text-gray-600">{request.existingTireMake || 'N/A'}</span>
                     </td>
                   </tr>
-                  <tr className="border-b">
-                    <td className="p-2">New Tires</td>
-                    <td className="text-center">{request.tireSize}</td>
-                    <td className="text-center">{request.quantity}</td>
-                    <td className="text-right">{formatCurrency(request.totalPrice)}</td>
+                  <tr>
+                    <td className="p-4">
+                      <div className="font-medium text-gray-700">New Tires</div>
+                      {request.warrantyDistance && (
+                        <div className="text-sm text-gray-500 mt-1">
+                          Warranty: {request.warrantyDistance.toLocaleString()} KM
+                        </div>
+                      )}
+                    </td>
+                    <td className="p-4 text-center text-gray-600">{request.tireSize}</td>
+                    <td className="p-4 text-center text-gray-600">{request.quantity}</td>
+                    <td className="p-4 text-right text-gray-800">{formatCurrency(request.totalPrice)}</td>
                   </tr>
                   {request.tubesQuantity > 0 && (
-                    <tr className="border-b">
-                      <td className="p-2">Tubes</td>
-                      <td className="text-center">{request.tireSize}</td>
-                      <td className="text-center">{request.tubesQuantity}</td>
-                      <td className="text-right">Included</td>
+                    <tr>
+                      <td className="p-4 text-gray-700">Tubes</td>
+                      <td className="p-4 text-center text-gray-600">{request.tireSize}</td>
+                      <td className="p-4 text-center text-gray-600">{request.tubesQuantity}</td>
+                      <td className="p-4 text-right text-gray-600">Included</td>
                     </tr>
                   )}
-                  <tr className="font-semibold bg-gray-100">
-                    <td colSpan={3} className="p-2 text-right">Total:</td>
-                    <td className="p-2 text-right">{formatCurrency(request.totalPrice)}</td>
-                  </tr>
                 </tbody>
+                <tfoot className="bg-gray-50">
+                  <tr className="font-semibold">
+                    <td colSpan={3} className="p-4 text-right text-gray-700">Total Amount:</td>
+                    <td className="p-4 text-right text-gray-900">{formatCurrency(request.totalPrice)}</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
 
-          {/* Additional Details */}
-          <div className="grid grid-cols-2 gap-4 text-sm mt-4">
-            <div className="space-y-1">
-              <p><span className="font-medium">Supplier:</span> {request.supplierName || '-'}</p>
-              <p><span className="font-medium">Supplier Phone:</span> {request.supplierPhone || '-'}</p>
-              <p><span className="font-medium">Supplier Email:</span> {request.supplierEmail || '-'}</p>
-              <p><span className="font-medium">Warranty:</span> {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : '-'}</p>
-            </div>
-            <div className="space-y-1">
-              <p><span className="font-medium">Current KM:</span> {request.presentKmReading.toLocaleString()}</p>
+          {/* Supplier Information */}
+          <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-800 mb-3">Supplier Information</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <p><span className="text-gray-600">Name:</span> <span className="text-gray-800">{request.supplierName || '-'}</span></p>
+                <p><span className="text-gray-600">Phone:</span> <span className="text-gray-800">{request.supplierPhone || '-'}</span></p>
+              </div>
+              <div className="space-y-2">
+                <p><span className="text-gray-600">Email:</span> <span className="text-gray-800">{request.supplierEmail || '-'}</span></p>
+              </div>
             </div>
           </div>
 
           {/* Signatures */}
-          <div className="grid grid-cols-2 gap-8 mt-8 pt-4 border-t">
-            <div className="text-center">
-              <div className="border-t border-gray-300 w-32 mx-auto mt-8"></div>
-              <p className="text-xs text-gray-600 mt-1">Customer Officer</p>
-            </div>
-            <div className="text-center">
-              <div className="border-t border-gray-300 w-32 mx-auto mt-8"></div>
-              <p className="text-xs text-gray-600 mt-1">Requester</p>
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="grid grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="border-t-2 border-gray-400 w-40 mx-auto mt-8"></div>
+                <p className="text-sm font-medium text-gray-700 mt-2">Authorized By</p>
+                <p className="text-xs text-gray-500">Customer Officer</p>
+              </div>
+              <div className="text-center">
+                <div className="border-t-2 border-gray-400 w-40 mx-auto mt-8"></div>
+                <p className="text-sm font-medium text-gray-700 mt-2">Requested By</p>
+                <p className="text-xs text-gray-500">{request.requesterName}</p>
+              </div>
+              <div className="text-center">
+                <div className="border-t-2 border-gray-400 w-40 mx-auto mt-8"></div>
+                <p className="text-sm font-medium text-gray-700 mt-2">Approved By</p>
+                <p className="text-xs text-gray-500">Department Head</p>
+              </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center text-xs text-gray-500 mt-4 pt-4 border-t">
-            <p>This is an official receipt of SLT Mobitel Tire Management System</p>
-            <p>Generated: {new Date().toLocaleString()}</p>
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="text-center">
+              <div className="text-sm text-gray-600">
+                <p className="font-medium">SLT Mobitel - Tire Management System</p>
+                <p className="mt-1">This is a computer-generated document</p>
+                <p className="text-xs text-gray-500 mt-2">Generated on: {new Date().toLocaleString()}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

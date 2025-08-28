@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, ZoomIn } from 'lucide-react';
+import { X, ZoomIn, Download } from 'lucide-react';
 import type { TireRequest } from '../types/api';
+import OrderReceipt from './OrderReceipt';
 
 interface RequestDetailsModalProps {
   request: TireRequest | null;
@@ -125,6 +126,19 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   <p><span className="font-medium">Tire Wear Indicator:</span> {request.tireWearIndicatorAppeared !== undefined ? (request.tireWearIndicatorAppeared ? "Yes" : "No") : "N/A"}</p>
                 </div>
               </div>
+
+              {/* Order Receipt - Only show for placed orders */}
+              {request.status === 'order placed' && (
+                <div className="col-span-full space-y-4">
+                  <h4 className="text-lg font-semibold text-green-700 border-b border-green-200 pb-2">
+                    Order Receipt
+                  </h4>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-sm text-green-600 font-medium mb-4">Download the official receipt for this order:</p>
+                    <OrderReceipt order={request} />
+                  </div>
+                </div>
+              )}
 
               {/* Cancellation Information - Only show for cancelled orders */}
               {request.status === 'order cancelled' && request.customer_officer_note && (

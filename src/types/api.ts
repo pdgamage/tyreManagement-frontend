@@ -23,8 +23,8 @@ export interface TireRequest {
   vehicleId: number;
   vehicleNumber: string;
   vehicleType?: string;
-  vehicleDepartment?: string;
-  vehicleCostCentre?: string;
+  userSection?: string;
+  costCenter?: string;
   quantity: number;
   tubesQuantity: number;
   tireSize: string;

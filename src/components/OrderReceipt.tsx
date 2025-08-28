@@ -1,6 +1,5 @@
 import { format } from 'date-fns';
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { FileDown } from 'lucide-react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
@@ -353,27 +352,17 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
   );
 };
 
-// Main component that renders the download button
-const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
+export const OrderReceiptPDF = ({ order }: { order: Order }) => {
   if (!order) return null;
-
+  
   return (
-    <div className="mb-4">
-      <PDFDownloadLink
-        document={<OrderReceiptPDF order={order} />}
-        fileName={`order-receipt-${order.orderNumber || order.id}.pdf`}
-        className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors cursor-pointer"
-        style={{ textDecoration: 'none' }}
-      >
-        {({ loading }) => (
-          <>
-            <FileDown className="w-5 h-5 mr-2" />
-            <span>{loading ? 'Generating receipt...' : 'Download Receipt'}</span>
-          </>
-        )}
-      </PDFDownloadLink>
-    </div>
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Your existing PDF content */}
+        {/* ... */}
+      </Page>
+    </Document>
   );
 };
 
-export default OrderReceipt;
+export default OrderReceiptPDF;

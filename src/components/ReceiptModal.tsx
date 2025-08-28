@@ -58,37 +58,38 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
   if (!isOpen || !request) return null;
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      const content = document.getElementById('printable-receipt')?.innerHTML;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Order Receipt - ${request.id}</title>
-            <style>
-              @page { size: A4; margin: 2cm; }
-              body { font-family: Arial, sans-serif; }
-              .receipt-container { padding: 20px; }
-              table { width: 100%; border-collapse: collapse; margin: 1em 0; }
-              th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-              th { background-color: #f3f4f6; }
-              .header { text-align: center; margin-bottom: 2em; }
-              .footer { text-align: center; margin-top: 2em; font-size: 0.8em; }
-            </style>
-          </head>
-          <body>
-            <div class="receipt-container">
-              ${content}
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    }
+    // Add print-specific styles to the head
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #printable-receipt, #printable-receipt * {
+          visibility: visible;
+        }
+        #printable-receipt {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+        @page {
+          size: A4;
+          margin: 2cm;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Print the document
+    window.print();
+
+    // Remove the style element after printing
+    document.head.removeChild(style);
   };
 
   return (
@@ -151,10 +152,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="grid grid-cols-2 gap-6 border-b pb-4">
             <div className="space-y-2">
               <div>
-                <p className="text-sm font-semibold">Order Details:</p>
+                <p className="text-sm font-semibold">Order Information:</p>
                 <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
                 <p className="text-sm">Request ID: <span className="text-gray-600">#{request.id}</span></p>
-                <p className="text-sm">Submitted: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
+                <p className="text-sm">Order Submitted: <span className="text-gray-700">{request.submittedAt ? formatDate(request.submittedAt) : '-'}</span></p>
                 <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
               </div>
               <div className="mt-3">
@@ -166,31 +167,26 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             </div>
             <div className="space-y-2">
               <div>
-                <p className="text-sm font-semibold">Department Information:</p>
-                <p className="text-sm">Department: <span className="text-gray-700">{request.userSection || '-'}</span></p>
-                <p className="text-sm">Cost Center: <span className="text-gray-700">{request.costCenter || '-'}</span></p>
-              </div>
-              <div className="mt-3">
+                <div className="mt-3">
                 <p className="text-sm font-semibold">Request Details:</p>
                 <p className="text-sm">Reason: <span className="text-gray-700">{request.requestReason || '-'}</span></p>
-                <p className="text-sm">Existing Tire Make: <span className="text-gray-700">{request.existingTireMake || '-'}</span></p>
               </div>
             </div>
           </div>
 
-          {/* Contact Information */}
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="space-y-1">
+          {/* Contact and Vehicle Information */}
+          <div className="grid grid-cols-2 gap-6 text-sm border-b pb-4">
+            <div className="space-y-2">
+              <p className="font-semibold">Contact Information:</p>
               <p><span className="font-medium">Requester:</span> {request.requesterName}</p>
-              <p><span className="font-medium">Contact:</span> {request.requesterPhone}</p>
+              <p><span className="font-medium">Phone:</span> {request.requesterPhone}</p>
             </div>
-            <div className="space-y-1">
-              <p><span className="font-medium">Vehicle Number:</span> {request.vehicleNumber}</p>
+            <div className="space-y-2">
+              <p className="font-semibold">Vehicle Information:</p>
+              <p><span className="font-medium">Number:</span> {request.vehicleNumber}</p>
               <p><span className="font-medium">Make/Model:</span> {request.vehicleBrand} {request.vehicleModel}</p>
             </div>
-          </div>
-
-          {/* Order Details Table */}
+          </div>          {/* Order Details Table */}
           <div className="mt-4">
             <div className="bg-gray-50 rounded border text-sm">
               <table className="w-full">

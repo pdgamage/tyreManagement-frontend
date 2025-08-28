@@ -230,10 +230,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="grid grid-cols-2 gap-4 text-sm mt-4">
             <div className="space-y-1">
               <p><span className="font-medium">Supplier:</span> {request.supplierName || '-'}</p>
+              <p><span className="font-medium">Supplier Phone:</span> {request.supplierPhone || '-'}</p>
+              <p><span className="font-medium">Supplier Email:</span> {request.supplierEmail || '-'}</p>
               <p><span className="font-medium">Warranty:</span> {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : '-'}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-medium">Order Reference:</span> {request.id}</p>
+              <p><span className="font-medium">Order Number:</span> {request.id}</p>
               <p><span className="font-medium">Current KM:</span> {request.presentKmReading.toLocaleString()}</p>
             </div>
           </div>

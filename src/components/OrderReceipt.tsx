@@ -244,8 +244,6 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={styles.infoText}>
               Processing Date: {formatDate(order.orderPlacedDate)}
             </Text>
-            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
-            <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
           </View>
           
           {/* Delivery Information */}
@@ -264,7 +262,6 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={styles.sectionTitle}>Requester Details</Text>
             <Text style={styles.infoText}>Name: {order.requesterName}</Text>
             <Text style={styles.infoText}>Contact: {order.requesterPhone}</Text>
-            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
           </View>
           
           {/* Vehicle Details */}

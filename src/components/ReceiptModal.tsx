@@ -166,8 +166,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               </div>
             </div>
             <div className="space-y-2">
-              <div>
-                <div className="mt-3">
+              <div className="mt-3">
                 <p className="text-sm font-semibold">Request Details:</p>
                 <p className="text-sm">Reason: <span className="text-gray-700">{request.requestReason || '-'}</span></p>
               </div>

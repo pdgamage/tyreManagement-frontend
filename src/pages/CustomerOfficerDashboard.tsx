@@ -80,6 +80,30 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
+  // Prepare request for receipt display
+  const prepareReceiptData = (request: Request) => ({
+    id: request.id,
+    orderNumber: request.orderNumber || `OR${String(request.id).padStart(6, '0')}`,
+    requesterName: request.requesterName,
+    requesterEmail: request.requesterEmail,
+    requesterPhone: request.requesterPhone,
+    vehicleNumber: request.vehicleNumber,
+    vehicleBrand: request.vehicleBrand,
+    vehicleModel: request.vehicleModel,
+    quantity: request.quantity,
+    tubesQuantity: request.tubesQuantity,
+    tireSize: request.tireSize,
+    totalPrice: request.totalPrice || 0,
+    userSection: request.userSection,
+    costCenter: request.costCenter,
+    supplierName: request.supplierName,
+    supplierEmail: request.supplierEmail,
+    supplierPhone: request.supplierPhone,
+    submittedAt: request.submittedAt.toString(),
+    orderPlacedDate: request.orderPlacedDate?.toString() || request.order_timestamp?.toString() || request.submittedAt.toString(),
+    status: request.status,
+  });
+
   // Filter requests to show both "complete" and "order placed" status
   const completeRequests = requests.filter(
     (req) => req.status === "complete" || req.status === "order placed"
@@ -536,7 +560,7 @@ const CustomerOfficerDashboard = () => {
             
             {/* Receipt Content */}
             <div className="p-6">
-              <Receipt request={selectedReceiptRequest} />
+              <Receipt request={prepareReceiptData(selectedReceiptRequest)} />
             </div>
           </div>
         </div>

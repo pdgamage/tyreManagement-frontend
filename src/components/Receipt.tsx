@@ -4,7 +4,7 @@ import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-
 
 interface ReceiptProps {
   request: {
-    id: number;
+    id: string | number;
     orderNumber: string | null;
     requesterName: string;
     requesterEmail: string;
@@ -15,14 +15,14 @@ interface ReceiptProps {
     quantity: number;
     tubesQuantity: number;
     tireSize: string;
-    totalPrice: number | null;
-    userSection: string | null;
-    costCenter: string | null;
-    supplierName: string | null;
-    supplierEmail: string | null;
-    supplierPhone: string | null;
+    totalPrice: number | null | undefined;
+    userSection: string | null | undefined;
+    costCenter: string | null | undefined;
+    supplierName: string | null | undefined;
+    supplierEmail: string | null | undefined;
+    supplierPhone: string | null | undefined;
     submittedAt: string | Date;
-    orderPlacedDate: string | Date | null;
+    orderPlacedDate: string | null | undefined;
     status?: string;
   };
 }

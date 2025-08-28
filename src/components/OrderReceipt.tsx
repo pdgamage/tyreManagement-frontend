@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { Order } from '../types/Order';
+import type { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
 // Helper function to safely format dates

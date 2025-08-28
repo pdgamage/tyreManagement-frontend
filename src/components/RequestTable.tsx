@@ -10,7 +10,8 @@ import {
   Eye,
   ShoppingCart,
   X,
-
+  FileText,
+  Download
 } from "lucide-react";
 import type { Request } from "../types/request";
 
@@ -148,6 +149,8 @@ interface RequestTableProps {
   onDelete: (id: string) => void;
   onPlaceOrder: (request: Request) => void;
   onCancelOrder?: (id: string) => void;
+  onViewReceipt?: (request: Request) => void;
+  onDownloadReceipt?: (request: Request) => void;
 
   showActions?: boolean;
   showPlaceOrderButton?: boolean;
@@ -164,6 +167,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
   onDelete,
   onPlaceOrder,
   onCancelOrder,
+  onViewReceipt,
+  onDownloadReceipt,
 
   showActions = true,
   showPlaceOrderButton = false,
@@ -379,6 +384,34 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           <X className="w-5 h-5" />
                         </button>
                       )}
+
+                    {request.status?.toLowerCase().trim() === "order placed" && onViewReceipt && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewReceipt(request);
+                          }}
+                          className="px-4 text-gray-500 hover:text-blue-700"
+                          aria-label="View Receipt"
+                          title="View Receipt"
+                        >
+                          <FileText className="w-5 h-5" />
+                        </button>
+                    )}
+
+                    {request.status?.toLowerCase().trim() === "order placed" && onDownloadReceipt && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDownloadReceipt(request);
+                          }}
+                          className="px-4 text-gray-500 hover:text-green-700"
+                          aria-label="Download Receipt"
+                          title="Download Receipt"
+                        >
+                          <Download className="w-5 h-5" />
+                        </button>
+                    )}
 
                     {showDeleteButton && (
                       <button

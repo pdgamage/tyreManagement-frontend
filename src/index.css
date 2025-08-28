@@ -3,6 +3,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import "./styles/animations.css";
+@import "./styles/print.css";
 
 /* Autosuggest suggestion list styles */
 .react-autosuggest__container {

@@ -1,0 +1,68 @@
+@media print {
+  /* Hide everything except the receipt content */
+  body > *:not(#printable-receipt) {
+    display: none !important;
+  }
+
+  /* Reset background colors and shadows for better printing */
+  #printable-receipt {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    padding: 20px !important;
+  }
+
+  /* Ensure page breaks don't cut through important sections */
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Format tables nicely for printing */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  /* Remove background colors but keep borders */
+  .bg-gray-50,
+  .bg-green-50,
+  .bg-blue-50 {
+    background-color: white !important;
+  }
+
+  /* Ensure text is black for better printing */
+  .text-gray-600,
+  .text-gray-500,
+  .text-blue-600 {
+    color: black !important;
+  }
+
+  /* Hide print and close buttons */
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Add page numbers */
+  @page {
+    margin: 2cm;
+  }
+
+  @page :first {
+    margin-top: 3cm;
+  }
+
+  /* Ensure proper page breaks */
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  table, figure {
+    page-break-inside: avoid;
+  }
+}

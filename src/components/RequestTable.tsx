@@ -12,7 +12,9 @@ import {
   X,
   Receipt
 } from "lucide-react";
+import ReceiptModal from "./ReceiptModal";
 import type { Request } from "../types/request";
+import type { BaseRequest } from "../types/shared";
 
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
@@ -173,6 +175,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
   const [sortField, setSortField] = useState<keyof Request>("submittedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReceipt, setSelectedReceipt] = useState<Request | null>(null);
   const requestsPerPage = 5;
 
   const handleSort = (field: keyof Request) => {
@@ -385,7 +388,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onView(request); // This will open the modal with receipt
+                          setSelectedReceipt(request);
                         }}
                         className="px-4 text-gray-500 hover:text-emerald-700 flex items-center gap-1"
                         aria-label="View Receipt"
@@ -469,6 +472,13 @@ const RequestTable: React.FC<RequestTableProps> = ({
           </div>
         </div>
       )}
+
+      {/* Receipt Modal */}
+      <ReceiptModal
+        request={selectedReceipt}
+        isOpen={!!selectedReceipt}
+        onClose={() => setSelectedReceipt(null)}
+      />
     </div>
   );
 };

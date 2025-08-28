@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Printer, FileDown } from 'lucide-react';
+import { X, Download, Printer, FileDown } from 'lucide-react';
 import type { Request } from '../types/request';
 import type { Order } from '../types/Order';
 import { format } from 'date-fns';
@@ -43,13 +43,7 @@ interface ReceiptModalProps {
 
 const formatDate = (date: string | Date | undefined) => {
   if (!date) return '-';
-  try {
-    const parsedDate = typeof date === 'string' ? new Date(date) : date;
-    return format(parsedDate, 'dd/MM/yyyy');
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return '-';
-  }
+  return format(new Date(date), 'dd/MM/yyyy');
 };
 
 const formatCurrency = (amount: number | undefined) => {
@@ -115,7 +109,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrint}
-              className="flex items-center px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+              className="flex items-center px-3 py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
               title="Print Receipt"
             >
               <Printer className="w-4 h-4 mr-1.5" />
@@ -124,24 +118,23 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             <PDFDownloadLink
               document={<OrderReceipt order={requestToOrder(request)} />}
               fileName={`order-receipt-${request.id}.pdf`}
-              className="flex items-center px-3 py-2 bg-green-600 text-white hover:bg-green-700 rounded-md transition-colors"
+              className="flex items-center px-3 py-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors"
             >
               {({ loading }) => (
                 <>
-                  <FileDown className="w-4 h-4 mr-1.5" />
+                  <Download className="w-4 h-4 mr-1.5" />
                   <span className="text-sm">
-                    {loading ? 'Preparing...' : 'Download'}
+                    {loading ? 'Preparing...' : 'Download PDF'}
                   </span>
                 </>
               )}
             </PDFDownloadLink>
             <button
               onClick={onClose}
-              className="flex items-center px-3 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-md transition-colors"
+              className="p-1.5 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
               title="Close"
             >
-              <X className="w-4 h-4 mr-1.5" />
-              <span className="text-sm">Close</span>
+              <X size={20} />
             </button>
           </div>
         </div>
@@ -161,9 +154,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <div>
                 <p className="text-sm font-semibold">Order Information:</p>
                 <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
-                <p className="text-sm">Order Number: <span className="text-gray-600">#{request.id}</span></p>
+                <p className="text-sm">Request ID: <span className="text-gray-600">#{request.id}</span></p>
                 <p className="text-sm">Order Submitted: <span className="text-gray-700">{request.submittedAt ? formatDate(request.submittedAt) : '-'}</span></p>
-                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(new Date(request.order_timestamp)) : '-'}</span></p>
+                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
               </div>
               <div className="mt-3">
                 <p className="text-sm font-semibold">Delivery Address:</p>
@@ -237,15 +230,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="grid grid-cols-2 gap-4 text-sm mt-4">
             <div className="space-y-1">
               <p><span className="font-medium">Supplier:</span> {request.supplierName || '-'}</p>
-              <p><span className="font-medium">Supplier Phone:</span> {request.supplierPhone || '-'}</p>
-              <p><span className="font-medium">Supplier Email:</span> {request.supplierEmail || '-'}</p>
               <p><span className="font-medium">Warranty:</span> {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : '-'}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-medium">Order Number:</span> {request.id}</p>
               <p><span className="font-medium">Order Reference:</span> {request.id}</p>
-              <p><span className="font-medium">Order Placed Date:</span> {request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</p>
-              <p><span className="font-medium">Current KM:</span> {request.presentKmReading?.toLocaleString() || '-'}</p>
+              <p><span className="font-medium">Current KM:</span> {request.presentKmReading.toLocaleString()}</p>
             </div>
           </div>
 

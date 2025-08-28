@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { FileDown } from 'lucide-react';
 import { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
@@ -13,10 +14,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  receiptNumber: {
+    fontSize: 14,
+    color: '#2563eb',
+    marginBottom: 10,
+  },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1a237e',
+  },
+  subHeaderText: {
+    fontSize: 16,
+    color: '#4b5563',
+    marginTop: 5,
   },
   companyInfo: {
     marginBottom: 20,
@@ -95,12 +106,14 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
     <Page size="A4" style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>TIRE ORDER RECEIPT</Text>
+        <Text style={styles.receiptNumber}>Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}</Text>
+        <Text style={styles.headerText}>SLT MOBITEL</Text>
+        <Text style={styles.subHeaderText}>Tire Management System</Text>
       </View>
 
       {/* Company Information */}
           <View style={styles.companyInfo}>
-            <Text style={styles.value}>Sri Lanka Transport Board</Text>
+            <Text style={styles.value}>SLT Mobitel - Official Purchase Order</Text>
             <Text style={styles.label}>Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}</Text>
             <Text style={styles.label}>Request ID: #{order.id}</Text>
             <Text style={styles.label}>Date Submitted: {format(new Date(order.submittedAt), 'dd/MM/yyyy')}</Text>
@@ -256,11 +269,15 @@ const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
       <PDFDownloadLink
         document={<OrderReceiptPDF order={order} />}
         fileName={`order-receipt-${order.orderNumber}.pdf`}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+        className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors cursor-pointer"
+        style={{ textDecoration: 'none' }}
       >
-        {({ loading }) =>
-          loading ? 'Generating receipt...' : 'Download Receipt'
-        }
+        {({ loading }) => (
+          <>
+            <FileDown className="w-5 h-5 mr-2" />
+            <span>{loading ? 'Generating receipt...' : 'Download Receipt'}</span>
+          </>
+        )}
       </PDFDownloadLink>
     </div>
   );

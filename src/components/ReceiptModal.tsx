@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Download, Printer, FileDown } from 'lucide-react';
+import { X, Printer, FileDown } from 'lucide-react';
 import type { Request } from '../types/request';
 import type { Order } from '../types/Order';
 import { format } from 'date-fns';
@@ -110,20 +110,23 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                 <Printer className="w-5 h-5 mr-2" />
                 <span>Print</span>
               </button>
-              <PDFDownloadLink
-                document={<OrderReceipt order={requestToOrder(request)} />}
-                fileName={`order-receipt-${request.id}.pdf`}
-                className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
-              >
-                {({ loading }) => (
-                  <>
-                    <Download className="w-5 h-5 mr-2" />
-                    <span>
-                      {loading ? 'Preparing...' : 'Download PDF'}
-                    </span>
-                  </>
-                )}
-              </PDFDownloadLink>
+              <div>
+                <PDFDownloadLink
+                  document={<OrderReceipt order={requestToOrder(request)} />}
+                  fileName={`order-receipt-${request.id}.pdf`}
+                  className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {({ loading }) => (
+                    <>
+                      <FileDown className="w-5 h-5 mr-2" />
+                      <span>
+                        {loading ? 'Preparing...' : 'Download PDF'}
+                      </span>
+                    </>
+                  )}
+                </PDFDownloadLink>
+              </div>
               <button
                 onClick={onClose}
                 className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"
@@ -146,8 +149,13 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         <div className="p-6 space-y-6 bg-white" id="printable-receipt">
           {/* Receipt Header */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Sri Lanka Telecom Mobitel</h1>
-            <p className="text-lg text-gray-600">Tire Management System</p>
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+              alt="SLT Mobitel Logo" 
+              className="h-16 mx-auto mb-4"
+            />
+            <h2 className="text-xl font-bold text-gray-900 mt-4">Tire Management System</h2>
+            <p className="text-lg font-semibold mt-2 text-blue-600">Receipt No: {generateReceiptNumber(request)}</p>
             <p className="text-lg font-semibold mt-2">Official Purchase Order</p>
           </div>
 

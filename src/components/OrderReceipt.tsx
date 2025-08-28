@@ -5,14 +5,138 @@ import { Order } from '../types/Order';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
 // Helper function to safely format dates
-const formatDate = (date: string | Date | undefined | null): string => {
+const formatSafeDate = (date: string | Date | undefined | null): string => {
   if (!date) return '-';
   try {
-    return format(new Date(date), 'dd/MM/yyyy');
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '-';
+    return format(dateObj, 'dd/MM/yyyy');
   } catch (error) {
     return '-';
   }
 };
+
+// Helper function to safely format currency
+const formatCurrency = (amount: number | undefined): string => {
+  if (typeof amount !== 'number') return 'LKR 0.00';
+  return `LKR ${amount.toFixed(2)}`;
+};
+
+// Helper function to safely format dates
+const formatDate = (date: string | Date | undefined | null): string => {
+  if (!date) return '-';
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '-';
+    return format(dateObj, 'dd/MM/yyyy');
+  } catch (error) {
+    return '-';
+  }
+};
+
+// Helper function to safely format currency
+const formatCurrency = (amount: number | undefined): string => {
+  if (typeof amount !== 'number') return 'LKR 0.00';
+  return `LKR ${amount.toFixed(2)}`;
+};
+
+// PDF Document Component
+const ReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.headerContainer}>
+        <View style={styles.logoSection}>
+          <Text style={styles.headerText}>SLT MOBITEL</Text>
+          <Text style={styles.subHeaderText}>Tire Management System</Text>
+          <Text style={styles.companyInfo}>SLT Mobitel Head Office</Text>
+          <Text style={styles.companyInfo}>Lotus Road, Colombo 01</Text>
+          <Text style={styles.companyInfo}>Sri Lanka</Text>
+        </View>
+        <View style={styles.receiptSection}>
+          <Text style={styles.receiptNumber}>
+            Receipt #{order.orderNumber || '-'}
+          </Text>
+          <Text style={styles.dateText}>
+            Date: {order.orderPlacedDate ? formatDate(order.orderPlacedDate) : '-'}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Order Information</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Order ID: {order.id}</Text>
+          <Text style={styles.label}>Date Submitted: {order.submittedAt ? formatDate(order.submittedAt) : '-'}</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Customer Details</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Name: {order.requesterName}</Text>
+          <Text style={styles.label}>Phone: {order.requesterPhone}</Text>
+          <Text style={styles.label}>Department: {order.userSection || '-'}</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Order Details</Text>
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableHeader}>Item</Text>
+            <Text style={styles.tableHeader}>Size</Text>
+            <Text style={styles.tableHeader}>Quantity</Text>
+            <Text style={styles.tableHeader}>Amount</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>New Tires</Text>
+            <Text style={styles.tableCell}>{order.tireSize}</Text>
+            <Text style={styles.tableCell}>{order.quantity}</Text>
+            <Text style={styles.tableCell}>{order.totalPrice ? formatCurrency(order.totalPrice) : '-'}</Text>
+          </View>
+          {order.tubesQuantity > 0 && (
+            <View style={styles.tableRow}>
+              <Text style={styles.tableCell}>Tubes</Text>
+              <Text style={styles.tableCell}>{order.tireSize}</Text>
+              <Text style={styles.tableCell}>{order.tubesQuantity}</Text>
+              <Text style={styles.tableCell}>Included</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>This is a computer-generated document.</Text>
+        <Text style={styles.footerText}>SLT Mobitel - Tire Management System</Text>
+      </View>
+    </Page>
+  </Document>
+);
+
+// Main component that renders the download button
+const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
+  if (!order) return null;
+
+  return (
+    <div className="mb-4">
+      <PDFDownloadLink
+        document={<ReceiptPDF order={order} />}
+        fileName={`order-receipt-${order.orderNumber || order.id}.pdf`}
+        className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors cursor-pointer"
+        style={{ textDecoration: 'none' }}
+      >
+        {({ loading }) => (
+          <>
+            <FileDown className="w-5 h-5 mr-2" />
+            <span>{loading ? 'Generating receipt...' : 'Download Receipt'}</span>
+          </>
+        )}
+      </PDFDownloadLink>
+    </div>
+  );
+};
+
+export default OrderReceipt;
 
 // Define styles for the PDF
 const styles = StyleSheet.create({
@@ -55,6 +179,64 @@ const styles = StyleSheet.create({
   receiptNumber: {
     fontSize: 12,
     color: '#1D4ED8',
+    marginBottom: 4,
+  },
+  dateText: {
+    fontSize: 10,
+    color: '#4B5563',
+    marginTop: 4,
+  },
+  section: {
+    marginVertical: 10,
+    padding: 10,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 4,
+  },
+  label: {
+    fontSize: 10,
+    color: '#4B5563',
+  },
+  table: {
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    padding: 8,
+  },
+  tableHeader: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#374151',
+  },
+  tableCell: {
+    flex: 1,
+    fontSize: 10,
+    color: '#4B5563',
+  },
+  footer: {
+    marginTop: 40,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 10,
+    color: '#6B7280',
     marginBottom: 4,
   },
   label: {
@@ -224,35 +406,44 @@ const styles = StyleSheet.create({
 });
 
 // PDF Document Component
-const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Header with Logo and Receipt Info */}
-      <View style={styles.headerContainer}>
-        <View style={styles.logoSection}>
-          <Text style={styles.headerText}>SLT MOBITEL</Text>
-          <Text style={styles.subHeaderText}>Tire Management System</Text>
-          <View style={styles.companyInfo}>
-            <Text>SLT Mobitel Head Office</Text>
-            <Text>Lotus Road, Colombo 01</Text>
-            <Text>Sri Lanka</Text>
-            <Text>Tel: +94 11 2399399</Text>
+const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header with Logo and Receipt Info */}
+        <View style={styles.headerContainer}>
+          <View style={styles.logoSection}>
+            <Text style={styles.headerText}>SLT MOBITEL</Text>
+            <Text style={styles.subHeaderText}>Tire Management System</Text>
+            <View style={styles.companyInfo}>
+              <Text>SLT Mobitel Head Office</Text>
+              <Text>Lotus Road, Colombo 01</Text>
+              <Text>Sri Lanka</Text>
+              <Text>Tel: +94 11 2399399</Text>
+            </View>
+          </View>
+          <View style={styles.receiptSection}>
+            <Text style={styles.headerText}>PURCHASE ORDER</Text>
+            <Text style={styles.receiptNumber}>
+              Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}
+            </Text>
+            <Text style={[styles.label, { marginTop: 8 }]}>
+              Date Issued: {order.orderPlacedDate ? formatDate(order.orderPlacedDate) : '-'}
+            </Text>
+            <Text style={styles.label}>Order Reference: #{order.orderNumber || '-'}</Text>
           </View>
         </View>
-        <View style={styles.receiptSection}>
-          <Text style={styles.headerText}>PURCHASE ORDER</Text>
-          <Text style={styles.receiptNumber}>Receipt No: {generateReceiptNumber({ ...order, id: order.id.toString() })}</Text>
-          <Text style={[styles.label, { marginTop: 8 }]}>Date Issued: {formatDate(order.orderPlacedDate)}</Text>
-          <Text style={styles.label}>Order Reference: #{order.orderNumber}</Text>
-        </View>
-      </View>
 
-      {/* Order and Delivery Info */}
-      <View style={styles.infoGrid}>
-        <View style={styles.infoBox}>
-          <Text style={styles.sectionTitle}>Order Information</Text>
-          <Text style={styles.infoText}>Submission Date: {formatDate(order.submittedAt)}</Text>
-          <Text style={styles.infoText}>Processing Date: {formatDate(order.orderPlacedDate)}</Text>
+        {/* Order and Delivery Info */}
+        <View style={styles.infoGrid}>
+          <View style={styles.infoBox}>
+            <Text style={styles.sectionTitle}>Order Information</Text>
+            <Text style={styles.infoText}>
+              Submission Date: {order.submittedAt ? formatDate(order.submittedAt) : '-'}
+            </Text>
+            <Text style={styles.infoText}>
+              Processing Date: {order.orderPlacedDate ? formatDate(order.orderPlacedDate) : '-'}
+            </Text>
           <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
           <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
         </View>
@@ -501,6 +692,78 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
 );
 
 // Main Component
+const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.headerContainer}>
+        <View style={styles.logoSection}>
+          <Text style={styles.headerText}>SLT MOBITEL</Text>
+          <Text style={styles.subHeaderText}>Tire Management System</Text>
+          <Text style={styles.companyInfo}>SLT Mobitel Head Office</Text>
+          <Text style={styles.companyInfo}>Lotus Road, Colombo 01</Text>
+          <Text style={styles.companyInfo}>Sri Lanka</Text>
+        </View>
+        <View style={styles.receiptSection}>
+          <Text style={styles.receiptNumber}>
+            Receipt #{order.orderNumber || '-'}
+          </Text>
+          <Text style={styles.dateText}>
+            Date: {order.orderPlacedDate ? formatDate(order.orderPlacedDate) : '-'}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Order Information</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Order ID: {order.id}</Text>
+          <Text style={styles.label}>Date Submitted: {order.submittedAt ? formatDate(order.submittedAt) : '-'}</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Customer Details</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Name: {order.requesterName}</Text>
+          <Text style={styles.label}>Phone: {order.requesterPhone}</Text>
+          <Text style={styles.label}>Department: {order.userSection || '-'}</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Order Details</Text>
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableHeader}>Item</Text>
+            <Text style={styles.tableHeader}>Size</Text>
+            <Text style={styles.tableHeader}>Quantity</Text>
+            <Text style={styles.tableHeader}>Amount</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>New Tires</Text>
+            <Text style={styles.tableCell}>{order.tireSize}</Text>
+            <Text style={styles.tableCell}>{order.quantity}</Text>
+            <Text style={styles.tableCell}>{order.totalPrice ? formatCurrency(order.totalPrice) : '-'}</Text>
+          </View>
+          {order.tubesQuantity > 0 && (
+            <View style={styles.tableRow}>
+              <Text style={styles.tableCell}>Tubes</Text>
+              <Text style={styles.tableCell}>{order.tireSize}</Text>
+              <Text style={styles.tableCell}>{order.tubesQuantity}</Text>
+              <Text style={styles.tableCell}>Included</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>This is a computer-generated document.</Text>
+        <Text style={styles.footerText}>SLT Mobitel - Tire Management System</Text>
+      </View>
+    </Page>
+  </Document>
+);
+
 const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
   if (!order) return null;
 
@@ -508,7 +771,7 @@ const OrderReceipt: React.FC<{ order: Order }> = ({ order }) => {
     <div className="mb-4">
       <PDFDownloadLink
         document={<OrderReceiptPDF order={order} />}
-        fileName={`order-receipt-${order.orderNumber}.pdf`}
+        fileName={`order-receipt-${order.orderNumber || order.id}.pdf`}
         className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors cursor-pointer"
         style={{ textDecoration: 'none' }}
       >

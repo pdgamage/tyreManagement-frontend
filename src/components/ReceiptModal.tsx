@@ -93,55 +93,57 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center">
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl my-4">
+        {/* Fixed Action Buttons Bar */}
+        <div className="sticky top-0 z-10 bg-white border-b shadow-sm print:hidden">
+          <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Official Order Receipt #{request.id}
+            </h3>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handlePrint}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm"
+                title="Print Receipt"
+              >
+                <Printer className="w-5 h-5 mr-2" />
+                <span>Print</span>
+              </button>
+              <PDFDownloadLink
+                document={<OrderReceipt order={requestToOrder(request)} />}
+                fileName={`order-receipt-${request.id}.pdf`}
+                className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
+              >
+                {({ loading }) => (
+                  <>
+                    <Download className="w-5 h-5 mr-2" />
+                    <span>
+                      {loading ? 'Preparing...' : 'Download PDF'}
+                    </span>
+                  </>
+                )}
+              </PDFDownloadLink>
+              <button
+                onClick={onClose}
+                className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"
+                title="Close"
+              >
+                <X size={20} className="mr-2" />
+                <span>Close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Print-only header */}
         <div className="hidden print:block text-center p-4">
           <h1 className="text-xl font-bold">Sri Lanka Telecom Mobitel</h1>
           <p className="text-gray-600 text-sm">Tire Management System</p>
         </div>
 
-        {/* Header with action buttons */}
-        <div className="flex items-center justify-between p-4 border-b print:hidden bg-gray-50">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Official Order Receipt #{request.id}
-          </h3>
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handlePrint}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm"
-              title="Print Receipt"
-            >
-              <Printer className="w-5 h-5 mr-2" />
-              <span>Print</span>
-            </button>
-            <PDFDownloadLink
-              document={<OrderReceipt order={requestToOrder(request)} />}
-              fileName={`order-receipt-${request.id}.pdf`}
-              className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
-            >
-              {({ loading }) => (
-                <>
-                  <Download className="w-5 h-5 mr-2" />
-                  <span>
-                    {loading ? 'Preparing...' : 'Download PDF'}
-                  </span>
-                </>
-              )}
-            </PDFDownloadLink>
-            <button
-              onClick={onClose}
-              className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"
-              title="Close"
-            >
-              <X size={20} className="mr-2" />
-              <span>Close</span>
-            </button>
-          </div>
-        </div>
-
           {/* Receipt Content */}
-        <div className="p-6 space-y-6" id="printable-receipt">
+        <div className="p-6 space-y-6 bg-white" id="printable-receipt">
           {/* Receipt Header */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Sri Lanka Telecom Mobitel</h1>

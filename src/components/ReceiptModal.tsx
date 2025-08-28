@@ -181,9 +181,8 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <h3 className="font-semibold text-gray-800 mb-3">Order Information</h3>
               <div className="text-sm space-y-2">
                 <p><span className="text-gray-600">Submission Date:</span> {request.submittedAt ? formatDate(request.submittedAt) : '-'}</p>
-                <p><span className="text-gray-600">Processing Date:</span> {request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</p>
-                <p><span className="text-gray-600">Department:</span> {request.userSection || '-'}</p>
-                <p><span className="text-gray-600">Cost Center:</span> {request.costCenter || '-'}</p>
+                <p><span className="text-gray-600">Order Placed Date:</span> {request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</p>
+                
               </div>
             </div>
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -203,7 +202,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <div className="text-sm space-y-2">
                 <p><span className="text-gray-600">Name:</span> {request.requesterName}</p>
                 <p><span className="text-gray-600">Contact:</span> {request.requesterPhone}</p>
-                <p><span className="text-gray-600">Department:</span> {request.userSection || '-'}</p>
+               
                 <p><span className="text-gray-600">Reason:</span> {request.requestReason || '-'}</p>
               </div>
             </div>

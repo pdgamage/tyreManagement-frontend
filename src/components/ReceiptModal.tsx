@@ -97,7 +97,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl">
         {/* Print-only header */}
         <div className="hidden print:block text-center p-4">
-          <h1 className="text-xl font-bold">SLT Mobitel</h1>
+          <h1 className="text-xl font-bold">Sri Lanka Telecom Mobitel</h1>
           <p className="text-gray-600 text-sm">Tire Management System</p>
         </div>
 
@@ -144,7 +144,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         <div className="p-6 space-y-6" id="printable-receipt">
           {/* Receipt Header */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">SLT Mobitel</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Sri Lanka Telecom Mobitel</h1>
             <p className="text-lg text-gray-600">Tire Management System</p>
             <p className="text-lg font-semibold mt-2">Official Purchase Order</p>
           </div>
@@ -155,9 +155,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <div>
                 <p className="text-sm font-semibold">Order Information:</p>
                 <p className="text-sm font-medium">Receipt No: <span className="text-blue-600">{generateReceiptNumber(request)}</span></p>
-                <p className="text-sm">Request ID: <span className="text-gray-600">#{request.id}</span></p>
+                <p className="text-sm">Order Number: <span className="text-gray-600">#{request.orderNumber || '-'}</span></p>
                 <p className="text-sm">Order Submitted: <span className="text-gray-700">{request.submittedAt ? formatDate(request.submittedAt) : '-'}</span></p>
-                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
+                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.orderPlacedDate ? formatDate(request.orderPlacedDate) : '-'}</span></p>
               </div>
               <div className="mt-3">
                 <p className="text-sm font-semibold">Delivery Address:</p>

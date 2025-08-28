@@ -9,5 +9,5 @@ export const generateReceiptNumber = (request: {
   const vehicleCode = request.vehicleNumber.replace(/[^A-Z0-9]/g, '');
   const requestId = String(request.id).padStart(4, '0');
 
-  return `SLTB/TO/${year}${month}/${vehicleCode}/${requestId}`;
+  return `SLTM/TO/${year}${month}/${vehicleCode}/${requestId}`;
 };

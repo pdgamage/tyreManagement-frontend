@@ -59,4 +59,8 @@ export interface Request {
   supplierName?: string;
   supplierPhone?: string;
   supplierEmail?: string;
+  
+  // Order information
+  orderNumber?: string;
+  orderPlacedDate?: string | Date;
 }

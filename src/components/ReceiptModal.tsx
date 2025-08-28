@@ -238,7 +238,6 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               <p><span className="font-medium">Warranty:</span> {request.warrantyDistance ? `${request.warrantyDistance.toLocaleString()} KM` : '-'}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-medium">Order Number:</span> {request.id}</p>
               <p><span className="font-medium">Current KM:</span> {request.presentKmReading.toLocaleString()}</p>
             </div>
           </div>

@@ -97,7 +97,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl">
         {/* Print-only header */}
         <div className="hidden print:block text-center p-4">
-          <h1 className="text-xl font-bold">Sri Lanka Transport Board</h1>
+          <h1 className="text-xl font-bold">SLT Mobitel</h1>
           <p className="text-gray-600 text-sm">Tire Management System</p>
         </div>
 
@@ -144,7 +144,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         <div className="p-6 space-y-6" id="printable-receipt">
           {/* Receipt Header */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Sri Lanka Transport Board</h1>
+            <h1 className="text-2xl font-bold text-gray-900">SLT Mobitel</h1>
             <p className="text-lg text-gray-600">Tire Management System</p>
             <p className="text-lg font-semibold mt-2">Official Purchase Order</p>
           </div>
@@ -255,7 +255,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
 
           {/* Footer */}
           <div className="text-center text-xs text-gray-500 mt-4 pt-4 border-t">
-            <p>This is an official receipt of SLTB Tire Management System</p>
+            <p>This is an official receipt of SLT Mobitel Tire Management System</p>
             <p>Generated: {new Date().toLocaleString()}</p>
           </div>
         </div>

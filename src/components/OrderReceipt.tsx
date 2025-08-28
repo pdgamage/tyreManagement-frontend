@@ -242,7 +242,7 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
               Submission Date: {formatDate(order.submittedAt)}
             </Text>
             <Text style={styles.infoText}>
-              Processing Date: {formatDate(order.orderPlacedDate)}
+              Order Placed Date: {formatDate(order.orderPlacedDate)}
             </Text>
           </View>
           

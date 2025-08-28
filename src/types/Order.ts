@@ -24,9 +24,4 @@ export interface Order {
   requestReason?: string;
   existingTireMake?: string;
   order_placed_date?: string;
-  requesterEmail?: string;
-  supplierEmail?: string;
-  presentKmReading: number;
-  orderPlaced?: boolean;
-  receiptNumber: string;
 }

@@ -99,7 +99,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         <div className="sticky top-0 z-10 bg-white border-b shadow-sm print:hidden">
           <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between">
             <h3 className="text-xl font-semibold text-gray-900">
-              Official Order Receipt #{request.id}
+              Receipt #{generateReceiptNumber(request)}
             </h3>
             <div className="flex items-center gap-4">
               <button
@@ -112,15 +112,22 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               </button>
               <PDFDownloadLink
                 document={<OrderReceipt order={requestToOrder(request)} />}
-                fileName={`order-receipt-${request.id}.pdf`}
-                className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
+                fileName={`receipt-${generateReceiptNumber(request)}.pdf`}
+                className="flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
               >
                 {({ loading }) => (
                   <>
-                    <Download className="w-5 h-5 mr-2" />
-                    <span>
-                      {loading ? 'Preparing...' : 'Download PDF'}
-                    </span>
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
+                        <span>Preparing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-5 h-5 mr-2" />
+                        <span>Download PDF</span>
+                      </>
+                    )}
                   </>
                 )}
               </PDFDownloadLink>

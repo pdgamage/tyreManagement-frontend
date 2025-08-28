@@ -270,11 +270,11 @@ const RequestTable: React.FC<RequestTableProps> = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentRequests.map((request) => (
-              <tr
-                key={request.id}
-                className="cursor-pointer hover:bg-gray-50"
-                onClick={() => onView(request)}
-              >
+                <tr
+                  key={request.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => onView(request)}
+                >
                 <td className="px-6 py-4 whitespace-nowrap">
                   {formatDate(request.submittedAt)}
                 </td>
@@ -320,14 +320,14 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       >
                         <Eye className="w-5 h-5" />
                       </button>
-                    {/* Hide approve/reject buttons for users, only show for specific roles */}
-                    {(window.location.pathname.includes('/supervisor/') || 
-                      window.location.pathname.includes('/technical-manager/') ||
-                      window.location.pathname.includes('/engineer/')) && 
-                      (request.status?.toLowerCase() === "pending" ||
-                       request.status?.toLowerCase() === "supervisor approved" ||
-                       request.status?.toLowerCase() === "technical-manager approved" ||
-                       request.status?.toLowerCase() === "technical manager approved") && (
+                      {/* Hide approve/reject buttons for users, only show for specific roles */}
+                      {(window.location.pathname.includes('/supervisor/') || 
+                        window.location.pathname.includes('/technical-manager/') ||
+                        window.location.pathname.includes('/engineer/')) && 
+                        (request.status?.toLowerCase() === "pending" ||
+                         request.status?.toLowerCase() === "supervisor approved" ||
+                         request.status?.toLowerCase() === "technical-manager approved" ||
+                         request.status?.toLowerCase() === "technical manager approved") && (
                       <>
                         <button
                           onClick={(e) => {
@@ -353,63 +353,67 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         </button>
                       </>
                     )}
-                    {showPlaceOrderButton &&
-                      request.status?.toLowerCase().trim() === "complete" &&
-                      !(request as any).order_placed && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onPlaceOrder(request);
-                          }}
-                          className="px-4 text-gray-500 hover:text-green-700"
-                          aria-label="Place Order"
-                          title="Place Order"
-                        >
-                          <ShoppingCart className="w-5 h-5" />
-                        </button>
+
+                      {showPlaceOrderButton &&
+                        request.status?.toLowerCase().trim() === "complete" &&
+                        !(request as any).order_placed && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onPlaceOrder(request);
+                            }}
+                            className="px-4 text-gray-500 hover:text-green-700"
+                            aria-label="Place Order"
+                            title="Place Order"
+                          >
+                            <ShoppingCart className="w-5 h-5" />
+                          </button>
                       )}
-                    {showCancelButton &&
-                      request.status?.toLowerCase().trim() === "complete" &&
-                      onCancelOrder && (
+
+                      {showCancelButton &&
+                        request.status?.toLowerCase().trim() === "complete" &&
+                        onCancelOrder && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCancelOrder(request.id);
+                            }}
+                            className="px-4 text-gray-500 hover:text-orange-700"
+                            aria-label="Cancel Order"
+                            title="Cancel Order"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                      )}
+
+                      {/* View/Download Receipt Button - Only show for order placed status */}
+                      {request.status?.toLowerCase() === "order placed" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onCancelOrder(request.id);
+                            setSelectedReceipt(request);
                           }}
-                          className="px-4 text-gray-500 hover:text-orange-700"
-                          aria-label="Cancel Order"
-                          title="Cancel Order"
+                          className="px-4 text-gray-500 hover:text-emerald-700 flex items-center gap-1"
+                          aria-label="View Receipt"
+                          title="View Receipt"
                         >
-                          <X className="w-5 h-5" />
+                          <Receipt className="w-5 h-5" />
                         </button>
                       )}
 
-                    {/* View/Download Receipt Button - Only show for order placed status */}
-                    {request.status?.toLowerCase() === "order placed" && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedReceipt(request);
-                        }}
-                        className="px-4 text-gray-500 hover:text-emerald-700 flex items-center gap-1"
-                        aria-label="View Receipt"
-                        title="View Receipt"
-                      >
-                        <Receipt className="w-5 h-5" />
-                      </button>
-                    )}
-                    {showDeleteButton && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(request.id);
-                        }}
-                        className="px-4 text-gray-500 hover:text-red-700"
-                        aria-label="Delete"
-                      >
-                        <Trash className="w-5 h-5" />
-                      </button>
-                    )}
+                      {showDeleteButton && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(request.id);
+                          }}
+                          className="px-4 text-gray-500 hover:text-red-700"
+                          aria-label="Delete"
+                        >
+                          <Trash className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 )}
               </tr>

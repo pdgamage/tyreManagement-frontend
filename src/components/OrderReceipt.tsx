@@ -80,7 +80,7 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
         <Text style={styles.label}>Date: {format(new Date(order.orderPlacedDate), 'dd/MM/yyyy')}</Text>
       </View>
 
-      {/* Customer Information */}
+        {/* Customer Information */}
       <View style={styles.section}>
         <Text style={styles.value}>Requester Information</Text>
         <View style={styles.row}>
@@ -89,23 +89,57 @@ const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => (
             <Text style={styles.value}>{order.requesterName}</Text>
           </View>
           <View style={styles.column}>
-            <Text style={styles.label}>Department:</Text>
-            <Text style={styles.value}>{order.userSection}</Text>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Cost Center:</Text>
-            <Text style={styles.value}>{order.costCenter}</Text>
-          </View>
-          <View style={styles.column}>
             <Text style={styles.label}>Contact:</Text>
             <Text style={styles.value}>{order.requesterPhone}</Text>
           </View>
         </View>
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Department:</Text>
+            <Text style={styles.value}>{order.userSection}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Cost Center:</Text>
+            <Text style={styles.value}>{order.costCenter}</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Vehicle Information */}
+      {/* Delivery Information */}
+      <View style={styles.section}>
+        <Text style={styles.value}>Delivery Information</Text>
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Office:</Text>
+            <Text style={styles.value}>{order.deliveryOfficeName || '-'}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Street:</Text>
+            <Text style={styles.value}>{order.deliveryStreetName || '-'}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Town:</Text>
+            <Text style={styles.value}>{order.deliveryTown || '-'}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Request Details */}
+      <View style={styles.section}>
+        <Text style={styles.value}>Request Details</Text>
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Request Reason:</Text>
+            <Text style={styles.value}>{order.requestReason || '-'}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Existing Tire Make:</Text>
+            <Text style={styles.value}>{order.existingTireMake || '-'}</Text>
+          </View>
+        </View>
+      </View>      {/* Vehicle Information */}
       <View style={styles.section}>
         <Text style={styles.value}>Vehicle Information</Text>
         <View style={styles.row}>

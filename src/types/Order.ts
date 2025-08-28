@@ -2,6 +2,7 @@ export interface Order {
   id: number;
   orderNumber: string;
   orderPlacedDate: string;
+  submittedAt: string | Date;
   requesterName: string;
   userSection: string;
   costCenter: string;
@@ -16,4 +17,11 @@ export interface Order {
   supplierName: string;
   supplierPhone: string;
   totalPrice: number;
+  // Additional fields
+  deliveryOfficeName?: string;
+  deliveryStreetName?: string;
+  deliveryTown?: string;
+  requestReason?: string;
+  existingTireMake?: string;
+  order_placed_date?: string;
 }

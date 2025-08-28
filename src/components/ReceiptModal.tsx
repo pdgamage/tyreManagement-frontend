@@ -10,6 +10,7 @@ const requestToOrder = (request: Request): Order => ({
   id: Number(request.id),
   orderNumber: request.id,
   orderPlacedDate: request.order_timestamp?.toString() || new Date().toISOString(),
+  submittedAt: request.submittedAt,
   requesterName: request.requesterName,
   userSection: request.userSection || '',
   costCenter: request.costCenter || '',
@@ -23,7 +24,14 @@ const requestToOrder = (request: Request): Order => ({
   warrantyDistance: request.warrantyDistance || 0,
   supplierName: request.supplierName || '',
   supplierPhone: request.supplierPhone || '',
-  totalPrice: request.totalPrice || 0
+  totalPrice: request.totalPrice || 0,
+  // Additional fields
+  deliveryOfficeName: request.deliveryOfficeName,
+  deliveryStreetName: request.deliveryStreetName,
+  deliveryTown: request.deliveryTown,
+  requestReason: request.requestReason,
+  existingTireMake: request.existingTireMake,
+  order_placed_date: request.order_timestamp?.toString()
 });
 
 interface ReceiptModalProps {
@@ -139,26 +147,44 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           </div>
 
           {/* Order Information */}
-          <div className="flex justify-between items-start border-b pb-4">
-            <div>
-              <p className="text-sm font-semibold">Order Number: <span className="text-gray-700">{request.id}</span></p>
-              <p className="text-sm">Submitted Date: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
-              <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
+          <div className="grid grid-cols-2 gap-6 border-b pb-4">
+            <div className="space-y-2">
+              <div>
+                <p className="text-sm font-semibold">Order Details:</p>
+                <p className="text-sm">Order Number: <span className="text-gray-700">{request.id}</span></p>
+                <p className="text-sm">Submitted Date: <span className="text-gray-700">{formatDate(request.submittedAt)}</span></p>
+                <p className="text-sm">Order Placed: <span className="text-gray-700">{request.order_timestamp ? formatDate(request.order_timestamp) : '-'}</span></p>
+              </div>
+              <div className="mt-3">
+                <p className="text-sm font-semibold">Delivery Address:</p>
+                <p className="text-sm">Office: <span className="text-gray-700">{request.deliveryOfficeName || '-'}</span></p>
+                <p className="text-sm">Street: <span className="text-gray-700">{request.deliveryStreetName || '-'}</span></p>
+                <p className="text-sm">Town: <span className="text-gray-700">{request.deliveryTown || '-'}</span></p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Reference ID: {request.id}</p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-sm font-semibold">Department Information:</p>
+                <p className="text-sm">Department: <span className="text-gray-700">{request.userSection || '-'}</span></p>
+                <p className="text-sm">Cost Center: <span className="text-gray-700">{request.costCenter || '-'}</span></p>
+              </div>
+              <div className="mt-3">
+                <p className="text-sm font-semibold">Request Details:</p>
+                <p className="text-sm">Reason: <span className="text-gray-700">{request.requestReason || '-'}</span></p>
+                <p className="text-sm">Existing Tire Make: <span className="text-gray-700">{request.existingTireMake || '-'}</span></p>
+              </div>
             </div>
-          </div>          {/* Essential Information */}
+          </div>
+
+          {/* Contact Information */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-1">
               <p><span className="font-medium">Requester:</span> {request.requesterName}</p>
-              <p><span className="font-medium">Department:</span> {request.userSection || '-'}</p>
-              <p><span className="font-medium">Cost Center:</span> {request.costCenter || '-'}</p>
+              <p><span className="font-medium">Contact:</span> {request.requesterPhone}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-medium">Vehicle:</span> {request.vehicleNumber}</p>
+              <p><span className="font-medium">Vehicle Number:</span> {request.vehicleNumber}</p>
               <p><span className="font-medium">Make/Model:</span> {request.vehicleBrand} {request.vehicleModel}</p>
-              <p><span className="font-medium">Contact:</span> {request.requesterPhone}</p>
             </div>
           </div>
 

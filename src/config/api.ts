@@ -22,9 +22,7 @@ export const API_CONFIG = {
     // Supplier endpoints
     SUPPLIERS: "/api/suppliers",
 
-    // Receipt endpoints
-    RECEIPTS: "/api/receipts",
-    RECEIPTS_BY_CUSTOMER_OFFICER: "/api/receipts/officer",
+
 
     // Health check
     HEALTH: "/api/health",
@@ -67,10 +65,7 @@ export const apiUrls = {
   // Supplier URLs
   suppliers: () => buildApiUrl(API_CONFIG.ENDPOINTS.SUPPLIERS),
 
-  // Receipt URLs
-  receipts: () => buildApiUrl(API_CONFIG.ENDPOINTS.RECEIPTS),
-  receiptById: (id: string | number) => buildApiUrl(API_CONFIG.ENDPOINTS.RECEIPTS, id.toString()),
-  receiptsByCustomerOfficer: (id: string | number) => buildApiUrl(API_CONFIG.ENDPOINTS.RECEIPTS_BY_CUSTOMER_OFFICER, id.toString()),
+
 
   // Health check
   health: () => buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH),

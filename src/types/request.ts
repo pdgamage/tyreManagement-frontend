@@ -55,8 +55,6 @@ export interface Request {
   customer_officer_decision_by?: string;
   order_placed?: boolean;
   order_timestamp?: Date | string;
-  orderNumber?: string | null;
-  orderPlacedDate?: string | null;
   // Supplier information
   supplierName?: string;
   supplierPhone?: string;

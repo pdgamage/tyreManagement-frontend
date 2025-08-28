@@ -16,11 +16,9 @@ import {
   Package,
   XCircle,
   CheckCircle2,
-  X,
 } from "lucide-react";
 
 import { Request } from "../types/request";
-import Receipt from "../components/Receipt";
 
 interface RequestsContextType {
   requests: Request[];
@@ -50,8 +48,6 @@ const CustomerOfficerDashboard = () => {
   const [orderRequest, setOrderRequest] = useState<Request | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [selectedReceiptRequest, setSelectedReceiptRequest] = useState<Request | null>(null);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -80,30 +76,6 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
-  // Prepare request for receipt display
-  const prepareReceiptData = (request: Request) => ({
-    id: request.id,
-    orderNumber: request.orderNumber || `OR${String(request.id).padStart(6, '0')}`,
-    requesterName: request.requesterName,
-    requesterEmail: request.requesterEmail,
-    requesterPhone: request.requesterPhone,
-    vehicleNumber: request.vehicleNumber,
-    vehicleBrand: request.vehicleBrand,
-    vehicleModel: request.vehicleModel,
-    quantity: request.quantity,
-    tubesQuantity: request.tubesQuantity,
-    tireSize: request.tireSize,
-    totalPrice: request.totalPrice || 0,
-    userSection: request.userSection,
-    costCenter: request.costCenter,
-    supplierName: request.supplierName,
-    supplierEmail: request.supplierEmail,
-    supplierPhone: request.supplierPhone,
-    submittedAt: request.submittedAt.toString(),
-    orderPlacedDate: request.orderPlacedDate?.toString() || request.order_timestamp?.toString() || request.submittedAt.toString(),
-    status: request.status,
-  });
-
   // Filter requests to show both "complete" and "order placed" status
   const completeRequests = requests.filter(
     (req) => req.status === "complete" || req.status === "order placed"
@@ -123,17 +95,6 @@ const CustomerOfficerDashboard = () => {
   const handlePlaceOrder = (request: Request) => {
     setOrderRequest(request);
     setShowPlaceOrderModal(true);
-  };
-
-  const handleViewReceipt = (request: Request) => {
-    setSelectedReceiptRequest(request);
-    setShowReceiptModal(true);
-  };
-
-  const handleDownloadReceipt = (request: Request) => {
-    // Receipt download is handled by the Receipt component itself
-    setSelectedReceiptRequest(request);
-    setShowReceiptModal(true);
   };
 
 
@@ -460,8 +421,6 @@ const CustomerOfficerDashboard = () => {
                     onDelete={handleDelete}
                     onPlaceOrder={handlePlaceOrder}
                     onCancelOrder={handleCancelOrder}
-                    onViewReceipt={handleViewReceipt}
-                    onDownloadReceipt={handleDownloadReceipt}
                     showActions={true}
                     showPlaceOrderButton={true}
                     showCancelButton={true}
@@ -539,32 +498,6 @@ const CustomerOfficerDashboard = () => {
         onClose={() => setShowPlaceOrderModal(false)}
         onOrderPlaced={handleOrderPlaced}
       />
-
-      {/* Receipt Modal */}
-      {showReceiptModal && selectedReceiptRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
-          <div className="relative bg-white rounded-xl shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white/95 backdrop-blur">
-              <h2 className="text-2xl font-bold text-gray-800">Order Receipt</h2>
-              <button
-                onClick={() => {
-                  setShowReceiptModal(false);
-                  setSelectedReceiptRequest(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            {/* Receipt Content */}
-            <div className="p-6">
-              <Receipt request={prepareReceiptData(selectedReceiptRequest)} />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

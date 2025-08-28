@@ -9,13 +9,14 @@ import { generateReceiptNumber } from '../utils/receiptUtils';
 
 const requestToOrder = (request: Request): Order => ({
   id: Number(request.id),
-  orderNumber: request.id,
-  orderPlacedDate: request.order_timestamp?.toString() || new Date().toISOString(),
+  orderNumber: request.orderNumber || '',
+  orderPlacedDate: request.orderPlacedDate?.toString() || new Date().toISOString(),
   submittedAt: request.submittedAt,
   requesterName: request.requesterName,
   userSection: request.userSection || '',
   costCenter: request.costCenter || '',
   requesterPhone: request.requesterPhone,
+  requesterEmail: request.requesterEmail,
   vehicleNumber: request.vehicleNumber,
   vehicleBrand: request.vehicleBrand,
   vehicleModel: request.vehicleModel,
@@ -25,14 +26,17 @@ const requestToOrder = (request: Request): Order => ({
   warrantyDistance: request.warrantyDistance || 0,
   supplierName: request.supplierName || '',
   supplierPhone: request.supplierPhone || '',
+  supplierEmail: request.supplierEmail || '',
   totalPrice: request.totalPrice || 0,
+  presentKmReading: request.presentKmReading,
   // Additional fields
-  deliveryOfficeName: request.deliveryOfficeName,
-  deliveryStreetName: request.deliveryStreetName,
-  deliveryTown: request.deliveryTown,
+  deliveryOfficeName: request.deliveryOfficeName || '',
+  deliveryStreetName: request.deliveryStreetName || '',
+  deliveryTown: request.deliveryTown || '',
   requestReason: request.requestReason,
   existingTireMake: request.existingTireMake,
-  order_placed_date: request.order_timestamp?.toString()
+  orderPlaced: request.order_placed,
+  receiptNumber: generateReceiptNumber(request)
 });
 
 interface ReceiptModalProps {
@@ -57,28 +61,56 @@ const formatCurrency = (amount: number | undefined) => {
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
   if (!isOpen || !request) return null;
 
-  const handlePrint = () => {
+    const handlePrint = () => {
     // Add print-specific styles to the head
     const style = document.createElement('style');
     style.textContent = `
       @media print {
+        @page {
+          size: A4;
+          margin: 1.5cm;
+        }
+        
         body * {
           visibility: hidden;
         }
+
         #printable-receipt, #printable-receipt * {
           visibility: visible;
         }
+
         #printable-receipt {
           position: absolute;
-          left: 0;
+          left: 50%;
+          transform: translateX(-50%);
           top: 0;
-          width: 100%;
+          width: 21cm;
+          padding: 0 !important;
+          font-size: 12pt;
         }
-        @page {
-          size: A4;
-          margin: 2cm;
+
+        #printable-receipt table {
+          width: 100% !important;
+          page-break-inside: avoid;
         }
-        .no-print {
+
+        #printable-receipt .text-2xl {
+          font-size: 18pt !important;
+        }
+
+        #printable-receipt .text-lg {
+          font-size: 14pt !important;
+        }
+
+        #printable-receipt .grid {
+          display: block;
+        }
+
+        #printable-receipt .grid > div {
+          margin-bottom: 1cm;
+        }
+
+        .no-print, .print:hidden {
           display: none !important;
         }
       }
@@ -90,9 +122,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
 
     // Remove the style element after printing
     document.head.removeChild(style);
-  };
-
-  return (
+  };  return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center">
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl my-4">
         {/* Fixed Action Buttons Bar */}

@@ -38,25 +38,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          
-          // Add SLT Mobitel text in correct brand colors
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(0, 160, 214); // #00A0D6 - SLT blue color
-          pdf.setFontSize(24);
-          pdf.text('SLT Mobitel', 20, 20);
-          
-          // Add "The Connection" tagline
+          // Add watermark text with lighter style
           pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(128, 128, 128); // Gray color for tagline
-          pdf.setFontSize(12);
-          pdf.text('The Connection', 20, 25);
-
-          // Add watermark with brand colors
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(0, 160, 214, 0.1); // Light blue watermark
-          pdf.setFontSize(60);
+          pdf.setTextColor(200);
+          pdf.setFontSize(40);
           pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
-          
           pdf.save(`order_receipt_${request.id}.pdf`);
         });
       }
@@ -100,22 +86,16 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           {/* Company Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
-              <div className="flex items-center gap-4">
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
-                  alt="SLT Mobitel Logo" 
-                  className="h-16"
-                />
-                <div className="border-l-2 border-gray-300 pl-4">
-                  <h1 className="text-xl font-bold text-[#00a0d6]">SLT Mobitel</h1>
-                  <p className="text-sm text-gray-500">The Connection</p>
-                </div>
-              </div>
-              <div className="mt-4 text-gray-600 text-sm space-y-1">
-                <p className="font-medium">SLT Mobitel Head Office</p>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                alt="SLT Mobitel Logo" 
+                className="h-16"
+              />
+              <div className="mt-2 text-gray-600 text-sm">
+                <p>SLT Mobitel Head Office</p>
                 <p>Lotus Road, Colombo 01</p>
                 <p>Sri Lanka</p>
-                <p className="font-medium">Tel: +94 11 2399399</p>
+                <p>Tel: +94 11 2399399</p>
               </div>
             </div>
             <div className="text-right">

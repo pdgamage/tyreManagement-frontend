@@ -60,13 +60,19 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           
           // Add watermark with better styling
           const watermarkText = 'SLT Mobitel';
-          const watermarkFontSize = 50;
           const watermarkOpacity = 0.1; // 10% opacity
           
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(0, 0, 0);
           pdf.setGState(pdf.GState({opacity: watermarkOpacity}));
-          pdf.setFontSize(watermarkFontSize);
+          // Make watermark width ~80% of page width to mimic on-screen look
+          const desiredWidth = pdfWidth * 0.8;
+          const unitWidth = pdf.getStringUnitWidth(watermarkText);
+          // Convert desiredWidth (in page units) to a font size (pt) using scaleFactor
+          let computedFontSize = (desiredWidth * pdf.internal.scaleFactor) / Math.max(unitWidth, 0.001);
+          // Clamp to reasonable bounds
+          computedFontSize = Math.max(36, Math.min(computedFontSize, 90));
+          pdf.setFontSize(computedFontSize);
           
           // Calculate exact page center for watermark
           const x = pdfWidth / 2;
@@ -118,7 +124,13 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         </div>
 
           {/* Receipt Content */}
-        <div className="p-6 space-y-6 bg-white" id="printable-receipt">
+        <div className="relative p-6 space-y-6 bg-white" id="printable-receipt">
+          {/* On-screen watermark (excluded from PDF via 'no-print') */}
+          <div className="no-print pointer-events-none select-none absolute inset-0 flex items-center justify-center">
+            <div className="text-gray-400 opacity-10 font-bold text-6xl sm:text-7xl transform rotate-45 tracking-wider">
+              SLT Mobitel
+            </div>
+          </div>
           {/* Company Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">

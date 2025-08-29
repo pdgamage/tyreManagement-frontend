@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
 });
 
 // PDF Document Component
-const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
+export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>

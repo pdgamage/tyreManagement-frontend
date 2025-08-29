@@ -4,7 +4,7 @@ import type { Request } from '../types/request';
 import type { Order } from '../types/Order';
 import { format } from 'date-fns';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import OrderReceipt from './OrderReceipt';
+import { OrderReceiptPDF } from './OrderReceipt';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
 const requestToOrder = (request: Request): Order => ({
@@ -112,7 +112,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
               </button>
               <div>
                 <PDFDownloadLink
-                  document={<OrderReceipt order={requestToOrder(request)} />}
+                  document={<OrderReceiptPDF order={requestToOrder(request)} />}
                   fileName={`order-receipt-${request.id}.pdf`}
                   className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
                   style={{ textDecoration: 'none' }}
@@ -120,9 +120,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                   {({ loading }) => (
                     <>
                       <FileDown className="w-5 h-5 mr-2" />
-                      <span>
-                        {loading ? 'Preparing...' : 'Download PDF'}
-                      </span>
+                      <span>{loading ? 'Preparing...' : 'Download PDF'}</span>
                     </>
                   )}
                 </PDFDownloadLink>

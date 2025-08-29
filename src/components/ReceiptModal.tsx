@@ -32,18 +32,35 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
     if (isOpen && request) {
       const element = document.getElementById('printable-receipt');
       if (element) {
-        html2canvas(element).then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          // Add watermark text with lighter style
-          pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(200);
-          pdf.setFontSize(40);
-          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
-          pdf.save(`order_receipt_${request.id}.pdf`);
+        // Wait for images to load
+        const images = element.getElementsByTagName('img');
+        const imagePromises = Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve; // Handle error case as well
+          });
+        });
+
+        Promise.all(imagePromises).then(() => {
+          html2canvas(element, {
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            scale: 2 // Increase quality
+          }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            // Add watermark text with lighter style
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(200);
+            pdf.setFontSize(40);
+            pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
+            pdf.save(`order_receipt_${request.id}.pdf`);
+          });
         });
       }
     }
@@ -87,9 +104,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
               <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                src={require('../images/slt_logo.png')} 
                 alt="SLT Mobitel Logo" 
                 className="h-16"
+                style={{ objectFit: 'contain' }}
               />
               <div className="mt-2 text-gray-600 text-sm">
                 <p>SLT Mobitel Head Office</p>

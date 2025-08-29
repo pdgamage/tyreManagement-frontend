@@ -1,11 +1,39 @@
 import React from 'react';
 import { X, Printer, FileDown } from 'lucide-react';
 import type { Request } from '../types/request';
+import type { Order } from '../types/Order';
 import { format } from 'date-fns';
-// We'll print the actual DOM to a new window so the downloaded PDF matches the on-screen receipt
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { OrderReceiptPDF } from './OrderReceipt';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
-// ...existing code...
+const requestToOrder = (request: Request): Order => ({
+  id: Number(request.id),
+  orderNumber: request.id,
+  orderPlacedDate: request.order_timestamp?.toString() || new Date().toISOString(),
+  submittedAt: request.submittedAt,
+  requesterName: request.requesterName,
+  userSection: request.userSection || '',
+  costCenter: request.costCenter || '',
+  requesterPhone: request.requesterPhone,
+  vehicleNumber: request.vehicleNumber,
+  vehicleBrand: request.vehicleBrand,
+  vehicleModel: request.vehicleModel,
+  tireSize: request.tireSize,
+  quantity: request.quantity,
+  tubesQuantity: request.tubesQuantity,
+  warrantyDistance: request.warrantyDistance || 0,
+  supplierName: request.supplierName || '',
+  supplierPhone: request.supplierPhone || '',
+  totalPrice: request.totalPrice || 0,
+  // Additional fields
+  deliveryOfficeName: request.deliveryOfficeName,
+  deliveryStreetName: request.deliveryStreetName,
+  deliveryTown: request.deliveryTown,
+  requestReason: request.requestReason,
+  existingTireMake: request.existingTireMake,
+  order_placed_date: request.order_timestamp?.toString()
+});
 
 interface ReceiptModalProps {
   request: Request | null;
@@ -64,45 +92,6 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
     document.head.removeChild(style);
   };
 
-  const handleDownload = () => {
-    const printable = document.getElementById('printable-receipt');
-    if (!printable) return;
-
-    // Collect stylesheet and style tags to preserve styling in new window
-    const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-      .map((n) => n.outerHTML)
-      .join('\n');
-
-    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${styles}<style>body{background:#fff;padding:20px}</style></head><body>${printable.outerHTML}</body></html>`;
-
-    // POST to backend to generate PDF via Puppeteer and download
-  fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/pdf/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ html })
-    }).then(async (res) => {
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'PDF generation failed' }));
-        console.error('PDF generation error', err);
-        return alert('PDF generation failed. See console for details.');
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `order-receipt-${request.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-    }).catch((err) => {
-      console.error('Download failed', err);
-      alert('Download failed. See console for details.');
-    });
-  };
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center">
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl my-4">
@@ -122,14 +111,19 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                 <span>Print</span>
               </button>
               <div>
-                <button
-                  onClick={handleDownload}
-                  className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
-                  title="Download PDF"
+                <PDFDownloadLink
+                  document={<OrderReceiptPDF order={requestToOrder(request)} />}
+                  fileName={`order-receipt-${request.id}.pdf`}
+                  className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
+                  style={{ textDecoration: 'none' }}
                 >
-                  <FileDown className="w-5 h-5 mr-2" />
-                  <span>Download PDF</span>
-                </button>
+                  {({ loading }) => (
+                    <>
+                      <FileDown className="w-5 h-5 mr-2" />
+                      <span>{loading ? 'Preparing...' : 'Download PDF'}</span>
+                    </>
+                  )}
+                </PDFDownloadLink>
               </div>
               <button
                 onClick={onClose}

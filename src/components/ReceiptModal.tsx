@@ -118,13 +118,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
         </div>
 
           {/* Receipt Content */}
-        <div className="relative p-6 space-y-6 bg-white" id="printable-receipt">
-          {/* On-screen watermark (excluded from PDF via 'no-print') */}
-          <div className="no-print pointer-events-none select-none absolute inset-0 flex items-center justify-center">
-            <div className="text-gray-400 opacity-10 font-bold text-6xl transform rotate-45">
-              SLT Mobitel
-            </div>
-          </div>
+        <div className="p-6 space-y-6 bg-white" id="printable-receipt">
           {/* Company Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">

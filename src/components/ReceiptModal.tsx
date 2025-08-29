@@ -1,10 +1,8 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import type { Request } from '../types/request';
-import type { Order } from '../types/Order';
 import { format } from 'date-fns';
 import { generateReceiptNumber } from '../utils/receiptUtils';
-import OrderReceipt from './OrderReceipt';
 
 
 
@@ -30,35 +28,6 @@ const formatCurrency = (amount: number | undefined) => {
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
   if (!isOpen || !request) return null;
 
-  // Convert Request to Order type for the OrderReceipt component
-  const orderData = {
-    id: Number(request.id),
-    orderNumber: request.orderNumber,
-    orderPlacedDate: request.orderPlacedDate,
-    submittedAt: request.submittedAt,
-    requesterName: request.requesterName,
-    userSection: request.userSection,
-    costCenter: request.costCenter,
-    requesterPhone: request.requesterPhone,
-    vehicleNumber: request.vehicleNumber,
-    vehicleBrand: request.vehicleBrand,
-    vehicleModel: request.vehicleModel,
-    tireSize: request.tireSize,
-    quantity: request.quantity,
-    tubesQuantity: request.tubesQuantity || 0,
-    warrantyDistance: request.warrantyDistance,
-    supplierName: request.supplierName,
-    supplierPhone: request.supplierPhone,
-    supplierEmail: request.supplierEmail,
-    totalPrice: request.totalPrice,
-    presentKmReading: request.presentKmReading,
-    deliveryOfficeName: request.deliveryOfficeName,
-    deliveryStreetName: request.deliveryStreetName,
-    deliveryTown: request.deliveryTown,
-    requestReason: request.requestReason,
-    existingTireMake: request.existingTireMake
-  };
-
 
 
   return (
@@ -70,8 +39,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             <h3 className="text-xl font-semibold text-gray-900">
               Official Order Receipt #{request.id}
             </h3>
-            <div className="flex items-center gap-3">
-              <OrderReceipt order={orderData} />
+            <div>
               <button
                 onClick={onClose}
                 className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"

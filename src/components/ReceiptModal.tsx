@@ -33,17 +33,53 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
     if (isOpen && request) {
       const element = document.getElementById('printable-receipt');
       if (element) {
-        html2canvas(element).then((canvas) => {
+        // Hide elements that shouldn't appear in the PDF
+        const elementsToHide = document.querySelectorAll('.no-print');
+        elementsToHide.forEach(el => el.classList.add('hidden'));
+
+        html2canvas(element, {
+          scale: 2, // Higher scale for better quality
+          useCORS: true,
+          logging: false,
+          backgroundColor: null,
+          ignoreElements: (element) => {
+            // Ignore elements with no-print class
+            return element.classList.contains('no-print');
+          }
+        }).then((canvas) => {
+          // Restore hidden elements
+          elementsToHide.forEach(el => el.classList.remove('hidden'));
+          
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
+          
+          // Add main content
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          // Add watermark text with lighter style
-          pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(200);
-          pdf.setFontSize(40);
-          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
+          
+          // Add watermark with better styling
+          const watermarkText = 'SLT Mobitel';
+          const watermarkFontSize = 50;
+          const watermarkOpacity = 0.1; // 10% opacity
+          
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(0, 0, 0);
+          pdf.setGState(pdf.GState({opacity: watermarkOpacity}));
+          pdf.setFontSize(watermarkFontSize);
+          
+          // Calculate center position
+          const textWidth = pdf.getStringUnitWidth(watermarkText) * watermarkFontSize / pdf.internal.scaleFactor;
+          const x = (pdfWidth - textWidth) / 2;
+          const y = pdfHeight / 2;
+          
+          // Draw watermark
+          pdf.text(watermarkText, x, y, {angle: 45, align: 'center'});
+          
+          // Reset graphics state
+          pdf.setGState(pdf.GState({opacity: 1}));
+          
+          // Save the PDF
           pdf.save(`order_receipt_${request.id}.pdf`);
         });
       }

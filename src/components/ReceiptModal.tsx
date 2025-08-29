@@ -73,26 +73,34 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       .map((n) => n.outerHTML)
       .join('\n');
 
-    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${styles}<style>body{background:#fff;padding:20px}</style></head><body>${printable.outerHTML}<script>window.onload = function(){window.focus(); setTimeout(()=>{ window.print(); },200);};</script></body></html>`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${styles}<style>body{background:#fff;padding:20px}</style></head><body>${printable.outerHTML}</body></html>`;
 
-    try {
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const newWin = window.open(url, '_blank');
-      // Revoke object URL after a short delay
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      if (!newWin) {
-        // Fallback: navigate current window to blob URL
-        window.location.href = url;
+    // POST to backend to generate PDF via Puppeteer and download
+  fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/pdf/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ html })
+    }).then(async (res) => {
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'PDF generation failed' }));
+        console.error('PDF generation error', err);
+        return alert('PDF generation failed. See console for details.');
       }
-    } catch (err) {
-      // Last-resort fallback: open about:blank and write directly
-      const newWin = window.open('', '_blank', 'noopener,noreferrer');
-      if (!newWin) return;
-      newWin.document.open();
-      newWin.document.write(html);
-      newWin.document.close();
-    }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `order-receipt-${request.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }).catch((err) => {
+      console.error('Download failed', err);
+      alert('Download failed. See console for details.');
+    });
   };
 
   return (

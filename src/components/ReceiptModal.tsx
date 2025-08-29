@@ -34,23 +34,34 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       if (element) {
         html2canvas(element).then((canvas) => {
           const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          // Create watermark PDF
+          const watermarkPdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = watermarkPdf.internal.pageSize.getWidth();
+          const pdfHeight = watermarkPdf.internal.pageSize.getHeight();
           
-          // Add watermark text with very light style
-          pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(220, 220, 220);
-          pdf.setFontSize(60);
+          // Configure watermark style
+          watermarkPdf.setFontSize(90);
+          watermarkPdf.setTextColor(245, 245, 245);
           
-          // Add multiple watermarks for better coverage
-          for (let i = 0; i < pdfHeight; i += 100) {
-            pdf.text('SLT MOBITEL', pdfWidth / 2, i, { 
-              angle: 45,
-              align: 'center'
-            });
+          // Add repeated watermark pattern
+          for (let i = -50; i < pdfHeight + 100; i += 150) {
+            for (let j = -50; j < pdfWidth + 100; j += 150) {
+              watermarkPdf.text('SLT MOBITEL', j, i, { 
+                angle: 45,
+                align: 'center'
+              });
+            }
           }
+          
+          // Get watermark as base64
+          const watermarkData = watermarkPdf.output('datauristring');
+          
+          // Create final PDF
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          // Add watermark first, then content on top
+          pdf.addImage(watermarkData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
           
           pdf.save(`order_receipt_${request.id}.pdf`);
         });

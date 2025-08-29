@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import type { Request } from '../types/request';
 import { format } from 'date-fns';
 import { generateReceiptNumber } from '../utils/receiptUtils';
+import OrderReceipt from './OrderReceipt';
 
 
 
@@ -28,6 +29,13 @@ const formatCurrency = (amount: number | undefined) => {
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
   if (!isOpen || !request) return null;
 
+  // Convert Request to Order type for the OrderReceipt component
+  const orderData = {
+    ...request,
+    id: Number(request.id),
+    // Add any other necessary field conversions here
+  };
+
 
 
   return (
@@ -39,7 +47,8 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
             <h3 className="text-xl font-semibold text-gray-900">
               Official Order Receipt #{request.id}
             </h3>
-            <div>
+            <div className="flex items-center gap-3">
+              <OrderReceipt order={orderData as any} />
               <button
                 onClick={onClose}
                 className="flex items-center px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded-md transition-colors shadow-sm"

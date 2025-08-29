@@ -73,18 +73,26 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       .map((n) => n.outerHTML)
       .join('\n');
 
-    const newWin = window.open('', '_blank', 'noopener,noreferrer');
-    if (!newWin) return;
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${styles}<style>body{background:#fff;padding:20px}</style></head><body>${printable.outerHTML}<script>window.onload = function(){window.focus(); setTimeout(()=>{ window.print(); },200);};</script></body></html>`;
 
-    newWin.document.open();
-    newWin.document.write(`<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${styles}<style>body{background:#fff;padding:20px}</style></head><body>${printable.outerHTML}</body></html>`);
-    newWin.document.close();
-
-    // Wait for styles to load then print
-    setTimeout(() => {
-      newWin.focus();
-      newWin.print();
-    }, 500);
+    try {
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const newWin = window.open(url, '_blank');
+      // Revoke object URL after a short delay
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      if (!newWin) {
+        // Fallback: navigate current window to blob URL
+        window.location.href = url;
+      }
+    } catch (err) {
+      // Last-resort fallback: open about:blank and write directly
+      const newWin = window.open('', '_blank', 'noopener,noreferrer');
+      if (!newWin) return;
+      newWin.document.open();
+      newWin.document.write(html);
+      newWin.document.close();
+    }
   };
 
   return (

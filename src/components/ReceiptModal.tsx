@@ -1,39 +1,11 @@
 import React from 'react';
 import { X, Printer, FileDown } from 'lucide-react';
 import type { Request } from '../types/request';
-import type { Order } from '../types/Order';
+// ...existing code...
 import { format } from 'date-fns';
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { OrderReceiptPDF } from './OrderReceipt';
 import { generateReceiptNumber } from '../utils/receiptUtils';
 
-const requestToOrder = (request: Request): Order => ({
-  id: Number(request.id),
-  orderNumber: request.id,
-  orderPlacedDate: request.order_timestamp?.toString() || new Date().toISOString(),
-  submittedAt: request.submittedAt,
-  requesterName: request.requesterName,
-  userSection: request.userSection || '',
-  costCenter: request.costCenter || '',
-  requesterPhone: request.requesterPhone,
-  vehicleNumber: request.vehicleNumber,
-  vehicleBrand: request.vehicleBrand,
-  vehicleModel: request.vehicleModel,
-  tireSize: request.tireSize,
-  quantity: request.quantity,
-  tubesQuantity: request.tubesQuantity,
-  warrantyDistance: request.warrantyDistance || 0,
-  supplierName: request.supplierName || '',
-  supplierPhone: request.supplierPhone || '',
-  totalPrice: request.totalPrice || 0,
-  // Additional fields
-  deliveryOfficeName: request.deliveryOfficeName,
-  deliveryStreetName: request.deliveryStreetName,
-  deliveryTown: request.deliveryTown,
-  requestReason: request.requestReason,
-  existingTireMake: request.existingTireMake,
-  order_placed_date: request.order_timestamp?.toString()
-});
+// ...existing code...
 
 interface ReceiptModalProps {
   request: Request | null;
@@ -92,6 +64,28 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
     document.head.removeChild(style);
   };
 
+  const handleDownload = () => {
+    const printable = document.getElementById('printable-receipt');
+    if (!printable) return;
+
+    // Collect stylesheets to preserve Tailwind styling in new window
+    const cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+      .map((node) => node.outerHTML)
+      .join('\n');
+
+    const newWin = window.open('', '_blank', 'noopener,noreferrer');
+    if (!newWin) return;
+
+    newWin.document.write(`<!doctype html><html><head><meta charset="utf-8"/><title>Receipt</title>${cssLinks}<style>body{background:white;padding:20px}</style></head><body>${printable.outerHTML}</body></html>`);
+    newWin.document.close();
+
+    // Give the new window a short time to render styles
+    setTimeout(() => {
+      newWin.focus();
+      newWin.print();
+    }, 500);
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center">
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl my-4">
@@ -111,19 +105,14 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                 <span>Print</span>
               </button>
               <div>
-                <PDFDownloadLink
-                  document={<OrderReceiptPDF order={requestToOrder(request)} />}
-                  fileName={`order-receipt-${request.id}.pdf`}
-                  className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm cursor-pointer"
-                  style={{ textDecoration: 'none' }}
+                <button
+                  onClick={handleDownload}
+                  className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-colors shadow-sm"
+                  title="Download PDF"
                 >
-                  {({ loading }) => (
-                    <>
-                      <FileDown className="w-5 h-5 mr-2" />
-                      <span>{loading ? 'Preparing...' : 'Download PDF'}</span>
-                    </>
-                  )}
-                </PDFDownloadLink>
+                  <FileDown className="w-5 h-5 mr-2" />
+                  <span>Download PDF</span>
+                </button>
               </div>
               <button
                 onClick={onClose}

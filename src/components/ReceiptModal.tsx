@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import sltLogo from '../images/slt_logo.png';
 import { X } from 'lucide-react';
 import type { Request } from '../types/request';
 import { format } from 'date-fns';
@@ -87,9 +88,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
               <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                src={sltLogo}
                 alt="SLT Mobitel Logo" 
-                className="h-16"
+                className="h-16 object-contain"
               />
               <div className="mt-2 text-gray-600 text-sm">
                 <p>SLT Mobitel Head Office</p>

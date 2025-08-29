@@ -27,7 +27,7 @@ const formatCurrency = (amount: number | undefined) => {
   })}`;
 };
 
-const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Element => {
+const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Element | null => {
   useEffect(() => {
     if (!isOpen || !request) return;
 
@@ -80,10 +80,6 @@ const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Elem
     };
 
     generatePDF();
-  }, [isOpen, request]);
-        });
-      }
-    }
   }, [isOpen, request]);
 
   if (!isOpen || !request) return null;

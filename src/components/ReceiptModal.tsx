@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { X } from 'lucide-react';
@@ -28,13 +28,334 @@ const formatCurrency = (amount: number | undefined) => {
 };
 
 const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Element | null => {
-  useEffect(() => {
-    if (!isOpen || !request) return;
+  // Function to generate PDF with delay
+  const generatePDF = async () => {
+    const element = document.getElementById('printable-receipt');
+    if (!element || !request) return;
 
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for render
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2,
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add the main content
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Add multiple light watermarks in background
+      pdf.saveGraphicsState();
+      pdf.setGState({ opacity: 0.1 });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(80);
+      
+      // Add watermarks in a repeating pattern
+      const spacing = 120;
+      for (let y = 0; y <= pdfHeight; y += spacing) {
+        for (let x = 0; x <= pdfWidth; x += spacing) {
+          pdf.text('SLT MOBITEL', x, y, {
+            angle: 45,
+            align: 'center'
+          });
+        }
+      }
+      
+      pdf.restoreGraphicsState();
+      pdf.save(`order_receipt_${request.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  // Effect to trigger PDF generation when modal opens
+  useEffect(() => {
+    if (isOpen && request) {
+      generatePDF();
+    }
+  }, [isOpen, request]);
+  const generatePDF = useCallback(async () => {
+    if (!request) return;
+    
     const element = document.getElementById('printable-receipt');
     if (!element) return;
 
-    const generatePDF = async () => {
+    try {
+      // Wait for images to load
+      const images = element.getElementsByTagName('img');
+      await Promise.all(
+        Array.from(images).map(img => 
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            }
+          })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add the main content
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Add multiple light watermarks in background
+      pdf.saveGraphicsState();
+      pdf.setGState({ opacity: 0.1 });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(80);
+      
+      // Add watermarks in a repeating pattern
+      const spacing = 120; // Spacing between watermarks in mm
+      for (let y = 0; y <= pdfHeight; y += spacing) {
+        for (let x = 0; x <= pdfWidth; x += spacing) {
+          pdf.text('SLT MOBITEL', x, y, {
+            angle: 45,
+            align: 'center'
+          });
+        }
+      }
+      
+      // Restore the graphics state
+      pdf.restoreGraphicsState();
+
+      if (request.id) {
+        pdf.save(`order_receipt_${request.id}.pdf`);
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  }, [request]);
+
+  useEffect(() => {
+    if (!isOpen || !request) return;
+    
+    // Add a small delay to ensure content is fully rendered
+    const timer = setTimeout(generatePDF, 1000);
+    return () => clearTimeout(timer);
+  }, [isOpen, request, generatePDF]);
+  const generatePDF = React.useCallback(async () => {
+    if (!request) return;
+    
+    const element = document.getElementById('printable-receipt');
+    if (!element) return;
+
+    try {
+      // Wait for images to load
+      const images = element.getElementsByTagName('img');
+      await Promise.all(
+        Array.from(images).map(img => 
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            }
+          })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add the main content
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Add multiple light watermarks in background
+      pdf.saveGraphicsState();
+      pdf.setGState({ opacity: 0.1 });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(80);
+      
+      // Add watermarks in a repeating pattern
+      const spacing = 120; // Spacing between watermarks in mm
+      for (let y = 0; y <= pdfHeight; y += spacing) {
+        for (let x = 0; x <= pdfWidth; x += spacing) {
+          pdf.text('SLT MOBITEL', x, y, {
+            angle: 45,
+            align: 'center'
+          });
+        }
+      }
+      
+      // Restore the graphics state
+      pdf.restoreGraphicsState();
+
+      pdf.save(`order_receipt_${request.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  }, [request]);
+
+  useEffect(() => {
+    if (!isOpen || !request) return;
+
+    // Add a small delay to ensure content is fully rendered
+    const timer = setTimeout(generatePDF, 1000);
+    return () => clearTimeout(timer);
+  }, [isOpen, request, generatePDF]);
+  const generatePDF = async (element: HTMLElement | null) => {
+    if (!element || !request) return;
+    
+    try {
+      // Wait for images to load
+      const images = element.getElementsByTagName('img');
+      await Promise.all(
+        Array.from(images).map(img => 
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            }
+          })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add the main content
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Add multiple light watermarks in background
+      pdf.saveGraphicsState();
+      pdf.setGState({ opacity: 0.1 });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(80);
+      
+      // Add watermarks in a repeating pattern
+      const spacing = 120; // Spacing between watermarks in mm
+      for (let y = 0; y <= pdfHeight; y += spacing) {
+        for (let x = 0; x <= pdfWidth; x += spacing) {
+          pdf.text('SLT MOBITEL', x, y, {
+            angle: 45,
+            align: 'center'
+          });
+        }
+      }
+      
+      // Restore the graphics state
+      pdf.restoreGraphicsState();
+
+      pdf.save(`order_receipt_${request.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen || !request) return;
+
+    // Add a small delay to ensure content is fully rendered
+    const timer = setTimeout(() => {
+      const element = document.getElementById('printable-receipt');
+      generatePDF(element);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, request]);
+  const generatePDF = async (element: HTMLElement) => {
+    try {
+      // Wait for images to load
+      const images = element.getElementsByTagName('img');
+      await Promise.all(
+        Array.from(images).map(img => 
+          new Promise((resolve) => {
+            if (img.complete) resolve(null);
+            else {
+              img.onload = () => resolve(null);
+              img.onerror = () => resolve(null);
+            }
+          })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add the main content
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Add multiple light watermarks in background
+      pdf.saveGraphicsState();
+      pdf.setGState({ opacity: 0.1 });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(80);
+      
+      // Add watermarks in a repeating pattern
+      const spacing = 120; // Spacing between watermarks in mm
+      for (let y = 0; y <= pdfHeight; y += spacing) {
+        for (let x = 0; x <= pdfWidth; x += spacing) {
+          pdf.text('SLT MOBITEL', x, y, {
+            angle: 45,
+            align: 'center'
+          });
+        }
+      }
+      
+      // Restore the graphics state
+      pdf.restoreGraphicsState();
+
+      pdf.save(`order_receipt_${request.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+  useEffect(() => {
+    if (!isOpen || !request) return;
+
+    // Add a small delay to ensure content is rendered
+    const timeoutId = setTimeout(() => {
+      const element = document.getElementById('printable-receipt');
+      if (!element) return;
+
+      const generatePDF = async () => {
       try {
         // Wait for images to load
         const images = element.getElementsByTagName('img');

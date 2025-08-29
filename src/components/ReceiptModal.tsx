@@ -38,6 +38,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          // Add watermark text if logo not visible
+          pdf.setTextColor(150);
+          pdf.setFontSize(40);
+          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
           pdf.save(`order_receipt_${request.id}.pdf`);
         });
       }

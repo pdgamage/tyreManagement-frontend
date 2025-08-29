@@ -64,14 +64,26 @@ const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Elem
         // Add the main content
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-        // Add very light watermark
+        // Add multiple light watermarks in background
+        pdf.saveGraphicsState();
+        pdf.setGState({ opacity: 0.1 });
         pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(240, 240, 240); // Even lighter gray
-        pdf.setFontSize(72);
-        pdf.text('SLT MOBITEL', pdfWidth / 2, pdfHeight / 2, {
-          angle: 45,
-          align: 'center'
-        });
+        pdf.setTextColor(150, 150, 150);
+        pdf.setFontSize(80);
+        
+        // Add watermarks in a repeating pattern
+        const spacing = 120; // Spacing between watermarks in mm
+        for (let y = 0; y <= pdfHeight; y += spacing) {
+          for (let x = 0; x <= pdfWidth; x += spacing) {
+            pdf.text('SLT MOBITEL', x, y, {
+              angle: 45,
+              align: 'center'
+            });
+          }
+        }
+        
+        // Restore the graphics state
+        pdf.restoreGraphicsState();
 
         pdf.save(`order_receipt_${request.id}.pdf`);
       } catch (error) {
@@ -122,7 +134,8 @@ const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Elem
               <img 
                 src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
                 alt="SLT Mobitel Logo" 
-                className="h-16"
+                className="h-12 w-auto"
+                style={{ maxWidth: '180px' }}
               />
               <div className="mt-2 text-gray-600 text-sm">
                 <p>SLT Mobitel Head Office</p>

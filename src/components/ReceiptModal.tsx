@@ -86,16 +86,22 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           {/* Company Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
-                alt="SLT Mobitel Logo" 
-                className="h-16"
-              />
-              <div className="mt-2 text-gray-600 text-sm">
-                <p>SLT Mobitel Head Office</p>
+              <div className="flex items-center gap-4">
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                  alt="SLT Mobitel Logo" 
+                  className="h-16"
+                />
+                <div className="border-l-2 border-gray-300 pl-4">
+                  <h1 className="text-xl font-bold text-[#00a0d6]">SLT Mobitel</h1>
+                  <p className="text-sm text-gray-500">The Connection</p>
+                </div>
+              </div>
+              <div className="mt-4 text-gray-600 text-sm space-y-1">
+                <p className="font-medium">SLT Mobitel Head Office</p>
                 <p>Lotus Road, Colombo 01</p>
                 <p>Sri Lanka</p>
-                <p>Tel: +94 11 2399399</p>
+                <p className="font-medium">Tel: +94 11 2399399</p>
               </div>
             </div>
             <div className="text-right">

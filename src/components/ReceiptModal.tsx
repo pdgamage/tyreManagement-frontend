@@ -68,13 +68,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           pdf.setGState(pdf.GState({opacity: watermarkOpacity}));
           pdf.setFontSize(watermarkFontSize);
           
-          // Calculate center position
-          const textWidth = pdf.getStringUnitWidth(watermarkText) * watermarkFontSize / pdf.internal.scaleFactor;
-          const x = (pdfWidth - textWidth) / 2;
+          // Calculate exact page center for watermark
+          const x = pdfWidth / 2;
           const y = pdfHeight / 2;
           
           // Draw watermark
-          pdf.text(watermarkText, x, y, {angle: 45, align: 'center'});
+          pdf.text(watermarkText, x, y, { angle: 45, align: 'center' });
           
           // Reset graphics state
           pdf.setGState(pdf.GState({opacity: 1}));

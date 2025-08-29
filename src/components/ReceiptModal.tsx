@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Printer, FileDown } from 'lucide-react';
 import type { Request } from '../types/request';
 import type { Order } from '../types/Order';
@@ -32,7 +32,6 @@ const requestToOrder = (request: Request): Order => ({
   deliveryTown: request.deliveryTown,
   requestReason: request.requestReason,
   existingTireMake: request.existingTireMake,
-  order_placed_date: request.order_timestamp?.toString()
 });
 
 interface ReceiptModalProps {
@@ -55,6 +54,11 @@ const formatCurrency = (amount: number | undefined) => {
 };
 
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   if (!isOpen || !request) return null;
 
   const handlePrint = () => {
@@ -111,15 +115,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                 <span>Print</span>
               </button>
               <div>
-                <Suspense fallback={
-                  <button
-                    disabled
-                    className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md transition-colors shadow-sm cursor-not-allowed"
-                  >
-                    <FileDown className="w-5 h-5 mr-2" />
-                    <span>Loading...</span>
-                  </button>
-                }>
+                {isClient ? (
                   <PDFDownloadLink
                     document={<OrderReceipt order={requestToOrder(request)} />}
                     fileName={`order-receipt-${request.id}.pdf`}
@@ -135,7 +131,15 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
                       </>
                     )}
                   </PDFDownloadLink>
-                </Suspense>
+                ) : (
+                  <button
+                    disabled
+                    className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md transition-colors shadow-sm cursor-not-allowed"
+                  >
+                    <FileDown className="w-5 h-5 mr-2" />
+                    <span>Download PDF</span>
+                  </button>
+                )}
               </div>
               <button
                 onClick={onClose}

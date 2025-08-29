@@ -30,74 +30,22 @@ const formatCurrency = (amount: number | undefined) => {
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
   useEffect(() => {
     if (isOpen && request) {
-      setTimeout(() => {  // Add a small delay to ensure the modal content is rendered
-        const element = document.getElementById('printable-receipt');
-        if (element) {
-          // Wait for images to load
-          const images = element.getElementsByTagName('img');
-          const imagePromises = Array.from(images).map(img => {
-            return new Promise((resolve, reject) => {
-              if (img.complete) {
-                if (img.naturalWidth === 0) {
-                  // Image failed to load
-                  img.src = ''; // Clear the source
-                  reject(new Error('Image failed to load'));
-                } else {
-                  resolve(null);
-                }
-              }
-              img.onload = () => resolve(null);
-              img.onerror = () => {
-                img.src = ''; // Clear the source on error
-                reject(new Error('Image failed to load'));
-              };
-            });
-          });
-
-          Promise.allSettled(imagePromises)
-            .then(() => {
-              return html2canvas(element, {
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                scale: 2, // Increase quality
-                backgroundColor: '#ffffff', // Ensure white background
-                onclone: (clonedDoc) => {
-                  // Ensure all content is visible in the cloned document
-                  const clonedElement = clonedDoc.getElementById('printable-receipt');
-                  if (clonedElement) {
-                    clonedElement.style.height = 'auto';
-                    clonedElement.style.overflow = 'visible';
-                  }
-                }
-              });
-            })
-            .then((canvas) => {
-              const imgData = canvas.toDataURL('image/png', 1.0);
-              const pdf = new jsPDF('p', 'mm', 'a4');
-              const pdfWidth = pdf.internal.pageSize.getWidth();
-              const pdfHeight = pdf.internal.pageSize.getHeight();
-              
-              // Calculate aspect ratio to fit content properly
-              const aspectRatio = canvas.width / canvas.height;
-              const imgWidth = pdfWidth;
-              const imgHeight = pdfWidth / aspectRatio;
-              
-              pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-              
-              // Add watermark text with lighter style
-              pdf.setFont('helvetica', 'normal');
-              pdf.setTextColor(200);
-              pdf.setFontSize(40);
-              pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
-              pdf.save(`order_receipt_${request.id}.pdf`);
-            })
-            .catch((error) => {
-              console.error('Error generating PDF:', error);
-              // You might want to show an error message to the user here
-            });
-        }
-      }, 500);  // 500ms delay to ensure modal is rendered
+      const element = document.getElementById('printable-receipt');
+      if (element) {
+        html2canvas(element).then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          // Add watermark text with lighter style
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(200);
+          pdf.setFontSize(40);
+          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
+          pdf.save(`order_receipt_${request.id}.pdf`);
+        });
+      }
     }
   }, [isOpen, request]);
 
@@ -139,10 +87,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
               <img 
-                src={require('../images/slt_logo.png')} 
+                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
                 alt="SLT Mobitel Logo" 
                 className="h-16"
-                style={{ objectFit: 'contain' }}
               />
               <div className="mt-2 text-gray-600 text-sm">
                 <p>SLT Mobitel Head Office</p>

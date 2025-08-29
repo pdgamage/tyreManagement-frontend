@@ -38,11 +38,25 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          // Add watermark text with lighter style
+          
+          // Add SLT Mobitel text in correct brand colors
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(0, 160, 214); // #00A0D6 - SLT blue color
+          pdf.setFontSize(24);
+          pdf.text('SLT Mobitel', 20, 20);
+          
+          // Add "The Connection" tagline
           pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(200);
-          pdf.setFontSize(40);
+          pdf.setTextColor(128, 128, 128); // Gray color for tagline
+          pdf.setFontSize(12);
+          pdf.text('The Connection', 20, 25);
+
+          // Add watermark with brand colors
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(0, 160, 214, 0.1); // Light blue watermark
+          pdf.setFontSize(60);
           pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
+          
           pdf.save(`order_receipt_${request.id}.pdf`);
         });
       }

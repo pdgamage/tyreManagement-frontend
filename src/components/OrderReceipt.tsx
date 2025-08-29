@@ -279,32 +279,35 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={[styles.tableCell, { flex: 2 }]}>Item Description</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>Make/Size</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>Quantity</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Amount</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Unit Price</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Total Price</Text>
           </View>
           <View style={[styles.tableRow, { backgroundColor: '#f9fafb' }]}>
-            <Text style={[styles.tableCell, { flex: 6 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
+            <Text style={[styles.tableCell, { flex: 2 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
+            <Text style={[styles.tableCell, { flex: 1.5 }]}>N/A</Text>
+            <Text style={[styles.tableCell, { flex: 1 }]}>1</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={[styles.tableCell, { flex: 2 }]}>New Tires</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{order.quantity}</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>
-              {formatCurrency(order.totalPrice)}
-            </Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.unitPrice)}</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.totalPrice)}</Text>
           </View>
           {order.tubesQuantity > 0 && (
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { flex: 2 }]}>Tubes</Text>
               <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{order.tubesQuantity}</Text>
+              <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
               <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Included</Text>
             </View>
           )}
           <View style={[styles.tableRow, { backgroundColor: '#f9fafb', fontWeight: 'bold' }]}>
             <Text style={[styles.tableCell, { flex: 4.5, textAlign: 'right' }]}>Total Amount:</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>
-              {formatCurrency(order.totalPrice)}
-            </Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.totalPrice)}</Text>
           </View>
         </View>
 

@@ -17,6 +17,7 @@ export interface Order {
   supplierName?: string;
   supplierPhone?: string;
   supplierEmail?: string;
+  unitPrice?: number;
   totalPrice?: number;
   presentKmReading?: number;
   deliveryOfficeName?: string;

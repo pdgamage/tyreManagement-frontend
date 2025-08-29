@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { X, ZoomIn, Download } from 'lucide-react';
+import { X, ZoomIn } from 'lucide-react';
 import type { TireRequest } from '../types/api';
-import OrderReceipt from './OrderReceipt';
 
 interface RequestDetailsModalProps {
   request: TireRequest | null;
@@ -141,31 +140,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                         <h5 className="text-lg font-semibold text-gray-900 mb-2">Official Order Receipt</h5>
                         <p className="text-sm text-gray-600">Order Number: {request.orderNumber}</p>
                         <p className="text-sm text-gray-600">Date: {formatDate(request.orderPlacedDate)}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        {request.orderNumber && request.orderPlacedDate && (
-                          <OrderReceipt 
-                            order={{
-                              id: request.id,
-                              orderNumber: request.orderNumber,
-                              orderPlacedDate: request.orderPlacedDate,
-                              requesterName: request.requesterName,
-                              userSection: request.userSection || '',
-                              costCenter: request.costCenter || '',
-                              requesterPhone: request.requesterPhone,
-                              vehicleNumber: request.vehicleNumber,
-                              vehicleBrand: request.vehicleBrand,
-                              vehicleModel: request.vehicleModel,
-                              tireSize: request.tireSize,
-                              quantity: request.quantity,
-                              tubesQuantity: request.tubesQuantity,
-                              warrantyDistance: request.warrantyDistance || 0,
-                              supplierName: request.supplierName || '',
-                              supplierPhone: request.supplierPhone || '',
-                              totalPrice: Number(request.totalPrice) || 0
-                            }} 
-                          />
-                        )}
                       </div>
                     </div>
                     <div className="border-t border-green-200 pt-4 mt-4">

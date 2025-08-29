@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { X } from 'lucide-react';
@@ -27,23 +27,60 @@ const formatCurrency = (amount: number | undefined) => {
   })}`;
 };
 
-const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
+const ReceiptModal = ({ request, onClose, isOpen }: ReceiptModalProps): JSX.Element => {
   useEffect(() => {
-    if (isOpen && request) {
-      const element = document.getElementById('printable-receipt');
-      if (element) {
-        html2canvas(element).then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          // Add watermark text with lighter style
-          pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor(200);
-          pdf.setFontSize(40);
-          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
-          pdf.save(`order_receipt_${request.id}.pdf`);
+    if (!isOpen || !request) return;
+
+    const element = document.getElementById('printable-receipt');
+    if (!element) return;
+
+    const generatePDF = async () => {
+      try {
+        // Wait for images to load
+        const images = element.getElementsByTagName('img');
+        await Promise.all(
+          Array.from(images).map(img => 
+            new Promise((resolve) => {
+              if (img.complete) resolve(null);
+              else {
+                img.onload = () => resolve(null);
+                img.onerror = () => resolve(null);
+              }
+            })
+          )
+        );
+
+        const canvas = await html2canvas(element, {
+          useCORS: true,
+          allowTaint: true,
+          scale: 2
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        // Add the main content
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+        // Add very light watermark
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(240, 240, 240); // Even lighter gray
+        pdf.setFontSize(72);
+        pdf.text('SLT MOBITEL', pdfWidth / 2, pdfHeight / 2, {
+          angle: 45,
+          align: 'center'
+        });
+
+        pdf.save(`order_receipt_${request.id}.pdf`);
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
+    };
+
+    generatePDF();
+  }, [isOpen, request]);
         });
       }
     }

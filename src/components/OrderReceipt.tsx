@@ -56,39 +56,34 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20
-  },
-  orderTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1E40AF',
-    marginBottom: 4,
-    borderBottom: '1px solid #e5e7eb',
-    paddingBottom: 20
+    marginBottom: 30,
+    width: '100%'
   },
   logoSection: {
-    width: '50%'
+    width: '45%'
   },
   receiptSection: {
-    width: '40%',
-    backgroundColor: '#EFF6FF',
-    padding: 12,
-    borderRadius: 4
+    width: '45%',
+    alignItems: 'flex-start'
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#1E3A8A'
+    color: '#1E40AF',
+    marginBottom: 2
   },
   subHeaderText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#4B5563',
-    marginTop: 4
+    marginBottom: 8
   },
   companyInfo: {
+    marginTop: 8
+  },
+  companyText: {
     fontSize: 10,
     color: '#4B5563',
-    marginTop: 8
+    marginBottom: 2
   },
   receiptNumber: {
     fontSize: 12,
@@ -119,13 +114,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#4B5563'
   },
-  table: {
+  itemTable: {
     display: 'flex',
     width: 'auto',
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: '#bfbfbf',
-    marginVertical: 10
+    borderColor: '#E5E7EB',
+    marginVertical: 20,
+    borderRadius: 4,
   },
   tableRow: {
     margin: 'auto',
@@ -142,10 +138,16 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 10
   },
-  infoGrid: {
+  contentGrid: {
     flexDirection: 'row',
     gap: 20,
-    marginBottom: 20
+    marginTop: 20
+  },
+  leftColumn: {
+    flex: 1
+  },
+  rightColumn: {
+    flex: 1
   },
   infoBox: {
     flex: 1,
@@ -154,6 +156,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#E5E7EB'
+  },
+  supplierBox: {
+    padding: 12,
+    backgroundColor: '#EFF6FF',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB'
+  },
+  supplierGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4
+  },
+  supplierColumn: {
+    flex: 1
   },
   infoText: {
     fontSize: 10,
@@ -221,108 +238,114 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={styles.headerText}>SLT MOBITEL</Text>
             <Text style={styles.subHeaderText}>Tire Management System</Text>
             <View style={styles.companyInfo}>
-              <Text>SLT Mobitel Head Office</Text>
-              <Text>Lotus Road, Colombo 01</Text>
-              <Text>Sri Lanka</Text>
-              <Text>Tel: +94 11 2399399</Text>
+              <Text style={styles.companyText}>SLT Mobitel Head Office</Text>
+              <Text style={styles.companyText}>Lotus Road, Colombo 01</Text>
+              <Text style={styles.companyText}>Sri Lanka</Text>
+              <Text style={styles.companyText}>Tel: +94 11 2399399</Text>
             </View>
           </View>
           <View style={styles.receiptSection}>
-            <Text style={styles.orderTitle}>ORDER RECEIPT</Text>
+            <Text style={[styles.headerText, { color: '#2563EB' }]}>ORDER RECEIPT</Text>
             <Text style={styles.receiptNumber}>
               Receipt No: {generateSafeReceiptNumber(order)}
             </Text>
-            <Text style={[styles.label, { marginTop: 8 }]}>
-              Date Issued: {formatDate(order.orderPlacedDate)}
-            </Text>
-            <Text style={styles.label}>Order Reference: #{order.orderNumber || '-'}</Text>
-            <Text style={styles.label}>Request ID: #{order.id}</Text>
+            <Text style={styles.infoText}>Date Issued: {formatDate(order.orderPlacedDate)}</Text>
+            <Text style={styles.infoText}>Order Reference: #{order.orderNumber || '-'}</Text>
+            <Text style={styles.infoText}>Request ID: #{order.id}</Text>
           </View>
         </View>
 
         {/* Grid Section */}
-        <View style={styles.infoGrid}>
-          {/* Order Information */}
-          <View style={styles.infoBox}>
-            <Text style={styles.sectionTitle}>Order Information</Text>
-            <Text style={styles.infoText}>
-              Submission Date: {formatDate(order.submittedAt)}
-            </Text>
-            <Text style={styles.infoText}>
-              Processing Date: {formatDate(order.orderPlacedDate)}
-            </Text>
-            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
-            <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
+        <View style={styles.contentGrid}>
+          <View style={styles.leftColumn}>
+            <View style={styles.infoBox}>
+              <Text style={styles.sectionTitle}>Order Information</Text>
+              <Text style={styles.infoText}>
+                Submission Date: {formatDate(order.submittedAt)}
+              </Text>
+              <Text style={styles.infoText}>
+                Processing Date: {formatDate(order.orderPlacedDate)}
+              </Text>
+              <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
+            </View>
+            
+            <View style={[styles.infoBox, { marginTop: 15 }]}>
+              <Text style={styles.sectionTitle}>Requester Details</Text>
+              <Text style={styles.infoText}>Name: {order.requesterName}</Text>
+              <Text style={styles.infoText}>Contact: {order.requesterPhone}</Text>
+              <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
+            </View>
           </View>
-          
-          {/* Delivery Information */}
-          <View style={styles.infoBox}>
-            <Text style={styles.sectionTitle}>Delivery Information</Text>
-            <Text style={styles.infoText}>Office: {order.deliveryOfficeName || '-'}</Text>
-            <Text style={styles.infoText}>Street: {order.deliveryStreetName || '-'}</Text>
-            <Text style={styles.infoText}>Town: {order.deliveryTown || '-'}</Text>
+
+          <View style={styles.rightColumn}>
+            <View style={styles.infoBox}>
+              <Text style={styles.sectionTitle}>Delivery Information</Text>
+              <Text style={styles.infoText}>Office: {order.deliveryOfficeName || '-'}</Text>
+              <Text style={styles.infoText}>Street: {order.deliveryStreetName || '-'}</Text>
+              <Text style={styles.infoText}>Town: {order.deliveryTown || '-'}</Text>
+            </View>
+
+            <View style={[styles.infoBox, { marginTop: 15 }]}>
+              <Text style={styles.sectionTitle}>Vehicle Details</Text>
+              <Text style={styles.infoText}>Vehicle Number: {order.vehicleNumber}</Text>
+              <Text style={styles.infoText}>Make/Model: {order.vehicleBrand} {order.vehicleModel}</Text>
+              <Text style={styles.infoText}>Current KM: {formatKM(order.presentKmReading)}</Text>
+            </View>
           </View>
         </View>
 
-        {/* Second Grid Section */}
-        <View style={styles.infoGrid}>
-          {/* Requester Details */}
-          <View style={styles.infoBox}>
-            <Text style={styles.sectionTitle}>Requester Details</Text>
-            <Text style={styles.infoText}>Name: {order.requesterName}</Text>
-            <Text style={styles.infoText}>Contact: {order.requesterPhone}</Text>
-            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
-          </View>
-          
-          {/* Vehicle Details */}
-          <View style={styles.infoBox}>
-            <Text style={styles.sectionTitle}>Vehicle Details</Text>
-            <Text style={styles.infoText}>Vehicle Number: {order.vehicleNumber}</Text>
-            <Text style={styles.infoText}>Make/Model: {order.vehicleBrand} {order.vehicleModel}</Text>
-            <Text style={styles.infoText}>Current KM: {formatKM(order.presentKmReading)}</Text>
-          </View>
-        </View>
+
 
         {/* Order Details Table */}
-        <View style={styles.table}>
+        <View style={styles.itemTable}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>Item Description</Text>
-            <Text style={[styles.tableCell, { flex: 1.5 }]}>Make/Size</Text>
+            <Text style={[styles.tableCell, { flex: 3 }]}>Item Description</Text>
+            <Text style={[styles.tableCell, { flex: 2 }]}>Make/Size</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>Quantity</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Amount</Text>
+            <Text style={[styles.tableCell, { flex: 2, textAlign: 'right' }]}>Amount</Text>
           </View>
+          
           <View style={[styles.tableRow, { backgroundColor: '#f9fafb' }]}>
-            <Text style={[styles.tableCell, { flex: 6 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
+            <Text style={[styles.tableCell, { flex: 8 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
           </View>
+          
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>New Tires</Text>
-            <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
+            <Text style={[styles.tableCell, { flex: 3 }]}>New Tires</Text>
+            <Text style={[styles.tableCell, { flex: 2 }]}>{order.tireSize}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{order.quantity}</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.totalPrice)}</Text>
+            <Text style={[styles.tableCell, { flex: 2, textAlign: 'right' }]}>
+              {formatCurrency(order.totalPrice)}
+            </Text>
           </View>
+          
           {order.tubesQuantity > 0 && (
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { flex: 2 }]}>Tubes</Text>
-              <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
+              <Text style={[styles.tableCell, { flex: 3 }]}>Tubes</Text>
+              <Text style={[styles.tableCell, { flex: 2 }]}>{order.tireSize}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{order.tubesQuantity}</Text>
-              <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Included</Text>
+              <Text style={[styles.tableCell, { flex: 2, textAlign: 'right' }]}>Included</Text>
             </View>
           )}
-          <View style={[styles.tableRow, { backgroundColor: '#f9fafb', fontWeight: 'bold' }]}>
-            <Text style={[styles.tableCell, { flex: 4.5, textAlign: 'right' }]}>Total Amount:</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.totalPrice)}</Text>
+          
+          <View style={[styles.tableRow, { borderTopWidth: 1, borderTopColor: '#E5E7EB', marginTop: 4 }]}>
+            <Text style={[styles.tableCell, { flex: 6, textAlign: 'right', fontWeight: 'bold' }]}>
+              Total Amount:
+            </Text>
+            <Text style={[styles.tableCell, { flex: 2, textAlign: 'right', fontWeight: 'bold' }]}>
+              {formatCurrency(order.totalPrice)}
+            </Text>
           </View>
         </View>
 
         {/* Supplier Information */}
-        <View style={[styles.infoBox, { marginTop: 20, backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.supplierBox, { marginTop: 20 }]}>
           <Text style={styles.sectionTitle}>Supplier Information</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View>
+          <View style={styles.supplierGrid}>
+            <View style={styles.supplierColumn}>
               <Text style={styles.infoText}>Name: {order.supplierName || '-'}</Text>
               <Text style={styles.infoText}>Phone: {order.supplierPhone || '-'}</Text>
             </View>
-            <View>
+            <View style={styles.supplierColumn}>
               <Text style={styles.infoText}>Email: {order.supplierEmail || '-'}</Text>
               <Text style={styles.infoText}>Warranty: {formatKM(order.warrantyDistance)}</Text>
             </View>
@@ -330,29 +353,29 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
         </View>
 
         {/* Signatures */}
-        <View style={styles.signatureSection}>
+        <View style={[styles.signatureSection, { marginTop: 40 }]}>
           <View style={styles.signatureBox}>
-            <Text style={styles.signatureLine}>_________________________</Text>
+            <Text style={styles.signatureLine}>________________________</Text>
             <Text style={styles.signatureTitle}>Authorized By</Text>
             <Text style={styles.signatureSubtitle}>Customer Officer</Text>
           </View>
           <View style={styles.signatureBox}>
-            <Text style={styles.signatureLine}>_________________________</Text>
+            <Text style={styles.signatureLine}>________________________</Text>
             <Text style={styles.signatureTitle}>Requested By</Text>
             <Text style={styles.signatureSubtitle}>{order.requesterName}</Text>
           </View>
           <View style={styles.signatureBox}>
-            <Text style={styles.signatureLine}>_________________________</Text>
+            <Text style={styles.signatureLine}>________________________</Text>
             <Text style={styles.signatureTitle}>Approved By</Text>
             <Text style={styles.signatureSubtitle}>Department Head</Text>
           </View>
         </View>
 
         {/* Footer */}
-        <View style={styles.footer}>
+        <View style={[styles.footer, { marginTop: 30 }]}>
           <Text style={styles.footerText}>SLT Mobitel - Tire Management System</Text>
           <Text style={styles.footerSubtext}>This is a computer-generated document</Text>
-          <Text style={styles.footerDate}>Generated on: {new Date().toLocaleString()}</Text>
+          <Text style={styles.footerDate}>Generated on: {format(new Date(), 'dd/MM/yyyy HH:mm:ss')}</Text>
         </View>
       </Page>
     </Document>

@@ -56,7 +56,13 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 20
+  },
+  orderTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E40AF',
+    marginBottom: 4,
     borderBottom: '1px solid #e5e7eb',
     paddingBottom: 20
   },
@@ -222,7 +228,7 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             </View>
           </View>
           <View style={styles.receiptSection}>
-            <Text style={styles.headerText}>PURCHASE ORDER</Text>
+            <Text style={styles.orderTitle}>ORDER RECEIPT</Text>
             <Text style={styles.receiptNumber}>
               Receipt No: {generateSafeReceiptNumber(order)}
             </Text>
@@ -230,6 +236,7 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
               Date Issued: {formatDate(order.orderPlacedDate)}
             </Text>
             <Text style={styles.label}>Order Reference: #{order.orderNumber || '-'}</Text>
+            <Text style={styles.label}>Request ID: #{order.id}</Text>
           </View>
         </View>
 
@@ -242,8 +249,10 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
               Submission Date: {formatDate(order.submittedAt)}
             </Text>
             <Text style={styles.infoText}>
-              Order Placed Date: {formatDate(order.orderPlacedDate)}
+              Processing Date: {formatDate(order.orderPlacedDate)}
             </Text>
+            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
+            <Text style={styles.infoText}>Cost Center: {order.costCenter || '-'}</Text>
           </View>
           
           {/* Delivery Information */}
@@ -262,6 +271,7 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={styles.sectionTitle}>Requester Details</Text>
             <Text style={styles.infoText}>Name: {order.requesterName}</Text>
             <Text style={styles.infoText}>Contact: {order.requesterPhone}</Text>
+            <Text style={styles.infoText}>Department: {order.userSection || '-'}</Text>
           </View>
           
           {/* Vehicle Details */}
@@ -279,21 +289,15 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
             <Text style={[styles.tableCell, { flex: 2 }]}>Item Description</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>Make/Size</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>Quantity</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Unit Price</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Total Price</Text>
+            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Amount</Text>
           </View>
           <View style={[styles.tableRow, { backgroundColor: '#f9fafb' }]}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
-            <Text style={[styles.tableCell, { flex: 1.5 }]}>N/A</Text>
-            <Text style={[styles.tableCell, { flex: 1 }]}>1</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
+            <Text style={[styles.tableCell, { flex: 6 }]}>Existing Tire: {order.existingTireMake || 'N/A'}</Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={[styles.tableCell, { flex: 2 }]}>New Tires</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{order.quantity}</Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.unitPrice)}</Text>
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>{formatCurrency(order.totalPrice)}</Text>
           </View>
           {order.tubesQuantity > 0 && (
@@ -301,7 +305,6 @@ export const OrderReceiptPDF: React.FC<{ order: Order }> = ({ order }) => {
               <Text style={[styles.tableCell, { flex: 2 }]}>Tubes</Text>
               <Text style={[styles.tableCell, { flex: 1.5 }]}>{order.tireSize}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{order.tubesQuantity}</Text>
-              <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>N/A</Text>
               <Text style={[styles.tableCell, { flex: 1.5, textAlign: 'right' }]}>Included</Text>
             </View>
           )}

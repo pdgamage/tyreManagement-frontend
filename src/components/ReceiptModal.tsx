@@ -34,35 +34,15 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
       if (element) {
         html2canvas(element).then((canvas) => {
           const imgData = canvas.toDataURL('image/png');
-          // Create watermark PDF
-          const watermarkPdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = watermarkPdf.internal.pageSize.getWidth();
-          const pdfHeight = watermarkPdf.internal.pageSize.getHeight();
-          
-          // Configure watermark style
-          watermarkPdf.setFontSize(90);
-          watermarkPdf.setTextColor(245, 245, 245);
-          
-          // Add repeated watermark pattern
-          for (let i = -50; i < pdfHeight + 100; i += 150) {
-            for (let j = -50; j < pdfWidth + 100; j += 150) {
-              watermarkPdf.text('SLT MOBITEL', j, i, { 
-                angle: 45,
-                align: 'center'
-              });
-            }
-          }
-          
-          // Get watermark as base64
-          const watermarkData = watermarkPdf.output('datauristring');
-          
-          // Create final PDF
           const pdf = new jsPDF('p', 'mm', 'a4');
-          
-          // Add watermark first, then content on top
-          pdf.addImage(watermarkData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          
+          // Add watermark text with lighter style
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(200);
+          pdf.setFontSize(40);
+          pdf.text('SLT Mobitel', pdfWidth / 2, pdfHeight / 2, { angle: 45, align: 'center' });
           pdf.save(`order_receipt_${request.id}.pdf`);
         });
       }
@@ -106,10 +86,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           {/* Company Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div className="flex-1">
-              <div className="text-3xl font-bold text-blue-700">
-                SLT<span className="text-green-600">MOBITEL</span>
-                <div className="text-sm font-normal text-gray-600">The Connection</div>
-              </div>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SLTMobitel_Logo.svg" 
+                alt="SLT Mobitel Logo" 
+                className="h-16"
+              />
               <div className="mt-2 text-gray-600 text-sm">
                 <p>SLT Mobitel Head Office</p>
                 <p>Lotus Road, Colombo 01</p>

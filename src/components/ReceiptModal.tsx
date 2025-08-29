@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { X } from 'lucide-react';
 import type { Request } from '../types/request';
 import { format } from 'date-fns';
@@ -26,6 +28,22 @@ const formatCurrency = (amount: number | undefined) => {
 };
 
 const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen }) => {
+  useEffect(() => {
+    if (isOpen && request) {
+      const element = document.getElementById('printable-receipt');
+      if (element) {
+        html2canvas(element).then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`order_receipt_${request.id}.pdf`);
+        });
+      }
+    }
+  }, [isOpen, request]);
+
   if (!isOpen || !request) return null;
 
 

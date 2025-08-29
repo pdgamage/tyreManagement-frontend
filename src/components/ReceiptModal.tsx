@@ -60,31 +60,21 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ request, onClose, isOpen })
           
           // Add watermark with better styling
           const watermarkText = 'SLT Mobitel';
-          const viewText = 'View Receipt';
           const watermarkFontSize = 50;
           const watermarkOpacity = 0.1; // 10% opacity
           
-          // Set common styles
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(0, 0, 0);
           pdf.setGState(pdf.GState({opacity: watermarkOpacity}));
-          
-          // Calculate center position for main text
           pdf.setFontSize(watermarkFontSize);
-          const textWidth1 = pdf.getStringUnitWidth(watermarkText) * watermarkFontSize / pdf.internal.scaleFactor;
-          const x1 = (pdfWidth - textWidth1) / 2;
           
-          // Calculate center position for 'View Receipt' text
-          pdf.setFontSize(watermarkFontSize * 0.6);
-          const textWidth2 = pdf.getStringUnitWidth(viewText) * (watermarkFontSize * 0.6) / pdf.internal.scaleFactor;
-          const x2 = (pdfWidth - textWidth2) / 2;
+          // Calculate center position
+          const textWidth = pdf.getStringUnitWidth(watermarkText) * watermarkFontSize / pdf.internal.scaleFactor;
+          const x = (pdfWidth - textWidth) / 2;
+          const y = pdfHeight / 2;
           
-          // Draw watermarks
-          pdf.setFontSize(watermarkFontSize);
-          pdf.text(watermarkText, x1, pdfHeight * 0.45, {angle: 45, align: 'center'});
-          
-          pdf.setFontSize(watermarkFontSize * 0.6);
-          pdf.text(viewText, x2, pdfHeight * 0.55, {angle: 45, align: 'center'});
+          // Draw watermark
+          pdf.text(watermarkText, x, y, {angle: 45, align: 'center'});
           
           // Reset graphics state
           pdf.setGState(pdf.GState({opacity: 1}));

@@ -507,8 +507,7 @@ const CustomerOfficerDashboard = () => {
               Confirm Deletion
             </h3>
             <p className="mb-6 text-gray-600">
-              Are you sure you want to delete this request? This action cannot
-              be undone.
+              Are you sure you want to delete this request? The request will be moved to backup storage and can be restored if needed.
             </p>
             <div className="flex justify-end gap-4">
               <button

@@ -663,14 +663,13 @@ const UserDashboard = () => {
                   Confirm Deletion
                 </h3>
                 <p className="text-sm text-gray-500">
-                  This action cannot be undone
+                  Request will be moved to backup storage
                 </p>
               </div>
             </div>
 
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete this tire request? All associated
-              data will be permanently removed.
+              Are you sure you want to delete this tire request? The request will be moved to backup storage and can be restored if needed.
             </p>
 
             <div className="flex justify-end gap-3">
@@ -685,7 +684,7 @@ const UserDashboard = () => {
                 onClick={confirmDelete}
               >
                 <XCircle className="w-4 h-4" />
-                <span>Delete Request</span>
+                <span>Archive Request</span>
               </button>
             </div>
           </div>

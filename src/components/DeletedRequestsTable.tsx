@@ -77,6 +77,9 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<DeletedRequest | null>(null);
+  const [details, setDetails] = useState<any | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [restoreId, setRestoreId] = useState<number | null>(null);
 
@@ -170,6 +173,35 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       fetchDeletedRequests();
     }
   }, [filters]);
+
+  // Fetch full details for the selected deleted request
+  useEffect(() => {
+    const fetchDetails = async (id: number) => {
+      try {
+        setDetailsLoading(true);
+        setDetailsError(null);
+        setDetails(null);
+        const resp = await fetch(`${apiUrls.requests()}/deleted/${id}`);
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+          throw new Error(data.message || 'Failed to load deleted request');
+        }
+        setDetails(data.data);
+      } catch (e: any) {
+        setDetailsError(e.message || 'Failed to load details');
+      } finally {
+        setDetailsLoading(false);
+      }
+    };
+
+    if (selectedRequest) {
+      fetchDetails(selectedRequest.id);
+    } else {
+      setDetails(null);
+      setDetailsError(null);
+      setDetailsLoading(false);
+    }
+  }, [selectedRequest]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof Filters, value: string) => {
@@ -677,6 +709,95 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                 <span>Restore Request</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-3xl w-full p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Deleted Request Details</h3>
+                <p className="text-sm text-gray-600">Vehicle {selectedRequest.vehicleNumber}</p>
+              </div>
+              <button
+                onClick={() => setSelectedRequest(null)}
+                className="p-2 rounded hover:bg-gray-100"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {detailsLoading && (
+              <div className="py-8 text-center text-gray-600">Loading...</div>
+            )}
+            {detailsError && (
+              <div className="py-3 mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded">{detailsError}</div>
+            )}
+            {details && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester</div>
+                    <div className="text-sm text-gray-900">{details.requesterName}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Status</div>
+                    <div className="text-sm text-gray-900">{details.status}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Department</div>
+                    <div className="text-sm text-gray-900">{details.Department || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Cost Center</div>
+                    <div className="text-sm text-gray-900">{details.CostCenter || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Tire Size</div>
+                    <div className="text-sm text-gray-900">{details.tireSize}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Quantity</div>
+                    <div className="text-sm text-gray-900">{details.quantity} ({details.tubesQuantity} tubes)</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                    <div className="text-xs text-gray-500">Reason</div>
+                    <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.requestReason}</div>
+                  </div>
+                  {details.orderNotes && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Order Notes</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.orderNotes}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Images */}
+                {Array.isArray(details.images) && details.images.length > 0 && (
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 mb-2">Images</div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {details.images.map((src: string, idx: number) => (
+                        <img key={idx} src={src} alt={`Request Image ${idx + 1}`} className="w-full h-32 object-cover rounded border" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setSelectedRequest(null)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

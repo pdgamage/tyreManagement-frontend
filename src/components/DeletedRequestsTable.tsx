@@ -128,18 +128,26 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
         ? `${apiUrls.base}/requests/deleted/user/${userIdFilter}`
         : `${apiUrls.base}/requests/deleted`;
 
+      console.log('🔍 Fetching deleted requests from:', endpoint);
+      console.log('🔍 With params:', params.toString());
+      console.log('🔍 User ID filter:', userIdFilter);
+
       const response = await fetch(`${endpoint}?${params.toString()}`);
+      console.log('📡 Response status:', response.status);
+      
       const data = await response.json();
+      console.log('📦 Response data:', data);
 
       if (data.success) {
         setRequests(data.data);
         setPagination(data.pagination);
+        console.log('✅ Successfully set requests:', data.data.length, 'items');
       } else {
-        console.error('Failed to fetch deleted requests:', data.message);
+        console.error('❌ Failed to fetch deleted requests:', data.message);
         setRequests([]);
       }
     } catch (error) {
-      console.error('Error fetching deleted requests:', error);
+      console.error('❌ Error fetching deleted requests:', error);
       setRequests([]);
     } finally {
       setLoading(false);

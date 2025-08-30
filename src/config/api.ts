@@ -40,6 +40,9 @@ export const buildApiUrl = (endpoint: string, params?: string): string => {
 
 // Specific API URL builders
 export const apiUrls = {
+  // Base URL for direct access
+  base: API_CONFIG.BASE_URL,
+  
   // User URLs
   supervisors: () => buildApiUrl(API_CONFIG.ENDPOINTS.SUPERVISORS),
 

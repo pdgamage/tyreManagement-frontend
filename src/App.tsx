@@ -23,6 +23,7 @@ import EngineerRequestDetails from "./pages/EngineerRequestDetails";
 import CustomerOfficerRequestDetails from "./pages/CustomerOfficerRequestDetails";
 import UserRequestDetails from "./pages/UserRequestDetails";
 import TireInquiryDashboard from "./pages/TireInquiryDashboard";
+import DeletedRequestsPage from "./pages/DeletedRequestsPage";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -64,6 +65,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/user/deleted-requests"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <DeletedRequestsPage />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>
@@ -140,6 +153,18 @@ export function App() {
                 }
               />
               <Route
+                path="/supervisor/deleted-requests"
+                element={
+                  <RequireAuth role="supervisor">
+                    <Layout>
+                      <PageTransition>
+                        <DeletedRequestsPage />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/technical-manager"
                 element={
                   <RequireAuth role="technical-manager">
@@ -170,6 +195,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/technical-manager/deleted-requests"
+                element={
+                  <RequireAuth role="technical-manager">
+                    <Layout>
+                      <PageTransition>
+                        <DeletedRequestsPage />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>
@@ -212,6 +249,18 @@ export function App() {
                 }
               />
               <Route
+                path="/engineer/deleted-requests"
+                element={
+                  <RequireAuth role="engineer">
+                    <Layout>
+                      <PageTransition>
+                        <DeletedRequestsPage />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/customer-officer"
                 element={
                   <RequireAuth role="customer-officer">
@@ -242,6 +291,18 @@ export function App() {
                     <Layout>
                       <PageTransition>
                         <TireInquiryDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/customer-officer/deleted-requests"
+                element={
+                  <RequireAuth role="customer-officer">
+                    <Layout>
+                      <PageTransition>
+                        <DeletedRequestsPage />
                       </PageTransition>
                     </Layout>
                   </RequireAuth>

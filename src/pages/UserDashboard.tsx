@@ -36,10 +36,27 @@ const UserDashboard = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deletedRequestsCount, setDeletedRequestsCount] = useState(0);
 
   useEffect(() => {
     fetchRequests();
+    fetchDeletedRequestsCount();
   }, [fetchRequests]);
+
+  // Fetch count of deleted requests for the user
+  const fetchDeletedRequestsCount = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const response = await fetch(`${apiUrls.base}/requests/deleted/user/${user.id}?limit=1`);
+      const data = await response.json();
+      if (data.success) {
+        setDeletedRequestsCount(data.pagination.total);
+      }
+    } catch (error) {
+      console.error('Error fetching deleted requests count:', error);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -291,6 +308,16 @@ const UserDashboard = () => {
                 <FileText className="w-5 h-5" />
                 <span>User Inquiry</span>
               </button>
+              
+              <button
+                onClick={() => {
+                  navigate('/user/deleted-requests');
+                }}
+                className="bg-gradient-to-r from-red-500 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+              >
+                <Clock className="w-5 h-5" />
+                <span>Deleted Requests</span>
+              </button>
             </div>
 
 
@@ -467,6 +494,25 @@ const UserDashboard = () => {
                 </div>
                 <div className="w-16 h-16 bg-slate-400/30 rounded-xl flex items-center justify-center">
                   <X className="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+
+            {/* Deleted Requests Summary Card */}
+            <div 
+              className="bg-gradient-to-br from-red-500 to-orange-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer transform hover:scale-105"
+              onClick={() => navigate('/user/deleted-requests')}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-4xl font-bold mb-1">
+                    {deletedRequestsCount}
+                  </p>
+                  <p className="text-red-100 text-xs">Deleted requests</p>
+                  <p className="text-red-200 text-xs mt-1">Click to view & restore</p>
+                </div>
+                <div className="w-16 h-16 bg-red-400/30 rounded-xl flex items-center justify-center">
+                  <Clock className="w-8 h-8" />
                 </div>
               </div>
             </div>

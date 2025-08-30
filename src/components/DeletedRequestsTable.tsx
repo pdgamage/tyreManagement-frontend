@@ -80,6 +80,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const [details, setDetails] = useState<any | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState<string | null>(null);
+  const [showAllFields, setShowAllFields] = useState<boolean>(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [restoreId, setRestoreId] = useState<number | null>(null);
 
@@ -738,7 +739,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
               <div className="py-3 mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded">{detailsError}</div>
             )}
             {details && (
-              <div className="space-y-4">
+              <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+                {/* Primary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50 rounded border">
                     <div className="text-xs text-gray-500">Requester</div>
@@ -756,6 +758,14 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                     <div className="text-xs text-gray-500">Cost Center</div>
                     <div className="text-sm text-gray-900">{details.CostCenter || '-'}</div>
                   </div>
+                </div>
+
+                {/* Vehicle */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Vehicle</div>
+                    <div className="text-sm text-gray-900">{details.vehicleNumber} — {details.vehicleBrand} {details.vehicleModel}</div>
+                  </div>
                   <div className="p-3 bg-gray-50 rounded border">
                     <div className="text-xs text-gray-500">Tire Size</div>
                     <div className="text-sm text-gray-900">{details.tireSize}</div>
@@ -764,14 +774,193 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                     <div className="text-xs text-gray-500">Quantity</div>
                     <div className="text-sm text-gray-900">{details.quantity} ({details.tubesQuantity} tubes)</div>
                   </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Existing Tire Make</div>
+                    <div className="text-sm text-gray-900">{details.existingTireMake}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Required Tire Size</div>
+                    <div className="text-sm text-gray-900">{details.tireSizeRequired}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Last Replacement</div>
+                    <div className="text-sm text-gray-900">{details.lastReplacementDate ? new Date(details.lastReplacementDate).toLocaleDateString() : '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Present Km</div>
+                    <div className="text-sm text-gray-900">{details.presentKmReading}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Previous Km</div>
+                    <div className="text-sm text-gray-900">{details.previousKmReading}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                    <div className="text-xs text-gray-500">Tire Wear Pattern</div>
+                    <div className="text-sm text-gray-900">{details.tireWearPattern}</div>
+                  </div>
+                </div>
+
+                {/* Timing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Submitted At</div>
+                    <div className="text-sm text-gray-900">{details.submittedAt ? formatDate(details.submittedAt) : '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Deleted At</div>
+                    <div className="text-sm text-gray-900">{details.deletedAt ? formatDate(details.deletedAt) : '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Deleted By (ID)</div>
+                    <div className="text-sm text-gray-900">{details.deletedBy ?? 'System'}</div>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester Email</div>
+                    <div className="text-sm text-gray-900 break-all">{details.requesterEmail}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester Phone</div>
+                    <div className="text-sm text-gray-900">{details.requesterPhone}</div>
+                  </div>
+                </div>
+
+                {/* Notes & Reason */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50 rounded border md:col-span-2">
                     <div className="text-xs text-gray-500">Reason</div>
                     <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.requestReason}</div>
                   </div>
-                  {details.orderNotes && (
+                  {details.supervisor_notes && (
                     <div className="p-3 bg-gray-50 rounded border md:col-span-2">
-                      <div className="text-xs text-gray-500">Order Notes</div>
-                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.orderNotes}</div>
+                      <div className="text-xs text-gray-500">Supervisor Notes</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.supervisor_notes}</div>
+                    </div>
+                  )}
+                  {details.technical_manager_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Technical Manager Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.technical_manager_note}</div>
+                    </div>
+                  )}
+                  {details.engineer_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Engineer Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.engineer_note}</div>
+                    </div>
+                  )}
+                  {details.customer_officer_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Customer Officer Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.customer_officer_note}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Order & Supplier */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Supplier Name</div>
+                    <div className="text-sm text-gray-900">{details.supplierName || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Supplier Email</div>
+                    <div className="text-sm text-gray-900 break-all">{details.supplierEmail || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Supplier Phone</div>
+                    <div className="text-sm text-gray-900">{details.supplierPhone || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Order Number</div>
+                    <div className="text-sm text-gray-900">{details.orderNumber || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Order Placed</div>
+                    <div className="text-sm text-gray-900">{details.orderPlacedDate ? formatDate(details.orderPlacedDate) : '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                    <div className="text-xs text-gray-500">Order Notes</div>
+                    <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.orderNotes || '-'}</div>
+                  </div>
+                </div>
+
+                {/* Delivery & Pricing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Office</div>
+                    <div className="text-sm text-gray-900">{details.deliveryOfficeName || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Street</div>
+                    <div className="text-sm text-gray-900">{details.deliveryStreetName || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Town</div>
+                    <div className="text-sm text-gray-900">{details.deliveryTown || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Total Price</div>
+                    <div className="text-sm text-gray-900">{details.totalPrice ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Warranty Distance</div>
+                    <div className="text-sm text-gray-900">{details.warrantyDistance ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Wear Indicator Appeared</div>
+                    <div className="text-sm text-gray-900">{details.tireWearIndicatorAppeared ? 'Yes' : 'No'}</div>
+                  </div>
+                </div>
+
+                {/* Decisions (IDs) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Supervisor ID</div>
+                    <div className="text-sm text-gray-900">{details.supervisorId}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Technical Manager ID</div>
+                    <div className="text-sm text-gray-900">{details.technical_manager_id ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Supervisor Decision By</div>
+                    <div className="text-sm text-gray-900">{details.supervisor_decision_by ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Engineer Decision By</div>
+                    <div className="text-sm text-gray-900">{details.engineer_decision_by ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Customer Officer Decision By</div>
+                    <div className="text-sm text-gray-900">{details.customer_officer_decision_by ?? '-'}</div>
+                  </div>
+                </div>
+
+                {/* All columns (raw) */}
+                <div className="border rounded-lg">
+                  <button
+                    onClick={() => setShowAllFields(v => !v)}
+                    className="w-full flex items-center justify-between px-3 py-2 text-left bg-gray-50 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    <span className="text-sm font-medium text-gray-800">All Fields from requestbackup</span>
+                    <span className="text-xs text-gray-600">{showAllFields ? 'Hide' : 'Show'}</span>
+                  </button>
+                  {showAllFields && (
+                    <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Object.entries(details)
+                        .filter(([k, v]) => k !== 'images' && k !== 'isDeleted')
+                        .map(([key, value]) => (
+                          <div key={key} className="p-3 bg-white rounded border">
+                            <div className="text-[11px] uppercase tracking-wide text-gray-500">{key}</div>
+                            <div className="text-sm text-gray-900 break-words">
+                              {value === null || value === undefined || value === '' ? '-' : String(value)}
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   )}
                 </div>

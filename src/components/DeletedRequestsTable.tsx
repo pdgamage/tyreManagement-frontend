@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Filter,
-  Search,
   RotateCcw,
   ChevronLeft,
   ChevronRight,
@@ -76,7 +75,11 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const [requests, setRequests] = useState<DeletedRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<DeletedRequest | null>(null);
+  // Details modal state
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [detail, setDetail] = useState<any | null>(null);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [restoreId, setRestoreId] = useState<number | null>(null);
 
@@ -201,6 +204,27 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Handle pagination
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
+  };
+
+  // Open details modal and fetch full deleted request data
+  const openDetails = async (id: number) => {
+    setDetailOpen(true);
+    setDetailLoading(true);
+    setDetailError(null);
+    setDetail(null);
+    try {
+      const resp = await fetch(`${apiUrls.requests()}/deleted/${id}`);
+      const data = await resp.json();
+      if (data?.success) {
+        setDetail(data.data);
+      } else {
+        setDetailError(data?.message || 'Failed to load request details');
+      }
+    } catch (e: any) {
+      setDetailError(e?.message || 'Failed to load request details');
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   // Handle restore request
@@ -567,7 +591,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
                       <button
-                        onClick={() => setSelectedRequest(request)}
+                        onClick={() => openDetails(request.id)}
                         className="text-blue-600 hover:text-blue-900 p-1 rounded"
                         title="View Details"
                       >
@@ -642,6 +666,101 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
         </div>
       )}
 
+      {/* Details Modal */}
+      {detailOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-3xl shadow-lg">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h3 className="text-lg font-semibold">Deleted Request Details</h3>
+              <button onClick={() => setDetailOpen(false)} className="p-2 rounded hover:bg-gray-100" title="Close">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 max-h-[80vh] overflow-y-auto">
+              {detailLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                </div>
+              )}
+              {!detailLoading && detailError && (
+                <div className="text-red-600 bg-red-50 border border-red-200 p-3 rounded">{detailError}</div>
+              )}
+              {!detailLoading && detail && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Vehicle Number</p>
+                      <p className="font-medium">{detail.vehicleNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Status</p>
+                      <p className="font-medium">{detail.status}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Requester</p>
+                      <p className="font-medium">{detail.requesterName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Submitted At</p>
+                      <p className="font-medium">{detail.submittedAt ? new Date(detail.submittedAt).toLocaleString() : '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Deleted At</p>
+                      <p className="font-medium">{detail.deletedAt ? new Date(detail.deletedAt).toLocaleString() : '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Department</p>
+                      <p className="font-medium">{detail['Department'] || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Cost Center</p>
+                      <p className="font-medium">{detail['CostCenter'] || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Tire Size</p>
+                      <p className="font-medium">{detail.tireSize || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Quantity</p>
+                      <p className="font-medium">{detail.quantity}</p>
+                    </div>
+                  </div>
+
+                  {/* Notes and extra fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Request Reason</p>
+                      <p className="font-medium">{detail.requestReason || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Supplier</p>
+                      <p className="font-medium">{detail.supplierName || '-'}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500">Order Notes</p>
+                      <p className="font-medium whitespace-pre-wrap">{detail.orderNotes || '-'}</p>
+                    </div>
+                  </div>
+
+                  {/* Images */}
+                  <div>
+                    <p className="text-sm text-gray-500 mb-2">Images</p>
+                    {Array.isArray(detail.images) && detail.images.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {detail.images.map((src: string, idx: number) => (
+                          <img key={idx} src={src} alt={`Request image ${idx + 1}`} className="w-full h-32 object-cover rounded border" />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500">No images available</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Restore Confirmation Dialog */}
       {showRestoreConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

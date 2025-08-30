@@ -124,9 +124,11 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       });
 
       // Use user-specific endpoint if userIdFilter is provided
+      // IMPORTANT: use /api/requests prefix from apiUrls.requests()
+      const requestsBase = apiUrls.requests();
       const endpoint = userIdFilter 
-        ? `${apiUrls.base}/requests/deleted/user/${userIdFilter}`
-        : `${apiUrls.base}/requests/deleted`;
+        ? `${requestsBase}/deleted/user/${userIdFilter}`
+        : `${requestsBase}/deleted`;
 
       console.log('🔍 Fetching deleted requests from:', endpoint);
       console.log('🔍 With params:', params.toString());
@@ -212,7 +214,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     if (!restoreId) return;
 
     try {
-      const response = await fetch(`${apiUrls.base}/requests/restore/${restoreId}`, {
+      const response = await fetch(`${apiUrls.requests()}/restore/${restoreId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

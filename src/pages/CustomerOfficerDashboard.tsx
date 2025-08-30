@@ -113,18 +113,31 @@ const CustomerOfficerDashboard = () => {
     if (!deleteId) return;
 
     try {
+      console.log('🗑️  [CustomerOfficer] Deleting request ID:', deleteId);
+      
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: null // Customer officer user ID if available
+        })
       });
 
+      console.log('[CustomerOfficer] Delete response status:', response.status);
+      const responseData = await response.json();
+      console.log('[CustomerOfficer] Delete response data:', responseData);
+
       if (response.ok) {
+        console.log('✅ [CustomerOfficer] Delete successful, refreshing requests...');
         // Refresh the requests list after deletion
         await fetchRequests();
       } else {
-        console.error("Failed to delete request");
+        console.error('❌ [CustomerOfficer] Failed to delete request:', responseData);
       }
     } catch (error) {
-      console.error("Error deleting request:", error);
+      console.error("❌ [CustomerOfficer] Error deleting request:", error);
     }
 
     setShowDeleteConfirm(false);

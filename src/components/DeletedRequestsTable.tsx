@@ -571,7 +571,19 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {requests.map((request) => (
-                <tr key={request.id} className="hover:bg-gray-50">
+                <tr
+                  key={request.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedRequest(request)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedRequest(request);
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label={`View deleted request ${request.vehicleNumber}`}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col">
                       <div className="text-sm font-medium text-gray-900">{request.vehicleNumber}</div>
@@ -600,7 +612,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
                       <button
-                        onClick={() => setSelectedRequest(request)}
+                        onClick={(e) => { e.stopPropagation(); setSelectedRequest(request); }}
                         className="text-blue-600 hover:text-blue-900 p-1 rounded"
                         title="View Details"
                       >
@@ -608,7 +620,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                       </button>
                       {showRestoreButton && request.canRestore && (
                         <button
-                          onClick={() => handleRestore(request.id)}
+                          onClick={(e) => { e.stopPropagation(); handleRestore(request.id); }}
                           className="text-green-600 hover:text-green-900 p-1 rounded"
                           title="Restore Request"
                         >

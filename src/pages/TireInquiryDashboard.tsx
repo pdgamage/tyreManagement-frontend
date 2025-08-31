@@ -60,7 +60,6 @@ const statusOptions = [
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "order placed", label: "Order Placed", icon: <Package className="w-4 h-4 mr-2 text-purple-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
-  { value: "complete", label: "Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
 ];
 
 const UserInquiryDashboard: React.FC = () => {
@@ -756,20 +755,6 @@ const UserInquiryDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Engineer Approved</p>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('complete') || r.status === 'Engineer Approved').length}
-                  </p>
-                </div>
-                <div className="p-3 rounded-full bg-blue-50 text-blue-600">
-                  <Smile className="w-6 h-6" />
-                </div>
-              </div>
-            </div>
-            
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
               <div className="flex items-center justify-between">
                 <div>

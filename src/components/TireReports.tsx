@@ -167,7 +167,6 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
                   <option value="pending">User Requested tire</option>
                   <option value="approved">Approved</option>
                   <option value="rejected">Rejected</option>
-                  <option value="complete">Engineer Approved</option>
                 </select>
               </div>
 

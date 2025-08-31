@@ -42,7 +42,7 @@ const statusOptions = [
   { value: "pending", label: "User Requested tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
-  { value: "complete", label: "Complete - Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
+  { value: "complete", label: "Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
 ];
 
 const UserInquiryDashboard: React.FC = () => {
@@ -524,7 +524,7 @@ const UserInquiryDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Complete</p>
+                  <p className="text-sm font-medium text-gray-500">Engineer Approved</p>
                   <p className="text-2xl font-semibold text-gray-900">
                     {requests.filter(r => r.status.toLowerCase().includes('complete')).length}
                   </p>
@@ -755,7 +755,7 @@ const UserInquiryDashboard: React.FC = () => {
                           <div className="flex items-center gap-3 flex-wrap">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
                               {getStatusIcon(request.status)}
-                              {request.status.toLowerCase() === 'complete' ? 'Complete - Engineer Approved' : request.status}
+                              {request.status.toLowerCase() === 'complete' ? 'Engineer Approved' : request.status}
                             </span>
                             {request.status.toLowerCase() === 'complete' && (
                               <p className="text-sm text-gray-600 italic flex items-center">

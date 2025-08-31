@@ -441,12 +441,12 @@ const UserDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm font-medium mb-2">
-                    Complete Orders
+                    Finally Engineer Approved
                   </p>
                   <p className="text-4xl font-bold mb-1">
                     {completeOrderRequests.length}
                   </p>
-                  <p className="text-purple-200 text-xs">Orders completed</p>
+                  <p className="text-purple-200 text-xs">Engineer approved orders</p>
                 </div>
                 <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
                   <Package className="w-8 h-8" />
@@ -530,7 +530,7 @@ const UserDashboard = () => {
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}
                         {activeFilter === "complete-orders" &&
-                          "Completed Orders"}
+                          "Finally Engineer Approved"}
                         {activeFilter === "cancel-orders" && "Cancelled Orders"}
                       </span>
                     )}
@@ -548,7 +548,7 @@ const UserDashboard = () => {
                             : activeFilter === "place-orders"
                             ? "orders that have been placed"
                             : activeFilter === "complete-orders"
-                            ? "completed orders"
+                            ? "finally engineer approved orders"
                             : "cancelled orders"
                         } requests`}
                     {activeFilter !== "all" && (
@@ -596,7 +596,7 @@ const UserDashboard = () => {
                             : activeFilter === "place-orders"
                             ? "placed orders"
                             : activeFilter === "complete-orders"
-                            ? "completed orders"
+                            ? "finally engineer approved orders"
                             : "cancelled orders"
                         } found`}
                   </div>
@@ -613,7 +613,7 @@ const UserDashboard = () => {
                             : activeFilter === "place-orders"
                             ? "placed orders"
                             : activeFilter === "complete-orders"
-                            ? "completed orders"
+                            ? "finally engineer approved orders"
                             : "cancelled orders"
                         } at the moment.`}
                   </p>

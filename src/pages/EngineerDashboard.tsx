@@ -5,6 +5,7 @@ import RequestReports from "../components/RequestReports";
 import { UserCircle, ChevronDown, LogOut, ClipboardList, BarChart3, Clock, CheckCircle2, XCircle, Wrench } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { apiUrls } from "../config/api";
 import type { Request } from "../types/request";
 
 const EngineerDashboard = () => {
@@ -12,6 +13,8 @@ const EngineerDashboard = () => {
   const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"requests" | "analytics">("requests");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -58,6 +61,51 @@ const EngineerDashboard = () => {
   const handleReject = (requestId: string) => {
     // Navigate to detail page for rejection
     navigate(`/engineer/request/${requestId}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      console.log('🗑️  [Engineer] Deleting request ID:', deleteId);
+      
+      const response = await fetch(apiUrls.requestById(deleteId), {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id || null // Send engineer user ID for audit trail
+        })
+      });
+
+      console.log('[Engineer] Delete response status:', response.status);
+      const responseData = await response.json();
+      console.log('[Engineer] Delete response data:', responseData);
+
+      if (response.ok) {
+        console.log('✅ [Engineer] Delete successful, refreshing requests...');
+        // Refresh the requests list after deletion
+        await fetchRequests();
+      } else {
+        console.error('❌ [Engineer] Failed to delete request:', responseData);
+      }
+    } catch (error) {
+      console.error("❌ [Engineer] Error deleting request:", error);
+    }
+
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteId(null);
   };
 
   const handleLogout = async () => {
@@ -175,6 +223,13 @@ const EngineerDashboard = () => {
               </svg>
               <span>Engineer Inquiry</span>
             </button>
+            <button
+              onClick={() => navigate("/engineer/deleted-requests")}
+              className="text-slate-300 hover:text-white hover:bg-white/20 flex-1 py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3"
+            >
+              <Clock className="w-6 h-6" />
+              <span>Deleted Requests</span>
+            </button>
           </div>
         </div>
       </header>
@@ -267,9 +322,10 @@ const EngineerDashboard = () => {
                     onApprove={handleApprove}
                     onReject={handleReject}
                     onView={(request) => navigate(`/engineer/request/${request.id}`)}
-                    onDelete={() => {}}
+                    onDelete={handleDelete}
                     onPlaceOrder={() => {}}
-                    showActions={false}
+                    showActions={true}
+                    showDeleteButton={true}
                   />
                 </div>
               </div>
@@ -293,9 +349,10 @@ const EngineerDashboard = () => {
                     onApprove={() => {}}
                     onReject={() => {}}
                     onView={(request) => navigate(`/engineer/request/${request.id}`)}
-                    onDelete={() => {}}
+                    onDelete={handleDelete}
                     onPlaceOrder={() => {}}
-                    showActions={false}
+                    showActions={true}
+                    showDeleteButton={true}
                   />
                 </div>
               </div>
@@ -319,9 +376,10 @@ const EngineerDashboard = () => {
                     onApprove={() => {}}
                     onReject={() => {}}
                     onView={(request) => navigate(`/engineer/request/${request.id}`)}
-                    onDelete={() => {}}
+                    onDelete={handleDelete}
                     onPlaceOrder={() => {}}
-                    showActions={false}
+                    showActions={true}
+                    showDeleteButton={true}
                   />
                 </div>
               </div>
@@ -346,6 +404,53 @@ const EngineerDashboard = () => {
           </div>
         )}
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={cancelDelete}
+        >
+          <div
+            className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl border border-gray-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <XCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm Deletion
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Request will be moved to backup storage
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this request? The request will be moved to backup storage and can be restored if needed.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                onClick={cancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center space-x-2"
+                onClick={confirmDelete}
+              >
+                <XCircle className="w-4 h-4" />
+                <span>Archive Request</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

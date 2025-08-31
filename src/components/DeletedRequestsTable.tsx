@@ -740,129 +740,72 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
             )}
             {details && (
               <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
-                {/* Vehicle & Requester Info */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-800 mb-2">Vehicle & Requester Info</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Vehicle Number</div>
-                      <div className="text-sm text-gray-900">{details.vehicleNumber}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Status</div>
-                      <div className="text-sm text-gray-900">{details.status}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Vehicle Brand</div>
-                      <div className="text-sm text-gray-900">{details.vehicleBrand || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Vehicle Model</div>
-                      <div className="text-sm text-gray-900">{details.vehicleModel || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Department/Section</div>
-                      <div className="text-sm text-gray-900">{details.Department || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Cost Center</div>
-                      <div className="text-sm text-gray-900">{details.CostCenter || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Requester Name</div>
-                      <div className="text-sm text-gray-900">{details.requesterName}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Requester Email</div>
-                      <div className="text-sm text-gray-900 break-all">{details.requesterEmail}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Requester Phone</div>
-                      <div className="text-sm text-gray-900">{details.requesterPhone}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Submitted At</div>
-                      <div className="text-sm text-gray-900">{details.submittedAt ? formatDate(details.submittedAt) : '-'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Delivery & Pricing Information */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-800 mb-2">Delivery & Pricing Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Delivery Office</div>
-                      <div className="text-sm text-gray-900">{details.deliveryOfficeName || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Delivery Street</div>
-                      <div className="text-sm text-gray-900">{details.deliveryStreetName || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Delivery Town</div>
-                      <div className="text-sm text-gray-900">{details.deliveryTown || '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Total Price</div>
-                      <div className="text-sm text-gray-900">{details.totalPrice ?? '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Warranty Distance</div>
-                      <div className="text-sm text-gray-900">{details.warrantyDistance ?? '-'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tire & Request Details */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-800 mb-2">Tire & Request Details</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Tire Size Required</div>
-                      <div className="text-sm text-gray-900">{details.tireSizeRequired}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Quantity</div>
-                      <div className="text-sm text-gray-900">{details.quantity}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Tubes Quantity</div>
-                      <div className="text-sm text-gray-900">{details.tubesQuantity}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Existing Tire Make</div>
-                      <div className="text-sm text-gray-900">{details.existingTireMake}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Last Replacement Date</div>
-                      <div className="text-sm text-gray-900">{details.lastReplacementDate ? new Date(details.lastReplacementDate).toLocaleDateString() : '-'}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Present KM Reading</div>
-                      <div className="text-sm text-gray-900">{details.presentKmReading}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border">
-                      <div className="text-xs text-gray-500">Previous KM Reading</div>
-                      <div className="text-sm text-gray-900">{details.previousKmReading}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
-                      <div className="text-xs text-gray-500">Tire Wear Pattern</div>
-                      <div className="text-sm text-gray-900">{details.tireWearPattern}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
-                      <div className="text-xs text-gray-500">Request Reason</div>
-                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.requestReason}</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
-                      <div className="text-xs text-gray-500">Comments</div>
-                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.comments || '-'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timing & Audit */}
+                {/* Primary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester</div>
+                    <div className="text-sm text-gray-900">{details.requesterName}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Status</div>
+                    <div className="text-sm text-gray-900">{details.status}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Department</div>
+                    <div className="text-sm text-gray-900">{details.Department || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Cost Center</div>
+                    <div className="text-sm text-gray-900">{details.CostCenter || '-'}</div>
+                  </div>
+                </div>
+
+                {/* Vehicle */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Vehicle</div>
+                    <div className="text-sm text-gray-900">{details.vehicleNumber} — {details.vehicleBrand} {details.vehicleModel}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Tire Size</div>
+                    <div className="text-sm text-gray-900">{details.tireSize}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Quantity</div>
+                    <div className="text-sm text-gray-900">{details.quantity} ({details.tubesQuantity} tubes)</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Existing Tire Make</div>
+                    <div className="text-sm text-gray-900">{details.existingTireMake}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Required Tire Size</div>
+                    <div className="text-sm text-gray-900">{details.tireSizeRequired}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Last Replacement</div>
+                    <div className="text-sm text-gray-900">{details.lastReplacementDate ? new Date(details.lastReplacementDate).toLocaleDateString() : '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Present Km</div>
+                    <div className="text-sm text-gray-900">{details.presentKmReading}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Previous Km</div>
+                    <div className="text-sm text-gray-900">{details.previousKmReading}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                    <div className="text-xs text-gray-500">Tire Wear Pattern</div>
+                    <div className="text-sm text-gray-900">{details.tireWearPattern}</div>
+                  </div>
+                </div>
+
+                {/* Timing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Submitted At</div>
+                    <div className="text-sm text-gray-900">{details.submittedAt ? formatDate(details.submittedAt) : '-'}</div>
+                  </div>
                   <div className="p-3 bg-gray-50 rounded border">
                     <div className="text-xs text-gray-500">Deleted At</div>
                     <div className="text-sm text-gray-900">{details.deletedAt ? formatDate(details.deletedAt) : '-'}</div>
@@ -871,6 +814,50 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                     <div className="text-xs text-gray-500">Deleted By (ID)</div>
                     <div className="text-sm text-gray-900">{details.deletedBy ?? 'System'}</div>
                   </div>
+                </div>
+
+                {/* Contact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester Email</div>
+                    <div className="text-sm text-gray-900 break-all">{details.requesterEmail}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Requester Phone</div>
+                    <div className="text-sm text-gray-900">{details.requesterPhone}</div>
+                  </div>
+                </div>
+
+                {/* Notes & Reason */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                    <div className="text-xs text-gray-500">Reason</div>
+                    <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.requestReason}</div>
+                  </div>
+                  {details.supervisor_notes && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Supervisor Notes</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.supervisor_notes}</div>
+                    </div>
+                  )}
+                  {details.technical_manager_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Technical Manager Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.technical_manager_note}</div>
+                    </div>
+                  )}
+                  {details.engineer_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Engineer Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.engineer_note}</div>
+                    </div>
+                  )}
+                  {details.customer_officer_note && (
+                    <div className="p-3 bg-gray-50 rounded border md:col-span-2">
+                      <div className="text-xs text-gray-500">Customer Officer Note</div>
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.customer_officer_note}</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Order & Supplier */}
@@ -898,6 +885,34 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <div className="p-3 bg-gray-50 rounded border md:col-span-2">
                     <div className="text-xs text-gray-500">Order Notes</div>
                     <div className="text-sm text-gray-900 whitespace-pre-wrap">{details.orderNotes || '-'}</div>
+                  </div>
+                </div>
+
+                {/* Delivery & Pricing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Office</div>
+                    <div className="text-sm text-gray-900">{details.deliveryOfficeName || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Street</div>
+                    <div className="text-sm text-gray-900">{details.deliveryStreetName || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Delivery Town</div>
+                    <div className="text-sm text-gray-900">{details.deliveryTown || '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Total Price</div>
+                    <div className="text-sm text-gray-900">{details.totalPrice ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Warranty Distance</div>
+                    <div className="text-sm text-gray-900">{details.warrantyDistance ?? '-'}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <div className="text-xs text-gray-500">Wear Indicator Appeared</div>
+                    <div className="text-sm text-gray-900">{details.tireWearIndicatorAppeared ? 'Yes' : 'No'}</div>
                   </div>
                 </div>
 

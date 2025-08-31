@@ -668,7 +668,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                           }
                         </span>
                       ) : (
-                        <span className="text-gray-400 text-xs">Unknown</span>
+                        <span className="text-gray-400 text-xs">Not tracked</span>
                       )}
                     </div>
                   </td>

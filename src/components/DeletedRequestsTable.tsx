@@ -284,6 +284,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     switch (status.toLowerCase()) {
       case 'pending':
         return 'User Requested tire';
+      case 'complete':
+        return 'Engineer Approved';
       default:
         return status;
     }
@@ -421,7 +423,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <option value="technical-manager approved">Technical Manager Approved</option>
                   <option value="engineer approved">Engineer Approved</option>
                   <option value="approved">Approved</option>
-                  <option value="complete">Complete</option>
+                  <option value="complete">Engineer Approved</option>
                   <option value="order placed">Order Placed</option>
                   <option value="rejected">Rejected</option>
                   <option value="supervisor rejected">Supervisor Rejected</option>

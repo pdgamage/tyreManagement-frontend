@@ -187,7 +187,9 @@ const SupervisorRequestDetails = () => {
           }
         `}
           >
-            {request.status === 'pending' ? 'User Requested tire' : request.status.replace(/_/g, " ")}
+            {request.status === 'pending' ? 'User Requested tire' : 
+             request.status === 'complete' ? 'Engineer Approved' : 
+             request.status.replace(/_/g, " ")}
           </span>
         </h2>
         <form className="space-y-10">

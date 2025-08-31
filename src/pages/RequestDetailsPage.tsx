@@ -197,7 +197,7 @@ const RequestDetailsPage: React.FC = () => {
                   {getStatusIcon(request.status)}
                 </span>
                 <span className="capitalize">
-                  {(request.status || '').toLowerCase() === 'complete' ? 'Complete (Engineer Approved)' : 
+                  {(request.status || '').toLowerCase() === 'complete' ? 'Engineer Approved' : 
                    (request.status || '').toLowerCase() === 'pending' ? 'User Requested tire' : 
                    (request.status || '').toLowerCase()}
                 </span>

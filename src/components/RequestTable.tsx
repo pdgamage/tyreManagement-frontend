@@ -131,6 +131,10 @@ const getDescriptiveStatus = (request: Request) => {
     return "User Requested tire";
   }
   
+  if (request.status === "complete") {
+    return "Engineer Approved";
+  }
+  
   if (request.status === "rejected") {
     // Check who rejected it based on notes and decision_by fields
     if (request.supervisor_notes && request.supervisor_decision_by) {

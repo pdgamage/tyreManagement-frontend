@@ -144,7 +144,8 @@ const UserDashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id || null // Send user ID for audit trail
+          userId: user?.id || null, // Send user ID for audit trail
+          userRole: user?.role || null // Send user role for audit trail
         })
       });
 

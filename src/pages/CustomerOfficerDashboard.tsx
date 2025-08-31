@@ -122,7 +122,8 @@ const CustomerOfficerDashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id || null // Send customer officer user ID for audit trail
+          userId: user?.id || null, // Send customer officer user ID for audit trail
+          userRole: user?.role || null // Send customer officer role for audit trail
         })
       });
 

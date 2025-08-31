@@ -133,7 +133,8 @@ const TechnicalManagerDashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id || null // Send technical manager user ID for audit trail
+          userId: user?.id || null, // Send technical manager user ID for audit trail
+          userRole: user?.role || null // Send technical manager role for audit trail
         })
       });
 

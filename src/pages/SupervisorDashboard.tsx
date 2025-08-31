@@ -95,7 +95,8 @@ const SupervisorDashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id || null // Send supervisor user ID for audit trail
+          userId: user?.id || null, // Send supervisor user ID for audit trail
+          userRole: user?.role || null // Send supervisor role for audit trail
         })
       });
 

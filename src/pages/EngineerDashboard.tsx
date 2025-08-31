@@ -80,7 +80,8 @@ const EngineerDashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id || null // Send engineer user ID for audit trail
+          userId: user?.id || null, // Send engineer user ID for audit trail
+          userRole: user?.role || null // Send engineer role for audit trail
         })
       });
 

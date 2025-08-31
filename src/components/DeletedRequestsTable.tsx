@@ -251,6 +251,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     if (!restoreId) return;
 
     try {
+      console.log('🔄 Attempting to restore request ID:', restoreId);
+      
       const response = await fetch(`${apiUrls.requests()}/restore/${restoreId}`, {
         method: 'POST',
         headers: {
@@ -261,16 +263,20 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
         }),
       });
 
+      console.log('📡 Restore response status:', response.status);
       const data = await response.json();
+      console.log('📦 Restore response data:', data);
 
       if (data.success) {
         console.log('✅ Request restored successfully');
         fetchDeletedRequests(); // Refresh the list
       } else {
         console.error('❌ Failed to restore request:', data.message);
+        alert(`Failed to restore request: ${data.message}`);
       }
     } catch (error) {
       console.error('❌ Error restoring request:', error);
+      alert(`Error restoring request: ${error.message}`);
     }
 
     setShowRestoreConfirm(false);

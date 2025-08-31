@@ -66,15 +66,6 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
     completed: requests.filter(r => r.status?.toLowerCase().includes('complete')).length
   };
 
-  // Extra status note for clarity in list/table views
-  const getStatusExtraText = (status: string) => {
-    const s = (status || '').toLowerCase();
-    if (s === 'pending') {
-      return ' - user tire requested';
-    }
-    return '';
-  };
-
   return (
     <div className="space-y-6">
       {/* Stats Section */}
@@ -277,11 +268,6 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
                           }`}
                         >
                           {request.status}
-                          {getStatusExtraText(request.status) && (
-                            <span className="ml-1 text-[11px] opacity-80">
-                              {getStatusExtraText(request.status)}
-                            </span>
-                          )}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

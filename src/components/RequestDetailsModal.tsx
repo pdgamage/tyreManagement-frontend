@@ -48,8 +48,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 Request Details #{request.id}
               </h3>
               <div className={`inline-flex items-center px-3 py-1 mt-2 text-sm font-medium rounded-full border ${getStatusBadgeClass(request.status || '')}`}>
-                {(request.status || 'Unknown')}
-                {request.status && request.status.toLowerCase() === 'pending' ? ' - user tire requested' : ''}
+                {request.status || 'Unknown'}
               </div>
             </div>
             <button

@@ -131,15 +131,6 @@ const UserRequestDetails = () => {
     setImageZoom((prev) => Math.min(Math.max(prev * delta, 0.5), 3));
   };
 
-  // Extra helper text for certain statuses (UI clarity)
-  const getStatusExtraText = (status: string) => {
-    const s = (status || '').toLowerCase();
-    if (s === 'pending') {
-      return ' - user tire requested';
-    }
-    return '';
-  };
-
   const getStatusBadgeClass = (status: string) => {
     switch (status?.toLowerCase()) {
       case "pending":
@@ -233,7 +224,6 @@ const UserRequestDetails = () => {
                 )}`}
               >
                 {request.status || "Unknown"}
-                {getStatusExtraText(request.status || "")}
               </div>
             </div>
           </div>

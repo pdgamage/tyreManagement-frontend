@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import ReceiptModal from "./ReceiptModal";
 import type { Request } from "../types/request";
+import type { BaseRequest } from "../types/shared";
 
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
@@ -138,15 +139,6 @@ const getDescriptiveStatus = (request: Request) => {
     return "rejected";
   }
   return request.status;
-};
-
-// Extra small helper text next to status for clarity in the table
-const getStatusExtraText = (request: Request) => {
-  const status = (request.status || "").toLowerCase();
-  if (status === "pending") {
-    return " - user tire requested";
-  }
-  return "";
 };
 
 interface RequestTableProps {
@@ -313,11 +305,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   >
                     {getStatusStyles(request.status).icon}
                     <span className="ml-1">{getDescriptiveStatus(request)}</span>
-                    {getStatusExtraText(request) && (
-                      <span className="ml-1 text-[11px] opacity-80">
-                        {getStatusExtraText(request)}
-                      </span>
-                    )}
                   </span>
                 </td>
                 {showActions && (

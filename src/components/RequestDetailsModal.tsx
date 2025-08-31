@@ -38,11 +38,11 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
   if (!isOpen || !request) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl">
+        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[85vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b">
+          <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
             <div>
               <h3 className="text-2xl font-semibold text-gray-900">
                 Request Details #{request.id}
@@ -203,7 +203,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 flex justify-end">
+          <div className="border-t px-6 py-4 flex justify-end sticky bottom-0 bg-white">
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"

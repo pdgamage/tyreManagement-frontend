@@ -168,8 +168,7 @@ const CustomerOfficerRequestDetails = () => {
                     : "bg-red-100 text-red-800"
                 }`}
               >
-                {request.status.charAt(0).toUpperCase() +
-                  request.status.slice(1)}
+                {request.status === 'pending' ? 'User Requested tire' : (request.status.charAt(0).toUpperCase() + request.status.slice(1))}
               </span>
             </div>
           </div>

@@ -279,6 +279,16 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     setRestoreId(null);
   };
 
+  // Get status text with proper display labels
+  const getStatusText = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'User Requested tire';
+      default:
+        return status;
+    }
+  };
+
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -593,7 +603,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
                       {getStatusIcon(request.status)}
-                      <span className="ml-1">{request.status}</span>
+                      <span className="ml-1">{getStatusText(request.status)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -760,7 +770,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   </div>
                   <div className="p-3 bg-gray-50 rounded border">
                     <div className="text-xs text-gray-500">Status</div>
-                    <div className="text-sm text-gray-900">{details.status}</div>
+                    <div className="text-sm text-gray-900">{getStatusText(details.status)}</div>
                   </div>
                   <div className="p-3 bg-gray-50 rounded border">
                     <div className="text-xs text-gray-500">Department</div>

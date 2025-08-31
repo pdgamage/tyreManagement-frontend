@@ -127,6 +127,10 @@ const getStatusStyles = (status: string) => {
 
 // Function to get descriptive status text based on who made the decision
 const getDescriptiveStatus = (request: Request) => {
+  if (request.status === "pending") {
+    return "User Requested tire";
+  }
+  
   if (request.status === "rejected") {
     // Check who rejected it based on notes and decision_by fields
     if (request.supervisor_notes && request.supervisor_decision_by) {

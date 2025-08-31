@@ -18,6 +18,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { apiUrls } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -85,6 +87,10 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const [showAllFields, setShowAllFields] = useState<boolean>(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [restoreId, setRestoreId] = useState<number | null>(null);
+  const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
+  const [showRestoreError, setShowRestoreError] = useState(false);
+  const [restoreErrorMessage, setRestoreErrorMessage] = useState('');
+  const [restoreSuccessMessage, setRestoreSuccessMessage] = useState('');
 
   // Filter state
   const [filters, setFilters] = useState<Filters>({
@@ -270,20 +276,23 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
 
       if (data.success) {
         console.log('✅ Request restored successfully');
+        setRestoreSuccessMessage('Request restored successfully! The request has been moved back to the active requests list.');
+        setShowRestoreSuccess(true);
         fetchDeletedRequests(); // Refresh the list
-        alert('Request restored successfully!');
       } else {
         console.error('❌ Failed to restore request:', data.message);
         // Handle role-based authorization errors with more specific messaging
         if (response.status === 403) {
-          alert(`Access Denied: ${data.message}\n\nOnly users with '${data.deletedByRole}' role can restore this request.\nYour current role: '${data.userRole}'`);
+          setRestoreErrorMessage(`Access Denied: ${data.message}\n\nOnly users with '${data.deletedByRole}' role can restore this request.\nYour current role: '${data.userRole}'`);
         } else {
-          alert(`Failed to restore request: ${data.message}`);
+          setRestoreErrorMessage(`Failed to restore request: ${data.message}`);
         }
+        setShowRestoreError(true);
       }
     } catch (error) {
       console.error('❌ Error restoring request:', error);
-      alert(`Error restoring request: ${error.message}`);
+      setRestoreErrorMessage(`Error restoring request: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      setShowRestoreError(true);
     }
 
     setShowRestoreConfirm(false);
@@ -1129,6 +1138,72 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Restore Success Modal */}
+      {showRestoreSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Restore Successful</h3>
+                <p className="text-sm text-gray-600">The request has been restored successfully.</p>
+              </div>
+            </div>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-green-800">
+                {restoreSuccessMessage}
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-end">
+              <button
+                onClick={() => setShowRestoreSuccess(false)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>OK</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Restore Error Modal */}
+      {showRestoreError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Restore Failed</h3>
+                <p className="text-sm text-gray-600">The request could not be restored.</p>
+              </div>
+            </div>
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-800 whitespace-pre-line">
+                {restoreErrorMessage}
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-end">
+              <button
+                onClick={() => setShowRestoreError(false)}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+              >
+                <AlertCircle className="w-4 h-4" />
+                <span>OK</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

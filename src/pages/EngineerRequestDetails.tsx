@@ -82,16 +82,14 @@ const EngineerRequestDetails = () => {
 
     try {
       if (approve) {
-        // First approve as engineer
+        // Approve as engineer with final status "Engineer Approved"
         await updateRequestStatus(
           id!,
-          "engineer approved",
+          "Engineer Approved",
           notes,
           "engineer",
           user?.id
         );
-        // Then mark as complete with the same engineer notes
-        await updateRequestStatus(id!, "complete", notes, "engineer", user?.id);
       } else {
         // Just reject
         await updateRequestStatus(

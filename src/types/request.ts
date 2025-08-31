@@ -24,6 +24,7 @@ export interface Request {
     | "supervisor approved"
     | "technical-manager approved"
     | "engineer approved"
+    | "Engineer Approved"
     | "complete"
     | "order placed"
     | "order cancelled"

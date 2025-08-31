@@ -84,6 +84,13 @@ const getStatusStyles = (status: string) => {
         border: "border-green-300",
         icon: <CheckCircle className="w-4 h-4" />,
       };
+    case "Engineer Approved":
+      return {
+        bg: "bg-green-50",
+        text: "text-green-700",
+        border: "border-green-300",
+        icon: <CheckCircle className="w-4 h-4" />,
+      };
     case "order placed":
       return {
         bg: "bg-purple-50",
@@ -131,7 +138,7 @@ const getDescriptiveStatus = (request: Request) => {
     return "User Requested tire";
   }
   
-  if (request.status === "complete") {
+  if (request.status === "complete" || request.status === "Engineer Approved") {
     return "Engineer Approved";
   }
   
@@ -363,7 +370,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                     )}
 
                       {showPlaceOrderButton &&
-                        request.status?.toLowerCase().trim() === "complete" &&
+                        (request.status?.toLowerCase().trim() === "complete" ||
+                         request.status?.toLowerCase().trim() === "engineer approved") &&
                         !(request as any).order_placed && (
                           <button
                             onClick={(e) => {
@@ -379,7 +387,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       )}
 
                       {showCancelButton &&
-                        request.status?.toLowerCase().trim() === "complete" &&
+                        (request.status?.toLowerCase().trim() === "complete" ||
+                         request.status?.toLowerCase().trim() === "engineer approved") &&
                         onCancelOrder && (
                           <button
                             onClick={(e) => {

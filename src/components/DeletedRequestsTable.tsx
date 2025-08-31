@@ -286,6 +286,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
         return 'User Requested tire';
       case 'complete':
         return 'Engineer Approved';
+      case 'engineer approved':
+        return 'Engineer Approved';
       default:
         return status;
     }
@@ -309,6 +311,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       case 'customer-officer rejected':
         return 'bg-red-100 text-red-800';
       case 'complete':
+      case 'Engineer Approved':
         return 'bg-blue-100 text-blue-800';
       case 'order placed':
         return 'bg-purple-100 text-purple-800';
@@ -330,6 +333,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       case 'engineer approved':
       case 'customer-officer approved':
       case 'complete':
+      case 'engineer approved':
         return <CheckCircle2 className="w-4 h-4" />;
       case 'rejected':
       case 'supervisor rejected':

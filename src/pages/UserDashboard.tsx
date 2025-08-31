@@ -84,7 +84,7 @@ const UserDashboard = () => {
     (req: any) => req.status === "order placed"
   );
   const completeOrderRequests = userRequests.filter(
-    (req: any) => req.status === "complete"
+    (req: any) => req.status === "complete" || req.status === "Engineer Approved"
   );
   const cancelOrderRequests = userRequests.filter(
     (req: any) => req.status === "order cancelled"

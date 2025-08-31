@@ -1290,7 +1290,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
 
     // Check for pending requests
     const pendingRequests = vehicleRequests.filter(
-      (req) => !["rejected", "complete", "order placed"].includes(req.status)
+      (req) => !["rejected", "complete", "Engineer Approved", "order placed"].includes(req.status)
     );
 
     if (pendingRequests.length > 0) {
@@ -1311,7 +1311,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const recentCompletedRequests = vehicleRequests.filter((req) => {
-      const isCompleted = ["complete", "order placed"].includes(req.status);
+      const isCompleted = ["complete", "Engineer Approved", "order placed"].includes(req.status);
       const requestDate = new Date(req.submittedAt);
       return isCompleted && requestDate >= thirtyDaysAgo;
     });

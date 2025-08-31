@@ -761,7 +761,7 @@ const UserInquiryDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Engineer Approved</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('complete')).length}
+                    {requests.filter(r => r.status.toLowerCase().includes('complete') || r.status === 'Engineer Approved').length}
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-blue-50 text-blue-600">

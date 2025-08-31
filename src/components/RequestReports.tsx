@@ -65,16 +65,18 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
           r.status === "technical-manager rejected"
         );
       } else if (role === "engineer") {
-        // Engineer sees: technical-manager approved (pending work), complete (finished work), and rejected by engineer
+        // Engineer sees: technical-manager approved (pending work), complete/Engineer Approved (finished work), and rejected by engineer
         return (
           r.status === "technical-manager approved" ||
           r.status === "complete" ||
+          r.status === "Engineer Approved" ||
           r.status === "engineer rejected"
         );
       } else if (role === "customer-officer") {
-        // Customer officer sees: complete (ready for orders), order placed, order cancelled, and rejected by customer officer
+        // Customer officer sees: complete/Engineer Approved (ready for orders), order placed, order cancelled, and rejected by customer officer
         return (
           r.status === "complete" ||
+          r.status === "Engineer Approved" ||
           r.status === "order placed" ||
           r.status === "order cancelled" ||
           (r.status === "rejected" &&
@@ -95,7 +97,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       } else if (role === "engineer") {
         return r.status === "technical-manager approved"; // Engineer sees technical-manager approved as pending work
       } else if (role === "customer-officer") {
-        return r.status === "complete"; // Customer officer sees complete requests as pending orders
+        return r.status === "complete" || r.status === "Engineer Approved"; // Customer officer sees complete/Engineer Approved requests as pending orders
       }
       return r.status === "supervisor approved"; // Default for other roles
     }).length;
@@ -108,12 +110,12 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         return r.status === "technical-manager approved";
       } else if (role === "engineer") {
         // Engineer completed requests
-        return r.status === "complete";
+        return r.status === "complete" || r.status === "Engineer Approved";
       } else if (role === "customer-officer") {
         // Customer officer placed orders
         return r.status === "order placed";
       }
-      return r.status === "technical-manager approved" || r.status === "complete"; // Default for other roles
+      return r.status === "technical-manager approved" || r.status === "complete" || r.status === "Engineer Approved"; // Default for other roles
     }).length;
 
     const rejectedRequests = requests.filter((r) => {
@@ -191,10 +193,10 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     // Use role-specific data filtering
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled" ||
+      requests.filter((r) => r.status === "complete" || r.status === "Engineer Approved" || r.status === "order placed" || r.status === "order cancelled" ||
         (r.status === "rejected" && r.customer_officer_note && r.customer_officer_note.trim() !== "")) :
       role === "engineer" ?
-      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "Engineer Approved" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
       role === "supervisor" ?
@@ -222,7 +224,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
             }
           } else if (role === "engineer") {
             // Engineer-specific logic
-            if (request.status === "complete") {
+            if (request.status === "complete" || request.status === "Engineer Approved") {
               monthCounts[key].approved++;
             } else if (request.status === "engineer rejected") {
               monthCounts[key].rejected++;
@@ -246,7 +248,8 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
             if (
               request.status === "supervisor approved" ||
               request.status === "technical-manager approved" ||
-              request.status === "complete"
+              request.status === "complete" ||
+              request.status === "Engineer Approved"
             ) {
               monthCounts[key].approved++;
             } else if (request.status === "rejected") {
@@ -264,9 +267,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const sectionStats = useMemo(() => {
     // Use appropriate data based on role
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      requests.filter((r) => r.status === "complete" || r.status === "Engineer Approved" || r.status === "order placed" || r.status === "order cancelled") :
       role === "engineer" ?
-      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "Engineer Approved" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
       role === "supervisor" ?
@@ -293,9 +296,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const vehicleStats = useMemo(() => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      requests.filter((r) => r.status === "complete" || r.status === "Engineer Approved" || r.status === "order placed" || r.status === "order cancelled") :
       role === "engineer" ?
-      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "Engineer Approved" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
       role === "supervisor" ?
@@ -316,9 +319,9 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
   const tireSizeStats = useMemo(() => {
     // Use role-specific data
     const dataToUse = role === "customer-officer" ?
-      requests.filter((r) => r.status === "complete" || r.status === "order placed" || r.status === "order cancelled") :
+      requests.filter((r) => r.status === "complete" || r.status === "Engineer Approved" || r.status === "order placed" || r.status === "order cancelled") :
       role === "engineer" ?
-      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "engineer rejected") :
+      requests.filter((r) => r.status === "technical-manager approved" || r.status === "complete" || r.status === "Engineer Approved" || r.status === "engineer rejected") :
       role === "technical-manager" ?
       requests.filter((r) => r.status === "supervisor approved" || r.status === "technical-manager approved" || r.status === "technical-manager rejected") :
       role === "supervisor" ?

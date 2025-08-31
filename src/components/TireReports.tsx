@@ -63,7 +63,7 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
     pending: requests.filter(r => r.status?.toLowerCase().includes('pending')).length,
     approved: requests.filter(r => r.status?.toLowerCase().includes('approved')).length,
     rejected: requests.filter(r => r.status?.toLowerCase().includes('rejected')).length,
-    completed: requests.filter(r => r.status?.toLowerCase().includes('complete')).length
+    completed: requests.filter(r => r.status?.toLowerCase().includes('complete') || r.status === 'Engineer Approved').length
   };
 
   return (

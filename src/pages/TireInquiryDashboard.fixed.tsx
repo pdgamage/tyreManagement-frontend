@@ -526,7 +526,7 @@ const UserInquiryDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Engineer Approved</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('complete')).length}
+                    {requests.filter(r => r.status.toLowerCase().includes('complete') || r.status === 'Engineer Approved').length}
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-blue-50 text-blue-600">
@@ -755,9 +755,9 @@ const UserInquiryDashboard: React.FC = () => {
                           <div className="flex items-center gap-3 flex-wrap">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(request.status)} border flex items-center shadow-sm`}>
                               {getStatusIcon(request.status)}
-                              {request.status.toLowerCase() === 'complete' ? 'Engineer Approved' : request.status}
+                              {request.status.toLowerCase() === 'complete' || request.status === 'Engineer Approved' ? 'Engineer Approved' : request.status}
                             </span>
-                            {request.status.toLowerCase() === 'complete' && (
+                            {request.status.toLowerCase() === 'complete' || request.status === 'Engineer Approved' && (
                               <p className="text-sm text-gray-600 italic flex items-center">
                                 <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />
                                 The order has been sent to the customer officer 

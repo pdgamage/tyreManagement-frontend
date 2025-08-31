@@ -42,6 +42,7 @@ const SharedRequestDetails = () => {
       "supervisor approved": "bg-green-100 text-green-800 border-green-200",
       "technical-manager approved": "bg-blue-100 text-blue-800 border-blue-200",
       "engineer approved": "bg-purple-100 text-purple-800 border-purple-200",
+      "Engineer Approved": "bg-purple-100 text-purple-800 border-purple-200",
       complete: "bg-emerald-100 text-emerald-800 border-emerald-200",
       rejected: "bg-red-100 text-red-800 border-red-200",
       default: "bg-gray-100 text-gray-800 border-gray-200",

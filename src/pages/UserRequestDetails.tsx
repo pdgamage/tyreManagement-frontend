@@ -141,6 +141,8 @@ const UserRequestDetails = () => {
         return "bg-green-100 text-green-800 border-green-200";
       case "engineer approved":
         return "bg-purple-100 text-purple-800 border-purple-200";
+      case "Engineer Approved":
+        return "bg-purple-100 text-purple-800 border-purple-200";
       case "order placed":
         return "bg-indigo-100 text-indigo-800 border-indigo-200";
       case "complete":

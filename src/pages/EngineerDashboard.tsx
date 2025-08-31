@@ -39,7 +39,7 @@ const EngineerDashboard = () => {
 
   // Get requests completed by current engineer
   const completedRequests = requests.filter(
-    (req) => req.status === "complete"
+    (req) => req.status === "complete" || req.status === "Engineer Approved"
   );
 
   // Get requests rejected by current engineer

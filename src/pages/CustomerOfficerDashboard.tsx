@@ -76,9 +76,9 @@ const CustomerOfficerDashboard = () => {
     loadData();
   }, [fetchRequests]);
 
-  // Filter requests to show both "complete" and "order placed" status
+  // Filter requests to show both "complete", "Engineer Approved" and "order placed" status
   const completeRequests = requests.filter(
-    (req) => req.status === "complete" || req.status === "order placed"
+    (req) => req.status === "complete" || req.status === "Engineer Approved" || req.status === "order placed"
   );
 
   const placedOrders = requests.filter((req) => req.status === "order placed");

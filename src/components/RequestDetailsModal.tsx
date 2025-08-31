@@ -22,6 +22,8 @@ const getStatusBadgeClass = (status: string | undefined) => {
       return 'bg-purple-100 text-purple-800 border-purple-300';
     case 'engineer approved':
       return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+    case 'Engineer Approved':
+      return 'bg-indigo-100 text-indigo-800 border-indigo-300';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-300';
   }
@@ -50,6 +52,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               <div className={`inline-flex items-center px-3 py-1 mt-2 text-sm font-medium rounded-full border ${getStatusBadgeClass(request.status || '')}`}>
                 {request.status === 'pending' ? 'User Requested tire' : 
                  request.status === 'complete' ? 'Engineer Approved' : 
+                 request.status === 'Engineer Approved' ? 'Engineer Approved' : 
                  (request.status || 'Unknown')}
               </div>
             </div>
@@ -69,7 +72,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Request Information</h4>
                 <div className="space-y-2">
                   <p><span className="font-medium">ID:</span> {request.id}</p>
-                  <p><span className="font-medium">Status:</span> {request.status === 'pending' ? 'User Requested tire' : request.status === 'complete' ? 'Engineer Approved' : (request.status || '-')}</p>
+                  <p><span className="font-medium">Status:</span> {request.status === 'pending' ? 'User Requested tire' : request.status === 'complete' ? 'Engineer Approved' : request.status === 'Engineer Approved' ? 'Engineer Approved' : (request.status || '-')}</p>
                   <p><span className="font-medium">Submitted:</span> {formatDate(request.submittedAt)}</p>
                   <p><span className="font-medium">Reason:</span> {request.requestReason}</p>
                   <p><span className="font-medium">Comments:</span> {request.comments || 'N/A'}</p>

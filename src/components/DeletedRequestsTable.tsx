@@ -160,6 +160,15 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     }
   };
 
+  // Extra helper text for certain statuses (UI clarity)
+  const getStatusExtraText = (status: string) => {
+    const s = (status || '').toLowerCase();
+    if (s === 'pending') {
+      return ' - user tire requested';
+    }
+    return '';
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetchDeletedRequests();
@@ -594,6 +603,11 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
                       {getStatusIcon(request.status)}
                       <span className="ml-1">{request.status}</span>
+                      {getStatusExtraText(request.status) && (
+                        <span className="ml-1 text-[11px] opacity-80">
+                          {getStatusExtraText(request.status)}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

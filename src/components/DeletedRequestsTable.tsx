@@ -260,6 +260,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
         },
         body: JSON.stringify({
           userId: user?.id,
+          userRole: user?.role,
         }),
       });
 
@@ -270,9 +271,15 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       if (data.success) {
         console.log('✅ Request restored successfully');
         fetchDeletedRequests(); // Refresh the list
+        alert('Request restored successfully!');
       } else {
         console.error('❌ Failed to restore request:', data.message);
-        alert(`Failed to restore request: ${data.message}`);
+        // Handle role-based authorization errors with more specific messaging
+        if (response.status === 403) {
+          alert(`Access Denied: ${data.message}\n\nOnly users with '${data.deletedByRole}' role can restore this request.\nYour current role: '${data.userRole}'`);
+        } else {
+          alert(`Failed to restore request: ${data.message}`);
+        }
       }
     } catch (error) {
       console.error('❌ Error restoring request:', error);
@@ -360,6 +367,34 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Check if current user can restore a specific request
+  const canUserRestoreRequest = (request: DeletedRequest): boolean => {
+    // If no deletedByRole is tracked, allow restoration (backward compatibility)
+    if (!request.deletedByRole) {
+      return true;
+    }
+    
+    // Only allow restoration if user's role matches the deletedByRole
+    return user?.role === request.deletedByRole;
+  };
+
+  // Get role-based restore tooltip message
+  const getRestoreTooltip = (request: DeletedRequest): string => {
+    if (!request.deletedByRole) {
+      return "Restore Request";
+    }
+    
+    if (user?.role === request.deletedByRole) {
+      return "Restore Request";
+    }
+    
+    const roleDisplayName = request.deletedByRole === 'technical-manager' ? 'Technical Manager' :
+                           request.deletedByRole === 'customer-officer' ? 'Customer Officer' :
+                           request.deletedByRole.charAt(0).toUpperCase() + request.deletedByRole.slice(1);
+    
+    return `Only ${roleDisplayName}s can restore this request (deleted by ${roleDisplayName})`;
   };
 
   return (
@@ -687,11 +722,20 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      {showRestoreButton && request.canRestore && (
+                      {showRestoreButton && request.canRestore && canUserRestoreRequest(request) && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleRestore(request.id); }}
                           className="text-green-600 hover:text-green-900 p-1 rounded"
-                          title="Restore Request"
+                          title={getRestoreTooltip(request)}
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </button>
+                      )}
+                      {showRestoreButton && request.canRestore && !canUserRestoreRequest(request) && (
+                        <button
+                          disabled
+                          className="text-gray-400 p-1 rounded cursor-not-allowed opacity-50"
+                          title={getRestoreTooltip(request)}
                         >
                           <RotateCcw className="w-4 h-4" />
                         </button>
@@ -773,6 +817,23 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
               <p className="text-sm text-blue-800">
                 This action will move the request back to the active requests list with all its original data, images, and history preserved.
+              </p>
+            </div>
+            
+            {/* Role-based authorization notice */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-amber-800">
+                <strong>Role-based Security:</strong> Only users with the same role as the person who deleted this request can restore it.
+                {restoreId && (() => {
+                  const targetRequest = requests.find(r => r.id === restoreId);
+                  if (targetRequest?.deletedByRole) {
+                    const roleDisplay = targetRequest.deletedByRole === 'technical-manager' ? 'Technical Manager' :
+                                       targetRequest.deletedByRole === 'customer-officer' ? 'Customer Officer' :
+                                       targetRequest.deletedByRole.charAt(0).toUpperCase() + targetRequest.deletedByRole.slice(1);
+                    return ` This request was deleted by a ${roleDisplay}, so only ${roleDisplay}s can restore it.`;
+                  }
+                  return '';
+                })()}
               </p>
             </div>
             

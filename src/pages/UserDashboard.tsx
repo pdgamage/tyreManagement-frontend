@@ -327,7 +327,7 @@ const UserDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-yellow-100 text-sm font-medium mb-2">
-                    Pending Requests
+                    User Requested tire
                   </p>
                   <p className="text-4xl font-bold mb-1">
                     {pendingRequests.length}
@@ -525,7 +525,7 @@ const UserDashboard = () => {
                     Your Tire Requests
                     {activeFilter !== "all" && (
                       <span className="ml-2 text-sm font-medium bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                        {activeFilter === "pending" && "Pending"}
+                        {activeFilter === "pending" && "User Requested tire"}
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}
@@ -540,7 +540,7 @@ const UserDashboard = () => {
                       ? "Track the status of your tire requests with color-coded indicators"
                       : `Showing ${
                           activeFilter === "pending"
-                            ? "pending"
+                            ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"
                             : activeFilter === "rejected"
@@ -588,7 +588,7 @@ const UserDashboard = () => {
                       ? "No requests found"
                       : `No ${
                           activeFilter === "pending"
-                            ? "pending"
+                            ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"
                             : activeFilter === "rejected"
@@ -605,7 +605,7 @@ const UserDashboard = () => {
                       ? "Submit your first tire request using the form above"
                       : `You don't have any ${
                           activeFilter === "pending"
-                            ? "pending"
+                            ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"
                             : activeFilter === "rejected"

@@ -359,7 +359,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-gray-500 text-sm font-medium">
-            {role === "customer-officer" ? "Pending Orders" : "Pending Review"}
+            {role === "customer-officer" ? "Pending Orders" : "User Requested tire Review"}
           </h3>
           <div className="mt-2 flex items-center">
             <span className="text-3xl font-bold text-gray-900">
@@ -455,7 +455,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
                   { name: 'Orders Placed', value: stats.approvedRequests },
                   { name: 'Cancelled', value: stats.rejectedRequests }
                 ] : [
-                  { name: 'Pending', value: stats.pendingRequests },
+                  { name: 'User Requested tire', value: stats.pendingRequests },
                   { name: 'Approved', value: stats.approvedRequests },
                   { name: 'Rejected', value: stats.rejectedRequests }
                 ]}

@@ -39,7 +39,7 @@ interface Vehicle {
 
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
-  { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
+  { value: "pending", label: "User Requested tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
   { value: "complete", label: "Complete - Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
@@ -496,7 +496,7 @@ const UserInquiryDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Pending</p>
+                  <p className="text-sm font-medium text-gray-500">User Requested tire</p>
                   <p className="text-2xl font-semibold text-gray-900">
                     {requests.filter(r => r.status.toLowerCase().includes('pending')).length}
                   </p>

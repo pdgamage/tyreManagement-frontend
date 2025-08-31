@@ -1297,7 +1297,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
       const latestPending = pendingRequests[0];
       return {
         type: "pending",
-        message: `Vehicle ${vehicleNumber} already has a pending tire request (Status: ${latestPending.status.replace(
+        message: `Vehicle ${vehicleNumber} already has a user requested tire (Status: ${latestPending.status.replace(
           /_/g,
           " "
         )}). Please wait for the current request to be processed.`,

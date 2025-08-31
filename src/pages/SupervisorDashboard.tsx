@@ -181,7 +181,7 @@ const SupervisorDashboard = () => {
               <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-amber-100 text-sm font-medium mb-2">Pending Review</p>
+                    <p className="text-amber-100 text-sm font-medium mb-2">User Requested tire Review</p>
                     <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
                     <p className="text-amber-200 text-xs">Requires immediate attention</p>
                   </div>
@@ -250,7 +250,7 @@ const SupervisorDashboard = () => {
                       </svg>
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Pending Requests</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">User Requested tire</h2>
                       <p className="text-gray-600 mt-1">Requests awaiting your approval</p>
                     </div>
                   </div>

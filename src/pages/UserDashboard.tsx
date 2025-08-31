@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRequests } from "../contexts/RequestContext";
 import { apiUrls } from "../config/api";
 import { useNavigate } from "react-router-dom";
+import RequestDetailsModal from "../components/RequestDetailsModal";
 import {
   UserCircle,
   LogOut,
@@ -15,8 +16,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  TrendingUp,
-  Calendar,
   Activity,
   ShoppingCart,
   Package,
@@ -29,7 +28,8 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Removed selectedRequest state - using navigation instead of modal
+  // Selected request for details modal
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -122,7 +122,8 @@ const UserDashboard = () => {
 
   // Handler functions for RequestTable
   const handleView = (request: any) => {
-    navigate(`/user/request/${request.id}`);
+    // Open details modal instead of navigating to full page
+    setSelectedRequest(request as TireRequest);
   };
 
   const handleDelete = async (id: string) => {
@@ -668,6 +669,13 @@ const UserDashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Request Details Modal */}
+      <RequestDetailsModal
+        request={selectedRequest}
+        isOpen={!!selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+      />
 
       {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (

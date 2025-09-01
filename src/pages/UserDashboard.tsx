@@ -29,9 +29,7 @@ const UserDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Selected request for details modal
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
-    null
-  );
+  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -194,7 +192,7 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  const handleUpdate = (request: any) => {
+  const handleUpdate = (request: Request) => {
     setSelectedRequest(request);
     setShowEditForm(true);
   };
@@ -576,13 +574,10 @@ const UserDashboard = () => {
             <div className="p-8">
               {filteredRequests.length > 0 ? (
                 <RequestTable
-                  requests={filteredRequests.map(convertTireRequestToRequest)}
-                  title=""
+                  requests={userRequests}
+                  title="My Tire Requests"
                   onView={handleView}
                   onDelete={handleDelete}
-                  onApprove={handleApprove}
-                  onReject={handleReject}
-                  onPlaceOrder={handlePlaceOrder}
                   onUpdate={handleUpdate}
                   showActions={true}
                   showPlaceOrderButton={false}

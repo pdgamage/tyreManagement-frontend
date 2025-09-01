@@ -53,7 +53,6 @@ interface Filters {
   startDate: string;
   endDate: string;
   deletedBy: string;
-  deletedByRole: string;
 }
 
 interface Pagination {
@@ -100,7 +99,6 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
     startDate: '',
     endDate: '',
     deletedBy: '',
-    deletedByRole: '',
   });
 
   // Pagination and sorting state
@@ -227,7 +225,6 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
       startDate: '',
       endDate: '',
       deletedBy: '',
-      deletedByRole: '',
     });
   };
 
@@ -508,25 +505,6 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                 </div>
               </div>
 
-              {/* Deleted By Role Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Deleted By Role
-                </label>
-                <select
-                  value={filters.deletedByRole}
-                  onChange={(e) => handleFilterChange('deletedByRole', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="">All Roles</option>
-                  <option value="user">User</option>
-                  <option value="supervisor">Supervisor</option>
-                  <option value="technical-manager">Technical Manager</option>
-                  <option value="engineer">Engineer</option>
-                  <option value="customer-officer">Customer Officer</option>
-                </select>
-              </div>
-
               {/* Start Date Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -651,10 +629,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   </button>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Deleted By
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                  Deleted 
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -697,9 +672,6 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{formatDate(request.deletedAt)}</div>
                     <div className="text-xs text-gray-500">{request.daysSinceDeleted} days ago</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{request.deletedByName || 'System'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">

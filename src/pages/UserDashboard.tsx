@@ -7,6 +7,7 @@ import { useRequests } from "../contexts/RequestContext";
 import { apiUrls } from "../config/api";
 import { useNavigate } from "react-router-dom";
 import RequestDetailsModal from "../components/RequestDetailsModal";
+import TireRequestEditModal from "../components/TireRequestEditModal"; // Create this component
 import {
   UserCircle,
   LogOut,
@@ -28,6 +29,7 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [showEditModal, setShowEditModal] = useState(false);
   // Selected request for details modal
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -194,7 +196,7 @@ const UserDashboard = () => {
 
   const handleUpdate = (request: Request) => {
     setSelectedRequest(request);
-    setShowEditForm(true);
+    setShowEditModal(true);
   };
 
   return (
@@ -729,6 +731,20 @@ const UserDashboard = () => {
             </div>
           </div>
         </div>
+      )}
+      {showEditModal && selectedRequest && (
+        <TireRequestEditModal
+          request={selectedRequest}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedRequest(null);
+          }}
+          onSuccess={() => {
+            setShowEditModal(false);
+            setSelectedRequest(null);
+            fetchRequests();
+          }}
+        />
       )}
     </div>
   );

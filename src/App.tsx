@@ -27,6 +27,7 @@ import DeletedRequestsPage from "./pages/DeletedRequestsPage";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import UserRequestUpdate from "./pages/UserRequestUpdate";
 
 export function App() {
   return (
@@ -340,6 +341,18 @@ export function App() {
                       <UserRequestDetails />
                     </PageTransition>
                   </Layout>
+                }
+              />
+              <Route
+                path="/user/request-update/:id"
+                element={
+                  <RequireAuth role="user">
+                    <Layout>
+                      <PageTransition>
+                        <UserRequestUpdate />
+                      </PageTransition>
+                    </Layout>
+                  </RequireAuth>
                 }
               />
             </Routes>

@@ -29,7 +29,9 @@ const UserDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Selected request for details modal
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
+    null
+  );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -84,7 +86,8 @@ const UserDashboard = () => {
     (req: any) => req.status === "order placed"
   );
   const completeOrderRequests = userRequests.filter(
-    (req: any) => req.status === "complete" || req.status === "Engineer Approved"
+    (req: any) =>
+      req.status === "complete" || req.status === "Engineer Approved"
   );
   const cancelOrderRequests = userRequests.filter(
     (req: any) => req.status === "order cancelled"
@@ -135,30 +138,30 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
-      console.log('🗑️  Deleting request ID:', deleteId);
-      console.log('API URL:', apiUrls.requestById(deleteId));
-      
+      console.log("🗑️  Deleting request ID:", deleteId);
+      console.log("API URL:", apiUrls.requestById(deleteId));
+
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user?.id || null, // Send user ID for audit trail
-          userRole: user?.role || null // Send user role for audit trail
-        })
+          userRole: user?.role || null, // Send user role for audit trail
+        }),
       });
 
-      console.log('Delete response status:', response.status);
+      console.log("Delete response status:", response.status);
       const responseData = await response.json();
-      console.log('Delete response data:', responseData);
+      console.log("Delete response data:", responseData);
 
       if (response.ok) {
-        console.log('✅ Delete successful, refreshing requests...');
+        console.log("✅ Delete successful, refreshing requests...");
         await fetchRequests();
-        console.log('✅ Requests refreshed');
+        console.log("✅ Requests refreshed");
       } else {
-        console.error('❌ Failed to delete request:', responseData);
+        console.error("❌ Failed to delete request:", responseData);
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
@@ -183,6 +186,10 @@ const UserDashboard = () => {
 
   const handlePlaceOrder = (request: any) => {
     console.log("Place order for request:", request);
+  };
+
+  const handleUpdate = (request: any) => {
+    navigate(`/user/request-update/${request.id}`);
   };
 
   const handleLogout = async () => {
@@ -286,17 +293,17 @@ const UserDashboard = () => {
               </button>
               <button
                 onClick={() => {
-                  navigate('/user/inquiry-dashboard');
+                  navigate("/user/inquiry-dashboard");
                 }}
                 className="flex items-center px-6 py-3 space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:shadow-xl"
               >
                 <FileText className="w-5 h-5" />
                 <span>User Inquiry</span>
               </button>
-              
+
               <button
                 onClick={() => {
-                  navigate('/user/deleted-requests');
+                  navigate("/user/deleted-requests");
                 }}
                 className="flex items-center px-6 py-3 space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-red-500 to-orange-600 rounded-xl hover:shadow-xl"
               >
@@ -304,8 +311,6 @@ const UserDashboard = () => {
                 <span>Deleted Requests</span>
               </button>
             </div>
-
-
           </div>
         </div>
       </header>
@@ -447,7 +452,9 @@ const UserDashboard = () => {
                   <p className="mb-1 text-4xl font-bold">
                     {completeOrderRequests.length}
                   </p>
-                  <p className="text-xs text-purple-200">Engineer approved orders</p>
+                  <p className="text-xs text-purple-200">
+                    Engineer approved orders
+                  </p>
                 </div>
                 <div className="flex items-center justify-center w-16 h-16 bg-purple-400/30 rounded-xl">
                   <Package className="w-8 h-8" />
@@ -571,6 +578,7 @@ const UserDashboard = () => {
                   title=""
                   onView={handleView}
                   onDelete={handleDelete}
+                  onUpdate={handleUpdate}
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onPlaceOrder={handlePlaceOrder}
@@ -703,7 +711,8 @@ const UserDashboard = () => {
             </div>
 
             <p className="mb-6 text-gray-700">
-              Are you sure you want to delete this tire request? The request will be moved to backup storage and can be restored if needed.
+              Are you sure you want to delete this tire request? The request
+              will be moved to backup storage and can be restored if needed.
             </p>
 
             <div className="flex justify-end gap-3">

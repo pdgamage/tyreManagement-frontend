@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useRequests } from "../contexts/RequestContext";
-import { useAuth } from "../contexts/AuthContext";
 import { apiUrls } from "../config/api";
 
 const UserRequestUpdate = () => {
@@ -12,37 +11,37 @@ const UserRequestUpdate = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
-  // All fields, updatable and read-only
+  // Editable and read-only fields
   const [formData, setFormData] = useState<any>({
-    // Updatable fields
-    requestReason: "",
-    tireSize: "",
+    // Editable fields
     quantity: "",
+    tubesQuantity: "",
+    currentKm: "",
+    previousKm: "",
+    wearPattern: "",
+    requestReason: "",
     deliveryOffice: "",
+    deliveryStreet: "",
+    deliveryTown: "",
+    comments: "",
 
     // Read-only fields
     id: "",
     status: "",
     submittedAt: "",
-    comments: "",
+    tireSize: "",
     vehicleId: "",
     vehicleNumber: "",
     vehicleBrand: "",
     vehicleModel: "",
     department: "",
     costCentre: "",
-    tubesQuantity: "",
     currentMake: "",
     lastReplacement: "",
-    currentKm: "",
-    previousKm: "",
     kmDifference: "",
-    wearPattern: "",
     requesterName: "",
     requesterEmail: "",
     requesterPhone: "",
-    deliveryStreet: "",
-    deliveryTown: "",
     totalPrice: "",
     warrantyDistance: "",
     tireWearIndicator: "",
@@ -55,38 +54,38 @@ const UserRequestUpdate = () => {
         const data = await response.json();
         setRequest(data);
         setFormData({
-          // Updatable fields
-          requestReason: data.requestReason ?? "",
-          tireSize: data.tireSize ?? "",
+          // Editable fields
           quantity: data.quantity ?? "",
+          tubesQuantity: data.tubesQuantity ?? "",
+          currentKm: data.currentKm ?? "",
+          previousKm: data.previousKm ?? "",
+          wearPattern: data.wearPattern ?? "",
+          requestReason: data.requestReason ?? "",
           deliveryOffice: data.deliveryOffice ?? "",
+          deliveryStreet: data.deliveryStreet ?? "",
+          deliveryTown: data.deliveryTown ?? "",
+          comments: data.comments ?? "",
 
           // Read-only fields
           id: data.id ?? "",
           status: data.status ?? "",
           submittedAt:
             data.submittedAt && new Date(data.submittedAt).toLocaleString(),
-          comments: data.comments ?? "",
+          tireSize: data.tireSize ?? "",
           vehicleId: data.vehicleId ?? "",
           vehicleNumber: data.vehicleNumber ?? "",
           vehicleBrand: data.vehicleBrand ?? "",
           vehicleModel: data.vehicleModel ?? "",
           department: data.department ?? "",
           costCentre: data.costCentre ?? "",
-          tubesQuantity: data.tubesQuantity ?? "",
           currentMake: data.currentMake ?? "",
           lastReplacement:
             data.lastReplacement &&
             new Date(data.lastReplacement).toLocaleString(),
-          currentKm: data.currentKm ?? "",
-          previousKm: data.previousKm ?? "",
           kmDifference: data.kmDifference ?? "",
-          wearPattern: data.wearPattern ?? "",
           requesterName: data.requesterName ?? "",
           requesterEmail: data.requesterEmail ?? "",
           requesterPhone: data.requesterPhone ?? "",
-          deliveryStreet: data.deliveryStreet ?? "",
-          deliveryTown: data.deliveryTown ?? "",
           totalPrice: data.totalPrice ?? "",
           warrantyDistance: data.warrantyDistance ?? "",
           tireWearIndicator: data.tireWearIndicator ?? "",
@@ -113,12 +112,18 @@ const UserRequestUpdate = () => {
     e.preventDefault();
     setUpdating(true);
     try {
-      // Only send updatable fields
+      // Only send editable fields
       const updateData = {
-        requestReason: formData.requestReason,
-        tireSize: formData.tireSize,
         quantity: formData.quantity,
+        tubesQuantity: formData.tubesQuantity,
+        currentKm: formData.currentKm,
+        previousKm: formData.previousKm,
+        wearPattern: formData.wearPattern,
+        requestReason: formData.requestReason,
         deliveryOffice: formData.deliveryOffice,
+        deliveryStreet: formData.deliveryStreet,
+        deliveryTown: formData.deliveryTown,
+        comments: formData.comments,
       };
 
       const response = await fetch(apiUrls.requestById(id!), {
@@ -179,17 +184,6 @@ const UserRequestUpdate = () => {
                   readOnly
                 />
               </div>
-              <div>
-                <label className="block mb-2 font-medium text-gray-600">
-                  Comments
-                </label>
-                <input
-                  type="text"
-                  value={formData.comments}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
-                />
-              </div>
               <div className="md:col-span-2">
                 <label className="block mb-2 font-medium">
                   Request Reason *
@@ -201,6 +195,16 @@ const UserRequestUpdate = () => {
                   className="w-full p-2 border rounded"
                   rows={2}
                   required
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block mb-2 font-medium">Comments</label>
+                <textarea
+                  name="comments"
+                  value={formData.comments}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  rows={2}
                 />
               </div>
             </div>
@@ -274,14 +278,12 @@ const UserRequestUpdate = () => {
             <h2 className="mb-4 text-lg font-semibold">Tire Details</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="block mb-2 font-medium">Tire Size *</label>
+                <label className="block mb-2 font-medium">Tire Size</label>
                 <input
                   type="text"
-                  name="tireSize"
                   value={formData.tireSize}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
+                  className="w-full p-2 bg-gray-100 border rounded"
+                  readOnly
                 />
               </div>
               <div>
@@ -299,9 +301,10 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Tubes Quantity</label>
                 <input
                   type="number"
+                  name="tubesQuantity"
                   value={formData.tubesQuantity}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div>
@@ -327,19 +330,21 @@ const UserRequestUpdate = () => {
               <div>
                 <label className="block mb-2 font-medium">Current KM</label>
                 <input
-                  type="text"
+                  type="number"
+                  name="currentKm"
                   value={formData.currentKm}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div>
                 <label className="block mb-2 font-medium">Previous KM</label>
                 <input
-                  type="text"
+                  type="number"
+                  name="previousKm"
                   value={formData.previousKm}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div>
@@ -355,9 +360,10 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Wear Pattern</label>
                 <input
                   type="text"
+                  name="wearPattern"
                   value={formData.wearPattern}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
             </div>
@@ -424,18 +430,20 @@ const UserRequestUpdate = () => {
                 </label>
                 <input
                   type="text"
+                  name="deliveryStreet"
                   value={formData.deliveryStreet}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div>
                 <label className="block mb-2 font-medium">Delivery Town</label>
                 <input
                   type="text"
+                  name="deliveryTown"
                   value={formData.deliveryTown}
-                  className="w-full p-2 bg-gray-100 border rounded"
-                  readOnly
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div>

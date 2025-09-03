@@ -16,12 +16,12 @@ const UserRequestUpdate = () => {
     // Editable fields
     quantity: "",
     tubesQuantity: "",
-    currentKm: "",
-    previousKm: "",
-    wearPattern: "",
+    presentKmReading: "",
+    previousKmReading: "",
+    tireWearPattern: "",
     requestReason: "",
-    deliveryOffice: "",
-    deliveryStreet: "",
+    deliveryOfficeName: "",
+    deliveryStreetName: "",
     deliveryTown: "",
     comments: "",
 
@@ -44,7 +44,7 @@ const UserRequestUpdate = () => {
     requesterPhone: "",
     totalPrice: "",
     warrantyDistance: "",
-    tireWearIndicator: "",
+    tireWearIndicatorAppeared: "",
   });
 
   useEffect(() => {
@@ -57,12 +57,12 @@ const UserRequestUpdate = () => {
           // Editable fields
           quantity: data.quantity ?? "",
           tubesQuantity: data.tubesQuantity ?? "",
-          currentKm: data.currentKm ?? "",
-          previousKm: data.previousKm ?? "",
-          wearPattern: data.wearPattern ?? "",
+          presentKmReading: data.presentKmReading ?? "",
+          previousKmReading: data.previousKmReading ?? "",
+          tireWearPattern: data.tireWearPattern ?? "",
           requestReason: data.requestReason ?? "",
-          deliveryOffice: data.deliveryOffice ?? "",
-          deliveryStreet: data.deliveryStreet ?? "",
+          deliveryOfficeName: data.deliveryOfficeName ?? "",
+          deliveryStreetName: data.deliveryStreetName ?? "",
           deliveryTown: data.deliveryTown ?? "",
           comments: data.comments ?? "",
 
@@ -88,7 +88,7 @@ const UserRequestUpdate = () => {
           requesterPhone: data.requesterPhone ?? "",
           totalPrice: data.totalPrice ?? "",
           warrantyDistance: data.warrantyDistance ?? "",
-          tireWearIndicator: data.tireWearIndicator ?? "",
+          tireWearIndicatorAppeared: data.tireWearIndicatorAppeared ?? "",
         });
       } catch (error) {
         console.error("Error fetching request:", error);
@@ -116,12 +116,12 @@ const UserRequestUpdate = () => {
       const updateData = {
         quantity: formData.quantity,
         tubesQuantity: formData.tubesQuantity,
-        currentKm: formData.currentKm,
-        previousKm: formData.previousKm,
-        wearPattern: formData.wearPattern,
+        presentKmReading: formData.presentKmReading,
+        previousKmReading: formData.previousKmReading,
+        tireWearPattern: formData.tireWearPattern,
         requestReason: formData.requestReason,
-        deliveryOffice: formData.deliveryOffice,
-        deliveryStreet: formData.deliveryStreet,
+        deliveryOfficeName: formData.deliveryOfficeName,
+        deliveryStreetName: formData.deliveryStreetName,
         deliveryTown: formData.deliveryTown,
         comments: formData.comments,
       };
@@ -331,8 +331,8 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Current KM</label>
                 <input
                   type="number"
-                  name="currentKm"
-                  value={formData.currentKm}
+                  name="presentKmReading"
+                  value={formData.presentKmReading}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />
@@ -341,8 +341,8 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Previous KM</label>
                 <input
                   type="number"
-                  name="previousKm"
-                  value={formData.previousKm}
+                  name="previousKmReading"
+                  value={formData.previousKmReading}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />
@@ -360,8 +360,8 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Wear Pattern</label>
                 <input
                   type="text"
-                  name="wearPattern"
-                  value={formData.wearPattern}
+                  name="tireWearPattern"
+                  value={formData.tireWearPattern}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />
@@ -417,8 +417,8 @@ const UserRequestUpdate = () => {
                 </label>
                 <input
                   type="text"
-                  name="deliveryOffice"
-                  value={formData.deliveryOffice}
+                  name="deliveryOfficeName"
+                  value={formData.deliveryOfficeName}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                   required
@@ -430,8 +430,8 @@ const UserRequestUpdate = () => {
                 </label>
                 <input
                   type="text"
-                  name="deliveryStreet"
-                  value={formData.deliveryStreet}
+                  name="deliveryStreetName"
+                  value={formData.deliveryStreetName}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />
@@ -472,7 +472,7 @@ const UserRequestUpdate = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.tireWearIndicator}
+                  value={formData.tireWearIndicatorAppeared}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />

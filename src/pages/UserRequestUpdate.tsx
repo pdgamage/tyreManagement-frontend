@@ -265,7 +265,7 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Cost Center</label>
                 <input
                   type="text"
-                  value={formData.costCentre}
+                  value={formData.cost_center}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />

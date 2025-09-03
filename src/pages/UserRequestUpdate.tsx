@@ -34,10 +34,10 @@ const UserRequestUpdate = () => {
     vehicleNumber: "",
     vehicleBrand: "",
     vehicleModel: "",
-    department: "",
+    userSection: "",
     costCenter: "",
-    currentMake: "",
-    lastReplacement: "",
+    existingTireMake: "",
+    lastReplacementDate: "",
     kmDifference: "",
     requesterName: "",
     requesterEmail: "",
@@ -76,12 +76,12 @@ const UserRequestUpdate = () => {
           vehicleNumber: data.vehicleNumber ?? "",
           vehicleBrand: data.vehicleBrand ?? "",
           vehicleModel: data.vehicleModel ?? "",
-          department: data.department ?? "",
-          costCenter: data.costCenter ?? "fdh",
-          currentMake: data.currentMake ?? "",
-          lastReplacement:
-            data.lastReplacement &&
-            new Date(data.lastReplacement).toLocaleString(),
+          userSection: data.userSection ?? "",
+          costCenter: data.costCenter ?? "",
+          existingTireMake: data.existingTireMake ?? "",
+          lastReplacementDate:
+            data.lastReplacementDate &&
+            new Date(data.lastReplacementDate).toLocaleString(),
           kmDifference: data.kmDifference ?? "",
           requesterName: data.requesterName ?? "",
           requesterEmail: data.requesterEmail ?? "",
@@ -252,11 +252,11 @@ const UserRequestUpdate = () => {
               </div>
               <div>
                 <label className="block mb-2 font-medium">
-                  Department/Section
+                  userSection/Section
                 </label>
                 <input
                   type="text"
-                  value={formData.department}
+                  value={formData.userSection}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />
@@ -311,7 +311,7 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Current Make</label>
                 <input
                   type="text"
-                  value={formData.currentMake}
+                  value={formData.existingTireMake}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />
@@ -322,7 +322,7 @@ const UserRequestUpdate = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.lastReplacement}
+                  value={formData.lastReplacementDate}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />

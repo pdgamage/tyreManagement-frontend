@@ -77,7 +77,7 @@ const UserRequestUpdate = () => {
           vehicleBrand: data.vehicleBrand ?? "",
           vehicleModel: data.vehicleModel ?? "",
           department: data.department ?? "",
-          costCentre: data.CostCenter ?? "",
+          costCentre: data.costCentre ?? "fdh",
           currentMake: data.currentMake ?? "",
           lastReplacement:
             data.lastReplacement &&

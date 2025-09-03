@@ -52,44 +52,43 @@ const UserRequestUpdate = () => {
       try {
         const response = await fetch(apiUrls.requestById(id!));
         const data = await response.json();
-
-        // Set request data with all fields
         setRequest(data);
         setFormData({
           // Editable fields
-          quantity: data.quantity || "",
-          tubesQuantity: data.tubesQuantity || "",
-          currentKm: data.currentKm || "",
-          previousKm: data.previousKm || "",
-          wearPattern: data.wearPattern || "",
-          requestReason: data.requestReason || "",
-          deliveryOffice: data.deliveryOffice || "",
-          deliveryStreet: data.deliveryStreet || "",
-          deliveryTown: data.deliveryTown || "",
-          comments: data.comments || "",
+          quantity: data.quantity ?? "",
+          tubesQuantity: data.tubesQuantity ?? "",
+          currentKm: data.currentKm ?? "",
+          previousKm: data.previousKm ?? "",
+          wearPattern: data.wearPattern ?? "",
+          requestReason: data.requestReason ?? "",
+          deliveryOffice: data.deliveryOffice ?? "",
+          deliveryStreet: data.deliveryStreet ?? "",
+          deliveryTown: data.deliveryTown ?? "",
+          comments: data.comments ?? "",
 
           // Read-only fields
-          id: data.id || "",
-          status: data.status || "",
-          submittedAt: data.submittedAt
-            ? new Date(data.submittedAt).toLocaleString()
-            : "",
-          tireSize: data.tireSize || "",
-          vehicleId: data.vehicleId || "",
-          vehicleNumber: data.vehicleNumber || "",
-          vehicleBrand: data.vehicleBrand || "",
-          vehicleModel: data.vehicleModel || "",
-          department: data.department || "",
-          costCentre: data.costCentre || "",
-          currentMake: data.currentMake || "",
-          lastReplacement: data.lastReplacement || "",
-          kmDifference: data.kmDifference || "",
-          requesterName: data.requesterName || "",
-          requesterEmail: data.requesterEmail || "",
-          requesterPhone: data.requesterPhone || "",
-          totalPrice: data.totalPrice || "",
-          warrantyDistance: data.warrantyDistance || "",
-          tireWearIndicator: data.tireWearIndicator || "",
+          id: data.id ?? "",
+          status: data.status ?? "",
+          submittedAt:
+            data.submittedAt && new Date(data.submittedAt).toLocaleString(),
+          tireSize: data.tireSize ?? "",
+          vehicleId: data.vehicleId ?? "",
+          vehicleNumber: data.vehicleNumber ?? "",
+          vehicleBrand: data.vehicleBrand ?? "",
+          vehicleModel: data.vehicleModel ?? "",
+          department: data.department ?? "",
+          costCentre: data.costCentre ?? "",
+          currentMake: data.currentMake ?? "",
+          lastReplacement:
+            data.lastReplacement &&
+            new Date(data.lastReplacement).toLocaleString(),
+          kmDifference: data.kmDifference ?? "",
+          requesterName: data.requesterName ?? "",
+          requesterEmail: data.requesterEmail ?? "",
+          requesterPhone: data.requesterPhone ?? "",
+          totalPrice: data.totalPrice ?? "",
+          warrantyDistance: data.warrantyDistance ?? "",
+          tireWearIndicator: data.tireWearIndicator ?? "",
         });
       } catch (error) {
         console.error("Error fetching request:", error);

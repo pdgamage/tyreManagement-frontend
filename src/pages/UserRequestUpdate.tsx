@@ -361,7 +361,7 @@ const UserRequestUpdate = () => {
                 <input
                   type="text"
                   name="wearPattern"
-                  value={formData.wearPattern}
+                  value={formData.tireWearPattern}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />

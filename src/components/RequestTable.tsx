@@ -11,7 +11,7 @@ import {
   ShoppingCart,
   X,
   Receipt,
-  Edit2,
+  ClipboardPenLine,
 } from "lucide-react";
 import ReceiptModal from "./ReceiptModal";
 import type { Request } from "../types/request";
@@ -342,7 +342,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           className="p-2 text-gray-500 transition-colors rounded-lg hover:text-blue-700 hover:bg-blue-50"
                           aria-label="Update Request"
                         >
-                          <Edit2 className="w-5 h-5" />
+                          <ClipboardPenLine className="w-5 h-5" />
                         </button>
                       )}
                       <button

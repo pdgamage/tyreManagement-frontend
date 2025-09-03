@@ -22,8 +22,6 @@ export const API_CONFIG = {
     // Supplier endpoints
     SUPPLIERS: "/api/suppliers",
 
-
-
     // Health check
     HEALTH: "/api/health",
   },
@@ -42,7 +40,7 @@ export const buildApiUrl = (endpoint: string, params?: string): string => {
 export const apiUrls = {
   // Base URL for direct access
   base: API_CONFIG.BASE_URL,
-  
+
   // User URLs
   supervisors: () => buildApiUrl(API_CONFIG.ENDPOINTS.SUPERVISORS),
 
@@ -51,8 +49,7 @@ export const apiUrls = {
 
   // Request URLs
   requests: () => buildApiUrl(API_CONFIG.ENDPOINTS.REQUESTS),
-  requestById: (id: string | number) =>
-    buildApiUrl(API_CONFIG.ENDPOINTS.REQUESTS, id.toString()),
+  requestById: (id: string) => `${API_CONFIG.BASE_URL}/requests/${id}`,
   requestsByUser: (userId: string | number) =>
     buildApiUrl(`${API_CONFIG.ENDPOINTS.REQUESTS}/user`, userId.toString()),
 
@@ -67,8 +64,6 @@ export const apiUrls = {
 
   // Supplier URLs
   suppliers: () => buildApiUrl(API_CONFIG.ENDPOINTS.SUPPLIERS),
-
-
 
   // Health check
   health: () => buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH),

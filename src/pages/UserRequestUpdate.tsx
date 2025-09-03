@@ -152,7 +152,7 @@ const UserRequestUpdate = () => {
     <div className="min-h-screen py-8 bg-gray-50">
       <div className="max-w-4xl px-4 mx-auto">
         <h1 className="mb-6 text-2xl font-bold">
-          Update Request #{formData.id}
+          Update Request {formData.id}
         </h1>
         <form
           onSubmit={handleSubmit}

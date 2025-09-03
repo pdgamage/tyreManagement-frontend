@@ -351,7 +351,7 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">KM Difference</label>
                 <input
                   type="text"
-                  value={formData.kmDifference}
+                  value={formData.presentKmReading - formData.previousKmReading}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />

@@ -265,7 +265,7 @@ const UserRequestUpdate = () => {
                 <label className="block mb-2 font-medium">Cost Center</label>
                 <input
                   type="text"
-                  value={formData.costCenter}
+                  value={formData.costCentre}
                   className="w-full p-2 bg-gray-100 border rounded"
                   readOnly
                 />
@@ -361,7 +361,7 @@ const UserRequestUpdate = () => {
                 <input
                   type="text"
                   name="wearPattern"
-                  value={formData.tireWearPattern}
+                  value={formData.wearPattern}
                   onChange={handleChange}
                   className="w-full p-2 border rounded"
                 />

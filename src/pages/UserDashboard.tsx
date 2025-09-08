@@ -139,36 +139,41 @@ const UserDashboard = () => {
 
     try {
       console.log("🗑️  Deleting request ID:", deleteId);
-      console.log("API URL:", apiUrls.requestById(deleteId));
 
-      const response = await fetch(apiUrls.requestById(deleteId), {
-        method: "DELETE",
+      const response = await fetch(`${apiUrls.base}/api/requests/${deleteId}/delete`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           userId: user?.id,
-          userRole: "User", // Explicitly set role as User for deletion
+          userRole: user?.role || "User",
           deleteReason: "User initiated deletion",
+          status: "User Requested tire" // Add current status
         }),
       });
 
-      console.log("Delete response status:", response.status);
       const responseData = await response.json();
-      console.log("Delete response data:", responseData);
+      console.log("Delete response:", { status: response.status, data: responseData });
 
       if (response.ok) {
         console.log("✅ Delete successful, refreshing requests...");
         await fetchRequests();
-        console.log("✅ Requests refreshed");
+        // Show success message to user
+        alert("Request successfully archived");
       } else {
         console.error("❌ Failed to delete request:", responseData);
+        // Show error message to user
+        alert("Failed to archive request. Please try again.");
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
+      // Show error message to user
+      alert("An error occurred while archiving the request. Please try again.");
     }
 
+    // Always clean up regardless of success/failure
     setShowDeleteConfirm(false);
     setDeleteId(null);
   };

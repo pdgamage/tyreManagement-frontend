@@ -330,8 +330,10 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 {showActions && (
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      {/* Add update button for pending/user requested tire requests (case-insensitive, trimmed) */}
-                      {(["pending", "user requested tire"].includes((request.status || "").toLowerCase().trim())) && (
+                      {/* Add update button for pending requests */}
+                      {(request.status === "pending" ||
+                        request.status.toLowerCase() ===
+                          "user requested tire") && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -451,7 +453,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           }}
                           className="px-4 text-gray-500 hover:text-red-700"
                           aria-label="Delete"
-                          title="Delete Request"
                         >
                           <Trash className="w-5 h-5" />
                         </button>

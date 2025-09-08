@@ -305,7 +305,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Get status text with proper display labels
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'User Requested tire':
+      case 'pending':
+      case 'user requested tire':
         return 'User Requested tire';
       case 'complete':
         return 'Engineer Approved';
@@ -319,7 +320,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'User Requested tire':
+      case 'pending':
+      case 'user requested tire':
         return 'bg-yellow-100 text-yellow-800';
       case 'approved':
       case 'supervisor approved':
@@ -349,6 +351,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
+      case 'user requested tire':
         return <Clock className="w-4 h-4" />;
       case 'approved':
       case 'supervisor approved':
@@ -473,7 +476,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 >
                   <option value="">All Statuses</option>
-                  <option value="pending">User Requested tire</option>
+                  <option value="User Requested tire">User Requested tire</option>
                   <option value="supervisor approved">Supervisor Approved</option>
                   <option value="technical-manager approved">Technical Manager Approved</option>
                   <option value="engineer approved">Engineer Approved</option>

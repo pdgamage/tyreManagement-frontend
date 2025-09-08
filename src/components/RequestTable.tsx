@@ -20,6 +20,7 @@ import type { BaseRequest } from "../types/shared";
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
     case "pending":
+    case "user requested tire":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -135,15 +136,17 @@ const getStatusStyles = (status: string) => {
 
 // Function to get descriptive status text based on who made the decision
 const getDescriptiveStatus = (request: Request) => {
-  if (request.status === "User Requested tire") {
+  const status = request.status?.toLowerCase();
+  
+  if (status === "pending" || status === "user requested tire") {
     return "User Requested tire";
   }
 
-  if (request.status === "complete" || request.status === "Engineer Approved") {
+  if (status === "complete" || status === "engineer approved") {
     return "Engineer Approved";
   }
 
-  if (request.status === "rejected") {
+  if (status === "rejected") {
     // Check who rejected it based on notes and decision_by fields
     if (request.supervisor_notes && request.supervisor_decision_by) {
       return "supervisor rejected";
@@ -362,6 +365,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         ) ||
                         window.location.pathname.includes("/engineer/")) &&
                         (request.status?.toLowerCase() === "pending" ||
+                          request.status?.toLowerCase() === "user requested tire" ||
                           request.status?.toLowerCase() ===
                             "supervisor approved" ||
                           request.status?.toLowerCase() ===

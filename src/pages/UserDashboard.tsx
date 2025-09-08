@@ -138,6 +138,16 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
+      // Find the request being deleted
+      const requestToDelete = requests.find(req => req.id.toString() === deleteId);
+      
+      if (requestToDelete && requestToDelete.status === "User Requested tire") {
+        alert("Cannot delete a request with 'User Requested tire' status. Please wait for the request to be processed.");
+        setShowDeleteConfirm(false);
+        setDeleteId(null);
+        return;
+      }
+
       console.log("🗑️  Deleting request ID:", deleteId);
       console.log("API URL:", apiUrls.requestById(deleteId));
 
@@ -162,9 +172,11 @@ const UserDashboard = () => {
         console.log("✅ Requests refreshed");
       } else {
         console.error("❌ Failed to delete request:", responseData);
+        alert("Failed to delete request. Please try again later.");
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
+      alert("An error occurred while deleting the request. Please try again later.");
     }
 
     setShowDeleteConfirm(false);

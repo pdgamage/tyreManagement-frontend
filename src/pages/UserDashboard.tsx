@@ -168,15 +168,21 @@ const UserDashboard = () => {
       });
 
       console.log('[User] Delete response status:', response.status);
-      const responseData = await response.json();
-      console.log('[User] Delete response data:', responseData);
 
       if (response.ok) {
         console.log('✅ [User] Delete successful, refreshing requests...');
         // Refresh the requests list after deletion
         await fetchRequests();
       } else {
-        console.error('❌ [User] Failed to delete request:', responseData);
+        console.error('❌ [User] Failed to delete request:', response.status);
+        // Try to get error message if available
+        try {
+          const errorData = await response.json();
+          console.error('Error details:', errorData);
+        } catch (e) {
+          // If response is not JSON, just log the status
+          console.error('No additional error details available');
+        }
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);

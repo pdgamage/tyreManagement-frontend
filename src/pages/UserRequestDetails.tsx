@@ -52,7 +52,7 @@ const UserRequestDetails = () => {
 
   const canEdit = () => {
     return (
-      request?.status?.toLowerCase() === "pending" &&
+      request?.status?.toLowerCase() === "user requested tire" &&
       request?.requesterEmail === user?.email
     );
   };
@@ -133,7 +133,7 @@ const UserRequestDetails = () => {
 
   const getStatusBadgeClass = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "pending":
+      case "User Requested tire":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "supervisor approved":
         return "bg-blue-100 text-blue-800 border-blue-200";

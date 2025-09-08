@@ -56,7 +56,7 @@ const formatDate = (dateString?: string | null): string => {
 
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
-  { value: "pending", label: "User Requested tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
+  { value: "User Requested tire", label: "User Requested tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "order placed", label: "Order Placed", icon: <Package className="w-4 h-4 mr-2 text-purple-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
@@ -715,7 +715,7 @@ const UserInquiryDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-500">User Requested tire</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {requests.filter(r => r.status.toLowerCase().includes('pending')).length}
+                    {requests.filter(r => r.status.toLowerCase().includes('user requested tire')).length}
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-yellow-50 text-yellow-600">

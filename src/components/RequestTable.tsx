@@ -134,7 +134,7 @@ const getStatusStyles = (status: string) => {
 
 // Function to get descriptive status text based on who made the decision
 const getDescriptiveStatus = (request: Request) => {
-  if (request.status === "pending") {
+  if (request.status === "User Requested tire") {
     return "User Requested tire";
   }
   

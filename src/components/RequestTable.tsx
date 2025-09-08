@@ -19,7 +19,7 @@ import type { BaseRequest } from "../types/shared";
 
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
-    case "pending":
+    case "user requested tire":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -330,10 +330,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 {showActions && (
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      {/* Add update button for pending requests */}
-                      {(request.status === "pending" ||
-                        request.status.toLowerCase() ===
-                          "user requested tire") && (
+                      {/* Add update button for User Requested tire status */}
+                      {request.status?.toLowerCase().trim() === "user requested tire" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -361,12 +359,12 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           "/technical-manager/"
                         ) ||
                         window.location.pathname.includes("/engineer/")) &&
-                        (request.status?.toLowerCase() === "pending" ||
-                          request.status?.toLowerCase() ===
+                        (request.status?.toLowerCase().trim() === "user requested tire" ||
+                          request.status?.toLowerCase().trim() ===
                             "supervisor approved" ||
-                          request.status?.toLowerCase() ===
+                          request.status?.toLowerCase().trim() ===
                             "technical-manager approved" ||
-                          request.status?.toLowerCase() ===
+                          request.status?.toLowerCase().trim() ===
                             "technical manager approved") && (
                           <>
                             <button

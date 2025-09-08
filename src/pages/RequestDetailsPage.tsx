@@ -198,7 +198,7 @@ const RequestDetailsPage: React.FC = () => {
                 </span>
                 <span className="capitalize">
                   {(request.status || '').toLowerCase() === 'complete' ? 'Engineer Approved' : 
-                   (request.status || '').toLowerCase() === 'pending' ? 'User Requested tire' : 
+                   (request.status || '').toLowerCase().trim() === 'user requested tire' ? 'User Requested tire' : 
                    (request.status || '').toLowerCase()}
                 </span>
               </span>

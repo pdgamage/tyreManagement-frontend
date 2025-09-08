@@ -50,7 +50,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 Request Details #{request.id}
               </h3>
               <div className={`inline-flex items-center px-3 py-1 mt-2 text-sm font-medium rounded-full border ${getStatusBadgeClass(request.status || '')}`}>
-                {request.status === 'pending' ? 'User Requested tire' : 
+                {request.status?.toLowerCase().trim() === 'user requested tire' ? 'User Requested tire' : 
                  request.status === 'complete' ? 'Engineer Approved' : 
                  request.status === 'Engineer Approved' ? 'Engineer Approved' : 
                  (request.status || 'Unknown')}

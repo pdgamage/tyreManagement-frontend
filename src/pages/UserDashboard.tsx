@@ -67,14 +67,14 @@ const UserDashboard = () => {
 
   // Filter user's own requests
   const userRequests = requests.filter((req: any) => req.userId === user?.id);
-  const pendingRequests = userRequests.filter(
-    (req: any) => req.status === "User Requested tire"
+  const userRequestedTireRequests = userRequests.filter(
+    (req: any) => req.status?.toLowerCase().trim() === "user requested tire"
   );
   const approvedRequests = userRequests.filter(
     (req: any) =>
-      req.status === "supervisor approved" ||
-      req.status === "technical-manager approved" ||
-      req.status === "engineer approved"
+      req.status?.toLowerCase().trim() === "supervisor approved" ||
+      req.status?.toLowerCase().trim() === "technical-manager approved" ||
+      req.status?.toLowerCase().trim() === "engineer approved"
   );
   const rejectedRequests = userRequests.filter(
     (req: any) =>
@@ -96,8 +96,8 @@ const UserDashboard = () => {
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     switch (activeFilter) {
-      case "pending":
-        return pendingRequests;
+      case "user-requested-tire":
+        return userRequestedTireRequests;
       case "approved":
         return approvedRequests;
       case "rejected":
@@ -322,10 +322,10 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 lg:grid-cols-3">
             <div
               onClick={() =>
-                setActiveFilter(activeFilter === "pending" ? "all" : "pending")
+                setActiveFilter(activeFilter === "user-requested-tire" ? "all" : "user-requested-tire")
               }
               className={`bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-8 text-white shadow-xl border border-yellow-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "pending"
+                activeFilter === "user-requested-tire"
                   ? "ring-4 ring-yellow-300 ring-opacity-50"
                   : ""
               }`}
@@ -336,7 +336,7 @@ const UserDashboard = () => {
                     User Requested tire
                   </p>
                   <p className="mb-1 text-4xl font-bold">
-                    {pendingRequests.length}
+                    {userRequestedTireRequests.length}
                   </p>
                   <p className="text-xs text-yellow-200">Awaiting review</p>
                 </div>

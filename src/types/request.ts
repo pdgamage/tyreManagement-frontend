@@ -20,7 +20,7 @@ export interface Request {
   tireWearPattern: string;
   comments: string | null;
   status:
-    | "User Requested tire"
+    | "pending"
     | "supervisor approved"
     | "technical-manager approved"
     | "engineer approved"

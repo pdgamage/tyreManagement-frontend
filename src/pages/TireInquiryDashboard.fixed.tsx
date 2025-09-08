@@ -7,25 +7,10 @@ interface Vehicle {
   id: string;
   vehicleNumber: string;
   brand: string;
-  model: string;                  </div>
-          </div>
-        </div>
+  model: string;
+}
 
-        {/* Dashboard Stats (only shown when vehicle is selected) */}
-        {selectedVehicle && requests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>>
-          </div>
-        </div>
-
-        {/* Dashboard Stats (only shown when vehicle is selected) */}
-        {selectedVehicle && requests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>rface TireRequest {
+interface TireRequest {
   id: string;
   vehicleNumber: string;
   status: string;
@@ -39,7 +24,7 @@ interface Vehicle {
 
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
-  { value: "User Requested tire", label: "User Requested tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
+  { value: "pending", label: "Pending", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },
   { value: "complete", label: "Engineer Approved", icon: <Smile className="w-4 h-4 mr-2 text-blue-500" /> },
@@ -439,6 +424,7 @@ const UserInquiryDashboard: React.FC = () => {
                   }}
                   min={startDate || undefined}
                 />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -475,8 +461,6 @@ const UserInquiryDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-            </div>
-          </div>
 
         {/* Dashboard Stats (only shown when vehicle is selected) */}
         {selectedVehicle && requests.length > 0 && (
@@ -496,7 +480,7 @@ const UserInquiryDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">User Requested tire</p>
+                  <p className="text-sm font-medium text-gray-500">Pending</p>
                   <p className="text-2xl font-semibold text-gray-900">
                     {requests.filter(r => r.status.toLowerCase().includes('pending')).length}
                   </p>

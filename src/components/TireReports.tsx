@@ -75,7 +75,7 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
           <div className="mt-2 text-3xl font-semibold text-gray-900">{stats.total}</div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm font-medium text-yellow-600">User Requested tire</div>
+          <div className="text-sm font-medium text-yellow-600">Pending</div>
           <div className="mt-2 text-3xl font-semibold text-yellow-700">{stats.pending}</div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -164,7 +164,7 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
                   className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="pending">User Requested tire</option>
+                  <option value="pending">Pending</option>
                   <option value="approved">Approved</option>
                   <option value="rejected">Rejected</option>
                 </select>
@@ -266,7 +266,7 @@ const TireReports: React.FC<TireReportsProps> = ({ requests, onApplyFilters }) =
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {request.status === 'pending' ? 'User Requested tire' : 
+                          {request.status === 'pending' ? 'Pending' : 
                            request.status === 'complete' ? 'Engineer Approved' : 
                            request.status}
                         </span>

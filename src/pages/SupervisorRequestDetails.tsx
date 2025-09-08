@@ -177,7 +177,7 @@ const SupervisorRequestDetails = () => {
           <span
             className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold
           ${
-            request.status === "User Requested tire"
+            request.status === "pending"
               ? "bg-yellow-100 text-yellow-800"
               : request.status === "rejected"
               ? "bg-red-100 text-red-800"
@@ -187,7 +187,7 @@ const SupervisorRequestDetails = () => {
           }
         `}
           >
-            {request.status === 'User Requested tire' ? 'User Requested tire' : 
+            {request.status === 'pending' ? 'Pending' : 
              request.status === 'complete' ? 'Engineer Approved' : 
              request.status.replace(/_/g, " ")}
           </span>
@@ -462,13 +462,13 @@ const SupervisorRequestDetails = () => {
                 }`}
                 rows={4}
                 placeholder="Enter your notes here..."
-                disabled={request.status !== "User Requested tire"}
+                disabled={request.status !== "pending"}
               />
               {notesError && (
                 <p className="mt-2 text-sm text-red-600">{notesError}</p>
               )}
 
-              {request.status === "User Requested tire" && (
+              {request.status === "pending" && (
                 <div className="flex justify-end mt-4 space-x-4">
                   <button
                     type="button"

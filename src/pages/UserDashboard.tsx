@@ -68,7 +68,7 @@ const UserDashboard = () => {
   // Filter user's own requests
   const userRequests = requests.filter((req: any) => req.userId === user?.id);
   const pendingRequests = userRequests.filter(
-    (req: any) => req.status === "User Requested tire"
+    (req: any) => req.status === "pending"
   );
   const approvedRequests = userRequests.filter(
     (req: any) =>
@@ -96,7 +96,7 @@ const UserDashboard = () => {
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     switch (activeFilter) {
-      case "user-requested-tire":
+      case "pending":
         return pendingRequests;
       case "approved":
         return approvedRequests;
@@ -333,7 +333,7 @@ const UserDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="mb-2 text-sm font-medium text-yellow-100">
-                    User Requested tire
+                    Pending
                   </p>
                   <p className="mb-1 text-4xl font-bold">
                     {pendingRequests.length}
@@ -533,7 +533,7 @@ const UserDashboard = () => {
                     Your Tire Requests
                     {activeFilter !== "all" && (
                       <span className="px-3 py-1 ml-2 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                        {activeFilter === "pending" && "User Requested tire"}
+                        {activeFilter === "pending" && "Pending"}
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}

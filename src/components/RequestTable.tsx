@@ -19,7 +19,7 @@ import type { BaseRequest } from "../types/shared";
 
 const getStatusStyles = (status: string) => {
   switch (status) {
-    case "User Requested tire":
+    case "pending":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -134,9 +134,9 @@ const getStatusStyles = (status: string) => {
 };
 
 // Function to get descriptive status text based on who made the decision
-const getDescriptiveStatus = (request: Request) => {
-  if (request.status === "User Requested tire") {
-    return "User Requested tire";
+export const getDescriptiveStatus = (request: Request | BaseRequest) => {
+  if (request.status === "pending") {
+    return "Pending";
   }
 
   if (request.status === "complete" || request.status === "Engineer Approved") {
@@ -331,7 +331,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       {/* Add update button for pending requests */}
-                      {request.status === "User Requested tire" && (
+                      {request.status === "pending" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -359,7 +359,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           "/technical-manager/"
                         ) ||
                         window.location.pathname.includes("/engineer/")) &&
-                        (request.status === "User Requested tire" ||
+                        (request.status === "pending" ||
                           request.status === "supervisor approved" ||
                           request.status === "technical-manager approved") && (
                           <>

@@ -56,7 +56,7 @@ const SupervisorDashboard = () => {
   );
 
   const pendingRequests = supervisorRequests.filter(
-    (req) => req.status === "User Requested tire"
+    (req) => req.status === "pending"
   );
 
   // Show approved requests done by current supervisor

@@ -20,7 +20,6 @@ import type { BaseRequest } from "../types/shared";
 const getStatusStyles = (status: string) => {
   switch (status?.toLowerCase()) {
     case "pending":
-    case "user requested tire":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -136,17 +135,15 @@ const getStatusStyles = (status: string) => {
 
 // Function to get descriptive status text based on who made the decision
 const getDescriptiveStatus = (request: Request) => {
-  const status = request.status?.toLowerCase();
-  
-  if (status === "pending" || status === "user requested tire") {
+  if (request.status === "User Requested tire") {
     return "User Requested tire";
   }
 
-  if (status === "complete" || status === "engineer approved") {
+  if (request.status === "complete" || request.status === "Engineer Approved") {
     return "Engineer Approved";
   }
 
-  if (status === "rejected") {
+  if (request.status === "rejected") {
     // Check who rejected it based on notes and decision_by fields
     if (request.supervisor_notes && request.supervisor_decision_by) {
       return "supervisor rejected";
@@ -365,7 +362,6 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         ) ||
                         window.location.pathname.includes("/engineer/")) &&
                         (request.status?.toLowerCase() === "pending" ||
-                          request.status?.toLowerCase() === "user requested tire" ||
                           request.status?.toLowerCase() ===
                             "supervisor approved" ||
                           request.status?.toLowerCase() ===
@@ -452,19 +448,11 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       {showDeleteButton && (
                         <button
                           onClick={(e) => {
-                            console.log("🗑️  Delete button clicked in RequestTable");
-                            console.log("🗑️  Request details:", { id: request.id, status: request.status });
                             e.stopPropagation();
-                            e.preventDefault();
-                            // Ensure ID is a string
-                            const requestId = String(request.id);
-                            console.log("🗑️  Converted ID to string:", requestId);
-                            onDelete(requestId);
+                            onDelete(request.id);
                           }}
-                          className="px-2 py-1 text-gray-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                          className="px-4 text-gray-500 hover:text-red-700"
                           aria-label="Delete"
-                          title="Delete Request"
-                          type="button"
                         >
                           <Trash className="w-5 h-5" />
                         </button>

@@ -130,9 +130,6 @@ const UserDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
-    console.log("🗑️ Delete initiated for request ID:", id);
-    const request = requests.find(r => r.id === id);
-    console.log("Request status:", request?.status);
     setDeleteId(id);
     setShowDeleteConfirm(true);
   };
@@ -141,48 +138,30 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
-      console.log("🗑️ Starting deletion process...");
-      console.log("Request ID:", deleteId);
-      console.log("User ID:", user?.id);
-      console.log("User Role:", user?.role);
+      console.log("🗑️  Deleting request ID:", deleteId);
       console.log("API URL:", apiUrls.requestById(deleteId));
 
-      const request = requests.find(r => r.id === deleteId);
-      console.log("Request being deleted:", {
-        id: deleteId,
-        status: request?.status,
-        vehicleNumber: request?.vehicleNumber
-      });
-
-      console.log('🗑️  [User] Deleting request ID:', deleteId);
-      
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user?.id || null, // Send user ID for audit trail
-          userRole: user?.role || null // Send user role for audit trail
-        })
+          userRole: user?.role || null, // Send user role for audit trail
+        }),
       });
 
-      console.log('[User] Delete response status:', response.status);
+      console.log("Delete response status:", response.status);
+      const responseData = await response.json();
+      console.log("Delete response data:", responseData);
 
       if (response.ok) {
-        console.log('✅ [User] Delete successful, refreshing requests...');
-        // Refresh the requests list after deletion
+        console.log("✅ Delete successful, refreshing requests...");
         await fetchRequests();
+        console.log("✅ Requests refreshed");
       } else {
-        console.error('❌ [User] Failed to delete request:', response.status);
-        // Try to get error message if available
-        try {
-          const errorData = await response.json();
-          console.error('Error details:', errorData);
-        } catch (e) {
-          // If response is not JSON, just log the status
-          console.error('No additional error details available');
-        }
+        console.error("❌ Failed to delete request:", responseData);
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);

@@ -18,8 +18,8 @@ import type { Request } from "../types/request";
 import type { BaseRequest } from "../types/shared";
 
 const getStatusStyles = (status: string) => {
-  switch (status?.toLowerCase()) {
-    case "pending":
+  switch (status) {
+    case "User Requested tire":
       return {
         bg: "bg-amber-50",
         text: "text-amber-700",
@@ -331,9 +331,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       {/* Add update button for pending requests */}
-                      {(request.status === "pending" ||
-                        request.status.toLowerCase() ===
-                          "user requested tire") && (
+                      {request.status === "User Requested tire" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -361,13 +359,9 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           "/technical-manager/"
                         ) ||
                         window.location.pathname.includes("/engineer/")) &&
-                        (request.status?.toLowerCase() === "pending" ||
-                          request.status?.toLowerCase() ===
-                            "supervisor approved" ||
-                          request.status?.toLowerCase() ===
-                            "technical-manager approved" ||
-                          request.status?.toLowerCase() ===
-                            "technical manager approved") && (
+                        (request.status === "User Requested tire" ||
+                          request.status === "supervisor approved" ||
+                          request.status === "technical-manager approved") && (
                           <>
                             <button
                               onClick={(e) => {
@@ -395,9 +389,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         )}
 
                       {showPlaceOrderButton &&
-                        (request.status?.toLowerCase().trim() === "complete" ||
-                          request.status?.toLowerCase().trim() ===
-                            "engineer approved") &&
+                        (request.status === "complete" ||
+                          request.status === "Engineer Approved") &&
                         !(request as any).order_placed && (
                           <button
                             onClick={(e) => {
@@ -413,9 +406,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         )}
 
                       {showCancelButton &&
-                        (request.status?.toLowerCase().trim() === "complete" ||
-                          request.status?.toLowerCase().trim() ===
-                            "engineer approved") &&
+                        (request.status === "complete" ||
+                          request.status === "Engineer Approved") &&
                         onCancelOrder && (
                           <button
                             onClick={(e) => {
@@ -431,7 +423,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         )}
 
                       {/* View/Download Receipt Button - Only show for order placed status */}
-                      {request.status?.toLowerCase() === "order placed" && (
+                      {request.status === "order placed" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

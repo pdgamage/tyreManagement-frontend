@@ -96,7 +96,7 @@ const UserDashboard = () => {
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     switch (activeFilter) {
-      case "pending":
+      case "user-requested-tire":
         return pendingRequests;
       case "approved":
         return approvedRequests;
@@ -322,10 +322,10 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 lg:grid-cols-3">
             <div
               onClick={() =>
-                setActiveFilter(activeFilter === "pending" ? "all" : "pending")
+                setActiveFilter(activeFilter === "user-requested-tire" ? "all" : "user-requested-tire")
               }
               className={`bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-8 text-white shadow-xl border border-yellow-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "pending"
+                activeFilter === "user-requested-tire"
                   ? "ring-4 ring-yellow-300 ring-opacity-50"
                   : ""
               }`}

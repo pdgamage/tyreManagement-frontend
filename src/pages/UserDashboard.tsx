@@ -68,13 +68,13 @@ const UserDashboard = () => {
   // Filter user's own requests
   const userRequests = requests.filter((req: any) => req.userId === user?.id);
   const pendingRequests = userRequests.filter(
-    (req: any) => req.status === "User Requested tire"
+    (req: any) => req.status?.toLowerCase().trim() === "user requested tire"
   );
   const approvedRequests = userRequests.filter(
     (req: any) =>
-      req.status === "supervisor approved" ||
-      req.status === "technical-manager approved" ||
-      req.status === "engineer approved"
+      req.status?.toLowerCase().trim() === "supervisor approved" ||
+      req.status?.toLowerCase().trim() === "technical-manager approved" ||
+      req.status?.toLowerCase().trim() === "engineer approved"
   );
   const rejectedRequests = userRequests.filter(
     (req: any) =>

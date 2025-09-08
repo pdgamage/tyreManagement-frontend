@@ -130,6 +130,9 @@ const UserDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
+    console.log("🗑️ Delete initiated for request ID:", id);
+    const request = requests.find(r => r.id === id);
+    console.log("Request status:", request?.status);
     setDeleteId(id);
     setShowDeleteConfirm(true);
   };
@@ -138,8 +141,18 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
-      console.log("🗑️  Deleting request ID:", deleteId);
+      console.log("🗑️ Starting deletion process...");
+      console.log("Request ID:", deleteId);
+      console.log("User ID:", user?.id);
+      console.log("User Role:", user?.role);
       console.log("API URL:", apiUrls.requestById(deleteId));
+
+      const request = requests.find(r => r.id === deleteId);
+      console.log("Request being deleted:", {
+        id: deleteId,
+        status: request?.status,
+        vehicleNumber: request?.vehicleNumber
+      });
 
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
@@ -148,7 +161,7 @@ const UserDashboard = () => {
         },
         body: JSON.stringify({
           userId: user?.id || null, // Send user ID for audit trail
-          userRole: user?.role || null, // Send user role for audit trail
+          userRole: user?.role || null // Send user role for audit trail
         }),
       });
 

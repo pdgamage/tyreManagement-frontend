@@ -437,6 +437,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                         </button>
                       )}
 
+                      {/* Always show delete button regardless of status */}
                       {showDeleteButton && (
                         <button
                           onClick={(e) => {
@@ -445,6 +446,7 @@ const RequestTable: React.FC<RequestTableProps> = ({
                           }}
                           className="px-4 text-gray-500 hover:text-red-700"
                           aria-label="Delete"
+                          title="Archive Request"
                         >
                           <Trash className="w-5 h-5" />
                         </button>

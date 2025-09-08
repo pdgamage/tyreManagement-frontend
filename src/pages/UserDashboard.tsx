@@ -29,7 +29,9 @@ const UserDashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Selected request for details modal
-  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<TireRequest | null>(
+    null
+  );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -84,7 +86,8 @@ const UserDashboard = () => {
     (req: any) => req.status === "order placed"
   );
   const completeOrderRequests = userRequests.filter(
-    (req: any) => req.status === "complete" || req.status === "Engineer Approved"
+    (req: any) =>
+      req.status === "complete" || req.status === "Engineer Approved"
   );
   const cancelOrderRequests = userRequests.filter(
     (req: any) => req.status === "order cancelled"
@@ -135,30 +138,30 @@ const UserDashboard = () => {
     if (!deleteId) return;
 
     try {
-      console.log('🗑️  Deleting request ID:', deleteId);
-      console.log('API URL:', apiUrls.requestById(deleteId));
-      
+      console.log("🗑️  Deleting request ID:", deleteId);
+      console.log("API URL:", apiUrls.requestById(deleteId));
+
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user?.id || null, // Send user ID for audit trail
-          userRole: user?.role || null // Send user role for audit trail
-        })
+          userRole: user?.role || null, // Send user role for audit trail
+        }),
       });
 
-      console.log('Delete response status:', response.status);
+      console.log("Delete response status:", response.status);
       const responseData = await response.json();
-      console.log('Delete response data:', responseData);
+      console.log("Delete response data:", responseData);
 
       if (response.ok) {
-        console.log('✅ Delete successful, refreshing requests...');
+        console.log("✅ Delete successful, refreshing requests...");
         await fetchRequests();
-        console.log('✅ Requests refreshed');
+        console.log("✅ Requests refreshed");
       } else {
-        console.error('❌ Failed to delete request:', responseData);
+        console.error("❌ Failed to delete request:", responseData);
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
@@ -185,6 +188,10 @@ const UserDashboard = () => {
     console.log("Place order for request:", request);
   };
 
+  const handleUpdate = (request: any) => {
+    navigate(`/user/request-update/${request.id}`);
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate("/login");
@@ -193,24 +200,24 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
-      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
+      <header className="border-b shadow-2xl bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 border-slate-200">
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Enhanced Header Title Section */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/20">
+              <div className="flex items-center justify-center w-16 h-16 border-2 shadow-xl bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl border-white/20">
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white tracking-tight">
+                <h1 className="text-4xl font-bold tracking-tight text-white">
                   User Dashboard
                 </h1>
-                <p className="text-slate-300 text-lg font-medium mt-1">
+                <p className="mt-1 text-lg font-medium text-slate-300">
                   Submit tire requests and track your applications
                 </p>
                 <div className="flex items-center mt-2 space-x-2">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-slate-400 font-medium">
+                  <span className="text-sm font-medium text-slate-400">
                     User Level Access
                   </span>
                   <span className="text-slate-500">•</span>
@@ -222,17 +229,17 @@ const UserDashboard = () => {
             </div>
             <div className="flex items-center space-x-6">
               {/* Quick Actions */}
-              <div className="hidden lg:flex items-center space-x-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">
+              <div className="items-center hidden space-x-4 lg:flex">
+                <div className="px-4 py-2 border rounded-lg bg-white/10 backdrop-blur-sm border-white/20">
+                  <div className="text-xs font-medium text-slate-300">
                     Current Time
                   </div>
                   <div className="text-sm font-semibold text-white">
                     {currentTime.toLocaleTimeString()}
                   </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
-                  <div className="text-xs text-slate-300 font-medium">
+                <div className="px-4 py-2 border rounded-lg bg-white/10 backdrop-blur-sm border-white/20">
+                  <div className="text-xs font-medium text-slate-300">
                     Today's Date
                   </div>
                   <div className="text-sm font-semibold text-white">
@@ -242,7 +249,7 @@ const UserDashboard = () => {
               </div>
               {/* Enhanced User Profile */}
               <div className="flex items-center space-x-3">
-                <div className="text-right hidden sm:block">
+                <div className="hidden text-right sm:block">
                   <div className="text-sm font-medium text-white">
                     {user?.name || "User"}
                   </div>
@@ -251,16 +258,16 @@ const UserDashboard = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg border-2 border-white/20 hover:shadow-xl transition-all duration-200"
+                    className="flex items-center justify-center w-12 h-12 transition-all duration-200 border-2 shadow-lg bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl border-white/20 hover:shadow-xl"
                   >
                     <UserCircle className="w-6 h-6 text-white" />
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 w-48 py-1 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50">
+                    <div className="absolute right-0 z-50 w-48 py-1 mt-2 bg-white border border-gray-100 shadow-2xl rounded-xl">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                       >
                         <LogOut className="w-4 h-4 mr-3" />
                         Logout
@@ -277,7 +284,7 @@ const UserDashboard = () => {
             <div className="flex space-x-4">
               <button
                 onClick={() => setShowRequestForm(!showRequestForm)}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                className="flex items-center px-6 py-3 space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl hover:shadow-xl"
               >
                 <Plus className="w-5 h-5" />
                 <span>
@@ -286,35 +293,33 @@ const UserDashboard = () => {
               </button>
               <button
                 onClick={() => {
-                  navigate('/user/inquiry-dashboard');
+                  navigate("/user/inquiry-dashboard");
                 }}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                className="flex items-center px-6 py-3 space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:shadow-xl"
               >
                 <FileText className="w-5 h-5" />
                 <span>User Inquiry</span>
               </button>
-              
+
               <button
                 onClick={() => {
-                  navigate('/user/deleted-requests');
+                  navigate("/user/deleted-requests");
                 }}
-                className="bg-gradient-to-r from-red-500 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                className="flex items-center px-6 py-3 space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-red-500 to-orange-600 rounded-xl hover:shadow-xl"
               >
                 <Clock className="w-5 h-5" />
                 <span>Deleted Requests</span>
               </button>
             </div>
-
-
           </div>
         </div>
       </header>
 
       {/* Enhanced Main Content */}
-      <main className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8 -mt-6">
+      <main className="px-4 py-10 mx-auto -mt-6 max-w-7xl sm:px-6 lg:px-8">
         <div className="space-y-8">
           {/* Professional Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 lg:grid-cols-3">
             <div
               onClick={() =>
                 setActiveFilter(activeFilter === "pending" ? "all" : "pending")
@@ -327,15 +332,15 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-yellow-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-yellow-100">
                     User Requested tire
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {pendingRequests.length}
                   </p>
-                  <p className="text-yellow-200 text-xs">Awaiting review</p>
+                  <p className="text-xs text-yellow-200">Awaiting review</p>
                 </div>
-                <div className="w-16 h-16 bg-yellow-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-yellow-400/30 rounded-xl">
                   <Clock className="w-8 h-8" />
                 </div>
               </div>
@@ -355,17 +360,17 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-emerald-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-emerald-100">
                     Approved
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {approvedRequests.length}
                   </p>
-                  <p className="text-emerald-200 text-xs">
+                  <p className="text-xs text-emerald-200">
                     Successfully approved
                   </p>
                 </div>
-                <div className="w-16 h-16 bg-emerald-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-emerald-400/30 rounded-xl">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
               </div>
@@ -385,15 +390,15 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-rose-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-rose-100">
                     Rejected
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {rejectedRequests.length}
                   </p>
-                  <p className="text-rose-200 text-xs">Needs revision</p>
+                  <p className="text-xs text-rose-200">Needs revision</p>
                 </div>
-                <div className="w-16 h-16 bg-rose-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-rose-400/30 rounded-xl">
                   <XCircle className="w-8 h-8" />
                 </div>
               </div>
@@ -413,15 +418,15 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-blue-100">
                     Place Orders
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {placeOrderRequests.length}
                   </p>
-                  <p className="text-blue-200 text-xs">Orders placed</p>
+                  <p className="text-xs text-blue-200">Orders placed</p>
                 </div>
-                <div className="w-16 h-16 bg-blue-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-blue-400/30 rounded-xl">
                   <ShoppingCart className="w-8 h-8" />
                 </div>
               </div>
@@ -441,15 +446,17 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-purple-100">
                     Finally Engineer Approved
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {completeOrderRequests.length}
                   </p>
-                  <p className="text-purple-200 text-xs">Engineer approved orders</p>
+                  <p className="text-xs text-purple-200">
+                    Engineer approved orders
+                  </p>
                 </div>
-                <div className="w-16 h-16 bg-purple-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-purple-400/30 rounded-xl">
                   <Package className="w-8 h-8" />
                 </div>
               </div>
@@ -469,15 +476,15 @@ const UserDashboard = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-100 text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-medium text-slate-100">
                     Cancel Orders
                   </p>
-                  <p className="text-4xl font-bold mb-1">
+                  <p className="mb-1 text-4xl font-bold">
                     {cancelOrderRequests.length}
                   </p>
-                  <p className="text-slate-200 text-xs">Orders cancelled</p>
+                  <p className="text-xs text-slate-200">Orders cancelled</p>
                 </div>
-                <div className="w-16 h-16 bg-slate-400/30 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-16 h-16 bg-slate-400/30 rounded-xl">
                   <X className="w-8 h-8" />
                 </div>
               </div>
@@ -486,17 +493,17 @@ const UserDashboard = () => {
 
           {/* Tire Request Form Section */}
           {showRequestForm && (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-6 border-b border-green-100">
+            <div className="overflow-hidden bg-white border border-gray-100 shadow-xl rounded-2xl">
+              <div className="px-8 py-6 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                  <div className="flex items-center justify-center w-10 h-10 bg-green-500 rounded-xl">
                     <Plus className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-green-900">
                       Submit New Tire Request
                     </h2>
-                    <p className="text-green-700 text-sm">
+                    <p className="text-sm text-green-700">
                       Fill out the form below to request new tires for your
                       vehicle
                     </p>
@@ -515,17 +522,17 @@ const UserDashboard = () => {
           )}
 
           {/* Your Tire Requests Section with Color-Coded Statuses */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-blue-100">
+          <div className="overflow-hidden bg-white border border-gray-100 shadow-xl rounded-2xl">
+            <div className="px-8 py-6 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-xl">
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-blue-900">
                     Your Tire Requests
                     {activeFilter !== "all" && (
-                      <span className="ml-2 text-sm font-medium bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                      <span className="px-3 py-1 ml-2 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                         {activeFilter === "pending" && "User Requested tire"}
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
@@ -536,7 +543,7 @@ const UserDashboard = () => {
                       </span>
                     )}
                   </h2>
-                  <p className="text-blue-700 text-sm">
+                  <p className="text-sm text-blue-700">
                     {activeFilter === "all"
                       ? "Track the status of your tire requests with color-coded indicators"
                       : `Showing ${
@@ -555,7 +562,7 @@ const UserDashboard = () => {
                     {activeFilter !== "all" && (
                       <button
                         onClick={() => setActiveFilter("all")}
-                        className="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+                        className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
                       >
                         Show All
                       </button>
@@ -571,6 +578,7 @@ const UserDashboard = () => {
                   title=""
                   onView={handleView}
                   onDelete={handleDelete}
+                  onUpdate={handleUpdate}
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onPlaceOrder={handlePlaceOrder}
@@ -580,11 +588,11 @@ const UserDashboard = () => {
                   showDeleteButton={true}
                 />
               ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="py-12 text-center">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
                     <FileText className="w-8 h-8 text-gray-400" />
                   </div>
-                  <div className="text-gray-500 text-lg mb-2 font-medium">
+                  <div className="mb-2 text-lg font-medium text-gray-500">
                     {activeFilter === "all"
                       ? "No requests found"
                       : `No ${
@@ -601,7 +609,7 @@ const UserDashboard = () => {
                             : "cancelled orders"
                         } found`}
                   </div>
-                  <p className="text-gray-400 text-sm mb-6">
+                  <p className="mb-6 text-sm text-gray-400">
                     {activeFilter === "all"
                       ? "Submit your first tire request using the form above"
                       : `You don't have any ${
@@ -620,7 +628,7 @@ const UserDashboard = () => {
                   </p>
                   <button
                     onClick={() => setShowRequestForm(true)}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2 mx-auto"
+                    className="flex items-center px-6 py-3 mx-auto space-x-2 font-semibold text-white transition-all duration-200 shadow-lg bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl hover:shadow-xl"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Create First Request</span>
@@ -631,35 +639,35 @@ const UserDashboard = () => {
           </div>
 
           {/* Quick Tips Section */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+          <div className="p-8 border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl">
+            <div className="flex items-center mb-6 space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-xl">
                 <AlertCircle className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-blue-900">Quick Tips</h3>
-                <p className="text-blue-700 text-sm">
+                <p className="text-sm text-blue-700">
                   Important information for tire requests
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                <h4 className="font-semibold text-gray-900 mb-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="p-6 bg-white border border-blue-100 shadow-sm rounded-xl">
+                <h4 className="mb-2 font-semibold text-gray-900">
                   Before Submitting
                 </h4>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <ul className="space-y-1 text-sm text-gray-600">
                   <li>• Ensure your vehicle is registered in the system</li>
                   <li>• Check current tire condition and wear patterns</li>
                   <li>• Have your vehicle's current KM reading ready</li>
                   <li>• Take photos of tire damage if applicable</li>
                 </ul>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                <h4 className="font-semibold text-gray-900 mb-2">
+              <div className="p-6 bg-white border border-blue-100 shadow-sm rounded-xl">
+                <h4 className="mb-2 font-semibold text-gray-900">
                   Request Process
                 </h4>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <ul className="space-y-1 text-sm text-gray-600">
                   <li>• Requests are reviewed by supervisors first</li>
                   <li>• Technical managers verify technical requirements</li>
                   <li>• Engineers handle implementation details</li>
@@ -685,11 +693,11 @@ const UserDashboard = () => {
           onClick={cancelDelete}
         >
           <div
-            className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl border border-gray-200"
+            className="w-full max-w-md p-6 bg-white border border-gray-200 shadow-2xl rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+              <div className="flex items-center justify-center w-12 h-12 mr-4 bg-red-100 rounded-full">
                 <XCircle className="w-6 h-6 text-red-600" />
               </div>
               <div>
@@ -702,19 +710,20 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete this tire request? The request will be moved to backup storage and can be restored if needed.
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to delete this tire request? The request
+              will be moved to backup storage and can be restored if needed.
             </p>
 
             <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                className="px-4 py-2 font-medium text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200"
                 onClick={cancelDelete}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center space-x-2"
+                className="flex items-center px-4 py-2 space-x-2 font-medium text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
                 onClick={confirmDelete}
               >
                 <XCircle className="w-4 h-4" />

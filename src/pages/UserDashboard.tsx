@@ -145,10 +145,12 @@ const UserDashboard = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          userId: user?.id || null, // Send user ID for audit trail
-          userRole: user?.role || null, // Send user role for audit trail
+          userId: user?.id,
+          userRole: "User", // Explicitly set role as User for deletion
+          deleteReason: "User initiated deletion",
         }),
       });
 

@@ -67,14 +67,14 @@ const UserDashboard = () => {
 
   // Filter user's own requests
   const userRequests = requests.filter((req: any) => req.userId === user?.id);
-  const userRequestedTireRequests = userRequests.filter(
-    (req: any) => req.status?.toLowerCase().trim() === "user requested tire"
+  const pendingRequests = userRequests.filter(
+    (req: any) => req.status === "User Requested tire"
   );
   const approvedRequests = userRequests.filter(
     (req: any) =>
-      req.status?.toLowerCase().trim() === "supervisor approved" ||
-      req.status?.toLowerCase().trim() === "technical-manager approved" ||
-      req.status?.toLowerCase().trim() === "engineer approved"
+      req.status === "supervisor approved" ||
+      req.status === "technical-manager approved" ||
+      req.status === "engineer approved"
   );
   const rejectedRequests = userRequests.filter(
     (req: any) =>
@@ -96,8 +96,8 @@ const UserDashboard = () => {
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     switch (activeFilter) {
-      case "user-requested-tire":
-        return userRequestedTireRequests;
+      case "pending":
+        return pendingRequests;
       case "approved":
         return approvedRequests;
       case "rejected":
@@ -139,41 +139,34 @@ const UserDashboard = () => {
 
     try {
       console.log("🗑️  Deleting request ID:", deleteId);
+      console.log("API URL:", apiUrls.requestById(deleteId));
 
-      const response = await fetch(`${apiUrls.base}/api/requests/${deleteId}/delete`, {
-        method: "POST",
+      const response = await fetch(apiUrls.requestById(deleteId), {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          userId: user?.id,
-          userRole: user?.role || "User",
-          deleteReason: "User initiated deletion",
-          status: "User Requested tire" // Add current status
+          userId: user?.id || null, // Send user ID for audit trail
+          userRole: user?.role || null, // Send user role for audit trail
         }),
       });
 
+      console.log("Delete response status:", response.status);
       const responseData = await response.json();
-      console.log("Delete response:", { status: response.status, data: responseData });
+      console.log("Delete response data:", responseData);
 
       if (response.ok) {
         console.log("✅ Delete successful, refreshing requests...");
         await fetchRequests();
-        // Show success message to user
-        alert("Request successfully archived");
+        console.log("✅ Requests refreshed");
       } else {
         console.error("❌ Failed to delete request:", responseData);
-        // Show error message to user
-        alert("Failed to archive request. Please try again.");
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
-      // Show error message to user
-      alert("An error occurred while archiving the request. Please try again.");
     }
 
-    // Always clean up regardless of success/failure
     setShowDeleteConfirm(false);
     setDeleteId(null);
   };
@@ -329,10 +322,10 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 lg:grid-cols-3">
             <div
               onClick={() =>
-                setActiveFilter(activeFilter === "user-requested-tire" ? "all" : "user-requested-tire")
+                setActiveFilter(activeFilter === "pending" ? "all" : "pending")
               }
               className={`bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-8 text-white shadow-xl border border-yellow-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                activeFilter === "user-requested-tire"
+                activeFilter === "pending"
                   ? "ring-4 ring-yellow-300 ring-opacity-50"
                   : ""
               }`}
@@ -343,7 +336,7 @@ const UserDashboard = () => {
                     User Requested tire
                   </p>
                   <p className="mb-1 text-4xl font-bold">
-                    {userRequestedTireRequests.length}
+                    {pendingRequests.length}
                   </p>
                   <p className="text-xs text-yellow-200">Awaiting review</p>
                 </div>

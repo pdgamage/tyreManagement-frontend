@@ -371,7 +371,7 @@ const UserInquiryDashboard: React.FC = () => {
 
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower === 'user requested tire') return 'bg-yellow-50 text-yellow-800 border-yellow-100';
+    if (statusLower.includes('pending')) return 'bg-yellow-50 text-yellow-800 border-yellow-100';
     if (statusLower.includes('approved')) return 'bg-green-50 text-green-800 border-green-100';
     if (statusLower.includes('order placed') || statusLower.includes('place order')) return 'bg-purple-50 text-purple-800 border-purple-100';
     if (statusLower.includes('complete')) return 'bg-blue-50 text-blue-800 border-blue-100';
@@ -381,7 +381,7 @@ const UserInquiryDashboard: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower === 'user requested tire') return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
+    if (statusLower.includes('pending')) return <Clock className="w-4 h-4 mr-1.5 text-yellow-500" />;
     if (statusLower.includes('approved')) return <CheckCircle className="w-4 h-4 mr-1.5 text-green-500" />;
     if (statusLower.includes('order placed') || statusLower.includes('place order')) return <Package className="w-4 h-4 mr-1.5 text-purple-500" />;
     if (statusLower.includes('complete')) return <Smile className="w-4 h-4 mr-1.5 text-blue-500" />;
@@ -391,7 +391,7 @@ const UserInquiryDashboard: React.FC = () => {
 
   const getStatusText = (status: string) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower === 'user requested tire') return 'User Requested tire';
+    if (statusLower === 'pending') return 'User Requested tire';
     if (statusLower === 'complete') return 'Engineer Approved';
     return status;
   };

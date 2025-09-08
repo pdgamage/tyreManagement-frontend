@@ -154,27 +154,29 @@ const UserDashboard = () => {
         vehicleNumber: request?.vehicleNumber
       });
 
+      console.log('🗑️  [User] Deleting request ID:', deleteId);
+      
       const response = await fetch(apiUrls.requestById(deleteId), {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId: user?.id || null, // Send user ID for audit trail
           userRole: user?.role || null // Send user role for audit trail
-        }),
+        })
       });
 
-      console.log("Delete response status:", response.status);
+      console.log('[User] Delete response status:', response.status);
       const responseData = await response.json();
-      console.log("Delete response data:", responseData);
+      console.log('[User] Delete response data:', responseData);
 
       if (response.ok) {
-        console.log("✅ Delete successful, refreshing requests...");
+        console.log('✅ [User] Delete successful, refreshing requests...');
+        // Refresh the requests list after deletion
         await fetchRequests();
-        console.log("✅ Requests refreshed");
       } else {
-        console.error("❌ Failed to delete request:", responseData);
+        console.error('❌ [User] Failed to delete request:', responseData);
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);

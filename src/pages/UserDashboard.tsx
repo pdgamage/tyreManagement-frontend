@@ -130,12 +130,18 @@ const UserDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
+    console.log("🗑️  Delete button clicked for request ID:", id);
+    console.log("🗑️  Request ID type:", typeof id);
+    console.log("🗑️  Setting deleteId and showing confirmation modal");
     setDeleteId(id);
     setShowDeleteConfirm(true);
   };
 
   const confirmDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId) {
+      console.error("❌ No deleteId found in confirmDelete");
+      return;
+    }
 
     try {
       console.log("🗑️  Deleting request ID:", deleteId);
@@ -162,9 +168,11 @@ const UserDashboard = () => {
         console.log("✅ Requests refreshed");
       } else {
         console.error("❌ Failed to delete request:", responseData);
+        alert(`Failed to delete request: ${responseData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("❌ Error deleting request:", error);
+      alert(`Error deleting request: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
     setShowDeleteConfirm(false);

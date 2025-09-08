@@ -452,11 +452,19 @@ const RequestTable: React.FC<RequestTableProps> = ({
                       {showDeleteButton && (
                         <button
                           onClick={(e) => {
+                            console.log("🗑️  Delete button clicked in RequestTable");
+                            console.log("🗑️  Request details:", { id: request.id, status: request.status });
                             e.stopPropagation();
-                            onDelete(request.id);
+                            e.preventDefault();
+                            // Ensure ID is a string
+                            const requestId = String(request.id);
+                            console.log("🗑️  Converted ID to string:", requestId);
+                            onDelete(requestId);
                           }}
-                          className="px-4 text-gray-500 hover:text-red-700"
+                          className="px-2 py-1 text-gray-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors cursor-pointer"
                           aria-label="Delete"
+                          title="Delete Request"
+                          type="button"
                         >
                           <Trash className="w-5 h-5" />
                         </button>

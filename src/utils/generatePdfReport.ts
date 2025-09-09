@@ -2,7 +2,7 @@
 import { jsPDF } from 'jspdf';
 // @ts-ignore - jspdf-autotable doesn't have proper types
 import 'jspdf-autotable';
-import { RequestDetails } from '../types';
+import { Request } from '../types/request';
 
 // Extend the window object to include jsPDF types
 declare global {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const generatePdfReport = async (request: RequestDetails): Promise<string> => {
+export const generatePdfReport = async (request: Request): Promise<string> => {
   try {
     // Create a new PDF document
     const doc = new jsPDF({
@@ -67,7 +67,7 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
     ['Vehicle Number', request.vehicleNumber || '-'],
     ['Order Number', request.orderNumber || 'Not assigned'],
     ['Status', request.status === 'pending' ? 'User Requested tire' : request.status],
-    ['Request Date', new Date(request.requestDate || request.submittedAt).toLocaleString()],
+    ['Request Date', new Date(request.lastReplacementDate || request.submittedAt).toLocaleString()],
     ['Order Placed Date', request.orderPlacedDate ? new Date(request.orderPlacedDate).toLocaleString() : 'Not placed yet'],
   ];
 

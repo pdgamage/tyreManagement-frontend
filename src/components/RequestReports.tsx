@@ -53,7 +53,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
       if (role === "supervisor") {
         // Supervisor sees: pending, supervisor approved, or rejected by supervisor
         return (
-          r.status === "User Requested tire" ||
+          r.status === "pending" ||
           r.status === "supervisor approved" ||
           r.status === "supervisor rejected"
         );
@@ -91,7 +91,7 @@ const RequestReports: React.FC<RequestReportsProps> = ({ requests, role }) => {
 
     const pendingRequests = requests.filter((r) => {
       if (role === "supervisor") {
-        return r.status === "User Requested tire";
+        return r.status === "pending";
       } else if (role === "technical-manager") {
         return r.status === "supervisor approved";
       } else if (role === "engineer") {

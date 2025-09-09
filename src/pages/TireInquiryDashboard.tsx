@@ -262,7 +262,12 @@ const UserInquiryDashboard: React.FC = () => {
       // 2. Apply status filter
       if (statusFilter !== "all") {
         const requestStatus = (request.status || '').toLowerCase();
-        const statusFilterLower = statusFilter.toLowerCase();
+        let statusFilterLower = statusFilter.toLowerCase();
+        
+        // Map "User Requested tire" to "pending" for filtering
+        if (statusFilterLower === "user requested tire") {
+          statusFilterLower = "pending";
+        }
         
         // Special handling for 'order placed' status which might have variations
         if (statusFilterLower === 'order placed' || statusFilterLower === 'place order') {

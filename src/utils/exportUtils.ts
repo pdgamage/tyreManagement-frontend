@@ -1,28 +1,31 @@
-export const exportToExcel = (requests: TireRequest[], filename: string = 'tire_requests') => {
+import * as XLSX from 'xlsx';
+import { Request } from '../types/request';
+
+export const exportToExcel = (requests: Request[], filename: string = 'tire_requests') => {
   // Transform requests into a format suitable for Excel
   const data = requests.map(request => ({
     'Request ID': request.id,
     'Order Number': request.orderNumber || 'N/A',
     'Vehicle Number': request.vehicleNumber,
     'Status': request.status === 'pending' ? 'User Requested tire' : request.status,
-    'Request Date': new Date(request.requestDate).toLocaleString(),
+    'Request Date': new Date(request.lastReplacementDate).toLocaleString(),
     'Submitted Date': request.submittedAt ? new Date(request.submittedAt).toLocaleString() : 'N/A',
     'Supplier Name': request.supplierName || 'Not assigned',
-    'Number of Tires': request.tireCount || 0,
-    'Cost Centre': request.cost_centre || 'N/A',
-    'Department': request.department || 'N/A',
-    'Tire Brand': request.brand || 'N/A',
-    'Tire Size': request.size || 'N/A',
-    'Tire Pattern': request.pattern || 'N/A',
-    'Serial Number': request.serialNumber || 'N/A',
-    'Manufacture Date': request.manufactureDate ? new Date(request.manufactureDate).toLocaleDateString() : 'N/A',
+    'Number of Tires': request.quantity || 0,
+    'Cost Centre': request.costCenter || 'N/A',
+    'Department': request.userSection || 'N/A',
+    'Tire Brand': request.existingTireMake || 'N/A',
+    'Tire Size': request.tireSize || 'N/A',
+    'Tire Pattern': request.tireWearPattern || 'N/A',
+    'Serial Number': request.id || 'N/A',
+    'Manufacture Date': request.lastReplacementDate ? new Date(request.lastReplacementDate).toLocaleDateString() : 'N/A',
     'Comments': request.comments || 'No comments',
-    'Approved By': request.approvedBy || 'N/A',
-    'Approval Date': request.approvalDate ? new Date(request.approvalDate).toLocaleString() : 'N/A',
-    'Rejection Reason': request.rejectionReason || 'N/A',
-    'Engineer Approval': request.engineerApproval || 'N/A',
-    'Engineer Comments': request.engineerComments || 'N/A',
-    'Engineer Approval Date': request.engineerApprovalDate ? new Date(request.engineerApprovalDate).toLocaleString() : 'N/A',
+    'Approved By': request.supervisor_decision_by || 'N/A',
+    'Approval Date': request.submittedAt ? new Date(request.submittedAt).toLocaleString() : 'N/A',
+    'Rejection Reason': request.supervisor_notes || 'N/A',
+    'Engineer Approval': request.engineer_decision_by || 'N/A',
+    'Engineer Comments': request.engineer_note || 'N/A',
+    'Engineer Approval Date': request.engineer_decision_by ? new Date().toLocaleString() : 'N/A',
   }));
 
   // Create worksheet

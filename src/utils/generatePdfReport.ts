@@ -66,7 +66,7 @@ export const generatePdfReport = async (request: RequestDetails): Promise<string
   const requestData = [
     ['Vehicle Number', request.vehicleNumber || '-'],
     ['Order Number', request.orderNumber || 'Not assigned'],
-    ['Status', request.status],
+    ['Status', request.status === 'pending' ? 'User Requested tire' : request.status],
     ['Request Date', new Date(request.requestDate || request.submittedAt).toLocaleString()],
     ['Order Placed Date', request.orderPlacedDate ? new Date(request.orderPlacedDate).toLocaleString() : 'Not placed yet'],
   ];

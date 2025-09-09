@@ -71,7 +71,7 @@ export const exportToExcel = (data: RequestData[], fileName: string = 'tire_requ
     'Previous KM Reading': request.previousKmReading,
     'Tire Wear Pattern': request.tireWearPattern,
     'Comments': request.comments,
-    'Status': request.status,
+    'Status': request.status === 'pending' ? 'User Requested tire' : request.status,
     'Submitted At': request.submittedAt ? new Date(request.submittedAt).toLocaleString() : 'N/A',
     'Supervisor Notes': request.supervisor_notes,
     'Technical Manager Note': request.technical_manager_note,

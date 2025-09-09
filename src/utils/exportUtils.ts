@@ -1,38 +1,10 @@
-import * as XLSX from 'xlsx';
-
-interface TireRequest {
-  id: string;
-  vehicleNumber: string;
-  status: string;
-  orderNumber: string;
-  requestDate: string;
-  created_at?: string;
-  submittedAt?: string;
-  supplierName?: string;
-  tireCount?: number;
-  cost_centre?: string;
-  department?: string;
-  brand?: string;
-  size?: string;
-  pattern?: string;
-  serialNumber?: string;
-  manufactureDate?: string;
-  comments?: string;
-  approvedBy?: string;
-  approvalDate?: string;
-  rejectionReason?: string;
-  engineerApproval?: string;
-  engineerComments?: string;
-  engineerApprovalDate?: string;
-}
-
 export const exportToExcel = (requests: TireRequest[], filename: string = 'tire_requests') => {
   // Transform requests into a format suitable for Excel
   const data = requests.map(request => ({
     'Request ID': request.id,
     'Order Number': request.orderNumber || 'N/A',
     'Vehicle Number': request.vehicleNumber,
-    'Status': request.status,
+    'Status': request.status === 'pending' ? 'User Requested tire' : request.status,
     'Request Date': new Date(request.requestDate).toLocaleString(),
     'Submitted Date': request.submittedAt ? new Date(request.submittedAt).toLocaleString() : 'N/A',
     'Supplier Name': request.supplierName || 'Not assigned',

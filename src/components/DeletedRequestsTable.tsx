@@ -305,7 +305,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Get status text with proper display labels
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
+      case 'user requested tire':
         return 'User Requested Tire';
       case 'complete':
         return 'Engineer Approved';
@@ -319,7 +319,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
+      case 'user requested tire':
         return 'bg-yellow-100 text-yellow-800';
       case 'approved':
       case 'supervisor approved':
@@ -348,7 +348,7 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
   // Get status icon
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
+      case 'user requested tire':
         return <Clock className="w-4 h-4" />;
       case 'approved':
       case 'supervisor approved':
@@ -1184,6 +1184,8 @@ const DeletedRequestsTable: React.FC<DeletedRequestsTableProps> = ({
 };
 
 export default DeletedRequestsTable;
+
+
 
 
 

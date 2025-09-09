@@ -14,7 +14,7 @@ const getStatusBadgeClass = (status: string | undefined) => {
       return 'bg-green-100 text-green-800 border-green-300';
     case 'rejected':
       return 'bg-red-100 text-red-800 border-red-300';
-    case 'pending':
+    case 'user requested tire':
       return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     case 'supervisor approved':
       return 'bg-blue-100 text-blue-800 border-blue-300';
@@ -50,7 +50,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 Request Details #{request.id}
               </h3>
               <div className={`inline-flex items-center px-3 py-1 mt-2 text-sm font-medium rounded-full border ${getStatusBadgeClass(request.status || '')}`}>
-                {request.status === 'pending' ? 'User Requested Tire' : 
+                {request.status === 'User Requested tire' ? 'User Requested Tire' : 
                  request.status === 'complete' ? 'Engineer Approved' : 
                  request.status === 'Engineer Approved' ? 'Engineer Approved' : 
                  (request.status || 'Unknown')}
@@ -72,7 +72,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                 <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Request Information</h4>
                 <div className="space-y-2">
                   <p><span className="font-medium">ID:</span> {request.id}</p>
-                  <p><span className="font-medium">Status:</span> {request.status === 'pending' ? 'User Requested Tire' : request.status === 'complete' ? 'Engineer Approved' : request.status === 'Engineer Approved' ? 'Engineer Approved' : (request.status || '-')}</p>
+                  <p><span className="font-medium">Status:</span> {request.status === 'User Requested tire' ? 'User Requested Tire' : request.status === 'complete' ? 'Engineer Approved' : request.status === 'Engineer Approved' ? 'Engineer Approved' : (request.status || '-')}</p>
                   <p><span className="font-medium">Submitted:</span> {formatDate(request.submittedAt)}</p>
                   <p><span className="font-medium">Reason:</span> {request.requestReason}</p>
                   <p><span className="font-medium">Comments:</span> {request.comments || 'N/A'}</p>

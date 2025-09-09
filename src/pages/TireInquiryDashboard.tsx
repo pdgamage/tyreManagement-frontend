@@ -56,7 +56,7 @@ const formatDate = (dateString?: string | null): string => {
 
 const statusOptions = [
   { value: "all", label: "All Statuses", icon: null },
-  { value: "pending", label: "User Requested Tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
+  { value: "User Requested tire", label: "User Requested Tire", icon: <Clock className="w-4 h-4 mr-2 text-yellow-500" /> },
   { value: "approved", label: "Approved", icon: <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> },
   { value: "order placed", label: "Order Placed", icon: <Package className="w-4 h-4 mr-2 text-purple-500" /> },
   { value: "rejected", label: "Rejected", icon: <XCircle className="w-4 h-4 mr-2 text-red-500" /> },

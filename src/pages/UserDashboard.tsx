@@ -96,7 +96,7 @@ const UserDashboard = () => {
   // Filter requests based on active filter
   const getFilteredRequests = () => {
     switch (activeFilter) {
-      case "pending":
+      case "User Requested tire":
         return pendingRequests;
       case "approved":
         return approvedRequests;

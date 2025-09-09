@@ -1288,7 +1288,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
         vehicleNumber.trim().toLowerCase()
     );
 
-    // Check for pending requests (including "User Requested tire")
+    // Check for pending requests
     const pendingRequests = vehicleRequests.filter(
       (req) => !["rejected", "complete", "Engineer Approved", "order placed"].includes(req.status)
     );

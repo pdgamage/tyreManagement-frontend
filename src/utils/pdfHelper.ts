@@ -19,7 +19,7 @@ export const formatNumber = (num: number | undefined) => {
 export const preparePDFData = (request: TireRequest) => {
   return {
     id: request.id,
-    status: request.status || 'N/A',
+    status: request.status === 'pending' ? 'User Requested tire' : request.status || 'N/A',
     requestInfo: {
       orderNumber: request.orderNumber || 'Not Assigned',
       orderPlacedDate: formatDate(request.orderPlacedDate),
@@ -42,8 +42,8 @@ export const preparePDFData = (request: TireRequest) => {
       number: request.vehicleNumber || 'N/A',
       brand: request.vehicleBrand || 'N/A',
       model: request.vehicleModel || 'N/A',
-      department: request.vehicleDepartment || 'N/A',
-      section: request.vehicleCostCentre || 'N/A',
+      department: request.userSection || 'N/A',
+      section: request.costCenter || 'N/A',
     },
     tireDetails: {
       sizeRequired: request.tireSizeRequired || 'N/A',

@@ -1288,7 +1288,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
         vehicleNumber.trim().toLowerCase()
     );
 
-    // Check for pending requests
+    // Check for pending requests (including "User Requested tire")
     const pendingRequests = vehicleRequests.filter(
       (req) => !["rejected", "complete", "Engineer Approved", "order placed"].includes(req.status)
     );
@@ -1296,7 +1296,7 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
     if (pendingRequests.length > 0) {
       const latestPending = pendingRequests[0];
       return {
-        type: "pending",
+        type: "User Requested tire",
         message: `Vehicle ${vehicleNumber} already has a user requested tire (Status: ${latestPending.status.replace(
           /_/g,
           " "

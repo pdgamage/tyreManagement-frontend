@@ -187,7 +187,7 @@ const SupervisorRequestDetails = () => {
           }
         `}
           >
-            {request.status === 'pending' ? 'Pending' : 
+            {request.status === 'pending' ? 'User Requested Tire' : 
              request.status === 'complete' ? 'Engineer Approved' : 
              request.status.replace(/_/g, " ")}
           </span>

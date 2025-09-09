@@ -168,7 +168,7 @@ const CustomerOfficerRequestDetails = () => {
                     : "bg-red-100 text-red-800"
                 }`}
               >
-                {request.status === 'pending' ? 'Pending' : 
+                {request.status === 'pending' ? 'User Requested Tire' : 
                  request.status === 'complete' ? 'Engineer Approved' : 
                  (request.status.charAt(0).toUpperCase() + request.status.slice(1))}
               </span>

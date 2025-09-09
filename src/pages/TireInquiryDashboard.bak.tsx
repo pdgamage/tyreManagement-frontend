@@ -208,7 +208,7 @@ const TireInquiryDashboard: React.FC = () => {
       setRequests(data.map(request => ({
         id: request.id,
         vehicleNumber: request.vehicleNumber,
-        status: request.status || 'Pending',
+        status: request.status || 'User Requested Tire',
         orderNumber: request.orderNumber || 'Not Assigned',
         requestDate: request.created_at || request.submittedAt,
         supplierDetails: {

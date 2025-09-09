@@ -244,7 +244,7 @@ const EngineerDashboard = () => {
               <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl border border-amber-200 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-amber-100 text-sm font-medium mb-2">Pending Tasks</p>
+                    <p className="text-amber-100 text-sm font-medium mb-2">User Requested Tire Tasks</p>
                     <p className="text-4xl font-bold mb-1">{pendingRequests.length}</p>
                     <p className="text-amber-200 text-xs">Awaiting implementation</p>
                   </div>
@@ -311,7 +311,7 @@ const EngineerDashboard = () => {
                       <Clock className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-amber-900">Pending Engineering Tasks</h2>
+                      <h2 className="text-xl font-bold text-amber-900">User Requested Tire Engineering Tasks</h2>
                       <p className="text-amber-700 text-sm">Requests ready for implementation</p>
                     </div>
                   </div>

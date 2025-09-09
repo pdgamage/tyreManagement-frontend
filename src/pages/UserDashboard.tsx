@@ -333,7 +333,7 @@ const UserDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="mb-2 text-sm font-medium text-yellow-100">
-                    Pending
+                    User Requested Tire
                   </p>
                   <p className="mb-1 text-4xl font-bold">
                     {pendingRequests.length}
@@ -533,7 +533,7 @@ const UserDashboard = () => {
                     Your Tire Requests
                     {activeFilter !== "all" && (
                       <span className="px-3 py-1 ml-2 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                        {activeFilter === "pending" && "Pending"}
+                        {activeFilter === "user-requested-tire" && "User Requested Tire"}
                         {activeFilter === "approved" && "Approved"}
                         {activeFilter === "rejected" && "Rejected"}
                         {activeFilter === "place-orders" && "Orders Placed"}
@@ -547,7 +547,7 @@ const UserDashboard = () => {
                     {activeFilter === "all"
                       ? "Track the status of your tire requests with color-coded indicators"
                       : `Showing ${
-                          activeFilter === "pending"
+                          activeFilter === "user-requested-tire"
                             ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"
@@ -596,7 +596,7 @@ const UserDashboard = () => {
                     {activeFilter === "all"
                       ? "No requests found"
                       : `No ${
-                          activeFilter === "pending"
+                          activeFilter === "user-requested-tire"
                             ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"
@@ -613,7 +613,7 @@ const UserDashboard = () => {
                     {activeFilter === "all"
                       ? "Submit your first tire request using the form above"
                       : `You don't have any ${
-                          activeFilter === "pending"
+                          activeFilter === "user-requested-tire"
                             ? "user requested tire"
                             : activeFilter === "approved"
                             ? "approved"

@@ -136,7 +136,7 @@ const getStatusStyles = (status: string) => {
 // Function to get descriptive status text based on who made the decision
 export const getDescriptiveStatus = (request: Request | BaseRequest) => {
   if (request.status === "pending") {
-    return "Pending";
+    return "User Requested Tire";
   }
 
   if (request.status === "complete" || request.status === "Engineer Approved") {

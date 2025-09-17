@@ -1,5 +1,27 @@
 import * as XLSX from 'xlsx';
 
+// Define types for Excel cell styles
+interface ExcelCellStyle {
+  font?: {
+    bold?: boolean;
+    color?: { rgb: string };
+  };
+  fill?: {
+    fgColor: { rgb: string };
+  };
+  alignment?: {
+    horizontal?: 'left' | 'center' | 'right';
+    vertical?: 'top' | 'center' | 'bottom';
+  };
+  border?: {
+    top?: { style: string; color: { rgb: string } };
+    bottom?: { style: string; color: { rgb: string } };
+    left?: { style: string; color: { rgb: string } };
+    right?: { style: string; color: { rgb: string } };
+  };
+  numFmt?: string;
+}
+
 export interface RequestData {
   id: string;
   userId: string;
@@ -80,8 +102,8 @@ export const exportToExcel = (data: RequestData[], fileName: string = 'tire_requ
     'Delivery Office Name': request.deliveryOfficeName,
     'Delivery Street Name': request.deliveryStreetName,
     'Delivery Town': request.deliveryTown,
-    'Total Price': request.totalPrice,
-    'Warranty Distance': request.warrantyDistance,
+    'Total Price': request.totalPrice ? `$${request.totalPrice.toFixed(2)}` : '$0.00',
+    'Warranty Distance': request.warrantyDistance ? `${request.warrantyDistance} km` : 'N/A',
     'Tire Wear Indicator Appeared': request.tireWearIndicatorAppeared ? 'Yes' : 'No',
     'Department': request.Department,
     'Cost Center': request.CostCenter,
@@ -94,18 +116,78 @@ export const exportToExcel = (data: RequestData[], fileName: string = 'tire_requ
   }));
 
   // Create worksheet
-  const ws = XLSX.utils.json_to_sheet(excelData);
+  const ws = XLSX.utils.json_to_sheet(excelData, { cellStyles: true });
+
+  // Define styles with proper TypeScript types
+  const headerStyle: ExcelCellStyle = {
+    font: { bold: true, color: { rgb: 'FFFFFF' } },
+    fill: { fgColor: { rgb: '4472C4' } }, // Blue header
+    alignment: { horizontal: 'center', vertical: 'center' },
+    border: {
+      top: { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left: { style: 'thin', color: { rgb: '000000' } },
+      right: { style: 'thin', color: { rgb: '000000' } }
+    }
+  };
+
+  const dataStyle: ExcelCellStyle = {
+    alignment: { vertical: 'center' },
+    border: {
+      top: { style: 'thin', color: { rgb: 'D9D9D9' } },
+      bottom: { style: 'thin', color: { rgb: 'D9D9D9' } },
+      left: { style: 'thin', color: { rgb: 'D9D9D9' } },
+      right: { style: 'thin', color: { rgb: 'D9D9D9' } }
+    }
+  };
+
+  // Get the range of the worksheet
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+  
+  // Apply styles to headers (first row)
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+    if (!ws[cellAddress]) ws[cellAddress] = {};
+    ws[cellAddress].s = headerStyle;
+  }
+  
+  // Apply styles to data rows
+  for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cellAddress]) continue;
+      
+      // Apply alternating row colors
+      const rowStyle = { ...dataStyle };
+      if (R % 2 === 0) {
+        rowStyle.fill = { fgColor: { rgb: 'F2F2F2' } }; // Light gray for even rows
+      } else {
+        rowStyle.fill = { fgColor: { rgb: 'FFFFFF' } }; // White for odd rows
+      }
+      
+      ws[cellAddress].s = rowStyle;
+    }
+  }
 
   // Auto-size columns
-  const colWidths: number[] = [];
+  const colWidths: { wch: number }[] = [];
   excelData.forEach((row: Record<string, any>) => {
     Object.keys(row).forEach((key, i) => {
       const cellValue = String(row[key] || '');
-      colWidths[i] = Math.max(colWidths[i] || 0, cellValue.length, key.length);
+      colWidths[i] = { wch: Math.max(
+        colWidths[i]?.wch || 0, 
+        cellValue.length, 
+        key.length,
+        // Set minimum column width
+        10
+      )};
     });
   });
 
-  ws['!cols'] = colWidths.map(width => ({ width: Math.min(width + 2, 50) }));
+  ws['!cols'] = colWidths.map(col => ({
+    ...col,
+    width: Math.min(col.wch + 2, 50) // Add some padding but cap at 50
+  }));
 
   // Create workbook
   const wb = XLSX.utils.book_new();
@@ -113,5 +195,15 @@ export const exportToExcel = (data: RequestData[], fileName: string = 'tire_requ
 
   // Generate Excel file with current timestamp
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  
+  // Add some metadata
+  if (!wb.Props) {
+    wb.Props = {};
+  }
+  wb.Props.Title = 'Tire Management - User Inquiries';
+  wb.Props.Author = 'Tire Management System';
+  wb.Props.CreatedDate = new Date();
+  
+  // Write the file
   XLSX.writeFile(wb, `${fileName}_${timestamp}.xlsx`);
 };

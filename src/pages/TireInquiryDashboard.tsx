@@ -687,7 +687,58 @@ const UserInquiryDashboard: React.FC = () => {
           {selectedVehicle && filteredRequests.length > 0 && (
             <div className="mt-4 flex justify-end">
               <button
-                onClick={() => exportToExcel(filteredRequests, `tire_requests_${selectedVehicle.replace(/\s+/g, '_')}`)}
+                onClick={() => {
+                  // Map the filtered requests to match the expected format
+                  const exportData = filteredRequests.map(request => ({
+                    id: request.id,
+                    userId: '',
+                    vehicleId: '',
+                    vehicleNumber: request.vehicleNumber,
+                    quantity: 1,
+                    tubesQuantity: 0,
+                    tireSize: '',
+                    requestReason: '',
+                    requesterName: '',
+                    requesterEmail: '',
+                    requesterPhone: '',
+                    vehicleBrand: '',
+                    vehicleModel: '',
+                    lastReplacementDate: '',
+                    existingTireMake: '',
+                    tireSizeRequired: '',
+                    presentKmReading: 0,
+                    previousKmReading: 0,
+                    tireWearPattern: '',
+                    comments: '',
+                    status: request.status,
+                    submittedAt: request.submittedAt || request.created_at || '',
+                    supervisor_notes: '',
+                    technical_manager_note: '',
+                    engineer_note: '',
+                    customer_officer_note: '',
+                    supervisorId: '',
+                    technical_manager_id: '',
+                    supervisor_decision_by: '',
+                    engineer_decision_by: '',
+                    customer_officer_decision_by: '',
+                    deliveryOfficeName: '',
+                    deliveryStreetName: '',
+                    deliveryTown: '',
+                    totalPrice: 0,
+                    warrantyDistance: 0,
+                    tireWearIndicatorAppeared: false,
+                    Department: '',
+                    CostCenter: '',
+                    supplierName: request.supplierName || '',
+                    supplierEmail: '',
+                    supplierPhone: '',
+                    orderNumber: request.orderNumber || '',
+                    orderNotes: '',
+                    orderPlacedDate: ''
+                  }));
+                  
+                  exportToExcel(exportData, `tire_requests_${selectedVehicle.replace(/\s+/g, '_')}`);
+                }}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 shadow-sm"
               >
                 <FileDown className="w-4 h-4 mr-2" />

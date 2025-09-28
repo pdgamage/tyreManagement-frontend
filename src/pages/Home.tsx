@@ -168,47 +168,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 text-center">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <PhoneIcon className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Phone Support</h3>
-              <p className="text-gray-600 mb-6">24/7 emergency assistance for critical issues</p>
-              <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-                <p className="text-3xl font-bold text-blue-600 mb-2">1717</p>
-                <p className="text-blue-500 font-medium">Always Available</p>
-              </div>
-            </div>
-
-            <div className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 text-center">
-              <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <MailIcon className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Email Support</h3>
-              <p className="text-gray-600 mb-6">Detailed technical assistance and documentation</p>
-              <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200">
-                <p className="text-lg font-bold text-emerald-600 mb-2">support@mobitel.lk</p>
-                <p className="text-emerald-500 font-medium">Response within 2 hours</p>
-              </div>
-            </div>
-
-            <div className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 text-center">
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Monitor className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">System Status</h3>
-              <p className="text-gray-600 mb-6">Real-time monitoring and health checks</p>
-              <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
-                <div className="flex items-center justify-center space-x-3 mb-2">
-                  <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
-                  <p className="text-lg font-bold text-purple-600">All Systems Operational</p>
-                </div>
-                <p className="text-purple-500 font-medium">99.9% Uptime</p>
-              </div>
-            </div>
-          </div>
-        </div>
+          
       </section>
 
       {/* Call to Action Section */}

@@ -78,7 +78,7 @@ const Home = () => {
               </h1>
 
               <p className="text-lg lg:text-xl text-blue-100 mb-8 max-w-xl leading-relaxed">
-                Transform your fleet operations with intelligent automation, real-time monitoring, and enterprise-grade security.
+                Optimize your fleet with smart automation, live monitoring, and enterprise-level security.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">

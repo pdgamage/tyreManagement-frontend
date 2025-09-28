@@ -224,7 +224,7 @@ const Home = () => {
             Ready to <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Transform</span> Your Fleet?
           </h2>
           <p className="text-2xl text-blue-100 mb-12 max-w-4xl mx-auto leading-relaxed">
-            Join hundreds of organizations already using our platform to streamline their tire management operations and boost efficiency.
+            Hundreds of organizations rely on us to make tire management easier and more efficient.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">

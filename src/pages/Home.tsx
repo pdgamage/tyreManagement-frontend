@@ -73,7 +73,7 @@ const Home = () => {
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                  Tire Management
+                  Tyre Management
                 </span>
               </h1>
 

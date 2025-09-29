@@ -82,7 +82,7 @@ const Login = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Role-Based Access</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Customized dashboards for different user roles</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">Dynamic dashboards personalized for every user role</p>
                   </div>
                 </div>
 

@@ -106,7 +106,7 @@ const Login = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Fleet Management</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Complete vehicle and tire inventory management</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">All-in-one platform for complete vehicle and tire inventory control</p>
                   </div>
                 </div>
               </div>

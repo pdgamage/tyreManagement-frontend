@@ -94,7 +94,7 @@ const Login = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Approval Workflow</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Effortless approval workflow from initial request to final order</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">Streamlined approval process from request to order</p>
                   </div>
                 </div>
 

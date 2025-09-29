@@ -70,7 +70,7 @@ const Login = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Secure Access</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Enterprise-grade security with Microsoft Azure AD integration</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">Robust enterprise security powered by Microsoft Azure AD</p>
                   </div>
                 </div>
 

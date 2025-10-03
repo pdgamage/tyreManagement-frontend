@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRequests } from "../contexts/RequestContext";
-import RequestTable from "../components/RequestTable";
+import RequestTable from "../components/                    <div className="mt-4 sm:mt-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-12">
+            <button
+              onClick={() => setActiveTab("requests")}
+              className={`${
+                activeTab === "requests"
+                  ? "bg-white text-slate-700 shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-white/20"
+              } w-full py-3 sm:py-4 px-4 sm:px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 sm:space-x-3`}able";
 import RequestReports from "../components/RequestReports";
 import { Request } from "../types/request";
 import { useAuth } from "../contexts/AuthContext";
@@ -22,9 +30,8 @@ interface RequestsContextType {
 const SupervisorDashboard = () => {
   const { requests, fetchRequests } = useRequests() as RequestsContextType;
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<"requests" | "reports">(
-    "requests"
-  );
+  const [activeTab, setActiveTab] = useState<"requests" | "reports">("requests");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -132,19 +139,19 @@ const SupervisorDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Professional Header with Enhanced Design */}
-      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200">
-        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 shadow-2xl border-b border-slate-200 relative">
+        <div className="px-4 py-4 sm:py-6 lg:py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Enhanced Header Title Section */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 space-y-4 lg:space-y-0">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+          <div className="flex flex-col space-y-4 sm:space-y-6 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white tracking-tight">Supervisor Dashboard</h1>
-                <p className="text-slate-300 mt-2 text-lg">Review, approve, and manage tire requests efficiently</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">Supervisor Dashboard</h1>
+                <p className="text-slate-300 mt-2 text-base sm:text-lg">Review, approve, and manage tire requests efficiently</p>
                 <div className="flex items-center mt-3 space-x-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                     <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

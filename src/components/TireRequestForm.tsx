@@ -1396,6 +1396,10 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
           newErrors.tireSizeRequired = "Tire size is required";
         if (!formData.quantity || formData.quantity < 1)
           newErrors.quantity = "Valid quantity is required";
+        else if (formData.quantity > 4)
+          newErrors.quantity = "Maximum tire quantity is 4";
+        if (formData.tubesQuantity > 4)
+          newErrors.tubesQuantity = "Maximum tube quantity is 4";
         if (!formData.existingTireMake)
           newErrors.existingTireMake = "Existing tire make is required";
         if (!formData.lastReplacementDate)

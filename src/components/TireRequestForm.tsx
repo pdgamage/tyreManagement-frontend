@@ -599,7 +599,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           htmlFor="requestReason"
           className="block mb-1 font-medium text-gray-700"
         >
-          Request Reason * (Max 200 characters)
+          Request Reason * (Max 500 characters)
         </label>
         <textarea
           id="requestReason"
@@ -607,7 +607,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           value={formData.requestReason}
           onChange={handleChange}
           rows={3}
-          maxLength={200}
+          maxLength={500}
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
@@ -819,7 +819,7 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
             htmlFor="comments"
             className="block mb-1 font-medium text-gray-700"
           >
-            Comments
+            Comments (Max 500 characters)
           </label>
           <textarea
             id="comments"
@@ -827,8 +827,14 @@ const AdditionalInformationStep: React.FC<AdditionalInformationStepProps> = ({
             value={formData.comments}
             onChange={handleChange}
             rows={3}
+            maxLength={500}
             className="w-full p-3 border border-gray-300 rounded"
           />
+          <div className="flex justify-end mt-1">
+            <p className="text-sm text-gray-500">
+              {formData.comments.length}/500 characters
+            </p>
+          </div>
         </div>
         <div>
           <label className="block mb-2 font-medium text-gray-700">

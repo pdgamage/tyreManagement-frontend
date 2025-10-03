@@ -330,8 +330,8 @@ const RequestTable: React.FC<RequestTableProps> = ({
                 {showActions && (
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      {/* Add update button for pending requests */}
-                      {request.status === "pending" && (
+                      {/* Add update button for pending requests - only for user role */}
+                      {request.status === "pending" && window.location.pathname.startsWith("/user/") && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

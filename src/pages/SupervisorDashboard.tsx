@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRequests } from "../contexts/RequestContext";
-import RequestTable from "../components/                    <div className="mt-4 sm:mt-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-12">
-            <button
+import RequestTable from "../components/RequestTable";
+import RequestReports from "../components/RequestReports";
+import { Request } from "../types/request";
+import { useAuth } from "../contexts/AuthContext";
+import { apiUrls } from "../config/api";
+import { Clock, CheckCircle2, XCircle, BarChart3, LogOut } from "lucide-react";
               onClick={() => setActiveTab("requests")}
               className={`${
                 activeTab === "requests"

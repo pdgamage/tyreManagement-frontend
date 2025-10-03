@@ -599,7 +599,7 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           htmlFor="requestReason"
           className="block mb-1 font-medium text-gray-700"
         >
-          Request Reason *
+          Request Reason * (Max 200 characters)
         </label>
         <textarea
           id="requestReason"
@@ -607,12 +607,22 @@ const RequestInformationStep: React.FC<RequestInformationStepProps> = ({
           value={formData.requestReason}
           onChange={handleChange}
           rows={3}
+          maxLength={200}
           className="w-full p-3 border border-gray-300 rounded"
           required
         />
-        {errors.requestReason && (
-          <p className="mt-1 text-sm text-red-600">{errors.requestReason}</p>
-        )}
+        <div className="flex justify-between mt-1">
+          <div>
+            {errors.requestReason && (
+              <p className="text-sm text-red-600">{errors.requestReason}</p>
+            )}
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">
+              {formData.requestReason.length}/500 characters
+            </p>
+          </div>
+        </div>
       </div>
       {/* Department and Cost Center fields moved to Vehicle Information section */}
       {/* Supervisor select field removed from here */}

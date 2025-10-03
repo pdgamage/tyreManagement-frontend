@@ -451,6 +451,9 @@ const TireDetailsStep: React.FC<TireDetailsStepProps> = ({
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded"
           />
+          {errors.tubesQuantity && (
+            <p className="mt-1 text-sm text-red-600">{errors.tubesQuantity}</p>
+          )}
         </div>
         <div>
           <label
@@ -1169,6 +1172,21 @@ const TireRequestForm: React.FC<TireRequestFormProps> = ({
         [name]: limitedValue,
       }));
       return;
+    }
+
+    // Special handling for quantity fields to enforce limits
+    if (name === "quantity" || name === "tubesQuantity") {
+      const numValue = parseInt(value);
+      if (!isNaN(numValue)) {
+        const maxValue = 4;
+        const minValue = name === "quantity" ? 1 : 0;
+        const limitedValue = Math.max(minValue, Math.min(maxValue, numValue));
+        setFormData((prev) => ({
+          ...prev,
+          [name]: limitedValue,
+        }));
+        return;
+      }
     }
 
     // Special handling for date fields to ensure proper formatting
